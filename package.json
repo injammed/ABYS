@@ -1,0 +1,27 @@
+{
+  "name": "abys",
+  "version": "0.1.0",
+  "description": "ABYS founder-ops intelligence kernel for recursive product incubation.",
+  "type": "module",
+  "private": false,
+  "scripts": {
+    "kernel:demo": "tsx src/abys-kernel.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "latest",
+    "tsx": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  },
+  "keywords": [
+    "agent-orchestration",
+    "founder-tools",
+    "ai-ops",
+    "codex",
+    "memory-systems"
+  ],
+  "license": "UNLICENSED"
+}
