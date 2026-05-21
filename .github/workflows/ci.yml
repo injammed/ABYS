@@ -1,0 +1,38 @@
+name: ABYS CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Run ABYS cycle smoke test
+        run: npm run cycle -- "CI smoke test: verify ABYS can produce a plan, memory writes, and Codex packet."
+
+      - name: Upload ABYS cycle artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: abys-cycle-artifacts
+          path: .abys/
