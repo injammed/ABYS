@@ -5,6 +5,7 @@
   "type": "module",
   "private": false,
   "scripts": {
+    "cycle": "tsx src/abys-cycle.ts",
     "kernel:demo": "tsx src/abys-kernel.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
