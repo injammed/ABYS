@@ -1,5 +1,5 @@
+import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import { mkdir, readFile, appendFile } from "node:fs/promises";
 import type { MemoryEvent } from "./abys-kernel";
 
 export interface MemoryQuery {
@@ -34,7 +34,7 @@ export function createJsonlMemoryLedger(path = ".abys/memory.jsonl"): MemoryLedg
       const filtered = events.filter((event) => {
         if (filter.kind && event.kind !== filter.kind) return false;
         if (typeof filter.minImportance === "number" && event.importance < filter.minImportance) return false;
-        if (filter.tag && !event.payload.tags?.toString().split(",").map((tag) => tag.trim()).includes(filter.tag)) return false;
+        if (filter.tag && !getPayloadTags(event).includes(filter.tag)) return false;
         if (textNeedle) {
           const haystack = `${event.summary} ${JSON.stringify(event.payload)}`.toLowerCase();
           if (!haystack.includes(textNeedle)) return false;
@@ -62,6 +62,13 @@ async function readMemoryFile(path: string): Promise<MemoryEvent[]> {
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => JSON.parse(line) as MemoryEvent);
+}
+
+function getPayloadTags(event: MemoryEvent): string[] {
+  const tags = event.payload["tags"];
+  if (Array.isArray(tags)) return tags.filter((tag): tag is string => typeof tag === "string");
+  if (typeof tags === "string") return tags.split(",").map((tag) => tag.trim()).filter(Boolean);
+  return [];
 }
 
 function isNodeError(error: unknown): error is NodeJS.ErrnoException {
