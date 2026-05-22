@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/injammed/ABYS/schemas/task-packet.schema.json",
+  "title": "ABYS Task Packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "objective",
+    "target_repo",
+    "assumptions",
+    "files",
+    "implementation_steps",
+    "validation",
+    "risks_blockers",
+    "next_recursive_improvement"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^ABYS-TASK-[0-9A-Z_-]+$" },
+    "objective": { "type": "string", "minLength": 1 },
+    "target_repo": { "type": "string", "enum": ["ITEM", "ABYS", "SYNTEL"] },
+    "assumptions": { "type": "array", "items": { "type": "string" } },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "action"],
+        "properties": {
+          "path": { "type": "string" },
+          "action": { "type": "string", "enum": ["create", "edit", "delete", "move", "review"] },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "implementation_steps": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "validation": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "risks_blockers": { "type": "array", "items": { "type": "string" } },
+    "next_recursive_improvement": { "type": "string", "minLength": 1 },
+    "routing_notes": { "type": "string" }
+  }
+}
