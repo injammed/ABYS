@@ -1,0 +1,11 @@
+{
+  "repo": "injammed/ITEM",
+  "role": "artifact_canon",
+  "allowed_domains": ["artifact records", "canon review", "artifact schemas", "physical object specs", "visual specs", "narrative assets"],
+  "forbidden_domains": ["task orchestration ownership", "protocol ownership", "deployment ownership"],
+  "required_outputs": ["issue", "PR", "schema", "docs", "example", "canonical_record"],
+  "handoff_targets": {
+    "execution_machine": "injammed/ABYS",
+    "m2m_protocol": "injammed/SYNTEL"
+  }
+}
