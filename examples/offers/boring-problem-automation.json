@@ -1,0 +1,64 @@
+{
+  "offer_id": "ABYS-OFFER-BORING-PROBLEM-AUTOMATION",
+  "name": "Boring Problem Automation Sprint",
+  "buyer_segment": "Operations-heavy small and mid-sized organizations with recurring document, spreadsheet, compliance, or admin bottlenecks",
+  "pain": "Critical workflows are stuck in email attachments, PDFs, spreadsheets, manual review queues, and undocumented tribal processes.",
+  "promise": "Turn one messy recurring operational process into a structured workflow, cleaned output files, and an automation-ready delivery package.",
+  "scope": {
+    "included": [
+      "Process intake and workflow mapping",
+      "Sample document or spreadsheet review",
+      "Structured output format definition",
+      "Automation or semi-automation implementation plan",
+      "Delivery checklist and handoff documentation"
+    ],
+    "excluded": [
+      "Autonomous legal, medical, or financial decisions",
+      "Production access to regulated systems without written approval",
+      "Irreversible settlement, payments, or account changes",
+      "Unlimited revisions"
+    ]
+  },
+  "deliverables": [
+    "Workflow map",
+    "Clean structured output sample",
+    "Implementation task packet",
+    "Delivery checklist",
+    "Follow-up improvement plan"
+  ],
+  "pricing": {
+    "model": "fixed_fee",
+    "amount": 1500,
+    "currency": "USD",
+    "payment_terms": "50% deposit before work starts, 50% on delivery"
+  },
+  "intake_requirements": [
+    "Description of the current process",
+    "Example inputs",
+    "Desired output format",
+    "Volume estimate",
+    "Deadline and urgency",
+    "Data sensitivity classification"
+  ],
+  "fulfillment_workflow": [
+    "Qualify lead and confirm fit",
+    "Collect sample files and constraints",
+    "Define structured output",
+    "Create ABYS task packet",
+    "Build or document automation path",
+    "Deliver files and checklist",
+    "Capture result metrics and next offer"
+  ],
+  "payment_flow": {
+    "invoice_required": true,
+    "payment_status_values": ["not_invoiced", "invoiced", "deposit_paid", "paid", "overdue", "refunded"]
+  },
+  "success_metrics": [
+    "Manual steps reduced",
+    "Cycle time reduced",
+    "Error rate reduced",
+    "Reusable workflow created",
+    "Customer accepts follow-up scope"
+  ],
+  "retention_loop": "After delivery, offer a monthly workflow maintenance and improvement retainer."
+}
