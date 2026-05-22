@@ -1,0 +1,11 @@
+{
+  "repo": "injammed/SYNTEL",
+  "role": "m2m_protocol",
+  "allowed_domains": ["registry", "schemas", "receipts"],
+  "forbidden_domains": ["artifact canon ownership"],
+  "required_outputs": ["schema", "test", "docs", "example"],
+  "handoff_targets": {
+    "artifact_canon": "injammed/ITEM",
+    "execution_machine": "injammed/ABYS"
+  }
+}
