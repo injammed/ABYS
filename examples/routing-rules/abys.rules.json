@@ -1,0 +1,11 @@
+{
+  "repo": "injammed/ABYS",
+  "role": "execution_machine",
+  "allowed_domains": ["task packets", "workflow engines", "tests", "CI", "implementation scaffolds", "repo health validation"],
+  "forbidden_domains": ["artifact canon ownership", "protocol ownership", "unsupported claims"],
+  "required_outputs": ["issue", "PR", "schema", "test", "workflow", "docs", "code", "example"],
+  "handoff_targets": {
+    "artifact_canon": "injammed/ITEM",
+    "m2m_protocol": "injammed/SYNTEL"
+  }
+}
