@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/injammed/ABYS/schemas/customer-intake.schema.json",
+  "title": "ABYS Customer Intake",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "intake_id",
+    "customer",
+    "problem_statement",
+    "current_process",
+    "volume",
+    "urgency",
+    "budget_signal",
+    "data_sensitivity",
+    "desired_outcome",
+    "qualification"
+  ],
+  "properties": {
+    "intake_id": { "type": "string", "pattern": "^ABYS-INTAKE-[0-9A-Z_-]+$" },
+    "customer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["organization", "contact_name", "contact_email"],
+      "properties": {
+        "organization": { "type": "string", "minLength": 1 },
+        "contact_name": { "type": "string", "minLength": 1 },
+        "contact_email": { "type": "string", "format": "email" },
+        "website": { "type": "string" }
+      }
+    },
+    "problem_statement": { "type": "string", "minLength": 1 },
+    "current_process": { "type": "string", "minLength": 1 },
+    "volume": { "type": "string", "minLength": 1 },
+    "urgency": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "budget_signal": { "type": "string", "enum": ["unknown", "under_1k", "1k_5k", "5k_25k", "25k_plus"] },
+    "data_sensitivity": { "type": "string", "enum": ["public", "internal", "confidential", "regulated"] },
+    "desired_outcome": { "type": "string", "minLength": 1 },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score", "decision", "reason"],
+      "properties": {
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "decision": { "type": "string", "enum": ["accept", "clarify", "decline", "refer"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
