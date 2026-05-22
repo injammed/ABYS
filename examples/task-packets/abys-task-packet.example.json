@@ -1,0 +1,56 @@
+{
+  "task_id": "ABYS-TASK-0001",
+  "source_repo": "ABYS",
+  "objective": "Implement the v0 ABYS task packet schema, example packet, documentation, and tests so future concepts can terminate in Codex-compatible repository work.",
+  "assumptions": [
+    "ABYS is the execution machine for repo work, routing, tests, workflows, and implementation scaffolds.",
+    "ITEM artifact doctrine and SYNTEL protocol details should be routed out of ABYS when they are not execution workflow primitives.",
+    "A task packet is useful only if a human developer or Codex-like agent can implement it without decoding mythic context."
+  ],
+  "routing_decision": {
+    "target_repo": "ABYS",
+    "reason": "This work defines the ABYS execution primitive used to convert concepts into files, tests, PRs, and validation loops.",
+    "handoff_required": false
+  },
+  "deliverables": ["schema", "example", "tests", "docs", "pr"],
+  "codex_actions": [
+    {
+      "action": "create",
+      "path": "schemas/abys-task-packet.schema.json",
+      "description": "Define the machine-readable task packet contract."
+    },
+    {
+      "action": "create",
+      "path": "examples/task-packets/abys-task-packet.example.json",
+      "description": "Provide a minimal valid task packet example."
+    },
+    {
+      "action": "create",
+      "path": "tests/test_task_packet_schema.py",
+      "description": "Validate the example packet against the JSON schema."
+    },
+    {
+      "action": "create",
+      "path": "docs/intake-routing.md",
+      "description": "Document how concepts route between ITEM, ABYS, and SYNTEL."
+    }
+  ],
+  "validation": {
+    "test_command": "python -m pytest tests/test_task_packet_schema.py",
+    "acceptance_criteria": [
+      "The example task packet validates against schemas/abys-task-packet.schema.json.",
+      "The schema rejects unknown target repositories.",
+      "The schema requires at least one deliverable and one Codex action.",
+      "Documentation explains when to route work to ITEM or SYNTEL instead of ABYS."
+    ]
+  },
+  "risks_blockers": [
+    "Duplicate doctrine issues may keep generating prose unless they are consolidated into implementation issues.",
+    "Future packets may become too vague unless validation keeps required fields strict."
+  ],
+  "recursive_improvement": [
+    "Add a GitHub issue template that maps directly to this schema.",
+    "Add a repo-health workflow that validates task packets on pull requests.",
+    "Add routing-rule validation after the first task-packet PR lands."
+  ]
+}
