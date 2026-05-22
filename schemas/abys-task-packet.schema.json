@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/injammed/ABYS/schemas/abys-task-packet.schema.json",
+  "title": "ABYS Task Packet",
+  "description": "Codex-compatible execution packet for converting an intake concept into repository work, tests, validation, and recursive improvement.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "source_repo",
+    "objective",
+    "assumptions",
+    "routing_decision",
+    "deliverables",
+    "codex_actions",
+    "validation",
+    "risks_blockers",
+    "recursive_improvement"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "pattern": "^ABYS-TASK-[0-9]{4,}$"
+    },
+    "source_repo": {
+      "type": "string",
+      "enum": ["ITEM", "ABYS", "SYNTEL", "external"]
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 10
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "routing_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_repo", "reason"],
+      "properties": {
+        "target_repo": {
+          "type": "string",
+          "enum": ["ITEM", "ABYS", "SYNTEL"]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 10
+        },
+        "handoff_required": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "deliverables": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": ["docs", "schema", "code", "tests", "workflow", "issue", "pr", "example", "deployment"]
+      }
+    },
+    "codex_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "path", "description"],
+        "properties": {
+          "action": { "type": "string", "enum": ["create", "edit", "delete", "move", "test", "document"] },
+          "path": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 5 }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["test_command", "acceptance_criteria"],
+      "properties": {
+        "test_command": { "type": "string", "minLength": 1 },
+        "acceptance_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 5 }
+        }
+      }
+    },
+    "risks_blockers": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "recursive_improvement": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}
