@@ -8,20 +8,34 @@
     "id",
     "objective",
     "target_repo",
+    "council_decision",
     "assumptions",
     "files",
     "implementation_steps",
     "validation",
     "risks_blockers",
+    "terminal_output",
     "next_recursive_improvement"
   ],
   "properties": {
     "id": { "type": "string", "pattern": "^ABYS-TASK-[0-9A-Z_-]+$" },
     "objective": { "type": "string", "minLength": 1 },
     "target_repo": { "type": "string", "enum": ["ITEM", "ABYS", "SYNTEL"] },
+    "council_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "target_repo", "reason", "next_executable_action"],
+      "properties": {
+        "classification": { "type": "string", "enum": ["preserve", "refine", "redirect", "deprecate", "delete"] },
+        "target_repo": { "type": "string", "enum": ["ITEM", "ABYS", "SYNTEL"] },
+        "reason": { "type": "string", "minLength": 1 },
+        "next_executable_action": { "type": "string", "minLength": 1 }
+      }
+    },
     "assumptions": { "type": "array", "items": { "type": "string" } },
     "files": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -36,6 +50,10 @@
     "implementation_steps": { "type": "array", "minItems": 1, "items": { "type": "string" } },
     "validation": { "type": "array", "minItems": 1, "items": { "type": "string" } },
     "risks_blockers": { "type": "array", "items": { "type": "string" } },
+    "terminal_output": {
+      "type": "string",
+      "enum": ["file_edit", "schema", "issue", "test", "workflow", "pull_request", "deployment_step", "deletion_candidate"]
+    },
     "next_recursive_improvement": { "type": "string", "minLength": 1 },
     "routing_notes": { "type": "string" }
   }
