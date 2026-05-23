@@ -1,0 +1,19 @@
+{
+  "unit_name": "Vacuo Reserve Seal",
+  "vms_class": "Vacuo",
+  "denomination_relation": "Primary reserve-class unit; stores scarcity as memory before exchange.",
+  "substrate": "Black-gold archival coin face, renderable as icon, card, and museum plate.",
+  "issuance_logic": "Issued only when a canonical ITEM record represents retained potential rather than active circulation.",
+  "anti_entropy_claim": "Represents value held against dissipation by preserving scarcity as structured memory.",
+  "use_case": "Reserve artifact, ontology reference, high-order denomination family seed.",
+  "visual_grammar": "Dense black field, restrained gold radiance, vault-like concentric geometry, minimal ornament.",
+  "color_grammar": "Black, deep blue-black, antique gold, controlled white core.",
+  "geometric_grammar": "Nested rings, sealed center, pressure lines, archival border.",
+  "legibility_constraints": "Must remain readable at 64px icon scale; no microtext required for identity.",
+  "provenance": "Derived from ACCRE–ITEM Currency Handshake and VMS triad semantics.",
+  "veto_risks": [
+    "generic sci-fi coin art",
+    "decorative glow without reserve logic",
+    "crypto-token branding tone"
+  ]
+}
