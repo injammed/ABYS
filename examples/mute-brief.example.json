@@ -1,0 +1,19 @@
+{
+  "unit_name": "Mute Relay Token",
+  "vms_class": "Mute",
+  "denomination_relation": "Transfer-class subunit; mediates memory into exchange.",
+  "substrate": "Silver-blue transmissive token, renderable as icon, card, and exchange marker.",
+  "issuance_logic": "Issued when a canonical ITEM record represents circulation, mediation, or transactional passage.",
+  "anti_entropy_claim": "Preserves continuity during transfer by carrying structured memory through exchange.",
+  "use_case": "Transactional artifact, relay marker, sub-denominational movement unit.",
+  "visual_grammar": "Luminous pathways, signal geometry, light ring structure, visible conduit logic.",
+  "color_grammar": "Silver, blue-white, pale cyan, low gold accent only when bridging to Singulus.",
+  "geometric_grammar": "Paths, nodes, channels, split rings, directional flow marks.",
+  "legibility_constraints": "Must read as motion/relay even at small icon size; avoid dense ornamental borders.",
+  "provenance": "Derived from ACCRE–ITEM Currency Handshake and VMS triad semantics.",
+  "veto_risks": [
+    "generic network token",
+    "decorative circuitry without exchange logic",
+    "confusion with Vacuo reserve class"
+  ]
+}
