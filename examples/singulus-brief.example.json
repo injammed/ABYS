@@ -1,0 +1,19 @@
+{
+  "unit_name": "Singulus Event Coin",
+  "vms_class": "Singulus",
+  "denomination_relation": "Singular issuance-class unit; crystallizes completed exchange back into scarcity.",
+  "substrate": "Solar-gold ceremonial coin, renderable as icon, card, minted face, and museum plate.",
+  "issuance_logic": "Issued only when a canonical ITEM record represents a completed, historically fixed exchange event.",
+  "anti_entropy_claim": "Preserves a completed exchange as a singular artifact that resists dissolution into ordinary circulation.",
+  "use_case": "Canonical event marker, ceremonial denomination, high-finality artifact record.",
+  "visual_grammar": "Radiant center, singular seal logic, ceremonial density, sharp denomination hierarchy.",
+  "color_grammar": "Solar gold, warm white, bronze shadow, black ceremonial field.",
+  "geometric_grammar": "Central seal, sunburst core, fixed outer ring, event-marker glyph.",
+  "legibility_constraints": "Must read as finality and singular issuance at icon scale; avoid confusing it with generic gold coin art.",
+  "provenance": "Derived from ACCRE–ITEM Currency Handshake and VMS triad semantics.",
+  "veto_risks": [
+    "generic fantasy coin",
+    "ceremonial excess without issuance logic",
+    "confusion with public token launch"
+  ]
+}
