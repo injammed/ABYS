@@ -1,0 +1,50 @@
+{
+  "id": "ABYS-TASK-0000",
+  "objective": "Convert ITEM-0000 Full Mode Artifact DNA from candidate record into a validated canonical artifact workflow.",
+  "target_repo": "ITEM",
+  "assumptions": [
+    "ITEM is the artifact canon repository.",
+    "ABYS is responsible for converting concepts into executable task packets.",
+    "A full-mode artifact must have enough structure to become docs, schemas, examples, tests, or implementation work."
+  ],
+  "files": [
+    {
+      "path": "candidates/ITEM-0000-full-mode-artifact-dna.json",
+      "action": "review",
+      "notes": "Score candidate against ITEM canon rubric."
+    },
+    {
+      "path": "canon/ITEM-0000-full-mode-artifact-dna.json",
+      "action": "create",
+      "notes": "Create only after promotion criteria pass."
+    },
+    {
+      "path": "tests/validate_item_artifacts.py",
+      "action": "create",
+      "notes": "Validate candidate and canon JSON files against schemas/item-artifact.schema.json."
+    },
+    {
+      "path": ".github/workflows/validate-item-artifacts.yml",
+      "action": "create",
+      "notes": "Run schema validation on pull requests."
+    }
+  ],
+  "implementation_steps": [
+    "Normalize ITEM-0000 to match schemas/item-artifact.schema.json.",
+    "Create a validation script that loads every JSON file in candidates and canon.",
+    "Validate required fields, status values, routing, and canon score ranges.",
+    "Create CI workflow to run the validator.",
+    "Promote candidate to canon only after validator passes and score threshold is met."
+  ],
+  "validation": [
+    "python tests/validate_item_artifacts.py exits with status 0.",
+    "ITEM-0000 validates against item-artifact.schema.json.",
+    "Candidate has a computed canon score of at least 7 before promotion."
+  ],
+  "risks_blockers": [
+    "Current candidate format may not yet match the ITEM schema exactly.",
+    "Canon score may require human review before automatic promotion."
+  ],
+  "next_recursive_improvement": "Add a generator that reads failed validation output and proposes the smallest schema-compliant patch.",
+  "routing_notes": "This task packet belongs in ABYS, but its primary implementation target is ITEM."
+}
