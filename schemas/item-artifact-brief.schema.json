@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ITEM Artifact Brief",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "unit_name",
+    "vms_class",
+    "denomination_relation",
+    "substrate",
+    "issuance_logic",
+    "anti_entropy_claim",
+    "use_case",
+    "visual_grammar",
+    "provenance",
+    "veto_risks"
+  ],
+  "properties": {
+    "unit_name": { "type": "string", "minLength": 1 },
+    "vms_class": {
+      "type": "string",
+      "enum": ["Vacuo", "Mute", "Singulus"]
+    },
+    "denomination_relation": { "type": "string", "minLength": 1 },
+    "substrate": { "type": "string", "minLength": 1 },
+    "issuance_logic": { "type": "string", "minLength": 1 },
+    "anti_entropy_claim": { "type": "string", "minLength": 1 },
+    "use_case": { "type": "string", "minLength": 1 },
+    "visual_grammar": { "type": "string", "minLength": 1 },
+    "color_grammar": { "type": "string" },
+    "geometric_grammar": { "type": "string" },
+    "legibility_constraints": { "type": "string" },
+    "provenance": { "type": "string", "minLength": 1 },
+    "veto_risks": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}
