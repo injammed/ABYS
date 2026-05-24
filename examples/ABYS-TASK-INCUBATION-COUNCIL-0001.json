@@ -1,0 +1,58 @@
+{
+  "id": "ABYS-TASK-INCUBATION-COUNCIL-0001",
+  "objective": "Convert the ITEM, ABYS, and SYNTEL repositories from conceptual containers into a coordinated deployable incubation system with canon-vs-slop selection, repo routing, and concrete implementation outputs.",
+  "target_repo": "ABYS",
+  "council_decision": {
+    "classification": "preserve",
+    "target_repo": "ABYS",
+    "reason": "The incubation council pattern is not merely doctrine; it is a repeatable execution workflow that can emit docs, issues, schemas, tests, workflows, and deletion candidates across all three repositories.",
+    "next_executable_action": "Add a cross-repository intake rubric and validator plan, then create issues for schema validation, candidate promotion, and SYNTEL envelope examples."
+  },
+  "assumptions": [
+    "ITEM remains the canonical artifact foundry, not the execution engine.",
+    "ABYS remains the execution and product-development machine.",
+    "SYNTEL remains the signed agent communication protocol layer.",
+    "Concepts must terminate in files, tests, schemas, workflows, issues, PRs, deployment steps, or deletion candidates."
+  ],
+  "files": [
+    {
+      "path": "examples/ABYS-TASK-INCUBATION-COUNCIL-0001.json",
+      "action": "create",
+      "notes": "Seed task packet for the distributed incubation council operating loop."
+    },
+    {
+      "path": "docs/incubation-council.md",
+      "action": "create",
+      "notes": "Define council roles, selection rules, and terminal outputs."
+    },
+    {
+      "path": "src/abys_schema_check.py",
+      "action": "create",
+      "notes": "Future validator for ITEM artifacts, ABYS task packets, and SYNTEL envelopes."
+    },
+    {
+      "path": ".github/workflows/validate.yml",
+      "action": "create",
+      "notes": "Future CI gate for schema validation."
+    }
+  ],
+  "implementation_steps": [
+    "Normalize strong ITEM candidate records to the ITEM artifact schema.",
+    "Create a council operating document that classifies material as preserve, refine, redirect, deprecate, or delete.",
+    "Create issues for the first validator, first CI workflow, and first SYNTEL envelope examples.",
+    "Promote only candidates that can produce an ABYS task packet or a SYNTEL message when relevant."
+  ],
+  "validation": [
+    "The task packet validates against schemas/task-packet.schema.json.",
+    "Each repo receives a terminal action: file edit, issue, schema, test, workflow, or deletion candidate.",
+    "No mythic or conceptual material remains un-routed after review."
+  ],
+  "risks_blockers": [
+    "Repository code search is not indexed, so broad file discovery may miss existing files.",
+    "Schemas currently exist but do not yet appear to be enforced by CI.",
+    "Conceptual density can still exceed implementation capacity unless ABYS enforces terminal outputs."
+  ],
+  "terminal_output": "file_edit",
+  "next_recursive_improvement": "Implement a lightweight validator that scans ITEM/candidates, ABYS/examples, and SYNTEL/examples for schema compliance and emits failing paths in CI.",
+  "routing_notes": "This task belongs in ABYS because it defines execution behavior. ITEM receives artifact normalization. SYNTEL receives protocol examples and envelope validation."
+}
