@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { incubate } from "../src/abys-kernel";
 import { routeTask } from "../src/abys-routing";
-import type { ProductTask } from "../src/abys-kernel";
+import type { ProductTask, WorldSignal } from "../src/abys-kernel";
 
 function task(overrides: Partial<ProductTask>): ProductTask {
   return {
@@ -18,6 +19,15 @@ function task(overrides: Partial<ProductTask>): ProductTask {
     ...overrides,
   };
 }
+
+const repoSignal: WorldSignal = {
+  id: "sig-repo",
+  source: "repo",
+  summary: "Repository can receive code, tests, docs, issues, PRs, and workflows.",
+  confidence: 0.93,
+  observedAt: "2026-05-24T00:00:00.000Z",
+  tags: ["repo", "implementation"],
+};
 
 describe("ABYS routing contract", () => {
   it("routes repo-buildable implementation tasks to ABYS", () => {
@@ -86,5 +96,25 @@ describe("ABYS routing contract", () => {
 
     expect(decision.route).not.toBe("hold_for_review");
     expect(decision.slopFlags).not.toContain("slop-term:just");
+  });
+
+  it("attaches routing decisions to incubation plans", () => {
+    const plan = incubate({
+      objective: "Turn ABYS routing into deployable repository infrastructure.",
+      signals: [repoSignal],
+      now: "2026-05-24T00:00:00.000Z",
+      existingTasks: [task({
+        id: "task-syntel-receipt",
+        title: "Create SYNTEL verification receipt schema",
+        role: "architect",
+        objective: "Define protocol receipt schema for Codex handoff audit verification.",
+        executableOutput: "JSON schema plus test fixture for signed task receipt payloads.",
+      })],
+    });
+
+    expect(plan.immediateAction).not.toBeNull();
+    expect(Object.keys(plan.taskRoutes)).toHaveLength(plan.rankedTasks.length);
+    expect(plan.taskRoutes["task-syntel-receipt"].route).toBe("SYNTEL");
+    expect(plan.memoryWrites.at(-1)?.payload).toHaveProperty("route");
   });
 });
