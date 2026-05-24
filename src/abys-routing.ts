@@ -25,15 +25,16 @@ export function routeTask(task: ProductTask, signals: WorldSignal[] = []): Route
     ...task.dependsOn,
     ...signals.map((signal) => `${signal.summary} ${signal.tags.join(" ")}`),
   ].join(" "));
+  const tokens = tokenize(text);
 
-  const itemScore = scoreTerms(text, ITEM_TERMS);
-  const syntelScore = scoreTerms(text, SYNTEL_TERMS);
-  const abysScore = scoreTerms(text, ABYS_TERMS) + (task.status === "ready" ? 1 : 0);
-  const slopFlags = detectSlop(text, task);
+  const itemScore = scoreTerms(tokens, ITEM_TERMS);
+  const syntelScore = scoreTerms(tokens, SYNTEL_TERMS);
+  const abysScore = scoreTerms(tokens, ABYS_TERMS) + (task.status === "ready" ? 1 : 0);
+  const slopFlags = detectSlop(tokens, task);
 
   const artifactTargets = requiredArtifactsFor(task);
 
-  if (slopFlags.length >= 3 || task.blockers.some((blocker) => normalize(blocker).includes("vague"))) {
+  if (slopFlags.length >= 3 || task.blockers.some((blocker) => hasTerm(tokenize(normalize(blocker)), "vague"))) {
     return {
       route: "hold_for_review",
       confidence: 0.82,
@@ -86,16 +87,24 @@ function rationaleFor(route: TaskRoute): string {
   return "Route requires decomposition before execution.";
 }
 
-function detectSlop(text: string, task: ProductTask): string[] {
-  const flags = SLOP_TERMS.filter((term) => text.includes(term)).map((term) => `slop-term:${term}`);
+function detectSlop(tokens: Set<string>, task: ProductTask): string[] {
+  const flags = SLOP_TERMS.filter((term) => hasTerm(tokens, term)).map((term) => `slop-term:${term}`);
   if (task.executableOutput.length < 24) flags.push("weak-executable-output");
   if (!task.monetizationPath.trim()) flags.push("missing-monetization-path");
   if (task.objective.length < 32) flags.push("thin-objective");
   return flags;
 }
 
-function scoreTerms(text: string, terms: string[]): number {
-  return terms.reduce((score, term) => score + (text.includes(term) ? 1 : 0), 0);
+function scoreTerms(tokens: Set<string>, terms: string[]): number {
+  return terms.reduce((score, term) => score + (hasTerm(tokens, term) ? 1 : 0), 0);
+}
+
+function hasTerm(tokens: Set<string>, term: string): boolean {
+  return tokens.has(term);
+}
+
+function tokenize(text: string): Set<string> {
+  return new Set(text.split(" ").filter(Boolean));
 }
 
 function normalize(text: string): string {
