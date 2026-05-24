@@ -45,3 +45,14 @@ def test_required_execution_lists_cannot_be_empty(field: str) -> None:
 
     assert errors
     assert any("should be non-empty" in str(error.message) or "too short" in str(error.message) for error in errors)
+
+
+@pytest.mark.parametrize("field", ["assumptions", "risks_blockers", "recursive_improvement"])
+def test_required_context_and_closure_lists_cannot_be_empty(field: str) -> None:
+    example = load_json(EXAMPLE_PATH)
+    example[field] = []
+
+    errors = list(validator().iter_errors(example))
+
+    assert errors
+    assert any("should be non-empty" in str(error.message) or "too short" in str(error.message) for error in errors)
