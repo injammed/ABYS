@@ -64,4 +64,27 @@ describe("ABYS routing contract", () => {
     expect(decision.route).toBe("hold_for_review");
     expect(decision.slopFlags.length).toBeGreaterThanOrEqual(3);
   });
+
+  it("does not count short route keywords inside unrelated words", () => {
+    const decision = routeTask(task({
+      title: "Improve museum canon approach",
+      objective: "Improve an ITEM canon artifact description without creating a pull request task.",
+      executableOutput: "Canon wording revision and artifact acceptance criteria.",
+      monetizationPath: "Improves paid artifact review quality.",
+    }));
+
+    expect(decision.route).toBe("ITEM");
+  });
+
+  it("does not flag slop terms inside benign words", () => {
+    const decision = routeTask(task({
+      title: "Adjust dashboard audit copy",
+      objective: "Adjust product dashboard copy for audit clarity and implementation readiness.",
+      executableOutput: "Updated UI copy and acceptance criteria for dashboard audit states.",
+      monetizationPath: "Improves buyer trust in workflow quality controls.",
+    }));
+
+    expect(decision.route).not.toBe("hold_for_review");
+    expect(decision.slopFlags).not.toContain("slop-term:just");
+  });
 });
