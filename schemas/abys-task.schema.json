@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/injammed/ABYS/schemas/abys-task.schema.json",
+  "title": "ABYS Task Packet",
+  "description": "Executable task packet for ABYS. ABYS turns intent, ITEM records, and SYNTEL specs into files, code, tests, workflows, deployments, or measurable process improvements.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "status",
+    "objective",
+    "owner_repo",
+    "inputs",
+    "target_files",
+    "implementation_steps",
+    "acceptance_criteria",
+    "test_command",
+    "risks_blockers",
+    "next_recursive_improvement",
+    "execution_score"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ABYS-TASK-[0-9]{4,}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["candidate", "ready", "in_progress", "blocked", "done", "deprecated"]
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 1
+    },
+    "owner_repo": {
+      "type": "string",
+      "enum": ["ABYS", "ITEM", "SYNTEL"],
+      "description": "ABYS owns execution by default; use another value only when the task is a routed handoff."
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_repo", "reference", "role"],
+        "properties": {
+          "source_repo": { "type": "string", "enum": ["ABYS", "ITEM", "SYNTEL", "external"] },
+          "reference": { "type": "string", "minLength": 1 },
+          "role": { "type": "string", "minLength": 1 }
+        }
+      },
+      "minItems": 1
+    },
+    "target_files": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "implementation_steps": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "test_command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "risks_blockers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "next_recursive_improvement": {
+      "type": "string",
+      "minLength": 1
+    },
+    "execution_score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executable_target",
+        "input_output_clarity",
+        "acceptance_criteria",
+        "routing_discipline",
+        "economic_product_usefulness",
+        "recursive_improvement"
+      ],
+      "properties": {
+        "executable_target": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "input_output_clarity": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "acceptance_criteria": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "routing_discipline": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "economic_product_usefulness": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "recursive_improvement": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "total": { "type": "integer", "minimum": 0, "maximum": 12 }
+      }
+    }
+  }
+}
