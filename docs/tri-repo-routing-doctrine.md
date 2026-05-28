@@ -1,72 +1,51 @@
-# Tri-Repo Routing Doctrine: ITEM / ABYS / SYNTEL
+# Tri-Repo Routing Doctrine
 
-## Purpose
+ABYS is the central execution router for ITEM, ABYS, and SYNTEL.
 
-This doctrine defines the better configuration for the three repositories. The repos should not compete for meaning. They should form a directional system:
+It does not make every concept executable. It classifies, packetizes, validates, decomposes, or holds work until the next action is bounded.
+
+## Route Outputs
+
+The deterministic router may emit only:
 
 ```txt
-ITEM  ->  ABYS  ->  SYNTEL
-canon     execution  protocol
+ABYS | ITEM | SYNTEL | split | hold_for_review
 ```
 
-ITEM preserves durable artifacts. ABYS turns selected material into executable systems. SYNTEL transmits bounded, auditable coordination between agents and organizations.
+## Repository Roles
 
-## Repository roles
+| Repo | Role | ABYS action |
+|---|---|---|
+| ITEM | Artifact canon foundry | Convert artifact-bound work into canon/candidate task packets. |
+| ABYS | Execution machine | Convert implementation-bound work into files, tests, docs, workflows, and PRs. |
+| SYNTEL | Signed A2A/M2M coordination protocol | Convert protocol-bound work into specs, schemas, examples, receipts, and replay tests. |
 
-### ITEM: artifact canon
+## Execution Gate
 
-ITEM owns symbolic object doctrine, artifact records, preservation logic, visual/physical/narrative specifications, denominations, museum rooms, and canon-vs-slop adjudication.
+ABYS may execute only when a task has:
 
-ITEM does not own implementation workflows, agent orchestration, protocol authority, or settlement rails.
+- target route
+- objective
+- files or artifacts to change
+- validation command or test expectation
+- terminal output type
+- risk/blocker statement
+- next recursive improvement
 
-### ABYS: execution machine
+## Split Rule
 
-ABYS owns task packets, code, tests, CI, dashboards, reference tools, Codex-compatible execution packets, product workflows, validation harnesses, and recursive process improvement.
+Cross-boundary work must be decomposed before execution. A single packet may coordinate handoff, but it must not merge artifact canon, product runtime, and protocol semantics into one active doctrine file.
 
-ABYS does not own ITEM mythology or SYNTEL protocol authority. It consumes those inputs and produces runnable artifacts.
+## Hold Rule
 
-### SYNTEL: coordination rail
+Vague mythic material, unbounded autonomy claims, and atmosphere-only concepts route to `hold_for_review`. A held item can become executable only after a human or follow-up task supplies concrete files, schemas, tests, or artifact records.
 
-SYNTEL owns agent identity, signed envelopes, capability discovery, bounded intent negotiation, task contract formats, verification receipts, audit replay, and human escalation hooks.
+## Authalien Rule
 
-SYNTEL does not own artifact meaning or implementation workflow. It specifies what must be transmitted and verified.
+Authalien may target future A2A/M2M coordination, but routing stays staged:
 
-## Handoff law
+1. ITEM defines candidate artifact records.
+2. ABYS validates candidate records and route decisions.
+3. SYNTEL carries only signed, auditable, replayable payload references.
 
-Every durable cross-repo object must have one primary owner and explicit handoffs.
-
-- ITEM -> ABYS: artifact record becomes render, validator, product spec, manufacturing spec, interface, or test fixture.
-- ITEM -> SYNTEL: artifact record becomes structured payload, registry entry, receipt attachment, or identity-linked object reference.
-- SYNTEL -> ABYS: protocol element becomes validator, mock server, client, integration test, replay tool, or reference implementation.
-- ABYS -> ITEM: execution result may create a new artifact candidate only when the output has durable symbolic/object value.
-- ABYS -> SYNTEL: implementation experience may propose protocol revisions only through test failures, state-machine gaps, or audit defects.
-- SYNTEL -> ITEM: protocol payloads may carry ITEM records but must not import ITEM doctrine into protocol core.
-
-## Canon-vs-slop deletion rules
-
-Delete, deprecate, or refactor material that does any of the following:
-
-1. Uses grand language without a concrete artifact, executable target, or protocol contract.
-2. Treats ITEM, ABYS, and SYNTEL as interchangeable names for the same abstraction.
-3. Claims autonomy without identity, authorization, audit, bounded action, and human interruption.
-4. Claims execution without files, tests, acceptance criteria, and owner repo.
-5. Claims preservation without provenance, decay threat, maintenance rule, and review cadence.
-6. Describes markets, tokens, settlement, or economies before identity, bounded contracts, receipts, and audit exist.
-
-## Promotion rules
-
-Promote material only when it passes the owning repo's rubric.
-
-- ITEM promotion requires object definition, preservation function, anti-entropy mechanism, canon utility, boundary clarity, and provenance.
-- ABYS promotion requires executable target, input/output clarity, acceptance criteria, routing discipline, product usefulness, and recursive improvement.
-- SYNTEL promotion requires party definition, identity/auth, message shape, constraint boundary, verification/audit, and repo boundary.
-
-## Better configuration ruling
-
-The stronger architecture is not a monorepo and not three isolated idea bins. It is a staged system:
-
-1. ITEM compresses meaning into durable records.
-2. ABYS converts records and specs into executable work.
-3. SYNTEL gives agents a safe rail for transmitting intent, obligation, proof, and receipt.
-
-The repositories should expand capability by becoming stricter, not louder.
+Authalien never bypasses `split` or `hold_for_review` just because it is protocol-adjacent.
