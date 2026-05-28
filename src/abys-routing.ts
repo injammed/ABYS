@@ -17,7 +17,7 @@ export interface RouteDecision {
 
 const ITEM_TERMS = ["canon", "myth", "museum", "artifact", "symbolic", "aetimm", "item", "immutablis", "glyph"];
 const SYNTEL_TERMS = ["protocol", "envelope", "receipt", "verification", "signature", "audit", "identity", "contract", "replay", "trust"];
-const ABYS_TERMS = ["repo", "test", "workflow", "issue", "pr", "code", "deploy", "product", "task", "memory", "dashboard", "codex", "packet", "schema", "validator", "validation"];
+const ABYS_TERMS = ["repo", "test", "workflow", "issue", "pr", "code", "deploy", "product", "task", "memory", "dashboard", "codex", "packet", "validator", "validation"];
 const SLOP_TERMS = ["vibes", "infinite", "transcendent", "cosmic", "ultimate", "magic", "just", "somehow"];
 
 export function routeTask(task: ProductTask, signals: WorldSignal[] = []): RouteDecision {
