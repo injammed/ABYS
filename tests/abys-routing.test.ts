@@ -38,6 +38,7 @@ describe("ABYS routing contract", () => {
     }));
 
     expect(decision.route).toBe("ABYS");
+    expect(decision.owner_repo).toBe("ABYS");
     expect(decision.requiredArtifacts).toContain("test fixture");
   });
 
@@ -54,12 +55,27 @@ describe("ABYS routing contract", () => {
   it("routes protocol and receipt tasks to SYNTEL", () => {
     const decision = routeTask(task({
       title: "Define signed verification receipt protocol",
-      objective: "Create a protocol schema for Codex handoff packets and audit receipts.",
+      objective: "Create a protocol schema for signed envelopes and audit receipts.",
       executableOutput: "Task contract schema with verification receipt fields.",
-      role: "codex",
+      role: "architect",
     }));
 
     expect(decision.route).toBe("SYNTEL");
+    expect(decision.owner_repo).toBe("SYNTEL");
+  });
+
+  it("routes Codex task packets as ABYS execution with ITEM handoff", () => {
+    const decision = routeTask(task({
+      title: "Create Codex task packet for ITEM canon validation",
+      objective: "Create a Codex task packet that validates an ITEM canon artifact candidate.",
+      executableOutput: "ABYS task packet and validator test fixture for ITEM handoff.",
+      role: "codex",
+    }));
+
+    expect(decision.route).toBe("ABYS");
+    expect(decision.owner_repo).toBe("ABYS");
+    expect(decision.execution_surface).toBe("Codex");
+    expect(decision.handoff_target).toBe("ITEM");
     expect(decision.requiredArtifacts).toContain("Codex packet");
   });
 
@@ -72,7 +88,21 @@ describe("ABYS routing contract", () => {
     }));
 
     expect(decision.route).toBe("hold_for_review");
+    expect(decision.owner_repo).toBeNull();
+    expect(decision.execution_surface).toBe("hold");
     expect(decision.slopFlags.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("splits cross-boundary canon and protocol work before execution", () => {
+    const decision = routeTask(task({
+      title: "Define ITEM artifact canon and SYNTEL signed envelope protocol",
+      objective: "Create ITEM canon artifact rules and SYNTEL protocol receipt semantics in one work item.",
+      executableOutput: "Separate canon document and signed envelope protocol schema.",
+      monetizationPath: "Improves routing quality by forcing decomposition.",
+    }));
+
+    expect(decision.route).toBe("split");
+    expect(decision.owner_repo).toBeNull();
   });
 
   it("does not count short route keywords inside unrelated words", () => {
@@ -107,7 +137,7 @@ describe("ABYS routing contract", () => {
         id: "task-syntel-receipt",
         title: "Create SYNTEL verification receipt schema",
         role: "architect",
-        objective: "Define protocol receipt schema for Codex handoff audit verification.",
+        objective: "Define protocol receipt schema for signed handoff audit verification.",
         executableOutput: "JSON schema plus test fixture for signed task receipt payloads.",
       })],
     });
