@@ -1,0 +1,52 @@
+{
+  "id": "ABYS-TASK-AUTHALIEN-VALIDATOR-0001",
+  "source_repo": "ITEM",
+  "objective": "Create the ABYS validator task for Authalien candidate records so future A2A and M2M SYNTEL payloads can reference bounded ITEM artifacts instead of decorative language.",
+  "assumptions": [
+    "ITEM owns Authalien as a candidate machine-native symbolic system.",
+    "ABYS owns validation tasks and tests, not Authalien canon meaning.",
+    "SYNTEL may carry Authalien only as signed, auditable, replayable A2A/M2M payload data after validation."
+  ],
+  "routing_decision": {
+    "route": "ABYS",
+    "target_repo": "ABYS",
+    "handoff_required": true,
+    "handoff_targets": ["ITEM", "SYNTEL"],
+    "reason": "This packet creates the validator gate between ITEM candidate records and future SYNTEL A2A/M2M payload extensions."
+  },
+  "files": [
+    {
+      "path": "tests/authalien-candidate-validator.test.ts",
+      "action": "create",
+      "notes": "Validate ITEM Authalien candidate records and route decisions."
+    },
+    {
+      "path": "examples/fixtures/authalien-glyph-set.valid.json",
+      "action": "create",
+      "notes": "Valid bounded glyph inventory fixture."
+    },
+    {
+      "path": "examples/fixtures/authalien-glyph-set.invalid.json",
+      "action": "create",
+      "notes": "Invalid fixture proving decorative or unbounded glyph language is rejected."
+    }
+  ],
+  "implementation_steps": [
+    "Load the ITEM candidate record from candidates/authalien-primal-glyph-set.json.",
+    "Assert the record is status candidate and object_type machine_native_symbolic_system.",
+    "Validate that future glyph inventory fixtures include bounded symbol ids, names, meanings, and transformation rules.",
+    "Assert routeTask keeps Codex validator work in ABYS with ITEM handoff rather than SYNTEL auto-routing.",
+    "Document that SYNTEL may only carry validated Authalien payload references inside signed envelopes."
+  ],
+  "validation": [
+    "npm test -- tests/abys-routing.test.ts",
+    "python -m pytest tests/test_task_packet_schema.py"
+  ],
+  "risks_blockers": [
+    "Authalien can become decorative protocol slop if SYNTEL receives it before ITEM and ABYS validation gates are explicit.",
+    "A2A/M2M payloads must remain auditable and replayable rather than autonomous by default."
+  ],
+  "terminal_output": "test",
+  "next_recursive_improvement": "After the validator exists, add SYNTEL conformance examples for signed envelopes carrying validated Authalien payload references.",
+  "routing_notes": "This packet intentionally prepares A2A/M2M Authalien use without moving canon meaning or runtime authority out of ITEM and ABYS gates."
+}
