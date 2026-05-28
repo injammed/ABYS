@@ -2,14 +2,15 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/injammed/ABYS/schemas/task-packet.schema.json",
   "title": "ABYS Task Packet",
+  "description": "Codex-compatible execution packet for converting an intake concept into repository work, tests, validation, and recursive improvement.",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "id",
+    "source_repo",
     "objective",
-    "target_repo",
-    "council_decision",
     "assumptions",
+    "routing_decision",
     "files",
     "implementation_steps",
     "validation",
@@ -19,20 +20,21 @@
   ],
   "properties": {
     "id": { "type": "string", "pattern": "^ABYS-TASK-[0-9A-Z_-]+$" },
-    "objective": { "type": "string", "minLength": 1 },
-    "target_repo": { "type": "string", "enum": ["ITEM", "ABYS", "SYNTEL"] },
-    "council_decision": {
+    "source_repo": { "type": "string", "enum": ["ITEM", "ABYS", "SYNTEL", "external"] },
+    "objective": { "type": "string", "minLength": 10 },
+    "assumptions": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "routing_decision": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["classification", "target_repo", "reason", "next_executable_action"],
+      "required": ["route", "target_repo", "reason", "handoff_required"],
       "properties": {
-        "classification": { "type": "string", "enum": ["preserve", "refine", "redirect", "deprecate", "delete"] },
+        "route": { "type": "string", "enum": ["ABYS", "ITEM", "SYNTEL", "split", "hold_for_review"] },
         "target_repo": { "type": "string", "enum": ["ITEM", "ABYS", "SYNTEL"] },
-        "reason": { "type": "string", "minLength": 1 },
-        "next_executable_action": { "type": "string", "minLength": 1 }
+        "handoff_required": { "type": "boolean" },
+        "handoff_targets": { "type": "array", "items": { "type": "string", "enum": ["ITEM", "ABYS", "SYNTEL"] }, "uniqueItems": true },
+        "reason": { "type": "string", "minLength": 10 }
       }
     },
-    "assumptions": { "type": "array", "items": { "type": "string" } },
     "files": {
       "type": "array",
       "minItems": 1,
@@ -41,18 +43,18 @@
         "additionalProperties": false,
         "required": ["path", "action"],
         "properties": {
-          "path": { "type": "string" },
-          "action": { "type": "string", "enum": ["create", "edit", "delete", "move", "review"] },
+          "path": { "type": "string", "minLength": 1 },
+          "action": { "type": "string", "enum": ["create", "edit", "delete", "move", "review", "test", "document"] },
           "notes": { "type": "string" }
         }
       }
     },
-    "implementation_steps": { "type": "array", "minItems": 1, "items": { "type": "string" } },
-    "validation": { "type": "array", "minItems": 1, "items": { "type": "string" } },
-    "risks_blockers": { "type": "array", "items": { "type": "string" } },
+    "implementation_steps": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "validation": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "risks_blockers": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
     "terminal_output": {
       "type": "string",
-      "enum": ["file_edit", "schema", "issue", "test", "workflow", "pull_request", "deployment_step", "deletion_candidate"]
+      "enum": ["file_edit", "schema", "issue", "test", "workflow", "pull_request", "deployment_step", "docs", "hold", "split_packet", "deletion_candidate"]
     },
     "next_recursive_improvement": { "type": "string", "minLength": 1 },
     "routing_notes": { "type": "string" }
