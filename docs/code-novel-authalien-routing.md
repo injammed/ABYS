@@ -1,16 +1,16 @@
 # Code-Novel Authalien Routing
 
-Authalien and code-novel material can pass through ABYS only as routed work, not as autonomous lore or runtime authority.
+Authalien is intended for future A2A and M2M coordination, but it can pass through ABYS only as routed work, not as autonomous lore or runtime authority.
 
 ## Routing Rule
 
 - ITEM owns Authalien as candidate artifact material.
 - ABYS owns validators, task packets, tests, and implementation docs that operate on accepted candidate records.
-- SYNTEL owns signed envelopes or protocol extensions only after ITEM has a candidate record and ABYS has a validator task.
+- SYNTEL owns signed A2A/M2M envelopes or protocol extensions only after ITEM has a candidate record and ABYS has a validator task.
 
 ## Current State
 
-Authalien material is candidate-only. It should not auto-execute and should not become a SYNTEL extension by implication.
+Authalien material is candidate-only in ITEM and validator-gated in ABYS. It may be represented as an A2A/M2M payload extension in SYNTEL only when every envelope remains signed, auditable, replayable, and non-autonomous by default.
 
 ## ABYS-Allowed Work
 
@@ -20,17 +20,18 @@ ABYS may create:
 - schema validators for ITEM records
 - tests for route classification
 - implementation docs for how a future validator consumes a glyph inventory
+- validator tasks proving Authalien routes through ITEM before SYNTEL payload use
 
 ABYS must not create:
 
 - autonomous Authalien runtime behavior
 - opaque agent-to-agent execution
-- protocol extensions before SYNTEL v0 boundaries are stable
+- protocol extensions without SYNTEL audit/replay semantics
 - canon claims without ITEM judgment
 
 ## Validator Gate
 
-A future Authalien validator task must require:
+An Authalien validator task must require:
 
 1. ITEM candidate record path
 2. glyph inventory fixture
