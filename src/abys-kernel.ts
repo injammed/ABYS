@@ -8,8 +8,10 @@ product loop that can later be wired to OpenAI, Codex, vector storage, dashboard
 market data, browser automation, and human review.
 
 Core loop:
-intent -> world model -> council proposals -> scored task graph -> execution plan -> memory event
+intent -> world model -> council proposals -> scored task graph -> routing decision -> execution plan -> memory event
 */
+
+import { routeTask, type RouteDecision } from "./abys-routing";
 
 export type CouncilRole =
   | "architect"
@@ -54,10 +56,13 @@ export interface ProductTask {
   dependsOn: string[];
 }
 
+export type TaskRouteMap = Record<string, RouteDecision>;
+
 export interface ExecutionPlan {
   id: string;
   objective: string;
   rankedTasks: ProductTask[];
+  taskRoutes: TaskRouteMap;
   immediateAction: ProductTask | null;
   memoryWrites: MemoryEvent[];
 }
@@ -162,7 +167,11 @@ export function incubate(input: KernelInput): ExecutionPlan {
   const allTasks = [...(input.existingTasks ?? []), ...proposed];
 
   const rankedTasks = [...allTasks].sort((a, b) => rankTask(b) - rankTask(a));
+  const taskRoutes = Object.fromEntries(
+    rankedTasks.map((task) => [task.id, routeTask(task, input.signals)]),
+  );
   const immediateAction = rankedTasks.find((task) => task.status === "ready" && task.blockers.length === 0) ?? null;
+  const immediateRoute = immediateAction ? taskRoutes[immediateAction.id] : null;
 
   const memoryWrites: MemoryEvent[] = [
     {
@@ -180,7 +189,7 @@ export function incubate(input: KernelInput): ExecutionPlan {
       id: uid("mem", immediateAction.title, now),
       kind: "pattern",
       summary: `Highest leverage immediate action: ${immediateAction.title}`,
-      payload: { task: immediateAction, rank: rankTask(immediateAction) },
+      payload: { task: immediateAction, rank: rankTask(immediateAction), route: immediateRoute },
       createdAt: now,
       importance: 0.92,
     });
@@ -190,6 +199,7 @@ export function incubate(input: KernelInput): ExecutionPlan {
     id: uid("plan", input.objective, now),
     objective: input.objective,
     rankedTasks,
+    taskRoutes,
     immediateAction,
     memoryWrites,
   };
