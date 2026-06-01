@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://abys.local/schemas/execution_trace.schema.json",
+  "title": "ABYS Execution Trace v0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "objective",
+    "repo_target",
+    "permission_level",
+    "started_at",
+    "status",
+    "actions",
+    "failures",
+    "receipts"
+  ],
+  "properties": {
+    "run_id": {"type": "string", "minLength": 8},
+    "objective": {"type": "string", "minLength": 1},
+    "repo_target": {"type": "string", "enum": ["ITEM", "ABYS", "SYNTEL"]},
+    "permission_level": {"type": "string", "enum": ["draft", "observe", "advise", "act_with_approval", "autonomous"]},
+    "started_at": {"type": "string", "format": "date-time"},
+    "completed_at": {"type": "string", "format": "date-time"},
+    "status": {"type": "string", "enum": ["planned", "running", "completed", "failed", "rolled_back"]},
+    "cost_estimate": {"type": "number", "minimum": 0},
+    "duration_ms": {"type": "integer", "minimum": 0},
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step", "action", "tool", "input_hash", "output_hash", "status"],
+        "properties": {
+          "step": {"type": "integer", "minimum": 1},
+          "action": {"type": "string", "minLength": 1},
+          "tool": {"type": "string", "minLength": 1},
+          "input_hash": {"type": "string", "minLength": 16},
+          "output_hash": {"type": "string", "minLength": 16},
+          "status": {"type": "string", "enum": ["completed", "failed", "skipped"]},
+          "notes": {"type": "string"}
+        }
+      }
+    },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["failure_type", "description", "remediation"],
+        "properties": {
+          "failure_type": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "minLength": 1},
+          "remediation": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "receipts": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 8}
+    },
+    "rollback_plan": {"type": "string"}
+  }
+}
