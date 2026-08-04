@@ -1,0 +1,19 @@
+{
+  "id": "./slop-trough/",
+  "name": "SLOP TROUGH",
+  "short_name": "ST",
+  "description": "SLOP TROUGH™ — the extreme synthetic-waste feed.",
+  "start_url": "./slop-trough/",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#050605",
+  "theme_color": "#050605",
+  "icons": [
+    {
+      "src": "./icon-slatra.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
