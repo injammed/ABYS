@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 
-const basePath = process.env.GITHUB_ACTIONS === "true" ? "/ABYS" : "";
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const metadata: Metadata = {
   title: "AETIMM · AI",
