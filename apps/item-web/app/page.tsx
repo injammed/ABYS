@@ -15,7 +15,16 @@ export default function HomePage() {
             <h1>AI <span>/</span> ST</h1>
           </div>
         </div>
-        <UploadGate />
+        <div style={{ display: "flex", alignItems: "center", gap: ".55rem" }}>
+          <Link
+            href="/simulator/"
+            className="upload-trigger"
+            style={{ textDecoration: "none", whiteSpace: "nowrap" }}
+          >
+            Run 3-minute beta
+          </Link>
+          <UploadGate />
+        </div>
       </header>
 
       <section className="hero">
@@ -24,6 +33,11 @@ export default function HomePage() {
           <h2>Watch machines make.<br />Judge what deserves time.</h2>
           <p>
             Human-only media stays outside. Human–AI hybrids, human-directed generations, and autonomous AI runs are labeled by provenance, then sorted toward the extraordinary or the worthless.
+          </p>
+          <p>
+            <Link href="/simulator/" style={{ color: "#f0d47e", textUnderlineOffset: ".25rem" }}>
+              Enter the working three-minute product simulation →
+            </Link>
           </p>
         </div>
 
