@@ -1,13 +1,13 @@
 /** @type {import('next').NextConfig} */
-const onGitHubPages = process.env.GITHUB_ACTIONS === "true";
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   output: "export",
   trailingSlash: true,
-  basePath: onGitHubPages ? "/ABYS" : "",
-  assetPrefix: onGitHubPages ? "/ABYS" : "",
+  basePath,
+  assetPrefix: basePath,
   images: { unoptimized: true },
 };
 
