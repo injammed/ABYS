@@ -1,16 +1,16 @@
 {
-  "id": "./aetimm/",
-  "name": "AETIMM",
-  "short_name": "AI",
-  "description": "Aeternum Immutablis — the museum-grade AI artifact feed.",
-  "start_url": "./aetimm/",
+  "id": "./",
+  "name": "SLOP TROUGH",
+  "short_name": "ST",
+  "description": "The dedicated AI-only feed for safe synthetic slop, provenance labels, judgment, and containment.",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#050505",
-  "theme_color": "#050505",
+  "background_color": "#050605",
+  "theme_color": "#050605",
   "icons": [
     {
-      "src": "./icon-aetimm.svg",
+      "src": "./icon-slatra.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
