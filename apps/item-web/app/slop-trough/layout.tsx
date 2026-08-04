@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   description: "The extreme synthetic-waste feed, labeled ST.",
   applicationName: "SLOP TROUGH",
   manifest: `${basePath}/manifest-slop-trough.webmanifest`,
+  appleWebApp: {
+    capable: true,
+    title: "ST",
+    statusBarStyle: "black-translucent",
+  },
   icons: {
     icon: `${basePath}/icon-slatra.svg`,
     apple: `${basePath}/icon-slatra.svg`,
