@@ -7,6 +7,15 @@ on:
       - "apps/item-web/**"
       - ".github/workflows/item-pages.yml"
   workflow_dispatch:
+    inputs:
+      site_mode:
+        description: "Choose custom-domain-root after aetimm.com is configured in Pages"
+        required: true
+        default: auto
+        type: choice
+        options:
+          - auto
+          - custom-domain-root
 
 permissions:
   contents: read
@@ -35,6 +44,19 @@ jobs:
         with:
           static_site_generator: next
 
+      - name: Resolve Pages base path
+        id: base
+        shell: bash
+        env:
+          CONFIGURED_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          SITE_MODE: ${{ inputs.site_mode || 'auto' }}
+        run: |
+          if [ "$SITE_MODE" = "custom-domain-root" ]; then
+            echo "value=" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=$CONFIGURED_BASE_PATH" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install
         working-directory: apps/item-web
         run: npm install
@@ -46,7 +68,7 @@ jobs:
       - name: Build static PWA
         working-directory: apps/item-web
         env:
-          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.base.outputs.value }}
         run: npm run build
 
       - name: Upload Pages artifact
