@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { ArtifactFeed } from "@/components/ArtifactFeed";
 import { GenerationWitness } from "@/components/GenerationWitness";
+import { PhaseIdentity } from "@/components/PhaseIdentity";
 import { UploadGate } from "@/components/UploadGate";
 
 export default function HomePage() {
@@ -9,8 +11,8 @@ export default function HomePage() {
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true">◯</div>
           <div>
-            <p className="eyebrow">ITEM MUSEUM / SLOP TROUGH</p>
-            <h1>AETIMM <span>/</span> SLATRA</h1>
+            <p className="eyebrow">ITEM MUSEUM / SLOP TROUGH™</p>
+            <h1>AI <span>/</span> ST</h1>
           </div>
         </div>
         <UploadGate />
@@ -25,17 +27,15 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="twin-doors" aria-label="Twin app paths">
-          <article className="door aetimm-door">
-            <div className="door-symbol">◯</div>
-            <p>AETIMM</p>
+        <div className="twin-doors" aria-label="Twin installable app paths">
+          <Link className="door identity-door aetimm-door" href="/aetimm/">
+            <PhaseIdentity kind="aetimm" compact />
             <span>The extreme best: Full-Mode artifacts worth preserving</span>
-          </article>
-          <article className="door slatra-door">
-            <div className="door-symbol">⊘</div>
-            <p>SLATRA</p>
+          </Link>
+          <Link className="door identity-door slatra-door" href="/slop-trough/">
+            <PhaseIdentity kind="slatra" compact />
             <span>The extreme worst: random synthetic waste with no reason to persist</span>
-          </article>
+          </Link>
         </div>
       </section>
 
