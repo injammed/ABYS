@@ -30,7 +30,10 @@ jobs:
           node-version: 22
 
       - name: Configure Pages
+        id: pages
         uses: actions/configure-pages@v5
+        with:
+          static_site_generator: next
 
       - name: Install
         working-directory: apps/item-web
@@ -42,6 +45,8 @@ jobs:
 
       - name: Build static PWA
         working-directory: apps/item-web
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
         run: npm run build
 
       - name: Upload Pages artifact
