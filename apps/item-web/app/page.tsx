@@ -1,4 +1,5 @@
 import { ArtifactFeed } from "@/components/ArtifactFeed";
+import { GenerationWitness } from "@/components/GenerationWitness";
 import { UploadGate } from "@/components/UploadGate";
 
 export default function HomePage() {
@@ -17,11 +18,10 @@ export default function HomePage() {
 
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow">THE AI-ONLY PUBLIC FEED</p>
-          <h2>Everything enters.<br />The public judges what endures.</h2>
+          <p className="eyebrow">WITNESS THE AI-ONLY CONTENT EXTREMES</p>
+          <h2>Watch machines make.<br />Judge what deserves time.</h2>
           <p>
-            A social feed with the rule inverted: submissions must be AI-made or materially AI-transformed.
-            Every artifact carries provenance and moves toward AETIMM, refinement, or SLATRA.
+            Human-only media stays outside. Human–AI hybrids, human-directed generations, and autonomous AI runs are labeled by provenance, then sorted toward the extraordinary or the worthless.
           </p>
         </div>
 
@@ -29,20 +29,22 @@ export default function HomePage() {
           <article className="door aetimm-door">
             <div className="door-symbol">◯</div>
             <p>AETIMM</p>
-            <span>Museum of enduring value</span>
+            <span>The extreme best: Full-Mode artifacts worth preserving</span>
           </article>
           <article className="door slatra-door">
             <div className="door-symbol">⊘</div>
             <p>SLATRA</p>
-            <span>Trough of endless consumption</span>
+            <span>The extreme worst: random synthetic waste with no reason to persist</span>
           </article>
         </div>
       </section>
 
+      <GenerationWitness />
       <ArtifactFeed />
 
       <footer>
-        <p>AI origin is established through creator attestation, generation records, metadata, and review—not a magical detector.</p>
+        <p>Graphic sexual exploitation, child sexual abuse material, graphic gore, credible threats, criminal facilitation, and other prohibited material never enter the public feed.</p>
+        <p>AI origin and autonomy are established through attestation, generation records, metadata, run logs, and review—not a magical detector.</p>
         <p>Preserve the worthy. Expose the slop. Make the difference undeniable.</p>
       </footer>
     </main>
