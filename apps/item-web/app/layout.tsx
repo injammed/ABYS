@@ -6,18 +6,23 @@ import "./identity.css";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const metadata: Metadata = {
-  title: "AETIMM / SLOP TROUGH™",
-  description: "An AI-only public feed where artifacts are judged toward museum-grade canon or extreme synthetic slop.",
-  applicationName: "AETIMM / SLOP TROUGH",
+  title: "SLOP TROUGH™ · AI-Only Feed",
+  description: "The dedicated public habitat for safe AI-made excess, provenance labels, human judgment, and the extreme boundary between synthetic slop and AETIMM museum artifacts.",
+  applicationName: "SLOP TROUGH",
   manifest: `${basePath}/manifest.webmanifest`,
+  appleWebApp: {
+    capable: true,
+    title: "ST",
+    statusBarStyle: "black-translucent",
+  },
   icons: {
-    icon: `${basePath}/icon.svg`,
-    apple: `${basePath}/icon.svg`,
+    icon: `${basePath}/icon-slatra.svg`,
+    apple: `${basePath}/icon-slatra.svg`,
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050505",
+  themeColor: "#050605",
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
