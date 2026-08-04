@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   description: "Aeternum Immutablis — museum-grade AI artifacts.",
   applicationName: "AETIMM",
   manifest: `${basePath}/manifest-aetimm.webmanifest`,
+  appleWebApp: {
+    capable: true,
+    title: "AI",
+    statusBarStyle: "black-translucent",
+  },
   icons: {
     icon: `${basePath}/icon-aetimm.svg`,
     apple: `${basePath}/icon-aetimm.svg`,
