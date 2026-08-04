@@ -1,0 +1,19 @@
+{
+  "id": "./aetimm/",
+  "name": "AETIMM",
+  "short_name": "AI",
+  "description": "Aeternum Immutablis — the museum-grade AI artifact feed.",
+  "start_url": "./aetimm/",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    {
+      "src": "./icon-aetimm.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
