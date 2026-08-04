@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AccountGate } from "@/components/AccountGate";
 import { ArtifactFeed } from "@/components/ArtifactFeed";
 import { GenerationWitness } from "@/components/GenerationWitness";
 import { PhaseIdentity } from "@/components/PhaseIdentity";
@@ -15,7 +16,7 @@ export default function HomePage() {
             <h1>ST</h1>
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: ".55rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: ".55rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
           <Link
             href="/simulator/"
             className="upload-trigger"
@@ -23,6 +24,7 @@ export default function HomePage() {
           >
             Run 3-minute beta
           </Link>
+          <AccountGate />
           <UploadGate />
         </div>
       </header>

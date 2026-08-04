@@ -1,23 +1,118 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
+import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
+
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
 export function UploadGate() {
   const [open, setOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    const client = getSupabaseBrowserClient();
+    if (!client) return;
+
+    void client.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data } = client.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession));
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    const client = getSupabaseBrowserClient();
+    if (!client || !session) {
+      setMessage("Sign in before submitting an artifact.");
+      return;
+    }
+
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    const file = form.get("file");
+
+    if (!(file instanceof File) || file.size === 0) {
+      setMessage("Choose an image to upload.");
+      return;
+    }
+    if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+      setMessage("Beta uploads currently accept JPEG, PNG, WebP, or GIF images.");
+      return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setMessage("Image exceeds the 10 MB beta limit.");
+      return;
+    }
+
+    const extension = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "bin";
+    const mediaPath = `${session.user.id}/${crypto.randomUUID()}.${extension}`;
+
+    setBusy(true);
+    setMessage(null);
+
+    try {
+      const { error: uploadError } = await client.storage
+        .from("artifact-media")
+        .upload(mediaPath, file, { cacheControl: "3600", upsert: false, contentType: file.type });
+      if (uploadError) throw uploadError;
+
+      const { error: insertError } = await client.from("artifacts").insert({
+        creator_id: session.user.id,
+        title: String(form.get("title") ?? "").trim(),
+        summary: String(form.get("summary") ?? "").trim(),
+        origin_class: String(form.get("originClass") ?? ""),
+        generator: String(form.get("generator") ?? "").trim(),
+        human_role: String(form.get("humanRole") ?? "").trim(),
+        provenance_note: String(form.get("provenance") ?? "").trim(),
+        media_path: mediaPath,
+        media_type: "image",
+        status: "quarantine",
+        lane: null,
+        published_at: null,
+        ai_origin_attested: form.get("aiOrigin") === "on",
+        safety_attested: form.get("safety") === "on",
+        rights_attested: form.get("rights") === "on",
+      });
+
+      if (insertError) {
+        await client.storage.from("artifact-media").remove([mediaPath]);
+        throw insertError;
+      }
+
+      formElement.reset();
+      setMessage("Submitted to private quarantine. It will not enter the public feed until approved.");
+      window.dispatchEvent(new CustomEvent("aetimm:submission-created"));
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Submission failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!socialBackendEnabled) {
+    return (
+      <button className="upload-trigger" type="button" disabled title="Social backend not configured">
+        Uploads soon
+      </button>
+    );
   }
 
   return (
     <div className="upload-wrap">
-      <button className="upload-trigger" onClick={() => setOpen((value) => !value)}>
+      <button className="upload-trigger" type="button" onClick={() => setOpen((value) => !value)}>
         {open ? "Close submission" : "Submit AI artifact"}
       </button>
 
-      {open && (
+      {open && !session && (
+        <div className="upload-panel" role="status">
+          <p className="submission-note">Create an account or sign in before uploading.</p>
+        </div>
+      )}
+
+      {open && session && (
         <form className="upload-panel" onSubmit={submit}>
           <div>
             <label htmlFor="title">Artifact title</label>
@@ -25,8 +120,26 @@ export function UploadGate() {
           </div>
 
           <div>
-            <label htmlFor="file">AI-made media</label>
-            <input id="file" name="file" type="file" accept="image/*,video/*,audio/*" required />
+            <label htmlFor="summary">Summary</label>
+            <textarea
+              id="summary"
+              name="summary"
+              required
+              minLength={10}
+              maxLength={600}
+              placeholder="Explain what the artifact is and why it exists."
+            />
+          </div>
+
+          <div>
+            <label htmlFor="file">AI-made image</label>
+            <input
+              id="file"
+              name="file"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              required
+            />
           </div>
 
           <div>
@@ -42,7 +155,7 @@ export function UploadGate() {
 
           <div>
             <label htmlFor="generator">Generator / model</label>
-            <input id="generator" name="generator" required placeholder="Model, workflow, or tool stack" />
+            <input id="generator" name="generator" required minLength={2} maxLength={120} placeholder="Model, workflow, or tool stack" />
           </div>
 
           <div>
@@ -52,6 +165,7 @@ export function UploadGate() {
               name="humanRole"
               required
               minLength={15}
+              maxLength={800}
               placeholder="State exactly what humans did: configured the pipeline, prompted, supplied source material, edited, selected, or did nothing after trigger."
             />
           </div>
@@ -63,6 +177,7 @@ export function UploadGate() {
               name="provenance"
               required
               minLength={30}
+              maxLength={1600}
               placeholder="Describe prompts, seeds, source material, run logs, edits, model transformations, and publication path."
             />
           </div>
@@ -87,13 +202,11 @@ export function UploadGate() {
             <span>I have the right to submit the source material and grant the platform review rights.</span>
           </label>
 
-          <button className="submit-button" type="submit">Enter safety and judgment queue</button>
+          <button className="submit-button" type="submit" disabled={busy}>
+            {busy ? "Uploading…" : "Enter safety and judgment queue"}
+          </button>
 
-          {submitted && (
-            <p className="submission-note">
-              Local prototype accepted the form. Production submission requires automated safety screening, provenance checks, and human moderation before public visibility.
-            </p>
-          )}
+          {message && <p className="submission-note" role="status">{message}</p>}
         </form>
       )}
     </div>

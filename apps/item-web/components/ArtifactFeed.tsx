@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { FeedArtifact, FeedLane, makeFeedBatch, originClassLabels } from "@/lib/feed";
-
-type Judgment = "preserve" | "slop" | "refine";
+import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
+import { Judgment, loadOwnVotes, loadPublicFeedPage, saveVote } from "@/lib/social-feed";
 
 function laneLabel(lane: FeedLane): string {
   if (lane === "aetimm") return "AETIMM";
@@ -11,12 +12,82 @@ function laneLabel(lane: FeedLane): string {
   return "UNJUDGED";
 }
 
+function appendUnique(current: FeedArtifact[], incoming: FeedArtifact[]): FeedArtifact[] {
+  const existing = new Set(current.map((artifact) => artifact.id));
+  return [...current, ...incoming.filter((artifact) => !existing.has(artifact.id))];
+}
+
 export function ArtifactFeed() {
   const [lane, setLane] = useState<FeedLane | "all">("all");
-  const [artifacts, setArtifacts] = useState<FeedArtifact[]>(() => makeFeedBatch(0));
+  const [artifacts, setArtifacts] = useState<FeedArtifact[]>(() =>
+    socialBackendEnabled ? [] : makeFeedBatch(0)
+  );
   const [judgments, setJudgments] = useState<Record<string, Judgment>>({});
+  const [session, setSession] = useState<Session | null>(null);
   const [batch, setBatch] = useState(1);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(socialBackendEnabled);
+  const [feedError, setFeedError] = useState<string | null>(null);
+  const [voteMessage, setVoteMessage] = useState<string | null>(null);
   const sentinel = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const client = getSupabaseBrowserClient();
+    if (!client) return;
+
+    void client.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data } = client.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession));
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!socialBackendEnabled) return;
+    let cancelled = false;
+
+    setLoading(true);
+    setFeedError(null);
+    setArtifacts([]);
+    setCursor(null);
+    setHasMore(true);
+
+    void loadPublicFeedPage({ lane })
+      .then((page) => {
+        if (cancelled) return;
+        setArtifacts(page.artifacts);
+        setCursor(page.nextCursor);
+        setHasMore(Boolean(page.nextCursor));
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setFeedError(error instanceof Error ? error.message : "The public feed could not be loaded.");
+        setHasMore(false);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lane]);
+
+  useEffect(() => {
+    if (!socialBackendEnabled || !session || artifacts.length === 0) return;
+    let cancelled = false;
+
+    void loadOwnVotes(session.user.id, artifacts.map((artifact) => artifact.id))
+      .then((votes) => {
+        if (!cancelled) setJudgments((current) => ({ ...current, ...votes }));
+      })
+      .catch(() => {
+        // Public feed remains usable even if personal vote hydration fails.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [session, artifacts]);
 
   useEffect(() => {
     const node = sentinel.current;
@@ -24,24 +95,69 @@ export function ArtifactFeed() {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) return;
-        setArtifacts((current) => [...current, ...makeFeedBatch(batch)]);
-        setBatch((value) => value + 1);
+        if (!entry.isIntersecting || loading) return;
+
+        if (!socialBackendEnabled) {
+          setArtifacts((current) => [...current, ...makeFeedBatch(batch)]);
+          setBatch((value) => value + 1);
+          return;
+        }
+
+        if (!hasMore || !cursor) return;
+        setLoading(true);
+        void loadPublicFeedPage({ cursor, lane })
+          .then((page) => {
+            setArtifacts((current) => appendUnique(current, page.artifacts));
+            setCursor(page.nextCursor);
+            setHasMore(Boolean(page.nextCursor));
+          })
+          .catch((error) => {
+            setFeedError(error instanceof Error ? error.message : "More artifacts could not be loaded.");
+            setHasMore(false);
+          })
+          .finally(() => setLoading(false));
       },
       { rootMargin: "500px" }
     );
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [batch]);
+  }, [batch, cursor, hasMore, lane, loading]);
 
   const visible = useMemo(
-    () => artifacts.filter((artifact) => lane === "all" || artifact.lane === lane),
+    () => socialBackendEnabled
+      ? artifacts
+      : artifacts.filter((artifact) => lane === "all" || artifact.lane === lane),
     [artifacts, lane]
   );
 
-  function judge(id: string, judgment: Judgment) {
+  async function judge(id: string, judgment: Judgment) {
+    setVoteMessage(null);
+
+    if (!socialBackendEnabled) {
+      setJudgments((current) => ({ ...current, [id]: judgment }));
+      return;
+    }
+
+    if (!session) {
+      setVoteMessage("Sign in to record a public judgment.");
+      return;
+    }
+
+    const prior = judgments[id];
     setJudgments((current) => ({ ...current, [id]: judgment }));
+
+    try {
+      await saveVote(id, session.user.id, judgment);
+    } catch (error) {
+      setJudgments((current) => {
+        const next = { ...current };
+        if (prior) next[id] = prior;
+        else delete next[id];
+        return next;
+      });
+      setVoteMessage(error instanceof Error ? error.message : "Vote could not be saved.");
+    }
   }
 
   return (
@@ -65,6 +181,9 @@ export function ArtifactFeed() {
         Human-only media is outside the feed. Hybrid, directed, and autonomous AI runs remain visibly separated by provenance.
       </div>
 
+      {voteMessage && <p className="judgment-confirmation" role="status">{voteMessage}</p>}
+      {feedError && <p className="judgment-confirmation" role="alert">{feedError}</p>}
+
       <div className="artifact-list">
         {visible.map((artifact) => {
           const judgment = judgments[artifact.id];
@@ -72,6 +191,14 @@ export function ArtifactFeed() {
           return (
             <article className="artifact-card" key={artifact.id}>
               <div className="artifact-visual" style={{ background: artifact.gradient }}>
+                {artifact.mediaUrl && (
+                  <img
+                    src={artifact.mediaUrl}
+                    alt=""
+                    loading="lazy"
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  />
+                )}
                 <div className="visual-noise" />
                 <div className="lane-badge">{laneLabel(artifact.lane)}</div>
                 <div className="score-ring" aria-label={`Score ${artifact.score}`}>
@@ -110,19 +237,19 @@ export function ArtifactFeed() {
                 <div className="judgment-row" aria-label="Judge artifact">
                   <button
                     className={judgment === "preserve" ? "judge preserve selected" : "judge preserve"}
-                    onClick={() => judge(artifact.id, "preserve")}
+                    onClick={() => void judge(artifact.id, "preserve")}
                   >
                     Preserve
                   </button>
                   <button
                     className={judgment === "refine" ? "judge refine selected" : "judge refine"}
-                    onClick={() => judge(artifact.id, "refine")}
+                    onClick={() => void judge(artifact.id, "refine")}
                   >
                     Refine
                   </button>
                   <button
                     className={judgment === "slop" ? "judge slop selected" : "judge slop"}
-                    onClick={() => judge(artifact.id, "slop")}
+                    onClick={() => void judge(artifact.id, "slop")}
                   >
                     Slop
                   </button>
@@ -130,7 +257,7 @@ export function ArtifactFeed() {
 
                 {judgment && (
                   <p className="judgment-confirmation">
-                    Judgment recorded locally: <strong>{judgment}</strong>. Persistence and reputation arrive with the backend.
+                    {socialBackendEnabled ? "Judgment recorded" : "Judgment recorded locally"}: <strong>{judgment}</strong>.
                   </p>
                 )}
               </div>
@@ -139,8 +266,12 @@ export function ArtifactFeed() {
         })}
       </div>
 
+      {socialBackendEnabled && !loading && visible.length === 0 && !feedError && (
+        <p className="judgment-confirmation">No approved artifacts are in this lane yet.</p>
+      )}
+
       <div ref={sentinel} className="feed-sentinel" aria-hidden="true">
-        Loading more synthetic media…
+        {loading ? "Loading synthetic media…" : hasMore || !socialBackendEnabled ? "Scroll for more synthetic media…" : "End of the current feed."}
       </div>
     </section>
   );

@@ -30,7 +30,9 @@ export type FeedArtifact = {
   modalLead: string;
   aiOrigin: AiOrigin;
   gradient: string;
+  mediaUrl?: string;
   score: number;
+  publishedAt?: string;
 };
 
 export const originClassLabels: Record<OriginClass, string> = {
