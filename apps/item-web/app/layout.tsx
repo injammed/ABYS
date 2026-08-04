@@ -3,7 +3,7 @@ import "./globals.css";
 import "./witness.css";
 import "./identity.css";
 
-const basePath = process.env.GITHUB_ACTIONS === "true" ? "/ABYS" : "";
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const metadata: Metadata = {
   title: "AETIMM / SLOP TROUGH™",
