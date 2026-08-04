@@ -2,9 +2,17 @@
   "name": "AETIMM / SLATRA",
   "short_name": "ITEM",
   "description": "The AI-only feed for canon and slop judgment.",
-  "start_url": "/",
+  "start_url": "/ABYS/",
+  "scope": "/ABYS/",
   "display": "standalone",
   "background_color": "#050505",
   "theme_color": "#050505",
-  "icons": []
+  "icons": [
+    {
+      "src": "/ABYS/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
