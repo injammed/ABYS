@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FeedArtifact, FeedLane, makeFeedBatch } from "@/lib/feed";
+import { FeedArtifact, FeedLane, makeFeedBatch, originClassLabels } from "@/lib/feed";
 
 type Judgment = "preserve" | "slop" | "refine";
 
@@ -62,12 +62,13 @@ export function ArtifactFeed() {
 
       <div className="feed-rule">
         <span className="signal-dot" />
-        AI-made content only. Creator attestation is required; automated detection is advisory, not proof.
+        Human-only media is outside the feed. Hybrid, directed, and autonomous AI runs remain visibly separated by provenance.
       </div>
 
       <div className="artifact-list">
         {visible.map((artifact) => {
           const judgment = judgments[artifact.id];
+          const autonomous = artifact.aiOrigin.originClass === "autonomous_ai_run";
           return (
             <article className="artifact-card" key={artifact.id}>
               <div className="artifact-visual" style={{ background: artifact.gradient }}>
@@ -79,6 +80,13 @@ export function ArtifactFeed() {
               </div>
 
               <div className="artifact-body">
+                <div className="origin-strip">
+                  <span className={autonomous ? "origin-pill autonomous" : "origin-pill"}>
+                    {originClassLabels[artifact.aiOrigin.originClass]}
+                  </span>
+                  <span>{artifact.aiOrigin.confidence}</span>
+                </div>
+
                 <div className="artifact-kicker">
                   <span>{artifact.id.split("-").slice(0, 3).join("-")}</span>
                   <span>{artifact.modalLead}</span>
@@ -89,8 +97,14 @@ export function ArtifactFeed() {
 
                 <div className="provenance">
                   <strong>AI provenance</strong>
-                  <span>{artifact.aiOrigin.confidence}</span>
+                  <span>{artifact.aiOrigin.generator ?? "Generator undisclosed"}</span>
                   <p>{artifact.aiOrigin.provenanceNote}</p>
+                  <p><b>Human role:</b> {artifact.aiOrigin.humanRole}</p>
+                  {artifact.aiOrigin.automationManifest && (
+                    <p>
+                      <b>Automation manifest:</b> {artifact.aiOrigin.automationManifest.trigger}; run log {artifact.aiOrigin.automationManifest.runLogAvailable ? "available" : "missing"}; human intervention after trigger {artifact.aiOrigin.automationManifest.humanInterventionAfterTrigger ? "reported" : "not reported"}.
+                    </p>
+                  )}
                 </div>
 
                 <div className="judgment-row" aria-label="Judge artifact">
