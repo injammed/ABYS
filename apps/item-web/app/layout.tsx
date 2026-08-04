@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./witness.css";
 
 const basePath = process.env.GITHUB_ACTIONS === "true" ? "/ABYS" : "";
 
