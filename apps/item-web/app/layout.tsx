@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./witness.css";
+import "./identity.css";
 
 const basePath = process.env.GITHUB_ACTIONS === "true" ? "/ABYS" : "";
 
 export const metadata: Metadata = {
-  title: "AETIMM / SLATRA",
-  description: "An AI-only public feed where artifacts are judged toward canon or slop.",
-  applicationName: "AETIMM / SLATRA",
+  title: "AETIMM / SLOP TROUGH™",
+  description: "An AI-only public feed where artifacts are judged toward museum-grade canon or extreme synthetic slop.",
+  applicationName: "AETIMM / SLOP TROUGH",
   manifest: `${basePath}/manifest.webmanifest`,
   icons: {
     icon: `${basePath}/icon.svg`,
