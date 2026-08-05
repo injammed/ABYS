@@ -113,7 +113,7 @@ export function UploadGate() {
       )}
 
       {open && session && (
-        <form className="upload-panel" onSubmit={submit}>
+        <form className="upload-panel submission-panel" onSubmit={submit}>
           <div>
             <label htmlFor="title">Artifact title</label>
             <input id="title" name="title" required maxLength={100} placeholder="Name the artifact" />
@@ -202,11 +202,12 @@ export function UploadGate() {
             <span>I have the right to submit the source material and grant the platform review rights.</span>
           </label>
 
-          <button className="submit-button" type="submit" disabled={busy}>
-            {busy ? "Uploading…" : "Enter safety and judgment queue"}
-          </button>
-
-          {message && <p className="submission-note" role="status">{message}</p>}
+          <div className="submission-actions">
+            <button className="submit-button" type="submit" disabled={busy}>
+              {busy ? "Uploading…" : "Submit artifact"}
+            </button>
+            {message && <p className="submission-note" role="status">{message}</p>}
+          </div>
         </form>
       )}
     </div>
