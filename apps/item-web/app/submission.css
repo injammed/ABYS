@@ -1,0 +1,38 @@
+.submission-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 6.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-bottom: 0;
+}
+
+.submission-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin: 0 -1rem;
+  padding: .85rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(12, 12, 12, .88), rgba(12, 12, 12, .99) 28%);
+  backdrop-filter: blur(18px);
+}
+
+.submission-actions .submit-button {
+  margin-top: 0;
+}
+
+.submission-actions .submission-note {
+  margin: .65rem 0 0;
+}
+
+@media (max-width: 760px) {
+  .submission-panel {
+    position: fixed;
+    inset: 4.6rem .65rem .65rem;
+    width: auto;
+    max-height: none;
+    border-radius: 1rem;
+  }
+}
