@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 
@@ -33,6 +33,7 @@ export function AccountGate() {
   const [uploads, setUploads] = useState<PersonalArtifact[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const sessionRef = useRef<Session | null>(null);
 
   const loadAccountData = useCallback(async (activeSession: Session | null) => {
     const client = getSupabaseBrowserClient();
@@ -66,25 +67,41 @@ export function AccountGate() {
     const client = getSupabaseBrowserClient();
     if (!client) return;
 
+    let mounted = true;
+    document.documentElement.dataset.clientReady = "true";
+
     void client.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      sessionRef.current = data.session;
       setSession(data.session);
       void loadAccountData(data.session);
     });
 
-    const { data } = client.auth.onAuthStateChange((_event, nextSession) => {
+    const { data } = client.auth.onAuthStateChange((event, nextSession) => {
+      sessionRef.current = nextSession;
       setSession(nextSession);
       void loadAccountData(nextSession);
-      if (nextSession) setOpen(false);
+
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+        setOpen(false);
+      }
     });
 
-    const refreshUploads = () => void loadAccountData(session);
+    return () => {
+      mounted = false;
+      data.subscription.unsubscribe();
+      delete document.documentElement.dataset.clientReady;
+    };
+  }, [loadAccountData]);
+
+  useEffect(() => {
+    const refreshUploads = () => void loadAccountData(sessionRef.current);
     window.addEventListener("aetimm:submission-created", refreshUploads);
 
     return () => {
-      data.subscription.unsubscribe();
       window.removeEventListener("aetimm:submission-created", refreshUploads);
     };
-  }, [loadAccountData, session]);
+  }, [loadAccountData]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
