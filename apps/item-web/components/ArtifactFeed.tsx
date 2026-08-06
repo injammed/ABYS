@@ -17,6 +17,11 @@ import {
   shouldApplyVoteHydration,
 } from "@/lib/vote-state";
 
+type VoteRequestState = {
+  state: "saving" | "saved" | "error";
+  message: string;
+};
+
 function laneLabel(lane: FeedLane): string {
   if (lane === "aetimm") return "AETIMM";
   if (lane === "slatra") return "SLATRA";
@@ -35,6 +40,7 @@ export function ArtifactFeed() {
   );
   const [privatePreviews, setPrivatePreviews] = useState<FeedArtifact[]>([]);
   const [judgments, setJudgments] = useState<Record<string, Judgment>>({});
+  const [voteStates, setVoteStates] = useState<Record<string, VoteRequestState>>({});
   const [session, setSession] = useState<Session | null>(null);
   const [batch, setBatch] = useState(1);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -57,6 +63,7 @@ export function ArtifactFeed() {
         voteOwnerRef.current = nextOwnerId;
         voteHydrationVersionRef.current += 1;
         setJudgments({});
+        setVoteStates({});
         setVoteMessage(null);
       }
 
@@ -227,6 +234,10 @@ export function ArtifactFeed() {
 
     if (!socialBackendEnabled) {
       setJudgments((current) => ({ ...current, [id]: judgment }));
+      setVoteStates((current) => ({
+        ...current,
+        [id]: { state: "saved", message: "Judgment recorded locally." },
+      }));
       return;
     }
 
@@ -236,12 +247,27 @@ export function ArtifactFeed() {
       return;
     }
 
+    if (voteStates[id]?.state === "saving") return;
+
     voteHydrationVersionRef.current += 1;
     const prior = judgments[id];
     setJudgments((current) => ({ ...current, [id]: judgment }));
+    setVoteStates((current) => ({
+      ...current,
+      [id]: { state: "saving", message: `Saving ${judgment}…` },
+    }));
 
     try {
       await saveVote(id, voterId, judgment);
+      if (voteOwnerRef.current !== voterId) return;
+
+      setVoteStates((current) => ({
+        ...current,
+        [id]: {
+          state: "saved",
+          message: "Saved. Choosing again replaces your judgment.",
+        },
+      }));
     } catch (error) {
       if (voteOwnerRef.current !== voterId) return;
 
@@ -251,7 +277,13 @@ export function ArtifactFeed() {
         else delete next[id];
         return next;
       });
-      setVoteMessage(error instanceof Error ? error.message : "Vote could not be saved.");
+      setVoteStates((current) => ({
+        ...current,
+        [id]: {
+          state: "error",
+          message: error instanceof Error ? error.message : "Vote could not be saved.",
+        },
+      }));
     }
   }
 
@@ -288,6 +320,8 @@ export function ArtifactFeed() {
       <div className="artifact-list">
         {visible.map((artifact) => {
           const judgment = judgments[artifact.id];
+          const voteState = voteStates[artifact.id];
+          const votePending = voteState?.state === "saving";
           const autonomous = artifact.aiOrigin.originClass === "autonomous_ai_run";
           const creatorPreview = artifact.visibility === "creator_preview";
 
@@ -350,31 +384,43 @@ export function ArtifactFeed() {
                     Preserve · Refine · Slop unlock after curator publication.
                   </div>
                 ) : (
-                  <div className="judgment-row" aria-label="Judge artifact">
+                  <div className="judgment-row" aria-label="Judge artifact" aria-busy={votePending}>
                     <button
                       className={judgment === "preserve" ? "judge preserve selected" : "judge preserve"}
                       onClick={() => void judge(artifact.id, "preserve")}
+                      disabled={votePending}
+                      aria-pressed={judgment === "preserve"}
                     >
                       Preserve
                     </button>
                     <button
                       className={judgment === "refine" ? "judge refine selected" : "judge refine"}
                       onClick={() => void judge(artifact.id, "refine")}
+                      disabled={votePending}
+                      aria-pressed={judgment === "refine"}
                     >
                       Refine
                     </button>
                     <button
                       className={judgment === "slop" ? "judge slop selected" : "judge slop"}
                       onClick={() => void judge(artifact.id, "slop")}
+                      disabled={votePending}
+                      aria-pressed={judgment === "slop"}
                     >
                       Slop
                     </button>
                   </div>
                 )}
 
-                {judgment && !creatorPreview && (
-                  <p className="judgment-confirmation">
-                    {socialBackendEnabled ? "Judgment recorded" : "Judgment recorded locally"}: <strong>{judgment}</strong>.
+                {!creatorPreview && voteState && (
+                  <p className={`vote-status ${voteState.state}`} role={voteState.state === "error" ? "alert" : "status"} aria-live="polite">
+                    {voteState.message}
+                  </p>
+                )}
+
+                {!creatorPreview && judgment && !voteState && (
+                  <p className="vote-status current">
+                    Current judgment: <strong>{judgment}</strong>. Choosing again replaces it.
                   </p>
                 )}
               </div>
