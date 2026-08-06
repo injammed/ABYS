@@ -40,6 +40,7 @@ export function UploadGate() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [intakeControl, setIntakeControl] = useState<IntakeControl | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
   useEffect(() => {
     const client = getSupabaseBrowserClient();
@@ -139,7 +140,8 @@ export function UploadGate() {
       }
 
       formElement.reset();
-      setMessage("Submitted to private quarantine. It will not enter the public feed until approved.");
+      setSelectedFileName(null);
+      setMessage("Submitted to private quarantine. Your private Unjudged preview will appear in the feed.");
       window.dispatchEvent(new CustomEvent("aetimm:submission-created"));
     } catch (error) {
       setMessage(submissionErrorMessage(error));
@@ -192,7 +194,7 @@ export function UploadGate() {
 
           <div>
             <label htmlFor="title">Artifact title</label>
-            <input id="title" name="title" required maxLength={100} placeholder="Name the artifact" />
+            <input id="title" name="title" required maxLength={100} placeholder="Name the artifact" disabled={busy} />
           </div>
 
           <div>
@@ -204,6 +206,7 @@ export function UploadGate() {
               minLength={10}
               maxLength={600}
               placeholder="Explain what the artifact is and why it exists."
+              disabled={busy}
             />
           </div>
 
@@ -216,7 +219,16 @@ export function UploadGate() {
               accept="image/jpeg,image/png,image/webp,image/gif"
               required
               disabled={busy}
+              aria-describedby="selected-file"
+              onChange={(event) => {
+                setSelectedFileName(event.currentTarget.files?.[0]?.name ?? null);
+                setMessage(null);
+              }}
             />
+            <p id="selected-file" className={selectedFileName ? "file-selection selected" : "file-selection"}>
+              <span aria-hidden="true">◇</span>
+              {selectedFileName ?? "No image selected"}
+            </p>
           </div>
 
           <div>
@@ -283,7 +295,7 @@ export function UploadGate() {
 
           <div className="submission-actions">
             <button className="submit-button" type="submit" disabled={busy || intakePaused}>
-              {busy ? "Uploading…" : "Submit to private quarantine"}
+              {busy ? "Uploading to private quarantine…" : "Submit to private quarantine"}
             </button>
             {message && <p className="submission-note" role="status" aria-live="polite">{message}</p>}
           </div>
