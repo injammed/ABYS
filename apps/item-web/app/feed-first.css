@@ -226,8 +226,8 @@
 .primary-navigation-action .upload-panel {
   top: auto;
   right: 0;
-  bottom: calc(100% + 3.55rem);
-  max-height: min(72vh, 46rem);
+  bottom: calc(100% + 5.15rem);
+  max-height: min(68vh, 46rem);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
