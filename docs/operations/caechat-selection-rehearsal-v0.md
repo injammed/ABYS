@@ -32,10 +32,13 @@ Do not activate this fold until all are true:
 ## Activation order
 
 1. Apply `supabase/migrations/005_caechat_selection_rehearsal.sql` in the production Supabase SQL editor.
-2. Confirm the transaction completes without error.
-3. Deploy the matching web commit.
-4. Open `/curator/` with the trusted curator account.
-5. Keep issue #72 open until every step below is verified on a real device.
+2. Apply `supabase/migrations/006_selection_active_queue_guard.sql` immediately afterward.
+3. Confirm both transactions complete without error.
+4. Deploy the matching web commit.
+5. Open `/curator/` with the trusted curator account.
+6. Keep issue #72 open until every step below is verified on a real device.
+
+Migration `006` blocks a second nomination run while any selection remains in `nominated`, `candidate`, or `refinement`. Resolve the active queue before starting another run.
 
 ## Rehearsal artifact
 
@@ -151,6 +154,8 @@ The run snapshots:
 
 The deterministic contract proves that a cohort of ten nominates exactly one artifact and that 8,000 Preserve judgments out of 10,000 outrank 2 out of 2 under the confidence estimate.
 
+Attempting another nomination while the queue is active must fail with `ACTIVE_SELECTION_REVIEWS_EXIST`.
+
 ### 6. Candidate review
 
 Curator:
@@ -249,9 +254,18 @@ from public.selection_runs
 where id = '<selection-run-id>'::uuid;
 ```
 
+Active queue check:
+
+```sql
+select id, artifact_id, status, created_at
+from public.artifact_selection_reviews
+where status in ('nominated', 'candidate', 'refinement')
+order by created_at, id;
+```
+
 ## Rollback
 
-Prefer a forward repair. The migration adds evidence tables and narrows first publication to Unjudged; it does not delete artifact or vote data.
+Prefer a forward repair. The migrations add evidence tables, guard repeated runs, and narrow first publication to Unjudged; they do not delete artifact or vote data.
 
 For an emergency web rollback:
 
