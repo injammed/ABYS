@@ -25,12 +25,18 @@ type ArtifactRow = {
   profiles?: { display_name?: string } | Array<{ display_name?: string }> | null;
 };
 
+type PrivateArtifactRow = Omit<ArtifactRow, "lane" | "published_at"> & {
+  lane: FeedLane | null;
+  published_at: string | null;
+  created_at: string;
+};
+
 type VoteRow = {
   artifact_id: string;
   judgment: Judgment;
 };
 
-function creatorName(row: ArtifactRow): string {
+function creatorName(row: ArtifactRow | PrivateArtifactRow): string {
   if (Array.isArray(row.profiles)) return row.profiles[0]?.display_name || "Anonymous machine witness";
   return row.profiles?.display_name || "Anonymous machine witness";
 }
@@ -115,12 +121,62 @@ export async function loadPublicFeedPage(options: {
     mediaUrl: signedUrls.get(row.media_path),
     score: scoreForVotes(votesByArtifact.get(row.id) ?? []),
     publishedAt: row.published_at,
+    visibility: "public",
   }));
 
   return {
     artifacts,
     nextCursor: rows.length === limit ? rows.at(-1)?.published_at ?? null : null,
   };
+}
+
+export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArtifact[]> {
+  const client = requireSupabaseBrowserClient();
+  const { data, error } = await client
+    .from("artifacts")
+    .select(
+      "id,title,summary,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,created_at,profiles!artifacts_creator_id_fkey(display_name)"
+    )
+    .eq("creator_id", userId)
+    .eq("status", "quarantine")
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  if (error) throw error;
+
+  const rows = (data ?? []) as unknown as PrivateArtifactRow[];
+  const signedUrls = new Map<string, string>();
+
+  await Promise.all(
+    rows.map(async (row) => {
+      const { data: signed, error: signedError } = await client.storage
+        .from("artifact-media")
+        .createSignedUrl(row.media_path, 60 * 60);
+      if (!signedError && signed?.signedUrl) signedUrls.set(row.media_path, signed.signedUrl);
+    })
+  );
+
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    creator: creatorName(row),
+    lane: "unjudged",
+    summary: row.summary,
+    modalLead: "Private quarantine · awaiting review",
+    aiOrigin: {
+      originClass: row.origin_class,
+      declaredByCreator: true,
+      generator: row.generator,
+      humanRole: row.human_role,
+      provenanceNote: row.provenance_note,
+      confidence: "declared",
+    },
+    gradient: laneGradients.unjudged,
+    mediaUrl: signedUrls.get(row.media_path),
+    score: 50,
+    publishedAt: row.created_at,
+    visibility: "creator_preview",
+  }));
 }
 
 export async function loadOwnVotes(userId: string, artifactIds: string[]): Promise<Record<string, Judgment>> {
