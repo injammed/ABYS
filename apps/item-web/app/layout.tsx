@@ -6,6 +6,7 @@ import "./submission.css";
 import "./feed-preview.css";
 import "./lifecycle.css";
 import "./curator.css";
+import "./feed-first.css";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
