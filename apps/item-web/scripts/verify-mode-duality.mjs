@@ -21,11 +21,13 @@ function forbidPattern(label, pattern, source) {
 }
 
 requirePattern("ArtifactFeed on the root feed", /<ArtifactFeed\s*\/>/, rootPage);
+requirePattern("Feed active on the root route", /<PrimaryNavigation\b[^>]*mode=["']feed["'][^>]*\/>/, rootPage);
 requirePattern("Slop Trough compatibility alias to root feed", /export\s+\{\s*default\s*\}\s+from\s+["']\.\.\/page["']/, slopAlias);
 requirePattern("Museum mode contract marker", /data-interface-contract=["']museum-spatial-mode-v1["']/, museumPage);
 requirePattern("Museum return to the root field", /href=["']\/#field["']/, museumPage);
-requirePattern("persistent navigation in Museum", /<PrimaryNavigation\s*\/>/, museumPage);
+requirePattern("persistent navigation with Museum active", /<PrimaryNavigation\b[^>]*mode=["']museum["'][^>]*\/>/, museumPage);
 requirePattern("Feed navigation returns to root field", /href=["']\/#field["']/, navigation);
+requirePattern("Museum navigation reaches the Museum route", /href=["']\/aetimm\/["']/, navigation);
 
 forbidPattern("ArtifactFeed inside Museum", /ArtifactFeed/, museumPage);
 forbidPattern("GenerationWitness inside Museum", /GenerationWitness/, museumPage);
