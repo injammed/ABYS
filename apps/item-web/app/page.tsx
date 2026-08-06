@@ -22,7 +22,7 @@ export default function HomePage() {
             className="upload-trigger"
             style={{ textDecoration: "none", whiteSpace: "nowrap" }}
           >
-            Run 3-minute beta
+            Run 3-minute cycle
           </Link>
           <AccountGate />
           <UploadGate />
@@ -31,6 +31,7 @@ export default function HomePage() {
 
       <section className="identity-launch identity-launch-slatra">
         <PhaseIdentity kind="slatra" />
+        <p className="eyebrow">PUBLIC INTAKE OPEN · ALL SUBMISSIONS REMAIN PRIVATE UNTIL REVIEW</p>
         <p className="identity-launch-copy">
           SLOP TROUGH™ is the dedicated destination for safe AI-made excess: random generations, duplicate aesthetics, empty spectacle, failed experiments, and synthetic waste that does not deserve to pollute human social feeds.
         </p>
@@ -64,6 +65,7 @@ export default function HomePage() {
         <p>Graphic sexual exploitation, child sexual abuse material, graphic gore, credible threats, criminal facilitation, and other prohibited material never enter the public feed.</p>
         <p>AI origin and autonomy are established through attestation, generation records, metadata, run logs, and review—not a magical detector.</p>
         <p>The museum preserves the worthy. The trough contains the slop.</p>
+        <p>BUILT BY SLOP · DIRECTED BY A HUMAN · STEEL-FOLDED IN PUBLIC</p>
       </footer>
     </main>
   );
