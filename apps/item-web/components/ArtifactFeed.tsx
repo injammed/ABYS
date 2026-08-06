@@ -11,6 +11,11 @@ import {
   loadPublicFeedPage,
   saveVote,
 } from "@/lib/social-feed";
+import {
+  didVoteOwnerChange,
+  replaceHydratedVotes,
+  shouldApplyVoteHydration,
+} from "@/lib/vote-state";
 
 function laneLabel(lane: FeedLane): string {
   if (lane === "aetimm") return "AETIMM";
@@ -38,13 +43,28 @@ export function ArtifactFeed() {
   const [feedError, setFeedError] = useState<string | null>(null);
   const [voteMessage, setVoteMessage] = useState<string | null>(null);
   const sentinel = useRef<HTMLDivElement | null>(null);
+  const voteOwnerRef = useRef<string | null>(null);
+  const voteHydrationVersionRef = useRef(0);
 
   useEffect(() => {
     const client = getSupabaseBrowserClient();
     if (!client) return;
 
-    void client.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data } = client.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession));
+    const applySession = (nextSession: Session | null) => {
+      const nextOwnerId = nextSession?.user.id ?? null;
+
+      if (didVoteOwnerChange(voteOwnerRef.current, nextOwnerId)) {
+        voteOwnerRef.current = nextOwnerId;
+        voteHydrationVersionRef.current += 1;
+        setJudgments({});
+        setVoteMessage(null);
+      }
+
+      setSession(nextSession);
+    };
+
+    void client.auth.getSession().then(({ data }) => applySession(data.session));
+    const { data } = client.auth.onAuthStateChange((_event, nextSession) => applySession(nextSession));
     return () => data.subscription.unsubscribe();
   }, []);
 
@@ -110,16 +130,38 @@ export function ArtifactFeed() {
   }, [session?.user.id]);
 
   useEffect(() => {
-    if (!socialBackendEnabled || !session || artifacts.length === 0) return;
-    let cancelled = false;
+    if (!socialBackendEnabled) return;
 
+    const userId = session?.user.id ?? null;
     const publicArtifactIds = artifacts
       .filter((artifact) => artifact.visibility !== "creator_preview")
       .map((artifact) => artifact.id);
 
-    void loadOwnVotes(session.user.id, publicArtifactIds)
+    if (!userId || publicArtifactIds.length === 0) {
+      setJudgments({});
+      return;
+    }
+
+    let cancelled = false;
+    const requestVersion = voteHydrationVersionRef.current + 1;
+    voteHydrationVersionRef.current = requestVersion;
+
+    void loadOwnVotes(userId, publicArtifactIds)
       .then((votes) => {
-        if (!cancelled) setJudgments((current) => ({ ...current, ...votes }));
+        if (cancelled) return;
+
+        if (
+          !shouldApplyVoteHydration({
+            requestOwnerId: userId,
+            currentOwnerId: voteOwnerRef.current,
+            requestVersion,
+            currentVersion: voteHydrationVersionRef.current,
+          })
+        ) {
+          return;
+        }
+
+        setJudgments(replaceHydratedVotes(votes));
       })
       .catch(() => {
         // Public feed remains usable even if personal vote hydration fails.
@@ -128,7 +170,7 @@ export function ArtifactFeed() {
     return () => {
       cancelled = true;
     };
-  }, [session, artifacts]);
+  }, [session?.user.id, artifacts]);
 
   useEffect(() => {
     const node = sentinel.current;
@@ -188,17 +230,21 @@ export function ArtifactFeed() {
       return;
     }
 
-    if (!session) {
+    const voterId = session?.user.id;
+    if (!voterId) {
       setVoteMessage("Sign in to record a public judgment.");
       return;
     }
 
+    voteHydrationVersionRef.current += 1;
     const prior = judgments[id];
     setJudgments((current) => ({ ...current, [id]: judgment }));
 
     try {
-      await saveVote(id, session.user.id, judgment);
+      await saveVote(id, voterId, judgment);
     } catch (error) {
+      if (voteOwnerRef.current !== voterId) return;
+
       setJudgments((current) => {
         const next = { ...current };
         if (prior) next[id] = prior;
