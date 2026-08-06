@@ -65,6 +65,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:feed-root
 
+      - name: Verify Feed / Museum route duality
+        working-directory: apps/item-web
+        run: npm run verify:mode-duality
+
       - name: Verify curator migration contract
         working-directory: apps/item-web
         run: npm run verify:curator

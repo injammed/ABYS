@@ -46,6 +46,9 @@ jobs:
       - name: Verify permanent feed-first root
         run: npm run verify:feed-root
 
+      - name: Verify Feed / Museum route duality
+        run: npm run verify:mode-duality
+
       - name: Verify curator migration contract
         run: npm run verify:curator
 

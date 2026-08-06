@@ -1,22 +1,29 @@
 import Link from "next/link";
-import { ArtifactFeed } from "@/components/ArtifactFeed";
-import { GenerationWitness } from "@/components/GenerationWitness";
 import { PhaseIdentity } from "@/components/PhaseIdentity";
+import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 
 export default function AetimmPage() {
   return (
-    <main>
-      <section className="identity-launch identity-launch-aetimm">
+    <main className="about-page museum-page" data-interface-contract="museum-spatial-mode-v1">
+      <section className="identity-launch identity-launch-aetimm" aria-label="AETIMM Museum entrance">
         <PhaseIdentity kind="aetimm" />
         <p className="identity-launch-copy">
-          AETIMM phases into AI: Aeternum Immutablis, the museum door for machine-made work that deserves to persist.
+          AETIMM is the Museum: a distinct spatial environment for machine-made work deliberately selected to persist.
         </p>
-        <Link className="identity-switch" href="/slop-trough/">
-          Cross to ST · SLOP TROUGH™
-        </Link>
+        <p className="identity-launch-copy">
+          Its rooms, walls, shelves, cases, and inspection mechanics will be folded here without turning the Museum into another vertical feed.
+        </p>
+        <div className="identity-actions">
+          <Link className="identity-switch" href="/#field">
+            Return to the Slop Feed
+          </Link>
+          <Link className="identity-switch" href="/about/">
+            Read the field constitution
+          </Link>
+        </div>
       </section>
-      <GenerationWitness />
-      <ArtifactFeed />
+
+      <PrimaryNavigation />
     </main>
   );
 }
