@@ -4,7 +4,7 @@ import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 
 export default function HomePage() {
   return (
-    <main className="feed-first-page">
+    <main className="feed-first-page" data-interface-contract="slop-feed-root-v1">
       <header className="site-header feed-first-header">
         <a className="brand-lockup feed-first-brand" href="#field" aria-label="Return to the live feed">
           <div className="brand-mark" aria-hidden="true">◇</div>
