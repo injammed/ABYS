@@ -5,6 +5,7 @@ import type { Session } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 
 type Mode = "signin" | "signup";
+type SocialProvider = "google" | "github";
 
 type PersonalArtifact = {
   id: string;
@@ -32,6 +33,7 @@ export function AccountGate() {
   const [profileName, setProfileName] = useState("");
   const [uploads, setUploads] = useState<PersonalArtifact[]>([]);
   const [busy, setBusy] = useState(false);
+  const [socialProvider, setSocialProvider] = useState<SocialProvider | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const sessionRef = useRef<Session | null>(null);
 
@@ -56,6 +58,9 @@ export function AccountGate() {
     setProfileName(
       profile?.display_name ||
         activeSession.user.user_metadata.display_name ||
+        activeSession.user.user_metadata.full_name ||
+        activeSession.user.user_metadata.name ||
+        activeSession.user.user_metadata.user_name ||
         activeSession.user.email?.split("@")[0] ||
         "Creator"
     );
@@ -102,6 +107,29 @@ export function AccountGate() {
       window.removeEventListener("aetimm:submission-created", refreshUploads);
     };
   }, [loadAccountData]);
+
+  async function socialSignIn(provider: SocialProvider) {
+    const client = getSupabaseBrowserClient();
+    if (!client) return;
+
+    setBusy(true);
+    setSocialProvider(provider);
+    setMessage(null);
+
+    try {
+      const { error } = await client.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+      if (error) throw error;
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : `Could not connect with ${provider}.`);
+      setBusy(false);
+      setSocialProvider(null);
+    }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -225,7 +253,7 @@ export function AccountGate() {
               )}
             </div>
 
-            <p className="submission-note">Signed in as {session.user.email}</p>
+            <p className="submission-note">Signed in as {session.user.email || "social account"}</p>
             {message && <p className="submission-note" role="status">{message}</p>}
             <button className="submit-button" type="button" disabled={busy} onClick={signOut}>
               Sign out
@@ -244,6 +272,27 @@ export function AccountGate() {
 
       {open && (
         <form className="upload-panel" onSubmit={submit}>
+          <div style={{ display: "grid", gap: ".55rem" }}>
+            <button
+              className="submit-button"
+              type="button"
+              disabled={busy}
+              onClick={() => void socialSignIn("google")}
+            >
+              {socialProvider === "google" ? "Connecting to Google…" : "Continue with Google"}
+            </button>
+            <button
+              className="submit-button"
+              type="button"
+              disabled={busy}
+              onClick={() => void socialSignIn("github")}
+            >
+              {socialProvider === "github" ? "Connecting to GitHub…" : "Continue with GitHub"}
+            </button>
+          </div>
+
+          <p className="eyebrow" style={{ textAlign: "center", margin: ".15rem 0" }}>OR USE EMAIL</p>
+
           <div className="lane-tabs" aria-label="Account action">
             <button
               type="button"
