@@ -48,6 +48,42 @@ function topDecileCount(cohortSize) {
   return Math.max(1, Math.ceil(cohortSize * 0.1));
 }
 
+function lifecycleTransition(state, action) {
+  const next = { ...state };
+
+  if (action === "request_revision" && state.artifactStatus === "quarantine") {
+    next.artifactStatus = "needs_revision";
+    return next;
+  }
+  if (action === "resubmit" && state.artifactStatus === "needs_revision") {
+    next.artifactStatus = "quarantine";
+    return next;
+  }
+  if (action === "publish_unjudged" && state.artifactStatus === "quarantine") {
+    next.artifactStatus = "approved";
+    next.lane = "unjudged";
+    return next;
+  }
+  if (action === "nominate" && state.artifactStatus === "approved" && state.lane === "unjudged") {
+    next.selectionStatus = "nominated";
+    return next;
+  }
+  if (action === "candidate" && ["nominated", "refinement"].includes(state.selectionStatus)) {
+    next.selectionStatus = "candidate";
+    return next;
+  }
+  if (action === "museum_admit") {
+    if (state.artifactStatus !== "approved" || state.lane !== "unjudged" || state.selectionStatus !== "candidate") {
+      throw new Error("SELECTION_CANDIDATE_REQUIRED");
+    }
+    next.selectionStatus = "museum_admitted";
+    next.lane = "aetimm";
+    return next;
+  }
+
+  throw new Error(`invalid transition: ${action}`);
+}
+
 requirePattern("selection migration transaction", /begin;[\s\S]*commit;/i, migration);
 requirePattern("selection queue guard transaction", /begin;[\s\S]*commit;/i, queueGuard);
 forbidPattern("stray migration token", /\ba\s+create\s+or\s+replace\s+function/i, `${migration}\n${queueGuard}`);
@@ -92,10 +128,38 @@ if (!(eightThousandOfTenThousand > twoOfTwo)) {
 if (topDecileCount(10) !== 1) failures.push("ten eligible artifacts must nominate exactly one top-decile artifact");
 if (topDecileCount(11) !== 2) failures.push("eleven eligible artifacts must nominate two after ceiling");
 
+let lifecycle = {
+  artifactStatus: "quarantine",
+  lane: null,
+  selectionStatus: null,
+};
+lifecycle = lifecycleTransition(lifecycle, "request_revision");
+lifecycle = lifecycleTransition(lifecycle, "resubmit");
+lifecycle = lifecycleTransition(lifecycle, "publish_unjudged");
+lifecycle = lifecycleTransition(lifecycle, "nominate");
+
+let directAdmissionRejected = false;
+try {
+  lifecycleTransition(lifecycle, "museum_admit");
+} catch (error) {
+  directAdmissionRejected = error instanceof Error && error.message === "SELECTION_CANDIDATE_REQUIRED";
+}
+if (!directAdmissionRejected) failures.push("nominated artifact must not enter the Museum before candidate review");
+
+lifecycle = lifecycleTransition(lifecycle, "candidate");
+lifecycle = lifecycleTransition(lifecycle, "museum_admit");
+if (
+  lifecycle.artifactStatus !== "approved" ||
+  lifecycle.lane !== "aetimm" ||
+  lifecycle.selectionStatus !== "museum_admitted"
+) {
+  failures.push("complete rehearsal must end in approved/aetimm/museum_admitted state");
+}
+
 if (failures.length > 0) {
   console.error("Selection rehearsal contract failed:");
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
 
-console.log("Selection rehearsal PASS: quarantine, Unjudged publication, confidence nomination, guarded curator review, and Museum admission remain separate and testable.");
+console.log("Selection rehearsal PASS: quarantine, revision, Unjudged publication, confidence nomination, guarded curator review, and Museum admission remain separate and testable.");
