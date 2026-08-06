@@ -2,6 +2,8 @@ import { requireSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 export type SelectionStatus = "nominated" | "candidate" | "refinement";
 export type SelectionDecision = "candidate" | "refinement" | "archive" | "reject" | "museum_admit";
+export type SelectionArtifactStatus = "quarantine" | "needs_revision" | "approved" | "rejected" | "removed";
+export type SelectionArtifactLane = "unjudged" | "aetimm" | "slatra" | null;
 
 export type SelectionReview = {
   selection_id: number;
@@ -10,6 +12,8 @@ export type SelectionReview = {
   creator_name: string;
   media_path: string;
   mediaUrl?: string;
+  artifact_status: SelectionArtifactStatus;
+  artifact_lane: SelectionArtifactLane;
   cohort_rank: number;
   cohort_size: number;
   selection_score: number;
@@ -26,6 +30,18 @@ export type SelectionReview = {
 function asNumber(value: unknown): number {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function asArtifactStatus(value: unknown): SelectionArtifactStatus {
+  const status = String(value ?? "quarantine");
+  return status === "needs_revision" || status === "approved" || status === "rejected" || status === "removed"
+    ? status
+    : "quarantine";
+}
+
+function asArtifactLane(value: unknown): SelectionArtifactLane {
+  const lane = value === null || value === undefined ? null : String(value);
+  return lane === "unjudged" || lane === "aetimm" || lane === "slatra" ? lane : null;
 }
 
 export async function loadSelectionReviewQueue(): Promise<SelectionReview[]> {
@@ -49,6 +65,8 @@ export async function loadSelectionReviewQueue(): Promise<SelectionReview[]> {
         creator_name: String(row.creator_name ?? "Anonymous creator"),
         media_path: mediaPath,
         mediaUrl: signedError ? undefined : signed?.signedUrl,
+        artifact_status: asArtifactStatus(row.artifact_status),
+        artifact_lane: asArtifactLane(row.artifact_lane),
         cohort_rank: asNumber(row.cohort_rank),
         cohort_size: asNumber(row.cohort_size),
         selection_score: asNumber(row.selection_score),
