@@ -14,6 +14,26 @@ We do not worship slop. We cultivate from it.
 
 ---
 
+## Permanent Root Covenant
+
+This decision is intended to survive frameworks, redesigns, teams, models, and generations of the product:
+
+```txt
+open aetimm.com
+→ enter the Slop Feed
+→ scroll immediately
+→ judge
+→ continue
+```
+
+The root route is the Slop Feed. It is not a landing page, marketing page, portal, dashboard, museum entrance, or explanatory preface.
+
+Necessary capabilities—Submit, Museum, About, Account, search, filters, accessibility controls, provenance, and creator tools—must remain accessible as controls, sheets, overlays, or deep surfaces around the Feed. They must not displace the Feed as the opening environment.
+
+A future change to this covenant requires an explicit constitutional revision to this document and to the executable `verify:feed-root` contract. It must never happen accidentally through redesign, generated code, or branch drift.
+
+---
+
 ## Hard Interaction Duality
 
 ```txt
