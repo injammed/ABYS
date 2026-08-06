@@ -43,6 +43,9 @@ jobs:
       - name: Install
         run: npm install
 
+      - name: Verify permanent feed-first root
+        run: npm run verify:feed-root
+
       - name: Verify curator migration contract
         run: npm run verify:curator
 
