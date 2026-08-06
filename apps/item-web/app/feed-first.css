@@ -246,3 +246,18 @@
     font-size: 1rem;
   }
 }
+
+@media (forced-colors: active) {
+  .primary-navigation {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .primary-navigation-link,
+  .primary-navigation-action .upload-trigger,
+  .primary-navigation-mark {
+    color: CanvasText;
+  }
+}
