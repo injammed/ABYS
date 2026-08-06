@@ -39,6 +39,9 @@ if (feedIndex < 0 || controlsIndex < 0 || feedIndex > controlsIndex) {
   failures.push("ArtifactFeed must render before PrimaryNavigation");
 }
 
+requirePattern("Permanent Root Covenant", /## Permanent Root Covenant/, constitution);
+requirePattern("root route is the Slop Feed law", /The root route is the Slop Feed\./, constitution);
+requirePattern("explicit constitutional revision rule", /requires an explicit constitutional revision/, constitution);
 requirePattern("Infinite Field Principle", /## The Infinite Field Principle/, constitution);
 requirePattern("vertical-infinity Slop law", /SLOP = vertical infinity/, constitution);
 requirePattern("spatial-choice Museum law", /MUSEUM = spatial choice/, constitution);
