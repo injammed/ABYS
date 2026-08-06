@@ -34,6 +34,26 @@ A future change to this covenant requires an explicit constitutional revision to
 
 ---
 
+## Permanent Route Identity Covenant
+
+The concepts and routes are identical by law:
+
+```txt
+/ = Slop Feed
+/slop-trough/ = compatibility alias of the Slop Feed
+/aetimm/ = Museum only
+```
+
+The Feed **is** the Slop Trough. There is no second Slop Trough landing destination, identity wall, portal, or parallel feed.
+
+The Museum is the Museum. It must not import or render the infinite `ArtifactFeed`, and its exit must return directly to `/#field`.
+
+Legacy or shared links to `/slop-trough/` must resolve to the same feed-first experience as `/`. They may not create a duplicate mode or a dead end.
+
+This mapping is enforced by the executable `verify:mode-duality` contract. A future change requires an explicit constitutional revision and migration plan.
+
+---
+
 ## Hard Interaction Duality
 
 ```txt
