@@ -27,12 +27,6 @@ export default function HomePage() {
         <ArtifactFeed />
       </section>
 
-      <footer>
-        <p>Everything begins in the Trough. Nothing enters AETIMM by accident.</p>
-        <p>AI origin and autonomy are established through attestation, generation records, metadata, run logs, and review—not a magical detector.</p>
-        <p>BUILT BY SLOP · DIRECTED BY A HUMAN · STEEL-FOLDED IN PUBLIC</p>
-      </footer>
-
       <PrimaryNavigation />
     </main>
   );
