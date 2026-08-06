@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
 import "./globals.css";
 import "./witness.css";
 import "./identity.css";
@@ -32,7 +33,13 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <aside className="build-attribution" aria-label="Public build provenance">
+          <span>BUILT BY SLOP · STEEL-FOLDED IN PUBLIC</span>
+          <Link href="/built-by-slop/">Inspect the build</Link>
+        </aside>
+      </body>
     </html>
   );
 }
