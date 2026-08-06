@@ -14,6 +14,60 @@ We do not worship slop. We cultivate from it.
 
 ---
 
+## Hard Interaction Duality
+
+```txt
+SLOP = vertical infinity
+MUSEUM = spatial choice
+```
+
+The two environments must not collapse into the same interaction model.
+
+The Trough is velocity, succession, abundance, and immediate judgment.
+
+The Museum is orientation, selection, inspection, comparison, and deliberate movement.
+
+The contrast is part of the product meaning.
+
+### SLOP TROUGH
+
+The Trough is scroll.
+
+Scroll is not one feature among many. It is the primary environment.
+
+```txt
+artifact
+→ judgment
+→ next artifact
+→ judgment
+→ next artifact
+```
+
+The main axis is vertical. Artifacts remain continuously ready above and below the current view. Nuanced controls must be accessible without breaking the field unnecessarily.
+
+The Trough may use taps for voting and controls, but it must not become a maze of rooms, dashboards, cards requiring repeated opening, or horizontally competing content rails.
+
+### AETIMM MUSEUM
+
+The Museum must not be another infinite feed with premium styling.
+
+Its interaction vocabulary should include:
+
+- entering and leaving rooms;
+- moving sideways between works, shelves, walls, cases, or chapters;
+- opening and closing artifacts;
+- selecting and deselecting;
+- zooming into provenance, lineage, revisions, and traits;
+- comparing a bounded set of works;
+- returning to a known place;
+- navigating a visible spatial or categorical structure.
+
+The Museum should feel finite at every immediate scale even when the larger institution grows. A visitor should know where they are, what they selected, and how to return.
+
+Vertical scrolling may exist inside a long document, provenance record, or accessibility fallback, but it must not define Museum discovery.
+
+---
+
 ## The Infinite Field Principle
 
 The website is not a landing page followed by a product.
@@ -97,6 +151,8 @@ Do not place these before the first artifact:
 
 Do not turn every control into a new page.
 
+Do not turn the Museum into a renamed feed, vertical ranking list, or endless content rail.
+
 Do not hide privileged authority inside a visual control. Authentication and authorization remain separate, and database-enforced policy outranks interface appearance.
 
 Do not sacrifice keyboard access, reduced-motion support, readable labels, safe-area handling, or recoverable errors for the appearance of frictionlessness.
@@ -125,7 +181,7 @@ Every interface fold must measurably strengthen at least one primary without wea
 3. One-handed artifact presentation and voting.
 4. Deterministic infinite loading and media prefetch.
 5. Visible vote culture and orthogonal Foam boards.
-6. Museum rooms and artifact journey.
+6. Museum rooms, bounded spatial navigation, and artifact journey.
 7. Feed-state restoration across nuanced controls.
 
 Each fold must pass automated checks, production deployment, and exact-device verification before it is treated as complete.
