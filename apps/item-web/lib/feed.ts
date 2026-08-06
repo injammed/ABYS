@@ -33,6 +33,7 @@ export type FeedArtifact = {
   mediaUrl?: string;
   score: number;
   publishedAt?: string;
+  visibility?: "public" | "creator_preview";
 };
 
 export const originClassLabels: Record<OriginClass, string> = {
