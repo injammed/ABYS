@@ -1,37 +1,21 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { CreatorSubmissionManager } from "@/components/CreatorSubmissionManager";
+import { loadCurrentRole, type ProfileRole } from "@/lib/moderation";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 
 type Mode = "signin" | "signup";
 type SocialProvider = "google" | "github";
-
-type PersonalArtifact = {
-  id: string;
-  title: string;
-  status: "quarantine" | "approved" | "rejected" | "removed";
-  lane: "aetimm" | "slatra" | "unjudged" | null;
-  created_at: string;
-};
-
-function statusLabel(artifact: PersonalArtifact): string {
-  if (artifact.status === "approved") {
-    if (artifact.lane === "aetimm") return "Approved · AETIMM";
-    if (artifact.lane === "slatra") return "Approved · SLOP TROUGH";
-    return "Approved · Unjudged";
-  }
-  if (artifact.status === "quarantine") return "In private quarantine";
-  if (artifact.status === "rejected") return "Rejected";
-  return "Removed";
-}
 
 export function AccountGate() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("signin");
   const [session, setSession] = useState<Session | null>(null);
   const [profileName, setProfileName] = useState("");
-  const [uploads, setUploads] = useState<PersonalArtifact[]>([]);
+  const [profileRole, setProfileRole] = useState<ProfileRole>("creator");
   const [busy, setBusy] = useState(false);
   const [socialProvider, setSocialProvider] = useState<SocialProvider | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -41,18 +25,13 @@ export function AccountGate() {
     const client = getSupabaseBrowserClient();
     if (!client || !activeSession) {
       setProfileName("");
-      setUploads([]);
+      setProfileRole("creator");
       return;
     }
 
-    const [{ data: profile }, { data: artifacts, error: artifactsError }] = await Promise.all([
+    const [{ data: profile }, role] = await Promise.all([
       client.from("profiles").select("display_name").eq("id", activeSession.user.id).maybeSingle(),
-      client
-        .from("artifacts")
-        .select("id,title,status,lane,created_at")
-        .eq("creator_id", activeSession.user.id)
-        .order("created_at", { ascending: false })
-        .limit(20),
+      loadCurrentRole(activeSession.user.id),
     ]);
 
     setProfileName(
@@ -64,8 +43,7 @@ export function AccountGate() {
         activeSession.user.email?.split("@")[0] ||
         "Creator"
     );
-
-    if (!artifactsError) setUploads((artifacts ?? []) as PersonalArtifact[]);
+    setProfileRole(role);
   }, []);
 
   useEffect(() => {
@@ -79,13 +57,17 @@ export function AccountGate() {
       if (!mounted) return;
       sessionRef.current = data.session;
       setSession(data.session);
-      void loadAccountData(data.session);
+      void loadAccountData(data.session).catch((error) => {
+        if (mounted) setMessage(error instanceof Error ? error.message : "Account data could not be loaded.");
+      });
     });
 
     const { data } = client.auth.onAuthStateChange((event, nextSession) => {
       sessionRef.current = nextSession;
       setSession(nextSession);
-      void loadAccountData(nextSession);
+      void loadAccountData(nextSession).catch((error) => {
+        if (mounted) setMessage(error instanceof Error ? error.message : "Account data could not be loaded.");
+      });
 
       if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
         setOpen(false);
@@ -100,11 +82,15 @@ export function AccountGate() {
   }, [loadAccountData]);
 
   useEffect(() => {
-    const refreshUploads = () => void loadAccountData(sessionRef.current);
-    window.addEventListener("aetimm:submission-created", refreshUploads);
+    const refreshAccount = () => {
+      void loadAccountData(sessionRef.current).catch(() => undefined);
+    };
+    window.addEventListener("aetimm:submission-created", refreshAccount);
+    window.addEventListener("aetimm:lifecycle-updated", refreshAccount);
 
     return () => {
-      window.removeEventListener("aetimm:submission-created", refreshUploads);
+      window.removeEventListener("aetimm:submission-created", refreshAccount);
+      window.removeEventListener("aetimm:lifecycle-updated", refreshAccount);
     };
   }, [loadAccountData]);
 
@@ -213,13 +199,15 @@ export function AccountGate() {
   }
 
   if (session) {
+    const canCurate = profileRole === "curator" || profileRole === "admin";
+
     return (
       <div className="upload-wrap">
         <button className="upload-trigger" type="button" onClick={() => setOpen((value) => !value)}>
           {profileName || session.user.email || "Account"}
         </button>
         {open && (
-          <div className="upload-panel" role="dialog" aria-label="Profile and uploads">
+          <div className="upload-panel account-lifecycle-panel" role="dialog" aria-label="Profile and artifact lifecycle">
             <form onSubmit={saveProfile}>
               <div>
                 <label htmlFor="profile-display-name">Display name</label>
@@ -239,19 +227,13 @@ export function AccountGate() {
               </button>
             </form>
 
-            <div>
-              <p className="eyebrow">MY UPLOADS</p>
-              {uploads.length === 0 ? (
-                <p className="submission-note">No slop submitted yet.</p>
-              ) : (
-                uploads.map((artifact) => (
-                  <p className="submission-note" key={artifact.id}>
-                    <strong>{artifact.title}</strong><br />
-                    {statusLabel(artifact)} · {new Date(artifact.created_at).toLocaleDateString()}
-                  </p>
-                ))
-              )}
-            </div>
+            {canCurate && (
+              <Link className="curator-account-link" href="/curator/">
+                Open private curator queue
+              </Link>
+            )}
+
+            <CreatorSubmissionManager session={session} />
 
             <p className="submission-note">Signed in as {session.user.email || "social account"}</p>
             {message && <p className="submission-note" role="status">{message}</p>}

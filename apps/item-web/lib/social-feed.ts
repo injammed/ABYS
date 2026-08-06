@@ -29,6 +29,7 @@ type PrivateArtifactRow = Omit<ArtifactRow, "lane" | "published_at"> & {
   lane: FeedLane | null;
   published_at: string | null;
   created_at: string;
+  status: "quarantine" | "needs_revision";
 };
 
 type VoteRow = {
@@ -135,10 +136,10 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
   const { data, error } = await client
     .from("artifacts")
     .select(
-      "id,title,summary,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,created_at,profiles!artifacts_creator_id_fkey(display_name)"
+      "id,title,summary,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,created_at,status,profiles!artifacts_creator_id_fkey(display_name)"
     )
     .eq("creator_id", userId)
-    .eq("status", "quarantine")
+    .in("status", ["quarantine", "needs_revision"])
     .order("created_at", { ascending: false })
     .limit(20);
 
@@ -162,7 +163,7 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
     creator: creatorName(row),
     lane: "unjudged",
     summary: row.summary,
-    modalLead: "Private quarantine · awaiting review",
+    modalLead: row.status === "needs_revision" ? "Private revision requested" : "Private quarantine · awaiting review",
     aiOrigin: {
       originClass: row.origin_class,
       declaredByCreator: true,

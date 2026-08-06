@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify:curator": "node scripts/verify-curator-contract.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "latest",
