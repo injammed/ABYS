@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { loadMuseumRegistry, MuseumArtifact } from "@/lib/museum";
+import { loadMuseumRegistry } from "@/lib/museum";
+import type { MuseumArtifact } from "@/lib/museum";
 import { socialBackendEnabled } from "@/lib/supabase-browser";
 
 export function MuseumRegistry() {
@@ -85,12 +86,12 @@ export function MuseumRegistry() {
             {selected.mediaUrl ? <img src={selected.mediaUrl} alt="" /> : <span>Preview unavailable</span>}
           </div>
           <div>
-            <p className="eyebrow">MUSEUM ADMISSION · {new Date(selected.publishedAt).toLocaleDateString()}</p>
+            <p className="eyebrow">PUBLICATION RECORD · {new Date(selected.publishedAt).toLocaleDateString()}</p>
             <h3>{selected.title}</h3>
             <p className="creator">by {selected.creatorName}</p>
             <p>{selected.summary}</p>
             <p className="museum-receipt-note">
-              This object reached the room through public publication, judgment evidence, algorithmic nomination, and explicit curator admission. Provenance and full selection receipts will deepen in later folds.
+              This object reached the room through public publication, judgment evidence, algorithmic nomination, and explicit curator admission. A later fold will expose the immutable admission timestamp and full selection receipt here.
             </p>
           </div>
         </div>
