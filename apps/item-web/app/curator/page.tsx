@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CuratorQueue } from "@/components/CuratorQueue";
+import { SelectionQueue } from "@/components/SelectionQueue";
 
 export default function CuratorPage() {
   return (
@@ -18,14 +19,15 @@ export default function CuratorPage() {
       </header>
 
       <section className="curator-intro">
-        <p className="eyebrow">PRIVATE REVIEW SURFACE</p>
-        <h2>Nothing publishes by accident.</h2>
+        <p className="eyebrow">PRIVATE REVIEW + SELECTION SURFACE</p>
+        <h2>Nothing publishes or enters the Museum by accident.</h2>
         <p>
-          Curator decisions execute through a database-authorized atomic transition. Approval publishes the artifact and records the note; revision and rejection keep the media private.
+          Quarantine review controls first publication. Public judgments create selection evidence. The algorithm nominates a cohort-relative top decile, and a separate curator decision controls Museum admission.
         </p>
       </section>
 
       <CuratorQueue />
+      <SelectionQueue />
     </main>
   );
 }
