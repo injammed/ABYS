@@ -13,6 +13,15 @@ on:
       - "apps/item-web/**"
       - "supabase/migrations/002_curator_submission_loop.sql"
       - ".github/workflows/item-feed-preview.yml"
+  push:
+    branches:
+      - "fold/**"
+      - "feature/**"
+      - "fix/**"
+    paths:
+      - "apps/item-web/**"
+      - "supabase/migrations/002_curator_submission_loop.sql"
+      - ".github/workflows/item-feed-preview.yml"
 
 jobs:
   build:
