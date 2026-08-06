@@ -7,11 +7,39 @@ import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-b
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
+type IntakeControl = {
+  intake_open: boolean;
+  daily_submission_limit: number;
+};
+
+function submissionErrorMessage(error: unknown): string {
+  const raw = error instanceof Error ? error.message : String(error ?? "");
+
+  if (raw.includes("INTAKE_CLOSED")) {
+    return "Public intake is temporarily paused. Existing private submissions remain safe.";
+  }
+  if (raw.includes("DAILY_SUBMISSION_LIMIT_REACHED")) {
+    return "Daily submission limit reached. Try again after the rolling 24-hour window clears.";
+  }
+  if (raw.includes("QUARANTINE_BACKLOG_LIMIT_REACHED")) {
+    return "Your private quarantine queue is full. Wait for review before submitting more.";
+  }
+  if (raw.includes("INTAKE_IDENTITY_MISMATCH") || raw.includes("INTAKE_REQUIRES_PRIVATE_QUARANTINE")) {
+    return "Submission authorization failed. Sign out, sign back in, and retry.";
+  }
+  if (raw.toLowerCase().includes("row-level security")) {
+    return "Intake rejected this upload. The queue may be paused or your account may have reached its limit.";
+  }
+
+  return raw || "Submission failed.";
+}
+
 export function UploadGate() {
   const [open, setOpen] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [intakeControl, setIntakeControl] = useState<IntakeControl | null>(null);
 
   useEffect(() => {
     const client = getSupabaseBrowserClient();
@@ -19,6 +47,19 @@ export function UploadGate() {
 
     void client.auth.getSession().then(({ data }) => setSession(data.session));
     const { data } = client.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession));
+
+    void client
+      .from("intake_control")
+      .select("intake_open,daily_submission_limit")
+      .eq("id", 1)
+      .maybeSingle()
+      .then(({ data: control, error }) => {
+        // Migration 003 may not yet be applied during a staged deployment.
+        // In that case, preserve the existing upload behavior rather than
+        // presenting a false closed state.
+        if (!error && control) setIntakeControl(control as IntakeControl);
+      });
+
     return () => data.subscription.unsubscribe();
   }, []);
 
@@ -28,6 +69,21 @@ export function UploadGate() {
     if (!client || !session) {
       setMessage("Sign in before submitting an artifact.");
       return;
+    }
+
+    const { data: currentControl, error: controlError } = await client
+      .from("intake_control")
+      .select("intake_open,daily_submission_limit")
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (!controlError && currentControl) {
+      const control = currentControl as IntakeControl;
+      setIntakeControl(control);
+      if (!control.intake_open) {
+        setMessage("Public intake is temporarily paused. Existing private submissions remain safe.");
+        return;
+      }
     }
 
     const formElement = event.currentTarget;
@@ -86,7 +142,7 @@ export function UploadGate() {
       setMessage("Submitted to private quarantine. It will not enter the public feed until approved.");
       window.dispatchEvent(new CustomEvent("aetimm:submission-created"));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Submission failed.");
+      setMessage(submissionErrorMessage(error));
     } finally {
       setBusy(false);
     }
@@ -100,10 +156,18 @@ export function UploadGate() {
     );
   }
 
+  const intakePaused = intakeControl?.intake_open === false;
+  const dailyLimit = intakeControl?.daily_submission_limit;
+
   return (
     <div className="upload-wrap">
-      <button className="upload-trigger" type="button" onClick={() => setOpen((value) => !value)}>
-        {open ? "Close submission" : "Submit slop"}
+      <button
+        className="upload-trigger"
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+      >
+        {open ? "Close submission" : intakePaused ? "Intake paused" : "Submit slop"}
       </button>
 
       {open && !session && (
@@ -112,10 +176,18 @@ export function UploadGate() {
         </div>
       )}
 
-      {open && session && (
-        <form className="upload-panel submission-panel" onSubmit={submit}>
+      {open && session && intakePaused && (
+        <div className="upload-panel" role="status">
+          <p className="submission-note">Public intake is temporarily paused. Existing private submissions remain safe.</p>
+        </div>
+      )}
+
+      {open && session && !intakePaused && (
+        <form className="upload-panel submission-panel" onSubmit={submit} aria-busy={busy}>
           <p className="submission-note">
-            Public intake is open. JPEG, PNG, WebP, or GIF · 10 MB maximum · every upload remains private until review.
+            Public intake is open. JPEG, PNG, WebP, or GIF · 10 MB maximum
+            {dailyLimit ? ` · ${dailyLimit} submissions per rolling 24 hours` : ""}
+            {" · "}every upload remains private until review.
           </p>
 
           <div>
@@ -143,12 +215,13 @@ export function UploadGate() {
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
               required
+              disabled={busy}
             />
           </div>
 
           <div>
             <label htmlFor="originClass">Origin class</label>
-            <select id="originClass" name="originClass" required defaultValue="">
+            <select id="originClass" name="originClass" required defaultValue="" disabled={busy}>
               <option value="" disabled>Select how the work was made</option>
               <option value="human_ai_hybrid">Human–AI hybrid — substantial human source material, editing, or authorship</option>
               <option value="ai_directed">Human-directed AI — human prompted and selected the output</option>
@@ -159,7 +232,7 @@ export function UploadGate() {
 
           <div>
             <label htmlFor="generator">Generator / model</label>
-            <input id="generator" name="generator" required minLength={2} maxLength={120} placeholder="Model, workflow, or tool stack" />
+            <input id="generator" name="generator" required minLength={2} maxLength={120} placeholder="Model, workflow, or tool stack" disabled={busy} />
           </div>
 
           <div>
@@ -171,6 +244,7 @@ export function UploadGate() {
               minLength={15}
               maxLength={800}
               placeholder="State exactly what humans did: configured the pipeline, prompted, supplied source material, edited, selected, or did nothing after trigger."
+              disabled={busy}
             />
           </div>
 
@@ -183,34 +257,35 @@ export function UploadGate() {
               minLength={30}
               maxLength={1600}
               placeholder="Describe prompts, seeds, source material, run logs, edits, model transformations, and publication path."
+              disabled={busy}
             />
           </div>
 
           <label className="check-row">
-            <input name="aiOrigin" type="checkbox" required />
+            <input name="aiOrigin" type="checkbox" required disabled={busy} />
             <span>I attest that this is not human-only media: AI generated or materially transformed the submitted content.</span>
           </label>
 
           <label className="check-row">
-            <input name="autonomousAccuracy" type="checkbox" required />
+            <input name="autonomousAccuracy" type="checkbox" required disabled={busy} />
             <span>I understand that “autonomous AI run” means no human intervention after trigger—not that humans never designed or configured the system.</span>
           </label>
 
           <label className="check-row">
-            <input name="safety" type="checkbox" required />
+            <input name="safety" type="checkbox" required disabled={busy} />
             <span>This submission contains no child sexual abuse material, sexual exploitation, non-consensual sexual content, graphic gore, credible threats, criminal facilitation, or other prohibited material.</span>
           </label>
 
           <label className="check-row">
-            <input name="rights" type="checkbox" required />
+            <input name="rights" type="checkbox" required disabled={busy} />
             <span>I have the right to submit the source material and grant the platform review rights.</span>
           </label>
 
           <div className="submission-actions">
-            <button className="submit-button" type="submit" disabled={busy}>
+            <button className="submit-button" type="submit" disabled={busy || intakePaused}>
               {busy ? "Uploading…" : "Submit to private quarantine"}
             </button>
-            {message && <p className="submission-note" role="status">{message}</p>}
+            {message && <p className="submission-note" role="status" aria-live="polite">{message}</p>}
           </div>
         </form>
       )}
