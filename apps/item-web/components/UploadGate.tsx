@@ -39,11 +39,11 @@ export function UploadGate() {
       return;
     }
     if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
-      setMessage("Beta uploads currently accept JPEG, PNG, WebP, or GIF images.");
+      setMessage("Uploads accept JPEG, PNG, WebP, or GIF images.");
       return;
     }
     if (file.size > MAX_UPLOAD_BYTES) {
-      setMessage("Image exceeds the 10 MB beta limit.");
+      setMessage("Image exceeds the 10 MB limit.");
       return;
     }
 
@@ -95,7 +95,7 @@ export function UploadGate() {
   if (!socialBackendEnabled) {
     return (
       <button className="upload-trigger" type="button" disabled title="Social backend not configured">
-        Uploads soon
+        Intake unavailable
       </button>
     );
   }
@@ -103,7 +103,7 @@ export function UploadGate() {
   return (
     <div className="upload-wrap">
       <button className="upload-trigger" type="button" onClick={() => setOpen((value) => !value)}>
-        {open ? "Close submission" : "Submit AI artifact"}
+        {open ? "Close submission" : "Submit slop"}
       </button>
 
       {open && !session && (
@@ -114,6 +114,10 @@ export function UploadGate() {
 
       {open && session && (
         <form className="upload-panel submission-panel" onSubmit={submit}>
+          <p className="submission-note">
+            Public intake is open. JPEG, PNG, WebP, or GIF · 10 MB maximum · every upload remains private until review.
+          </p>
+
           <div>
             <label htmlFor="title">Artifact title</label>
             <input id="title" name="title" required maxLength={100} placeholder="Name the artifact" />
@@ -204,7 +208,7 @@ export function UploadGate() {
 
           <div className="submission-actions">
             <button className="submit-button" type="submit" disabled={busy}>
-              {busy ? "Uploading…" : "Submit artifact"}
+              {busy ? "Uploading…" : "Submit to private quarantine"}
             </button>
             {message && <p className="submission-note" role="status">{message}</p>}
           </div>
