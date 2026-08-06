@@ -260,7 +260,7 @@ $$;
 
 revoke all on function public.wilson_lower_bound(bigint, bigint, double precision) from public;
 
-a create or replace function public.get_top_decile_candidates(
+create or replace function public.get_top_decile_candidates(
   p_min_judgments integer default 3
 )
 returns table (
@@ -475,7 +475,7 @@ set search_path = public, pg_temp
 as $$
 declare
   target public.artifact_selection_reviews%rowtype;
-  artifact public.artifacts%rowtype;
+  target_artifact public.artifacts%rowtype;
   normalized_decision text := lower(trim(coalesce(p_decision, '')));
   normalized_note text := trim(coalesce(p_note, ''));
   next_status text;
@@ -508,12 +508,12 @@ begin
   end if;
 
   select *
-  into artifact
+  into target_artifact
   from public.artifacts
   where id = target.artifact_id
   for update;
 
-  if not found or artifact.status <> 'approved' then
+  if not found or target_artifact.status <> 'approved' then
     raise exception 'SELECTION_ARTIFACT_NOT_PUBLISHED';
   end if;
 
@@ -522,7 +522,7 @@ begin
       raise exception 'SELECTION_CANDIDATE_REQUIRED';
     end if;
 
-    if artifact.lane <> 'unjudged' then
+    if target_artifact.lane <> 'unjudged' then
       raise exception 'MUSEUM_ADMISSION_REQUIRES_UNJUDGED';
     end if;
 
@@ -565,7 +565,7 @@ begin
     target.artifact_id,
     auth.uid(),
     next_event,
-    case when next_event = 'museum_admit' then 'aetimm' else artifact.lane end,
+    case when next_event = 'museum_admit' then 'aetimm' else target_artifact.lane end,
     normalized_note
   );
 
