@@ -57,6 +57,11 @@ jobs:
             echo "value=$CONFIGURED_BASE_PATH" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Capture public build provenance
+        id: provenance
+        shell: bash
+        run: echo "deployed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
       - name: Install
         working-directory: apps/item-web
         run: npm install
@@ -72,6 +77,9 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          BUILD_COMMIT_SHA: ${{ github.sha }}
+          BUILD_DEPLOYED_AT: ${{ steps.provenance.outputs.deployed_at }}
+          STEEL_FOLD: "3"
         run: npm run build
 
       - name: Upload Pages artifact
