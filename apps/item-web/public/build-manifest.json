@@ -1,0 +1,10 @@
+{
+  "product": "aetimm.com",
+  "repository": "injammed/ABYS",
+  "runtimePath": "apps/item-web",
+  "buildMode": "human-directed-ai-assisted",
+  "productionCommit": "development",
+  "deployedAt": "development",
+  "steelFold": 3,
+  "openCompletionIssue": 39
+}
