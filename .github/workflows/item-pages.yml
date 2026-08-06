@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "apps/item-web/**"
+      - "supabase/migrations/**"
       - ".github/workflows/item-pages.yml"
   workflow_dispatch:
     inputs:
@@ -72,6 +73,10 @@ jobs:
       - name: Verify primary 50/50 mode switch
         working-directory: apps/item-web
         run: npm run verify:mode-switch
+
+      - name: Verify aggregate-only vote privacy
+        working-directory: apps/item-web
+        run: npm run verify:vote-privacy
 
       - name: Verify curator migration contract
         working-directory: apps/item-web
