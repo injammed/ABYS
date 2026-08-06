@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "verify:feed-root": "node scripts/verify-feed-root.mjs",
     "verify:curator": "node scripts/verify-curator-contract.mjs",
     "verify:feed-cursor": "node scripts/verify-feed-cursor.mjs"
   },
