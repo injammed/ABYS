@@ -54,6 +54,27 @@ This mapping is enforced by the executable `verify:mode-duality` contract. A fut
 
 ---
 
+## Primary Two-Mode Switch
+
+The product has two equal primary experiential modes:
+
+```txt
+[ SLOP TROUGH 50% ][ AETIMM MUSEUM 50% ]
+```
+
+The switch is a conceptual coin flip between opposite poles:
+
+- **SLOP TROUGH** — vertical infinity, velocity, frontier noise, immediate judgment, and the bottom of the barrel;
+- **AETIMM MUSEUM** — bounded spatial choice, selection, inspection, preservation, and the frontier of mind.
+
+Neither mode is buried inside a generic five-button navigation bar. They receive equal primary width and one-tap access to each other. The current mode must be visible without disabling the opposite choice.
+
+Submit, About, Account, Search, Filters, accessibility, and creator tools remain secondary. They are essential utilities, not competing product modes.
+
+This hierarchy is enforced by the executable `verify:mode-switch` contract. Visual restyling may evolve indefinitely, but the two-mode hierarchy must not disappear accidentally.
+
+---
+
 ## Hard Interaction Duality
 
 ```txt
@@ -140,19 +161,23 @@ The persistent base layer:
 - visible loading, empty, retry, and end-of-availability states;
 - stable scroll and deterministic pagination.
 
-### 2. Controls
+### 2. Primary mode switch
 
-Persistent one-tap actions over the field:
+The equal one-tap experiential choices:
 
-- Feed;
+- Slop Trough;
+- AETIMM Museum.
+
+### 3. Secondary utilities
+
+Necessary capabilities that remain subordinate to the two-mode switch:
+
 - Submit;
-- Museum;
 - About;
-- Account.
+- Account;
+- future search, filters, playback, accessibility, and artifact actions.
 
-Future controls such as search, lane filters, accessibility preferences, playback, and artifact actions must follow the same principle: expose capability without replacing the field unnecessarily.
-
-### 3. Sheets
+### 4. Sheets
 
 Compact tasks should open as reversible sheets, drawers, or panels when accessibility and security permit:
 
@@ -164,7 +189,7 @@ Compact tasks should open as reversible sheets, drawers, or panels when accessib
 
 Closing a sheet must return the user to the same artifact and scroll position.
 
-### 4. Deep Surfaces
+### 5. Deep Surfaces
 
 Complex tasks may use dedicated routes:
 
@@ -193,6 +218,8 @@ Do not turn every control into a new page.
 
 Do not turn the Museum into a renamed feed, vertical ranking list, or endless content rail.
 
+Do not present Submit, About, Account, Search, or Filters as equal experiential destinations beside Slop Trough and Museum.
+
 Do not hide privileged authority inside a visual control. Authentication and authorization remain separate, and database-enforced policy outranks interface appearance.
 
 Do not sacrifice keyboard access, reduced-motion support, readable labels, safe-area handling, or recoverable errors for the appearance of frictionlessness.
@@ -217,7 +244,7 @@ Every interface fold must measurably strengthen at least one primary without wea
 ## Fold Order
 
 1. Feed-first root.
-2. Persistent primary controls.
+2. Equal Slop Trough / Museum primary switch.
 3. One-handed artifact presentation and voting.
 4. Deterministic infinite loading and media prefetch.
 5. Visible vote culture and orthogonal Foam boards.
