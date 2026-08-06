@@ -175,7 +175,7 @@
     align-items: center;
   }
 
-  .feed-first-live span:last-child {
+  .feed-first-live span:last-of-type {
     display: none;
   }
 
