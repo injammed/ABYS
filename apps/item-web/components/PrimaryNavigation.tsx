@@ -5,10 +5,10 @@ import { UploadGate } from "@/components/UploadGate";
 export function PrimaryNavigation() {
   return (
     <nav className="primary-navigation" aria-label="Primary navigation">
-      <a className="primary-navigation-link" href="#field">
+      <Link className="primary-navigation-link" href="/#field">
         <span className="primary-navigation-mark" aria-hidden="true">≋</span>
         <span>Feed</span>
-      </a>
+      </Link>
 
       <div className="primary-navigation-action primary-navigation-submit">
         <UploadGate />
