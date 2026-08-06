@@ -4,7 +4,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { FeedArtifact, FeedLane, makeFeedBatch, originClassLabels } from "@/lib/feed";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
-import { Judgment, loadOwnVotes, loadPublicFeedPage, saveVote } from "@/lib/social-feed";
+import {
+  Judgment,
+  loadOwnQuarantinePreviews,
+  loadOwnVotes,
+  loadPublicFeedPage,
+  saveVote,
+} from "@/lib/social-feed";
 
 function laneLabel(lane: FeedLane): string {
   if (lane === "aetimm") return "AETIMM";
@@ -22,6 +28,7 @@ export function ArtifactFeed() {
   const [artifacts, setArtifacts] = useState<FeedArtifact[]>(() =>
     socialBackendEnabled ? [] : makeFeedBatch(0)
   );
+  const [privatePreviews, setPrivatePreviews] = useState<FeedArtifact[]>([]);
   const [judgments, setJudgments] = useState<Record<string, Judgment>>({});
   const [session, setSession] = useState<Session | null>(null);
   const [batch, setBatch] = useState(1);
@@ -73,10 +80,44 @@ export function ArtifactFeed() {
   }, [lane]);
 
   useEffect(() => {
+    if (!socialBackendEnabled) return;
+
+    const userId = session?.user.id;
+    if (!userId) {
+      setPrivatePreviews([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    const refreshPreviews = () => {
+      void loadOwnQuarantinePreviews(userId)
+        .then((previews) => {
+          if (!cancelled) setPrivatePreviews(previews);
+        })
+        .catch(() => {
+          if (!cancelled) setPrivatePreviews([]);
+        });
+    };
+
+    refreshPreviews();
+    window.addEventListener("aetimm:submission-created", refreshPreviews);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("aetimm:submission-created", refreshPreviews);
+    };
+  }, [session?.user.id]);
+
+  useEffect(() => {
     if (!socialBackendEnabled || !session || artifacts.length === 0) return;
     let cancelled = false;
 
-    void loadOwnVotes(session.user.id, artifacts.map((artifact) => artifact.id))
+    const publicArtifactIds = artifacts
+      .filter((artifact) => artifact.visibility !== "creator_preview")
+      .map((artifact) => artifact.id);
+
+    void loadOwnVotes(session.user.id, publicArtifactIds)
       .then((votes) => {
         if (!cancelled) setJudgments((current) => ({ ...current, ...votes }));
       })
@@ -124,15 +165,23 @@ export function ArtifactFeed() {
     return () => observer.disconnect();
   }, [batch, cursor, hasMore, lane, loading]);
 
-  const visible = useMemo(
-    () => socialBackendEnabled
-      ? artifacts
-      : artifacts.filter((artifact) => lane === "all" || artifact.lane === lane),
-    [artifacts, lane]
-  );
+  const visible = useMemo(() => {
+    if (!socialBackendEnabled) {
+      return artifacts.filter((artifact) => lane === "all" || artifact.lane === lane);
+    }
+
+    const previewsForLane = lane === "all" || lane === "unjudged" ? privatePreviews : [];
+    return appendUnique(previewsForLane, artifacts);
+  }, [artifacts, lane, privatePreviews]);
 
   async function judge(id: string, judgment: Judgment) {
     setVoteMessage(null);
+
+    const artifact = visible.find((entry) => entry.id === id);
+    if (artifact?.visibility === "creator_preview") {
+      setVoteMessage("Public judgment unlocks after curator publication.");
+      return;
+    }
 
     if (!socialBackendEnabled) {
       setJudgments((current) => ({ ...current, [id]: judgment }));
@@ -181,6 +230,12 @@ export function ArtifactFeed() {
         Human-only media is outside the feed. Hybrid, directed, and autonomous AI runs remain visibly separated by provenance.
       </div>
 
+      {privatePreviews.length > 0 && (lane === "all" || lane === "unjudged") && (
+        <p className="private-feed-notice" role="status">
+          PRIVATE CREATOR PREVIEW · Your quarantined submissions appear here only for your account. They are not public until curator publication.
+        </p>
+      )}
+
       {voteMessage && <p className="judgment-confirmation" role="status">{voteMessage}</p>}
       {feedError && <p className="judgment-confirmation" role="alert">{feedError}</p>}
 
@@ -188,8 +243,10 @@ export function ArtifactFeed() {
         {visible.map((artifact) => {
           const judgment = judgments[artifact.id];
           const autonomous = artifact.aiOrigin.originClass === "autonomous_ai_run";
+          const creatorPreview = artifact.visibility === "creator_preview";
+
           return (
-            <article className="artifact-card" key={artifact.id}>
+            <article className={creatorPreview ? "artifact-card private-preview-card" : "artifact-card"} key={artifact.id}>
               <div className="artifact-visual" style={{ background: artifact.gradient }}>
                 {artifact.mediaUrl && (
                   <img
@@ -200,9 +257,11 @@ export function ArtifactFeed() {
                   />
                 )}
                 <div className="visual-noise" />
-                <div className="lane-badge">{laneLabel(artifact.lane)}</div>
-                <div className="score-ring" aria-label={`Score ${artifact.score}`}>
-                  {artifact.score}
+                <div className="lane-badge">
+                  {creatorPreview ? "UNJUDGED · PRIVATE PREVIEW" : laneLabel(artifact.lane)}
+                </div>
+                <div className="score-ring" aria-label={creatorPreview ? "Private preview" : `Score ${artifact.score}`}>
+                  {creatorPreview ? "PVT" : artifact.score}
                 </div>
               </div>
 
@@ -222,6 +281,12 @@ export function ArtifactFeed() {
                 <p className="creator">by {artifact.creator}</p>
                 <p className="summary">{artifact.summary}</p>
 
+                {creatorPreview && (
+                  <p className="private-preview-note">
+                    Visible only to you. The media remains in private quarantine and has not entered public judgment.
+                  </p>
+                )}
+
                 <div className="provenance">
                   <strong>AI provenance</strong>
                   <span>{artifact.aiOrigin.generator ?? "Generator undisclosed"}</span>
@@ -234,28 +299,34 @@ export function ArtifactFeed() {
                   )}
                 </div>
 
-                <div className="judgment-row" aria-label="Judge artifact">
-                  <button
-                    className={judgment === "preserve" ? "judge preserve selected" : "judge preserve"}
-                    onClick={() => void judge(artifact.id, "preserve")}
-                  >
-                    Preserve
-                  </button>
-                  <button
-                    className={judgment === "refine" ? "judge refine selected" : "judge refine"}
-                    onClick={() => void judge(artifact.id, "refine")}
-                  >
-                    Refine
-                  </button>
-                  <button
-                    className={judgment === "slop" ? "judge slop selected" : "judge slop"}
-                    onClick={() => void judge(artifact.id, "slop")}
-                  >
-                    Slop
-                  </button>
-                </div>
+                {creatorPreview ? (
+                  <div className="preview-judgment-lock">
+                    Preserve · Refine · Slop unlock after curator publication.
+                  </div>
+                ) : (
+                  <div className="judgment-row" aria-label="Judge artifact">
+                    <button
+                      className={judgment === "preserve" ? "judge preserve selected" : "judge preserve"}
+                      onClick={() => void judge(artifact.id, "preserve")}
+                    >
+                      Preserve
+                    </button>
+                    <button
+                      className={judgment === "refine" ? "judge refine selected" : "judge refine"}
+                      onClick={() => void judge(artifact.id, "refine")}
+                    >
+                      Refine
+                    </button>
+                    <button
+                      className={judgment === "slop" ? "judge slop selected" : "judge slop"}
+                      onClick={() => void judge(artifact.id, "slop")}
+                    >
+                      Slop
+                    </button>
+                  </div>
+                )}
 
-                {judgment && (
+                {judgment && !creatorPreview && (
                   <p className="judgment-confirmation">
                     {socialBackendEnabled ? "Judgment recorded" : "Judgment recorded locally"}: <strong>{judgment}</strong>.
                   </p>
@@ -267,7 +338,7 @@ export function ArtifactFeed() {
       </div>
 
       {socialBackendEnabled && !loading && visible.length === 0 && !feedError && (
-        <p className="judgment-confirmation">No approved artifacts are in this lane yet.</p>
+        <p className="judgment-confirmation">No approved artifacts or private previews are in this lane yet.</p>
       )}
 
       <div ref={sentinel} className="feed-sentinel" aria-hidden="true">

@@ -1,0 +1,46 @@
+.private-feed-notice {
+  margin: 1rem .35rem;
+  padding: .8rem 1rem;
+  border: 1px solid rgba(213, 166, 63, .36);
+  border-radius: .85rem;
+  background: rgba(213, 166, 63, .07);
+  color: var(--gold-light);
+  font-size: .72rem;
+  line-height: 1.5;
+  letter-spacing: .05em;
+}
+
+.private-preview-card {
+  border-color: rgba(213, 166, 63, .42);
+  box-shadow: 0 24px 90px rgba(213, 166, 63, .08);
+}
+
+.private-preview-card .lane-badge {
+  border-color: rgba(213, 166, 63, .46);
+  color: var(--gold-light);
+}
+
+.private-preview-card .score-ring {
+  border-color: rgba(213, 166, 63, .46);
+  color: var(--gold-light);
+  font-size: .64rem;
+  letter-spacing: .06em;
+}
+
+.private-preview-note,
+.preview-judgment-lock {
+  margin: .9rem 0;
+  padding: .75rem .85rem;
+  border: 1px dashed rgba(213, 166, 63, .35);
+  border-radius: .8rem;
+  background: rgba(213, 166, 63, .05);
+  color: #d9cfb7;
+  font-size: .76rem;
+  line-height: 1.5;
+}
+
+.preview-judgment-lock {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
