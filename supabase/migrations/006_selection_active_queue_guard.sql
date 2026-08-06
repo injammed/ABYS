@@ -26,6 +26,12 @@ begin
     raise exception 'INVALID_MINIMUM_JUDGMENTS';
   end if;
 
+  -- Serialize all nomination starts. Without this lock, two curators could both
+  -- observe an empty queue and create overlapping active selection runs.
+  perform pg_advisory_xact_lock(
+    hashtextextended('aetimm:selection:active-queue', 0)
+  );
+
   if exists (
     select 1
     from public.artifact_selection_reviews
