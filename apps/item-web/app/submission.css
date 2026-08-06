@@ -26,13 +26,3 @@
 .submission-actions .submission-note {
   margin: .65rem 0 0;
 }
-
-@media (max-width: 760px) {
-  .submission-panel {
-    position: fixed;
-    inset: 4.6rem .65rem .65rem;
-    width: auto;
-    max-height: none;
-    border-radius: 1rem;
-  }
-}
