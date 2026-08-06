@@ -61,6 +61,18 @@ jobs:
         working-directory: apps/item-web
         run: npm install
 
+      - name: Verify permanent feed-first root
+        working-directory: apps/item-web
+        run: npm run verify:feed-root
+
+      - name: Verify curator migration contract
+        working-directory: apps/item-web
+        run: npm run verify:curator
+
+      - name: Verify composite feed cursor
+        working-directory: apps/item-web
+        run: npm run verify:feed-cursor
+
       - name: Typecheck
         working-directory: apps/item-web
         run: npm run typecheck
