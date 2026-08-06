@@ -1,0 +1,33 @@
+.build-attribution {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .8rem;
+  width: 100%;
+  padding: .8rem 1rem;
+  border-top: 1px solid var(--line);
+  background: #050505;
+  color: var(--muted);
+  font-size: .66rem;
+  letter-spacing: .12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.build-attribution a {
+  border-bottom: 1px solid rgba(213, 166, 63, .5);
+  color: var(--gold-light);
+  text-decoration: none;
+}
+
+.build-attribution a:hover {
+  border-color: var(--gold-light);
+}
+
+@media (max-width: 560px) {
+  .build-attribution {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: .35rem;
+  }
+}
