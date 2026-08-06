@@ -1,4 +1,5 @@
 import { FeedArtifact, FeedLane, OriginClass } from "@/lib/feed";
+import { cursorForRow, decodeFeedCursor, feedCursorFilter } from "@/lib/feed-cursor";
 import { requireSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 export type Judgment = "preserve" | "refine" | "slop";
@@ -67,15 +68,18 @@ export async function loadPublicFeedPage(options: {
     )
     .eq("status", "approved")
     .order("published_at", { ascending: false })
-    .limit(limit);
+    .order("id", { ascending: false })
+    .limit(limit + 1);
 
-  if (options.cursor) query = query.lt("published_at", options.cursor);
   if (options.lane && options.lane !== "all") query = query.eq("lane", options.lane);
+  if (options.cursor) query = query.or(feedCursorFilter(decodeFeedCursor(options.cursor)));
 
   const { data, error } = await query;
   if (error) throw error;
 
-  const rows = (data ?? []) as unknown as ArtifactRow[];
+  const fetchedRows = (data ?? []) as unknown as ArtifactRow[];
+  const hasMore = fetchedRows.length > limit;
+  const rows = fetchedRows.slice(0, limit);
   const ids = rows.map((row) => row.id);
 
   const votesByArtifact = new Map<string, VoteRow[]>();
@@ -125,9 +129,10 @@ export async function loadPublicFeedPage(options: {
     visibility: "public",
   }));
 
+  const lastRow = rows.at(-1);
   return {
     artifacts,
-    nextCursor: rows.length === limit ? rows.at(-1)?.published_at ?? null : null,
+    nextCursor: hasMore && lastRow ? cursorForRow(lastRow) : null,
   };
 }
 
