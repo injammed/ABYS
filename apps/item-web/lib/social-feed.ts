@@ -38,18 +38,28 @@ type VoteRow = {
   judgment: Judgment;
 };
 
+type VoteAggregateRow = {
+  artifact_id: string;
+  preserve_count: number | string | null;
+  refine_count: number | string | null;
+  slop_count: number | string | null;
+};
+
 function creatorName(row: ArtifactRow | PrivateArtifactRow): string {
   if (Array.isArray(row.profiles)) return row.profiles[0]?.display_name || "Anonymous machine witness";
   return row.profiles?.display_name || "Anonymous machine witness";
 }
 
-function scoreForVotes(votes: VoteRow[]): number {
-  let score = 50;
-  for (const vote of votes) {
-    if (vote.judgment === "preserve") score += 4;
-    if (vote.judgment === "refine") score += 1;
-    if (vote.judgment === "slop") score -= 4;
-  }
+function numericCount(value: number | string | null | undefined): number {
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+function scoreForVoteAggregate(aggregate?: VoteAggregateRow): number {
+  const preserve = numericCount(aggregate?.preserve_count);
+  const refine = numericCount(aggregate?.refine_count);
+  const slop = numericCount(aggregate?.slop_count);
+  const score = 50 + preserve * 4 + refine - slop * 4;
   return Math.max(0, Math.min(100, score));
 }
 
@@ -82,18 +92,16 @@ export async function loadPublicFeedPage(options: {
   const rows = fetchedRows.slice(0, limit);
   const ids = rows.map((row) => row.id);
 
-  const votesByArtifact = new Map<string, VoteRow[]>();
+  const voteAggregates = new Map<string, VoteAggregateRow>();
   if (ids.length > 0) {
-    const { data: voteData, error: voteError } = await client
-      .from("artifact_votes")
-      .select("artifact_id,judgment")
-      .in("artifact_id", ids);
-    if (voteError) throw voteError;
+    const { data: aggregateData, error: aggregateError } = await client.rpc(
+      "get_artifact_vote_aggregates",
+      { p_artifact_ids: ids }
+    );
+    if (aggregateError) throw aggregateError;
 
-    for (const vote of (voteData ?? []) as VoteRow[]) {
-      const current = votesByArtifact.get(vote.artifact_id) ?? [];
-      current.push(vote);
-      votesByArtifact.set(vote.artifact_id, current);
+    for (const aggregate of (aggregateData ?? []) as VoteAggregateRow[]) {
+      voteAggregates.set(aggregate.artifact_id, aggregate);
     }
   }
 
@@ -124,7 +132,7 @@ export async function loadPublicFeedPage(options: {
     },
     gradient: laneGradients[row.lane],
     mediaUrl: signedUrls.get(row.media_path),
-    score: scoreForVotes(votesByArtifact.get(row.id) ?? []),
+    score: scoreForVoteAggregate(voteAggregates.get(row.id)),
     publishedAt: row.published_at,
     visibility: "public",
   }));
