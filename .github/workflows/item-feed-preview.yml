@@ -49,6 +49,9 @@ jobs:
       - name: Verify Feed / Museum route duality
         run: npm run verify:mode-duality
 
+      - name: Verify primary 50/50 mode switch
+        run: npm run verify:mode-switch
+
       - name: Verify curator migration contract
         run: npm run verify:curator
 
