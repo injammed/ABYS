@@ -142,7 +142,11 @@ $$;
 revoke all on function public.review_selection_candidate(bigint, text, text) from public;
 grant execute on function public.review_selection_candidate(bigint, text, text) to authenticated;
 
-create or replace function public.get_selection_review_queue()
+-- PostgreSQL cannot change a RETURNS TABLE signature with CREATE OR REPLACE.
+-- Drop the v0 queue reader before recreating it with artifact state columns.
+drop function if exists public.get_selection_review_queue();
+
+create function public.get_selection_review_queue()
 returns table (
   selection_id bigint,
   artifact_id uuid,
