@@ -27,7 +27,7 @@ export default function HomePage() {
         <ArtifactFeed />
       </section>
 
-      <PrimaryNavigation />
+      <PrimaryNavigation mode="feed" />
     </main>
   );
 }
