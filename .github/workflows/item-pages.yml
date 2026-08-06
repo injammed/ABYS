@@ -69,6 +69,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:mode-duality
 
+      - name: Verify primary 50/50 mode switch
+        working-directory: apps/item-web
+        run: npm run verify:mode-switch
+
       - name: Verify curator migration contract
         working-directory: apps/item-web
         run: npm run verify:curator

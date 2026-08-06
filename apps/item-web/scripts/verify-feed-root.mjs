@@ -26,7 +26,7 @@ requirePattern("feed-first root class", /<main[^>]*className=["']feed-first-page
 requirePattern("permanent interface contract marker", /data-interface-contract=["']slop-feed-root-v1["']/);
 requirePattern("live field anchor", /<section[^>]*id=["']field["'][^>]*>/);
 requirePattern("artifact feed render", /<ArtifactFeed\s*\/>/);
-requirePattern("persistent primary navigation", /<PrimaryNavigation\s*\/>/);
+requirePattern("persistent primary navigation with Feed active", /<PrimaryNavigation\b[^>]*mode=["']feed["'][^>]*\/>/);
 
 forbidPattern("marketing hero on the root route", /className=["'][^"']*\bhero\b[^"']*["']/);
 forbidPattern("generation witness on the root route", /<GenerationWitness\b/);
@@ -34,7 +34,7 @@ forbidPattern("phase identity landing wall on the root route", /<PhaseIdentity\b
 forbidPattern("terminal homepage footer", /<footer\b/);
 
 const feedIndex = page.indexOf("<ArtifactFeed />");
-const controlsIndex = page.indexOf("<PrimaryNavigation />");
+const controlsIndex = page.search(/<PrimaryNavigation\b/);
 if (feedIndex < 0 || controlsIndex < 0 || feedIndex > controlsIndex) {
   failures.push("ArtifactFeed must render before PrimaryNavigation");
 }
