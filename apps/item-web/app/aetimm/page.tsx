@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MuseumRegistry } from "@/components/MuseumRegistry";
 import { PhaseIdentity } from "@/components/PhaseIdentity";
 import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 
@@ -11,7 +12,7 @@ export default function AetimmPage() {
           AETIMM is the Museum: a distinct spatial environment for machine-made work deliberately selected to persist.
         </p>
         <p className="identity-launch-copy">
-          Its rooms, walls, shelves, cases, and inspection mechanics will be folded here without turning the Museum into another vertical feed.
+          Its rooms remain bounded. Visitors slide sideways, select, open, inspect, close, and return rather than entering another infinite vertical feed.
         </p>
         <div className="identity-actions">
           <Link className="identity-switch" href="/#field">
@@ -23,6 +24,7 @@ export default function AetimmPage() {
         </div>
       </section>
 
+      <MuseumRegistry />
       <PrimaryNavigation mode="museum" />
     </main>
   );
