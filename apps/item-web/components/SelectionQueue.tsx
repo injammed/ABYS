@@ -20,6 +20,7 @@ function selectionError(error: unknown): string {
   if (raw.includes("SELECTION_NOTE_REQUIRED")) return "Every selection decision requires a note of at least three characters.";
   if (raw.includes("SELECTION_CANDIDATE_REQUIRED")) return "Mark the nomination as a candidate before admitting it to the Museum.";
   if (raw.includes("MUSEUM_ADMISSION_REQUIRES_UNJUDGED")) return "Only a published Unjudged artifact can enter the Museum through this fold.";
+  if (raw.includes("SELECTION_ARTIFACT_NOT_PUBLISHED")) return "This artifact must complete creator revision, resubmission, and Unjudged republication before it can advance.";
   if (raw.includes("SELECTION_REVIEW_FINALIZED")) return "This selection review is already final.";
   if (raw.includes("get_selection_review_queue") || raw.includes("nominate_top_decile")) {
     return "Selection Fold S-00 is not active in the database yet.";
@@ -92,7 +93,9 @@ export function SelectionQueue() {
       await refresh(
         decision === "museum_admit"
           ? `${review.title} admitted to the AETIMM Museum.`
-          : `${review.title} routed to ${decision}.`,
+          : decision === "refinement"
+            ? `${review.title} returned privately to its creator for revision.`
+            : `${review.title} routed to ${decision}.`,
       );
     } catch (error) {
       setMessage(selectionError(error));
@@ -145,6 +148,9 @@ export function SelectionQueue() {
       <div className="curator-list">
         {queue.map((review) => {
           const active = busy?.startsWith(`${review.selection_id}:`) ?? false;
+          const publishedForSelection = review.artifact_status === "approved" && review.artifact_lane === "unjudged";
+          const awaitingCreatorRevision = review.selection_status === "refinement" && !publishedForSelection;
+
           return (
             <article className="curator-card" key={review.selection_id}>
               <div className="curator-media">
@@ -164,7 +170,14 @@ export function SelectionQueue() {
                 <h3>{review.title}</h3>
                 <p className="creator">by {review.creator_name}</p>
 
+                {awaitingCreatorRevision && (
+                  <p className="curator-message" role="status">
+                    Private refinement is active. The creator must revise, resubmit, and pass quarantine review before this nomination can advance.
+                  </p>
+                )}
+
                 <dl className="curator-facts">
+                  <div><dt>Artifact state</dt><dd>{review.artifact_status} · {review.artifact_lane ?? "private"}</dd></div>
                   <div><dt>Confidence-adjusted Preserve</dt><dd>{(review.selection_score * 100).toFixed(2)}%</dd></div>
                   <div><dt>Preserve</dt><dd>{review.preserve_count}</dd></div>
                   <div><dt>Refine</dt><dd>{review.refine_count}</dd></div>
@@ -190,12 +203,12 @@ export function SelectionQueue() {
                   </label>
 
                   <div className="curator-actions">
-                    <button type="button" disabled={active} onClick={() => void decide(review, "candidate")}>Mark candidate</button>
-                    <button type="button" disabled={active} onClick={() => void decide(review, "refinement")}>Request refinement</button>
+                    <button type="button" disabled={active || !publishedForSelection} onClick={() => void decide(review, "candidate")}>Mark candidate</button>
+                    <button type="button" disabled={active || !publishedForSelection} onClick={() => void decide(review, "refinement")}>Request refinement</button>
                     <button type="button" disabled={active} onClick={() => void decide(review, "archive")}>Archive</button>
                     <button type="button" disabled={active} onClick={() => void decide(review, "reject")}>Reject selection</button>
                     {review.selection_status === "candidate" && (
-                      <button type="button" disabled={active} onClick={() => void decide(review, "museum_admit")}>Admit to Museum</button>
+                      <button type="button" disabled={active || !publishedForSelection} onClick={() => void decide(review, "museum_admit")}>Admit to Museum</button>
                     )}
                   </div>
                 </div>
