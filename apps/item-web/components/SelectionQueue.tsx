@@ -5,6 +5,8 @@ import {
   loadSelectionReviewQueue,
   nominateTopDecile,
   reviewSelectionCandidate,
+} from "@/lib/selection";
+import type {
   SelectionDecision,
   SelectionReview,
 } from "@/lib/selection";
@@ -13,6 +15,7 @@ function selectionError(error: unknown): string {
   const raw = error instanceof Error ? error.message : String(error ?? "");
   if (raw.includes("CURATOR_ROLE_REQUIRED")) return "This account does not have curator authority.";
   if (raw.includes("NO_ELIGIBLE_SELECTION_COHORT")) return "No approved Unjudged artifacts have enough judgments yet.";
+  if (raw.includes("ACTIVE_SELECTION_REVIEWS_EXIST")) return "Finish the active selection queue before starting another nomination run.";
   if (raw.includes("INVALID_MINIMUM_JUDGMENTS")) return "Minimum judgments must be between 1 and 1,000.";
   if (raw.includes("SELECTION_NOTE_REQUIRED")) return "Every selection decision requires a note of at least three characters.";
   if (raw.includes("SELECTION_CANDIDATE_REQUIRED")) return "Mark the nomination as a candidate before admitting it to the Museum.";
@@ -32,7 +35,7 @@ export function SelectionQueue() {
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (successMessage?: string) => {
     setLoading(true);
     setMessage(null);
     try {
@@ -45,6 +48,7 @@ export function SelectionQueue() {
         }
         return next;
       });
+      if (successMessage) setMessage(successMessage);
     } catch (error) {
       setQueue([]);
       setMessage(selectionError(error));
@@ -62,8 +66,7 @@ export function SelectionQueue() {
     setMessage(null);
     try {
       const runId = await nominateTopDecile(minJudgments);
-      setMessage(`Top-decile nomination recorded in run ${runId}.`);
-      await refresh();
+      await refresh(`Top-decile nomination recorded in run ${runId}.`);
     } catch (error) {
       setMessage(selectionError(error));
     } finally {
@@ -86,12 +89,11 @@ export function SelectionQueue() {
         decision,
         note,
       });
-      setMessage(
+      await refresh(
         decision === "museum_admit"
           ? `${review.title} admitted to the AETIMM Museum.`
           : `${review.title} routed to ${decision}.`,
       );
-      await refresh();
     } catch (error) {
       setMessage(selectionError(error));
     } finally {
@@ -122,7 +124,7 @@ export function SelectionQueue() {
               disabled={busy !== null}
             />
           </label>
-          <button type="button" onClick={() => void runNomination()} disabled={busy !== null}>
+          <button type="button" onClick={() => void runNomination()} disabled={busy !== null || queue.length > 0}>
             {busy === "nominate" ? "Nominating…" : "Run top-decile nomination"}
           </button>
           <button className="upload-trigger" type="button" onClick={() => void refresh()} disabled={loading || busy !== null}>
