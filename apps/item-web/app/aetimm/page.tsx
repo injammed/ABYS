@@ -23,7 +23,7 @@ export default function AetimmPage() {
         </div>
       </section>
 
-      <PrimaryNavigation />
+      <PrimaryNavigation mode="museum" />
     </main>
   );
 }
