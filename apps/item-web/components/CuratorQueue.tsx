@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import type { FeedLane } from "@/lib/feed";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 import {
   CuratorArtifact,
@@ -12,12 +11,10 @@ import {
 } from "@/lib/moderation";
 
 type ReviewDraft = {
-  lane: FeedLane;
   note: string;
 };
 
 const DEFAULT_DRAFT: ReviewDraft = {
-  lane: "unjudged",
   note: "",
 };
 
@@ -25,7 +22,7 @@ function reviewError(error: unknown): string {
   const raw = error instanceof Error ? error.message : String(error ?? "");
   if (raw.includes("CURATOR_ROLE_REQUIRED")) return "This account does not have curator authority.";
   if (raw.includes("CURATOR_NOTE_REQUIRED")) return "Every decision requires a note of at least three characters.";
-  if (raw.includes("APPROVAL_LANE_REQUIRED")) return "Choose a publication lane before approval.";
+  if (raw.includes("INITIAL_PUBLICATION_REQUIRES_UNJUDGED")) return "First publication must enter Unjudged before selection review.";
   if (raw.includes("ARTIFACT_NOT_REVIEWABLE")) return "This artifact changed state and is no longer reviewable. Refresh the queue.";
   return raw || "The curator decision failed.";
 }
@@ -134,12 +131,12 @@ export function CuratorQueue() {
       await reviewArtifact({
         artifactId: artifact.id,
         decision,
-        lane: decision === "approve" ? draft.lane : null,
+        lane: decision === "approve" ? "unjudged" : null,
         note: draft.note.trim(),
       });
       setMessage(
         decision === "approve"
-          ? `${artifact.title} published to ${draft.lane}.`
+          ? `${artifact.title} published to Unjudged. Selection begins after public judgments accumulate.`
           : decision === "request_revision"
             ? `Revision requested for ${artifact.title}.`
             : `${artifact.title} rejected.`,
@@ -179,7 +176,8 @@ export function CuratorQueue() {
       <div className="curator-toolbar">
         <div>
           <p className="eyebrow">DATABASE-ENFORCED AUTHORITY</p>
-          <h2>{queue.length} waiting for judgment</h2>
+          <h2>{queue.length} waiting for quarantine judgment</h2>
+          <p>Approval publishes to Unjudged only. Museum admission happens later through the selection queue.</p>
         </div>
         <button className="upload-trigger" type="button" onClick={() => void refreshQueue()} disabled={loading}>
           {loading ? "Refreshing…" : "Refresh queue"}
@@ -239,7 +237,7 @@ export function CuratorQueue() {
                   ) : (
                     artifact.events.map((event) => (
                       <p key={event.id}>
-                        <strong>{event.event_type.replace("_", " ")}</strong> · {new Date(event.created_at).toLocaleString()}<br />
+                        <strong>{event.event_type.replaceAll("_", " ")}</strong> · {new Date(event.created_at).toLocaleString()}<br />
                         {event.note}
                       </p>
                     ))
@@ -247,18 +245,9 @@ export function CuratorQueue() {
                 </div>
 
                 <div className="curator-decision">
-                  <label>
-                    Publication lane
-                    <select
-                      value={draft.lane}
-                      onChange={(event) => updateDraft(artifact.id, { lane: event.target.value as FeedLane })}
-                      disabled={busy}
-                    >
-                      <option value="unjudged">Unjudged — public judgment begins here</option>
-                      <option value="aetimm">AETIMM — preserved artifact</option>
-                      <option value="slatra">SLOP TROUGH — contained slop</option>
-                    </select>
-                  </label>
+                  <p className="submission-note">
+                    First publication destination: <strong>UNJUDGED</strong>. Preserve, Refine, and Slop judgments then produce selection evidence.
+                  </p>
 
                   <label>
                     Required curator note
@@ -267,13 +256,13 @@ export function CuratorQueue() {
                       onChange={(event) => updateDraft(artifact.id, { note: event.target.value })}
                       minLength={3}
                       maxLength={1200}
-                      placeholder="State why this should be published, revised, or rejected. This note becomes append-only lifecycle evidence."
+                      placeholder="State why this should enter public judgment, return for revision, or be rejected."
                       disabled={busy}
                     />
                   </label>
 
                   <div className="curator-actions">
-                    <button type="button" disabled={busy} onClick={() => void decide(artifact, "approve")}>Approve + publish</button>
+                    <button type="button" disabled={busy} onClick={() => void decide(artifact, "approve")}>Approve → publish Unjudged</button>
                     <button type="button" disabled={busy} onClick={() => void decide(artifact, "request_revision")}>Request revision</button>
                     <button type="button" disabled={busy} onClick={() => void decide(artifact, "reject")}>Reject</button>
                   </div>
