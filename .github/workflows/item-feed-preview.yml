@@ -37,6 +37,9 @@ jobs:
       - name: Verify curator migration contract
         run: npm run verify:curator
 
+      - name: Verify composite feed cursor
+        run: npm run verify:feed-cursor
+
       - name: Typecheck
         run: npm run typecheck
 
