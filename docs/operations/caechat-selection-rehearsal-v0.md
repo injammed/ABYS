@@ -6,12 +6,14 @@ Prove one real artifact can travel through the complete selection lifecycle:
 
 ```txt
 private quarantine
-→ revision request
-→ creator revision
-→ resubmission
+→ quarantine revision
+→ creator resubmission
 → public Unjudged
 → judgments
 → top-decile nomination
+→ selection refinement
+→ creator resubmission
+→ public Unjudged
 → candidate
 → Museum admission
 ```
@@ -31,32 +33,35 @@ Do not activate this fold until all are true:
 
 ## Activation order
 
-1. Apply `supabase/migrations/005_caechat_selection_rehearsal.sql` in the production Supabase SQL editor.
-2. Apply `supabase/migrations/006_selection_active_queue_guard.sql` immediately afterward.
-3. Confirm both transactions complete without error.
-4. Deploy the matching web commit.
-5. Open `/curator/` with the trusted curator account.
-6. Keep issue #72 open until every step below is verified on a real device.
+Apply these migrations in one controlled window:
 
-Migration `006` blocks a second nomination run while any selection remains in `nominated`, `candidate`, or `refinement`. Resolve the active queue before starting another run.
+1. `005_caechat_selection_rehearsal.sql`
+2. `006_selection_active_queue_guard.sql`
+3. `007_selection_refinement_loop.sql`
+
+Then deploy the matching web commit immediately. Keep issue #72 open until the exact-device rehearsal passes.
+
+Migration `006` serializes nomination starts and blocks another run while any review remains `nominated`, `candidate`, or `refinement`.
+
+Migration `007` makes refinement actionable: the artifact becomes private `needs_revision`, the creator can edit and resubmit it, and the same selection receipt remains open until review concludes.
 
 ## Rehearsal artifact
 
-The existing `Jesus Angel’s Spine` fixture may be used when it remains private and owned by the creator account. A new safe fixture may be substituted.
+The existing `Jesus Angel’s Spine` fixture may be used while it remains private and owned by the creator account. A new safe fixture may be substituted.
 
-Do not use production user content without the creator's permission for a test.
+Do not use another creator's production content without permission.
 
 ## Exact rehearsal
 
-### 1. Quarantine
+### 1. Initial quarantine
 
 Creator:
 
 - submit the artifact;
-- confirm it appears as `UNJUDGED · PRIVATE PREVIEW` only while signed into the owning account;
+- confirm it appears as `UNJUDGED · PRIVATE PREVIEW` only to the owner;
 - confirm anonymous and second-account views cannot see it.
 
-Database expectation:
+Expected:
 
 ```txt
 status = quarantine
@@ -64,7 +69,7 @@ lane = null
 published_at = null
 ```
 
-### 2. Revision request
+### 2. Quarantine revision
 
 Curator:
 
@@ -75,11 +80,10 @@ Curator:
 Creator:
 
 - confirm the note appears in lifecycle history;
-- confirm the artifact remains private;
-- revise at least one descriptive field;
+- edit at least one descriptive field;
 - resubmit.
 
-Database expectation:
+Expected sequence:
 
 ```txt
 quarantine
@@ -87,7 +91,7 @@ quarantine
 → quarantine
 ```
 
-Events must include:
+Expected events:
 
 ```txt
 submitted
@@ -95,7 +99,7 @@ request_revision
 resubmitted
 ```
 
-### 3. Public Unjudged publication
+### 3. First public publication
 
 Curator:
 
@@ -119,11 +123,11 @@ Anonymous device:
 
 ### 4. Judgment evidence
 
-Use at least one real signed-in account for the production rehearsal. For serious calibration, use independent accounts and substantially more judgments.
+Use at least one real signed-in account for the mechanical rehearsal. Serious calibration requires independent accounts and substantially more judgments.
 
 Record Preserve, Refine, or Slop. Choosing again must replace the prior judgment rather than stacking another vote.
 
-The v0 selection cohort requires the configured minimum judgment count. For the first production rehearsal, the curator may set the minimum to `1`. This does not establish production-quality ranking.
+For the first rehearsal, the curator may set the minimum judgment count to `1`. That proves mechanics, not ranking quality.
 
 ### 5. Top-decile nomination
 
@@ -133,7 +137,7 @@ Curator:
 - set the minimum judgment count;
 - run `Top-decile nomination`.
 
-The function considers only artifacts that are:
+Eligibility is limited to artifacts that are:
 
 - approved;
 - in `unjudged`;
@@ -142,8 +146,7 @@ The function considers only artifacts that are:
 
 The run snapshots:
 
-- cohort identity;
-- cohort size;
+- cohort identity and size;
 - top-decile count;
 - rank;
 - Preserve, Refine, and Slop totals;
@@ -152,27 +155,72 @@ The run snapshots:
 - algorithm version;
 - curator identity and timestamp.
 
-The deterministic contract proves that a cohort of ten nominates exactly one artifact and that 8,000 Preserve judgments out of 10,000 outrank 2 out of 2 under the confidence estimate.
+A cohort of ten must nominate exactly one artifact. The contract also proves that 8,000 Preserve judgments out of 10,000 outrank 2 out of 2 under the confidence estimate.
 
-Attempting another nomination while the queue is active must fail with `ACTIVE_SELECTION_REVIEWS_EXIST`.
+Attempting another nomination while this queue remains active must fail with `ACTIVE_SELECTION_REVIEWS_EXIST`.
 
-### 6. Candidate review
+### 6. Selection refinement
 
 Curator:
 
-- inspect the nomination evidence;
-- write a note;
-- choose `Mark candidate`.
+- inspect the nomination;
+- write a selection-specific note;
+- choose `Request refinement`.
 
-Expected event:
+Expected:
 
 ```txt
-selection_candidate
+artifact status: approved → needs_revision
+artifact lane: unjudged → null
+published_at: value → null
+selection status: nominated → refinement
+event: selection_refinement
 ```
 
-The artifact remains publicly Unjudged. Candidate status alone does not change its lane.
+The artifact disappears from the public feed and becomes editable by its creator. The selection queue remains open and shows that creator revision is pending.
 
-### 7. Museum admission
+Creator:
+
+- confirm the selection-refinement note in history;
+- revise the artifact;
+- resubmit.
+
+Expected:
+
+```txt
+needs_revision → quarantine
+```
+
+Curator:
+
+- approve the revised artifact back to Unjudged.
+
+Expected:
+
+```txt
+quarantine → approved/unjudged
+selection status remains refinement
+```
+
+### 7. Candidate review
+
+Curator:
+
+- refresh the selection queue;
+- confirm the artifact is again `approved · unjudged`;
+- write a new note;
+- choose `Mark candidate`.
+
+Expected:
+
+```txt
+selection status: refinement → candidate
+event: selection_candidate
+```
+
+Candidate status alone does not change the artifact lane.
+
+### 8. Museum admission
 
 Curator:
 
@@ -180,7 +228,7 @@ Curator:
 - write a second explicit admission note;
 - choose `Admit to Museum`.
 
-The database rejects Museum admission unless the selection review is already in `candidate` state.
+The database must reject a direct `nominated → museum_admit` attempt.
 
 Expected:
 
@@ -190,33 +238,30 @@ selection status: candidate → museum_admitted
 event: museum_admit
 ```
 
-### 8. Museum proof
+### 9. Museum proof
 
 Device:
 
 - open the Museum;
 - confirm the admitted artifact appears in the finite sideways registry;
-- select it;
+- slide sideways;
+- select the work;
 - open the inspection surface;
 - close it;
 - return to the same room position;
 - return to the Slop Feed in one tap.
 
-The Museum registry is capped at 24 immediate room positions in this fold. It is not an infinite vertical feed.
+The immediate registry is capped at 24 positions. It is not an infinite vertical feed.
 
 ## Read-only verification queries
 
-Use known IDs and do not paste user emails, tokens, signed URLs, or private media paths into public issues.
-
-Artifact state:
+Use known IDs. Never paste emails, tokens, signed URLs, or private media paths into public issues.
 
 ```sql
 select id, title, status, lane, published_at
 from public.artifacts
 where id = '<artifact-id>'::uuid;
 ```
-
-Lifecycle history:
 
 ```sql
 select event_type, lane, note, created_at
@@ -225,36 +270,30 @@ where artifact_id = '<artifact-id>'::uuid
 order by created_at, id;
 ```
 
-Selection receipt:
-
 ```sql
 select
-  reviews.id,
-  reviews.status,
-  reviews.cohort_rank,
-  reviews.cohort_size,
-  reviews.selection_score,
-  reviews.preserve_count,
-  reviews.refine_count,
-  reviews.slop_count,
-  reviews.total_judgments,
-  reviews.algorithm_version,
-  reviews.created_at,
-  reviews.updated_at
-from public.artifact_selection_reviews reviews
-where reviews.artifact_id = '<artifact-id>'::uuid
-order by reviews.created_at, reviews.id;
+  id,
+  status,
+  cohort_rank,
+  cohort_size,
+  selection_score,
+  preserve_count,
+  refine_count,
+  slop_count,
+  total_judgments,
+  algorithm_version,
+  created_at,
+  updated_at
+from public.artifact_selection_reviews
+where artifact_id = '<artifact-id>'::uuid
+order by created_at, id;
 ```
-
-Run denominator:
 
 ```sql
 select id, cohort_key, min_judgments, cohort_size, top_count, algorithm_version, created_at
 from public.selection_runs
 where id = '<selection-run-id>'::uuid;
 ```
-
-Active queue check:
 
 ```sql
 select id, artifact_id, status, created_at
@@ -265,19 +304,19 @@ order by created_at, id;
 
 ## Rollback
 
-Prefer a forward repair. The migrations add evidence tables, guard repeated runs, and narrow first publication to Unjudged; they do not delete artifact or vote data.
+Prefer a forward repair. These migrations add evidence tables, serialize selection runs, create an actionable refinement loop, and narrow first publication to Unjudged. They do not delete artifact or vote data.
 
 For an emergency web rollback:
 
 - restore the prior web commit;
-- do not delete selection evidence;
-- understand that the older curator UI may attempt direct lane choices that the new database function rejects.
+- preserve all selection evidence;
+- expect the old curator UI's direct lane choices to be rejected by the new database function.
 
-For a database rollback, create a reviewed compensating migration. Do not drop selection tables or event history ad hoc from the dashboard.
+Use a reviewed compensating migration for database rollback. Do not drop selection tables or event history ad hoc.
 
 ## Residual limitations
 
-This fold does not establish a mature top-10% or top-1% product. It intentionally omits:
+This fold proves lifecycle architecture, not a mature top-10% or top-1% product. It intentionally omits:
 
 - exposure counts;
 - similarity and duplicate adjustment;
@@ -288,5 +327,3 @@ This fold does not establish a mature top-10% or top-1% product. It intentionall
 - expert review;
 - external benchmark coverage;
 - top-percentile selection.
-
-Its purpose is to prove the lifecycle architecture and create real evidence for the next folds.
