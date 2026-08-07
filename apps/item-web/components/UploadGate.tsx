@@ -209,9 +209,11 @@ export function UploadGate() {
 
   const materialPartCount = selectedFiles.length + (textPart.trim() ? 1 : 0) + (referenceUrl.trim() ? 1 : 0);
   const materialLimitExceeded = materialPartCount > MAX_PARTS || totalFileBytes > MAX_TOTAL_BYTES;
+  const intakePaused = intakeControl?.intake_open === false;
+  const dailyLimit = intakeControl?.daily_submission_limit;
 
   function validateIncomingFiles(incoming: File[]): void {
-    if (busy || incoming.length === 0) return;
+    if (busy || intakePaused || incoming.length === 0) return;
 
     const unsupported = incoming.find((file) => !fileIsAccepted(file));
     if (unsupported) {
@@ -263,18 +265,19 @@ export function UploadGate() {
   function handleDrop(event: DragEvent<HTMLDivElement>): void {
     event.preventDefault();
     setDragging(false);
+    if (intakePaused) return;
     validateIncomingFiles(Array.from(event.dataTransfer.files ?? []));
   }
 
   function removeSelectedFile(identity: string): void {
-    if (busy) return;
+    if (busy || intakePaused) return;
     setSelectedFiles((current) => current.filter((file) => fileIdentity(file) !== identity));
     setMessage(null);
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy) return;
+    if (busy || intakePaused) return;
 
     const client = getSupabaseBrowserClient();
     if (!client || !session) {
@@ -442,9 +445,6 @@ export function UploadGate() {
     );
   }
 
-  const intakePaused = intakeControl?.intake_open === false;
-  const dailyLimit = intakeControl?.daily_submission_limit;
-
   return (
     <div className="upload-wrap">
       <button
@@ -464,232 +464,242 @@ export function UploadGate() {
         </div>
       )}
 
-      {open && session && intakePaused && (
-        <div id="artifact-intake-panel" className="upload-panel" role="status">
-          <p className="submission-note">Public intake is temporarily paused. Existing private submissions remain safe.</p>
-        </div>
-      )}
+      {open && session && (
+        <form
+          id="artifact-intake-panel"
+          className="upload-panel submission-panel"
+          onSubmit={submit}
+          aria-busy={busy}
+          aria-describedby={intakePaused ? "intake-pause-note" : undefined}
+        >
+          {intakePaused && (
+            <p id="intake-pause-note" className="submission-note" role="status" aria-live="polite">
+              <strong>INTAKE PAUSED.</strong>{" "}
+              The Artifact surface stays visible during maintenance so the product does not disappear when the machinery changes state. Controls are locked; existing private submissions remain safe.
+            </p>
+          )}
 
-      {open && session && !intakePaused && (
-        <form id="artifact-intake-panel" className="upload-panel submission-panel" onSubmit={submit} aria-busy={busy}>
-          <p className="submission-note">
-            <strong>ALL SLOP WELCOME.</strong>{" "}
-            Full-modality AI-made Artifacts belong here: image, video, audio, text, documents, code, data, 3D, references, simulations, or mixed media. Everything you add becomes one Artifact. Every approved Artifact enters the same infinite feed.
-            {dailyLimit ? ` · ${dailyLimit} Artifacts per rolling 24 hours` : ""}
-            {" · "}12 materials maximum · 50 MB per file · 100 MB combined · private until review.
-          </p>
+          <fieldset className={styles.formFieldset} disabled={busy || intakePaused}>
+            <p className="submission-note">
+              <strong>ALL SLOP WELCOME.</strong>{" "}
+              Full-modality AI-made Artifacts belong here: image, video, audio, text, documents, code, data, 3D, references, simulations, or mixed media. Everything you add becomes one Artifact. Every approved Artifact enters the same infinite feed.
+              {dailyLimit ? ` · ${dailyLimit} Artifacts per rolling 24 hours` : ""}
+              {" · "}12 materials maximum · 50 MB per file · 100 MB combined · private until review.
+            </p>
 
-          <div>
-            <label htmlFor="title">Artifact title</label>
-            <input id="title" name="title" required maxLength={100} placeholder="Name the Artifact" disabled={busy} />
-          </div>
+            <div>
+              <label htmlFor="title">Artifact title</label>
+              <input id="title" name="title" required maxLength={100} placeholder="Name the Artifact" disabled={busy} />
+            </div>
 
-          <div>
-            <label htmlFor="summary">Describe the Artifact</label>
-            <textarea
-              id="summary"
-              name="summary"
-              required
-              minLength={10}
-              maxLength={600}
-              placeholder="What is it and why does it exist?"
-              disabled={busy}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="artifactDescription">How should it be experienced?</label>
-            <textarea
-              id="artifactDescription"
-              name="artifactDescription"
-              required
-              minLength={20}
-              maxLength={4000}
-              placeholder="Describe the whole work: its materials, relationships, behavior, dependencies, and what someone should understand when experiencing it."
-              disabled={busy}
-            />
-            <p className="submission-note">Describe the Artifact as a whole, not each file separately.</p>
-          </div>
-
-          <div>
-            <label htmlFor="files">AI-made Artifact</label>
-            <div
-              className={styles.dropZone}
-              data-dragging={dragging ? "true" : undefined}
-              onDragEnter={(event) => {
-                event.preventDefault();
-                if (!busy) setDragging(true);
-              }}
-              onDragOver={(event) => event.preventDefault()}
-              onDragLeave={(event) => {
-                event.preventDefault();
-                setDragging(false);
-              }}
-              onDrop={handleDrop}
-            >
-              <input
-                id="files"
-                className={styles.materialInput}
-                name="files"
-                type="file"
-                accept={FILE_ACCEPT}
-                multiple
+            <div>
+              <label htmlFor="summary">Describe the Artifact</label>
+              <textarea
+                id="summary"
+                name="summary"
+                required
+                minLength={10}
+                maxLength={600}
+                placeholder="What is it and why does it exist?"
                 disabled={busy}
-                aria-describedby="material-help selected-files material-limits"
-                onChange={handleFileInput}
               />
-              <label className={styles.materialPicker} htmlFor="files" data-disabled={busy ? "true" : undefined}>
-                <span className={styles.materialPlus} aria-hidden="true">+</span>
-                <span className={styles.materialAction}>{dragging ? "Drop material here" : "Add material"}</span>
-                <span className={styles.materialModes}>image · video · audio · PDF · code · data · 3D · archive · more</span>
-              </label>
             </div>
 
-            <div id="material-limits" className={styles.materialSummary}>
-              <span>{materialPartCount}/{MAX_PARTS} total materials</span>
-              <span>{formatBytes(totalFileBytes)} / 100 MB files</span>
+            <div>
+              <label htmlFor="artifactDescription">How should it be experienced?</label>
+              <textarea
+                id="artifactDescription"
+                name="artifactDescription"
+                required
+                minLength={20}
+                maxLength={4000}
+                placeholder="Describe the whole work: its materials, relationships, behavior, dependencies, and what someone should understand when experiencing it."
+                disabled={busy}
+              />
+              <p className="submission-note">Describe the Artifact as a whole, not each file separately.</p>
             </div>
 
-            <div id="selected-files" className={styles.materialList} aria-live="polite">
-              {selectedFiles.length === 0 ? (
-                <div className={styles.materialEmpty}>
-                  <span aria-hidden="true">◇</span>
-                  <span>No materials added</span>
-                </div>
-              ) : selectedFiles.map((file) => {
-                const identity = fileIdentity(file);
-                return (
-                  <div className={styles.materialRow} key={identity}>
+            <div>
+              <label htmlFor="files">AI-made Artifact</label>
+              <div
+                className={styles.dropZone}
+                data-dragging={dragging ? "true" : undefined}
+                data-paused={intakePaused ? "true" : undefined}
+                onDragEnter={(event) => {
+                  event.preventDefault();
+                  if (!busy && !intakePaused) setDragging(true);
+                }}
+                onDragOver={(event) => event.preventDefault()}
+                onDragLeave={(event) => {
+                  event.preventDefault();
+                  setDragging(false);
+                }}
+                onDrop={handleDrop}
+              >
+                <input
+                  id="files"
+                  className={styles.materialInput}
+                  name="files"
+                  type="file"
+                  accept={FILE_ACCEPT}
+                  multiple
+                  disabled={busy || intakePaused}
+                  aria-describedby="material-help selected-files material-limits"
+                  onChange={handleFileInput}
+                />
+                <label className={styles.materialPicker} htmlFor="files" data-disabled={busy || intakePaused ? "true" : undefined}>
+                  <span className={styles.materialPlus} aria-hidden="true">+</span>
+                  <span className={styles.materialAction}>{intakePaused ? "Add material · paused" : dragging ? "Drop material here" : "Add material"}</span>
+                  <span className={styles.materialModes}>image · video · audio · PDF · code · data · 3D · archive · more</span>
+                </label>
+              </div>
+
+              <div id="material-limits" className={styles.materialSummary}>
+                <span>{materialPartCount}/{MAX_PARTS} total materials</span>
+                <span>{formatBytes(totalFileBytes)} / 100 MB files</span>
+              </div>
+
+              <div id="selected-files" className={styles.materialList} aria-live="polite">
+                {selectedFiles.length === 0 ? (
+                  <div className={styles.materialEmpty}>
                     <span aria-hidden="true">◇</span>
-                    <span>
-                      {file.name}
-                      <span className={styles.materialMeta}>{modeForFile(file)} · {formatBytes(file.size)}</span>
-                    </span>
-                    <button
-                      className={styles.removeMaterial}
-                      type="button"
-                      disabled={busy}
-                      onClick={() => removeSelectedFile(identity)}
-                      aria-label={`Remove ${file.name}`}
-                    >
-                      Remove
-                    </button>
+                    <span>No materials added</span>
                   </div>
-                );
-              })}
+                ) : selectedFiles.map((file) => {
+                  const identity = fileIdentity(file);
+                  return (
+                    <div className={styles.materialRow} key={identity}>
+                      <span aria-hidden="true">◇</span>
+                      <span>
+                        {file.name}
+                        <span className={styles.materialMeta}>{modeForFile(file)} · {formatBytes(file.size)}</span>
+                      </span>
+                      <button
+                        className={styles.removeMaterial}
+                        type="button"
+                        disabled={busy || intakePaused}
+                        onClick={() => removeSelectedFile(identity)}
+                        aria-label={`Remove ${file.name}`}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <p id="material-help" className="submission-note">Everything added here belongs to one Artifact. Drop files here or use Add material. Files remain private and are treated as untrusted until review. Text and references below join that same Artifact.</p>
+              {materialLimitExceeded && <p className={styles.limitWarning} role="alert">Material limits exceeded. Remove material before submitting.</p>}
             </div>
 
-            <p id="material-help" className="submission-note">Everything added here belongs to one Artifact. Drop files here or use Add material. Files remain private and are treated as untrusted until review. Text and references below join that same Artifact.</p>
-            {materialLimitExceeded && <p className={styles.limitWarning} role="alert">Material limits exceeded. Remove material before submitting.</p>}
-          </div>
+            <div>
+              <label htmlFor="textPart">Text material · optional</label>
+              <textarea
+                id="textPart"
+                value={textPart}
+                onChange={(event) => {
+                  setTextPart(event.target.value);
+                  setMessage(null);
+                }}
+                maxLength={20000}
+                placeholder="Paste text that is itself part of the Artifact."
+                disabled={busy}
+              />
+            </div>
 
-          <div>
-            <label htmlFor="textPart">Text material · optional</label>
-            <textarea
-              id="textPart"
-              value={textPart}
-              onChange={(event) => {
-                setTextPart(event.target.value);
-                setMessage(null);
-              }}
-              maxLength={20000}
-              placeholder="Paste text that is itself part of the Artifact."
-              disabled={busy}
-            />
-          </div>
+            <div>
+              <label htmlFor="referenceUrl">Reference / website material · optional</label>
+              <input
+                id="referenceUrl"
+                type="url"
+                value={referenceUrl}
+                onChange={(event) => {
+                  setReferenceUrl(event.target.value);
+                  setMessage(null);
+                }}
+                maxLength={2000}
+                inputMode="url"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                placeholder="https://example.com — recorded as a reference; not fetched or executed during intake"
+                disabled={busy}
+              />
+            </div>
 
-          <div>
-            <label htmlFor="referenceUrl">Reference / website material · optional</label>
-            <input
-              id="referenceUrl"
-              type="url"
-              value={referenceUrl}
-              onChange={(event) => {
-                setReferenceUrl(event.target.value);
-                setMessage(null);
-              }}
-              maxLength={2000}
-              inputMode="url"
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              placeholder="https://example.com — recorded as a reference; not fetched or executed during intake"
-              disabled={busy}
-            />
-          </div>
+            <div className="submission-note">
+              <strong>Detected modes:</strong> {selectedModes.length ? selectedModes.join(" · ") : "none yet"}
+            </div>
 
-          <div className="submission-note">
-            <strong>Detected modes:</strong> {selectedModes.length ? selectedModes.join(" · ") : "none yet"}
-          </div>
+            <div>
+              <label htmlFor="originClass">Origin class</label>
+              <select id="originClass" name="originClass" required defaultValue="" disabled={busy}>
+                <option value="" disabled>Select how the work was made</option>
+                <option value="human_ai_hybrid">Human–AI hybrid — substantial human source material, editing, or authorship</option>
+                <option value="ai_directed">Human-directed AI — human prompted and selected the output</option>
+                <option value="autonomous_ai_run">Autonomous AI run — no human selection or editing after the run was triggered</option>
+                <option value="ai_origin_unverified">AI origin claimed, provenance not yet verified</option>
+              </select>
+            </div>
 
-          <div>
-            <label htmlFor="originClass">Origin class</label>
-            <select id="originClass" name="originClass" required defaultValue="" disabled={busy}>
-              <option value="" disabled>Select how the work was made</option>
-              <option value="human_ai_hybrid">Human–AI hybrid — substantial human source material, editing, or authorship</option>
-              <option value="ai_directed">Human-directed AI — human prompted and selected the output</option>
-              <option value="autonomous_ai_run">Autonomous AI run — no human selection or editing after the run was triggered</option>
-              <option value="ai_origin_unverified">AI origin claimed, provenance not yet verified</option>
-            </select>
-          </div>
+            <div>
+              <label htmlFor="generator">Generator / model / tool stack</label>
+              <input id="generator" name="generator" required minLength={2} maxLength={120} placeholder="Models, code, engines, workflows, or tools" disabled={busy} />
+            </div>
 
-          <div>
-            <label htmlFor="generator">Generator / model / tool stack</label>
-            <input id="generator" name="generator" required minLength={2} maxLength={120} placeholder="Models, code, engines, workflows, or tools" disabled={busy} />
-          </div>
+            <div>
+              <label htmlFor="humanRole">Human role</label>
+              <textarea
+                id="humanRole"
+                name="humanRole"
+                required
+                minLength={15}
+                maxLength={800}
+                placeholder="State what humans did across the Artifact: configured, prompted, supplied source material, coded, edited, selected, assembled, or did nothing after trigger."
+                disabled={busy}
+              />
+            </div>
 
-          <div>
-            <label htmlFor="humanRole">Human role</label>
-            <textarea
-              id="humanRole"
-              name="humanRole"
-              required
-              minLength={15}
-              maxLength={800}
-              placeholder="State what humans did across the Artifact: configured, prompted, supplied source material, coded, edited, selected, assembled, or did nothing after trigger."
-              disabled={busy}
-            />
-          </div>
+            <div>
+              <label htmlFor="provenance">Provenance note</label>
+              <textarea
+                id="provenance"
+                name="provenance"
+                required
+                minLength={30}
+                maxLength={1600}
+                placeholder="Describe prompts, seeds, source material, run logs, transformations, edits, assembly, and publication path."
+                disabled={busy}
+              />
+            </div>
 
-          <div>
-            <label htmlFor="provenance">Provenance note</label>
-            <textarea
-              id="provenance"
-              name="provenance"
-              required
-              minLength={30}
-              maxLength={1600}
-              placeholder="Describe prompts, seeds, source material, run logs, transformations, edits, assembly, and publication path."
-              disabled={busy}
-            />
-          </div>
+            <label className="check-row">
+              <input name="aiOrigin" type="checkbox" required disabled={busy} />
+              <span>I attest that AI generated or materially transformed the submitted Artifact or a meaningful component of it.</span>
+            </label>
 
-          <label className="check-row">
-            <input name="aiOrigin" type="checkbox" required disabled={busy} />
-            <span>I attest that AI generated or materially transformed the submitted Artifact or a meaningful component of it.</span>
-          </label>
+            <label className="check-row">
+              <input name="autonomousAccuracy" type="checkbox" required disabled={busy} />
+              <span>I understand that “autonomous AI run” means no human intervention after trigger—not that humans never designed or configured the system.</span>
+            </label>
 
-          <label className="check-row">
-            <input name="autonomousAccuracy" type="checkbox" required disabled={busy} />
-            <span>I understand that “autonomous AI run” means no human intervention after trigger—not that humans never designed or configured the system.</span>
-          </label>
+            <label className="check-row">
+              <input name="safety" type="checkbox" required disabled={busy} />
+              <span>This Artifact contains no prohibited sexual exploitation material, graphic gore intended for shock, credible threats, criminal facilitation, malware intended to harm users, or other prohibited material.</span>
+            </label>
 
-          <label className="check-row">
-            <input name="safety" type="checkbox" required disabled={busy} />
-            <span>This Artifact contains no prohibited sexual exploitation material, graphic gore intended for shock, credible threats, criminal facilitation, malware intended to harm users, or other prohibited material.</span>
-          </label>
+            <label className="check-row">
+              <input name="rights" type="checkbox" required disabled={busy} />
+              <span>I have the right to submit these materials and grant the platform review rights, and the provenance description truthfully identifies source/remix relationships to the best of my knowledge.</span>
+            </label>
 
-          <label className="check-row">
-            <input name="rights" type="checkbox" required disabled={busy} />
-            <span>I have the right to submit these materials and grant the platform review rights, and the provenance description truthfully identifies source/remix relationships to the best of my knowledge.</span>
-          </label>
-
-          <div className="submission-actions">
-            <button className="submit-button" type="submit" disabled={busy || intakePaused || materialLimitExceeded || materialPartCount < 1}>
-              {busy ? "Binding Artifact into private quarantine…" : "Submit Artifact"}
-            </button>
-            {message && <p className="submission-note" role="status" aria-live="polite">{message}</p>}
-          </div>
+            <div className="submission-actions">
+              <button className="submit-button" type="submit" disabled={busy || intakePaused || materialLimitExceeded || materialPartCount < 1}>
+                {busy ? "Binding Artifact into private quarantine…" : intakePaused ? "Intake paused" : "Submit Artifact"}
+              </button>
+              {message && <p className="submission-note" role="status" aria-live="polite">{message}</p>}
+            </div>
+          </fieldset>
         </form>
       )}
     </div>

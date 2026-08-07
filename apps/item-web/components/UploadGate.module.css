@@ -1,3 +1,15 @@
+.formFieldset {
+  display: contents;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.formFieldset:disabled {
+  opacity: .68;
+}
+
 .materialInput {
   position: absolute !important;
   width: 1px !important;
@@ -40,9 +52,10 @@
   outline-offset: 3px;
 }
 
-.materialPicker[data-disabled="true"] {
+.materialPicker[data-disabled="true"],
+.dropZone[data-paused="true"] .materialPicker {
   opacity: .55;
-  cursor: wait;
+  cursor: not-allowed;
 }
 
 .materialPlus {
@@ -137,7 +150,7 @@
 
 .removeMaterial:disabled {
   opacity: .45;
-  cursor: wait;
+  cursor: not-allowed;
 }
 
 .limitWarning {
