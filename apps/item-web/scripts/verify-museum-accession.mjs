@@ -3,8 +3,9 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const root = process.cwd();
-const [migration, museumClient, collection, page, curator, architecture] = await Promise.all([
+const [migration, indexes, museumClient, collection, page, curator, architecture] = await Promise.all([
   readFile(resolve(root, "..", "..", "supabase", "migrations", "015_museum_accession_lifecycle.sql"), "utf8"),
+  readFile(resolve(root, "..", "..", "supabase", "migrations", "016_accession_vote_indexes.sql"), "utf8"),
   readFile(resolve(root, "lib", "museum.ts"), "utf8"),
   readFile(resolve(root, "components", "MuseumCollection.tsx"), "utf8"),
   readFile(resolve(root, "app", "aetimm", "page.tsx"), "utf8"),
@@ -28,6 +29,8 @@ for (const [label, pattern, source] of [
   ["null-safe admin withdrawal authority", /caller_role is distinct from 'admin'/, migration],
   ["withdrawal keeps accession tombstone", /update public\.museum_accessions[\s\S]*withdrawn_at = now\(\)/, migration],
   ["accession is legacy-lane mirror only", /museum_accessions is the source of truth/, migration],
+  ["account vote FK/index path", /create index if not exists artifact_votes_voter_id_idx\s+on public\.artifact_votes \(voter_id\)/, indexes],
+  ["accession withdrawal FK/index path", /create index if not exists museum_accessions_withdrawn_by_idx\s+on public\.museum_accessions \(withdrawn_by\)/, indexes],
   ["Museum collection uses accession registry", /from\("museum_accessions"\)/, museumClient],
   ["Museum excludes withdrawn accessions", /\.is\("withdrawn_at", null\)/, museumClient],
   ["Museum permanent collection surface", /PERMANENT COLLECTION/, collection],
@@ -48,4 +51,4 @@ assert.ok(
   "Museum cadence configuration must not be client-readable or client-writable.",
 );
 
-console.log("Museum accession PASS: ordinary Artifacts stay public, community Museum votes pace immutable accessions, candidate admission requires crowd evidence, each refresh is bounded, the most Museum-voted unaccessioned work receives the next slot, public voting cannot deaccession it, and exceptional withdrawal preserves a tombstone.");
+console.log("Museum accession PASS: ordinary Artifacts stay public, community Museum votes pace immutable accessions, candidate admission requires crowd evidence, each refresh is bounded, account/withdrawal FK paths are indexed, public voting cannot deaccession it, and exceptional withdrawal preserves a tombstone.");
