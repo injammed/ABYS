@@ -1,0 +1,78 @@
+.gloss {
+  width: 100%;
+  min-height: 2.75rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .7rem;
+  padding: .55rem .7rem;
+  border: 1px solid rgba(213,166,63,.12);
+  border-radius: .45rem;
+  background:
+    linear-gradient(90deg, rgba(213,166,63,.018), transparent 22%, rgba(213,166,63,.012) 78%, transparent),
+    rgba(3,3,3,.42);
+  color: rgba(231,204,132,.78);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+
+.gloss:hover,
+.gloss:focus-visible {
+  border-color: rgba(255,226,154,.34);
+  color: rgba(255,226,154,.96);
+  outline: none;
+}
+
+.text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+  letter-spacing: .09em;
+}
+
+.dense .text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: clamp(.48rem, 1.25vw, .62rem);
+}
+
+.quiet {
+  border-color: rgba(255,255,255,.07);
+  background: transparent;
+  color: rgba(201,196,184,.6);
+}
+
+.quiet .text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: clamp(.46rem, 1vw, .58rem);
+}
+
+.gloss[data-language="en"] .text,
+.gloss[data-language="es"] .text,
+.gloss[data-language="zh"] .text,
+.gloss[data-language="ja"] .text,
+.gloss[data-language="ar"] .text {
+  font-family: inherit;
+  font-size: clamp(.62rem, 1.6vw, .82rem);
+  letter-spacing: .035em;
+  line-height: 1.45;
+}
+
+.language {
+  align-self: start;
+  padding-top: .08rem;
+  color: rgba(255,226,154,.45);
+  font: 600 .5rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: .08em;
+  white-space: nowrap;
+}
+
+.gloss[data-language="machine"] {
+  background:
+    repeating-linear-gradient(90deg, rgba(213,166,63,.016) 0 1px, transparent 1px 19px),
+    linear-gradient(180deg, rgba(213,166,63,.016), rgba(0,0,0,.06));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gloss { transition: none; }
+}
