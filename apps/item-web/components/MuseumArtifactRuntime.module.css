@@ -1,0 +1,165 @@
+.runtime {
+  position: relative;
+  width: 100%;
+  min-height: inherit;
+  display: grid;
+  place-items: stretch;
+}
+
+.image,
+.video {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 46rem;
+  object-fit: contain;
+  filter: drop-shadow(0 30px 36px rgba(0,0,0,.62));
+}
+
+.video {
+  background: #020202;
+}
+
+.audioHall,
+.textHall,
+.sealedHall {
+  min-height: 24rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: clamp(1.4rem, 4vw, 3rem);
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255,226,154,.09), transparent 18rem),
+    linear-gradient(180deg, rgba(10,9,7,.9), rgba(2,2,2,.96));
+}
+
+.audioHall > p,
+.textHall > p,
+.sealedHall > p {
+  margin: 0;
+  color: var(--gold-light);
+  font-size: .62rem;
+  letter-spacing: .18em;
+}
+
+.audioHall strong,
+.sealedHall strong {
+  max-width: 30rem;
+  font-family: Georgia, serif;
+  font-size: clamp(1.6rem, 4vw, 2.7rem);
+  font-weight: 400;
+}
+
+.audioHall audio {
+  width: min(34rem, 100%);
+}
+
+.rings {
+  position: relative;
+  width: clamp(7rem, 20vw, 11rem);
+  aspect-ratio: 1;
+}
+
+.rings i {
+  position: absolute;
+  inset: 10%;
+  border: 1px solid rgba(255,226,154,.38);
+  border-radius: 50%;
+  box-shadow: 0 0 22px rgba(213,166,63,.08);
+}
+
+.rings i:nth-child(1) { transform: rotateX(63deg); }
+.rings i:nth-child(2) { transform: rotateY(63deg); }
+.rings i:nth-child(3) { transform: rotate(45deg) scale(.72); }
+
+.textHall {
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow: auto;
+  text-align: left;
+}
+
+.textHall pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #e7e0d1;
+  font: 500 clamp(.78rem, 1.4vw, .96rem)/1.72 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.sealedHall span {
+  max-width: 35rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.sealedHall a,
+.materialRegister a {
+  color: var(--gold-light);
+  text-underline-offset: .24em;
+}
+
+.materialRegister {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: .8rem;
+  width: min(31rem, calc(100% - 1.6rem));
+  transform: translateX(-50%);
+  border: 1px solid rgba(255,226,154,.17);
+  background: rgba(3,3,3,.9);
+  backdrop-filter: blur(18px);
+  color: var(--muted);
+  font-size: .66rem;
+}
+
+.materialRegister > summary {
+  cursor: pointer;
+  padding: .65rem .8rem;
+  color: #e4dcc9;
+  letter-spacing: .11em;
+  user-select: none;
+}
+
+.materialRegister ol {
+  max-height: 14rem;
+  overflow: auto;
+  margin: 0;
+  padding: .3rem 1rem .85rem 2rem;
+}
+
+.materialRegister li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: .22rem .75rem;
+  padding: .35rem 0;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+
+.materialRegister li span {
+  color: #d8d0bf;
+  overflow-wrap: anywhere;
+}
+
+.materialRegister li small {
+  text-transform: uppercase;
+}
+
+.materialRegister li a {
+  grid-column: 1 / -1;
+  width: fit-content;
+}
+
+@media (max-width: 600px) {
+  .audioHall,
+  .textHall,
+  .sealedHall {
+    min-height: 20rem;
+    padding: 1rem;
+  }
+}
