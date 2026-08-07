@@ -135,7 +135,7 @@ export function LexiconText({
       data-cycle-ms="500"
     >
       {semantic && <span className={styles.srOnly}>{text}</span>}
-      <span className={styles.visual} aria-hidden={semantic ? "true" : undefined}>
+      <span className={styles.visual} aria-hidden="true">
         {characters.map((character, index) => (
           <span className={styles.character} key={`${index}-${character}`}>
             {reducedMotion ? character : mutateCharacter(character, index, text, effectiveTick)}
