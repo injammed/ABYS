@@ -1,0 +1,84 @@
+.statusMarks {
+  position: absolute;
+  z-index: 3;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .6rem;
+  pointer-events: none;
+}
+
+.museumMark,
+.privateMark,
+.slopRankScar {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: .42rem .62rem;
+  background: rgba(5, 5, 5, .78);
+  backdrop-filter: blur(10px);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-size: .66rem;
+}
+
+.museumMark {
+  order: 1;
+  border: 1px solid rgba(255, 226, 154, .64);
+  color: var(--gold-light);
+  font-family: Georgia, serif;
+}
+
+.privateMark {
+  order: 1;
+  border: 1px solid rgba(255, 255, 255, .28);
+  color: var(--muted);
+}
+
+.slopRankScar {
+  order: 2;
+  margin-left: auto;
+  border: 2px dashed rgba(134, 144, 90, .9);
+  color: #d5ddb0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 900;
+  transform: rotate(1.5deg);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, .55);
+}
+
+.details {
+  margin-top: .75rem;
+  border-top: 1px dotted var(--line);
+  color: var(--muted);
+  font-size: .76rem;
+}
+
+.details > summary {
+  width: fit-content;
+  padding: .65rem 0 .25rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.details > summary:hover {
+  color: var(--text);
+}
+
+@media (max-width: 430px) {
+  .statusMarks {
+    top: .7rem;
+    left: .7rem;
+    right: .7rem;
+  }
+
+  .museumMark,
+  .privateMark,
+  .slopRankScar {
+    font-size: .58rem;
+    min-height: 1.75rem;
+    padding: .35rem .48rem;
+  }
+}
