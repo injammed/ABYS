@@ -1,38 +1,25 @@
-.state,
-.empty {
-  width: min(58rem, calc(100% - 2rem));
-  margin: 3rem auto 9rem;
-  color: var(--muted);
-}
-
-.empty {
-  min-height: 42vh;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  text-align: center;
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 1.4rem;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(213,166,63,.1), transparent 18rem),
-    linear-gradient(180deg, rgba(255,255,255,.018), rgba(255,255,255,.004));
-}
-
-.empty h2 {
-  margin: .45rem 0 .2rem;
-  font-family: Georgia, serif;
-  font-size: clamp(2.3rem, 8vw, 5rem);
-  font-weight: 400;
-}
-
-.empty p:last-child {
-  max-width: 31rem;
-  line-height: 1.6;
-}
-
 .collection {
-  width: min(78rem, calc(100% - 2rem));
-  margin: 2.5rem auto 9rem;
+  position: relative;
+  width: min(82rem, calc(100% - 2rem));
+  min-height: 62vh;
+  margin: 0 auto 10rem;
+  padding-top: clamp(2.5rem, 6vw, 5rem);
+  scroll-margin-top: 2rem;
+}
+
+.collection::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 50%;
+  width: min(94rem, 110vw);
+  height: 100%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0 8%, rgba(255,226,154,.025) 8.1%, transparent 8.2% 91.8%, rgba(255,226,154,.025) 91.9%, transparent 92%),
+    radial-gradient(ellipse at 50% 0%, rgba(213,166,63,.06), transparent 42rem);
 }
 
 .roomHeader {
@@ -40,15 +27,96 @@
   justify-content: space-between;
   gap: 1rem;
   align-items: baseline;
-  margin-bottom: 1rem;
-  padding: 0 .25rem;
+  margin-bottom: 1.2rem;
+  padding: 0 .25rem .8rem;
+  border-bottom: 1px solid rgba(255,226,154,.1);
   color: var(--muted);
-  font-size: .68rem;
-  letter-spacing: .14em;
+  font-size: .64rem;
+  letter-spacing: .16em;
   text-transform: uppercase;
 }
 
-.roomHeader p { margin: 0; }
+.roomHeader p { margin: 0; color: var(--gold-light); }
+
+.emptyChamber {
+  position: relative;
+  min-height: min(58vh, 42rem);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  overflow: hidden;
+  padding: clamp(3rem, 8vw, 6rem) 1rem;
+  border: 1px solid rgba(255,226,154,.11);
+  background:
+    linear-gradient(rgba(255,255,255,.008) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.008) 1px, transparent 1px),
+    radial-gradient(circle at 50% 46%, rgba(213,166,63,.075), transparent 18rem),
+    linear-gradient(180deg, rgba(255,255,255,.012), rgba(0,0,0,.18));
+  background-size: 72px 72px, 72px 72px, auto, auto;
+  box-shadow: inset 0 0 120px rgba(0,0,0,.75), 0 35px 120px rgba(0,0,0,.45);
+}
+
+.emptyChamber::before,
+.emptyChamber::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid rgba(255,226,154,.07);
+  border-radius: 50%;
+}
+
+.emptyChamber::before {
+  width: min(32rem, 66vw);
+  aspect-ratio: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -58%) rotateX(68deg);
+}
+
+.emptyChamber::after {
+  width: min(21rem, 48vw);
+  aspect-ratio: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -58%) rotateY(67deg);
+}
+
+.voidPedestal {
+  position: relative;
+  z-index: 1;
+  width: clamp(4rem, 9vw, 6rem);
+  height: clamp(5rem, 10vw, 7rem);
+  margin-bottom: 1.8rem;
+  border: 1px solid rgba(255,226,154,.22);
+  background:
+    linear-gradient(145deg, rgba(255,226,154,.06), transparent 35%),
+    #060605;
+  box-shadow:
+    0 0 65px rgba(213,166,63,.08),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%);
+}
+
+.emptyChamber h2 {
+  position: relative;
+  z-index: 1;
+  margin: .55rem 0 .35rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.3rem, 7vw, 5.4rem);
+  font-weight: 400;
+  line-height: .95;
+  color: #ece4d2;
+}
+
+.emptyChamber > p:last-child {
+  position: relative;
+  z-index: 1;
+  max-width: 32rem;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
 
 .room {
   display: grid;
@@ -63,7 +131,7 @@
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,.13);
-  border-radius: 1.25rem;
+  border-radius: .25rem;
   background:
     linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.008) 38%, rgba(213,166,63,.028)),
     #070707;
@@ -87,20 +155,34 @@
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(18rem, .55fr);
-  min-height: 40rem;
-  border-color: rgba(255,226,154,.3);
+  min-height: 42rem;
+  border-color: rgba(255,226,154,.34);
   background:
-    radial-gradient(circle at 42% 35%, rgba(213,166,63,.09), transparent 30rem),
+    radial-gradient(circle at 42% 35%, rgba(213,166,63,.1), transparent 30rem),
     linear-gradient(145deg, rgba(255,255,255,.04), rgba(213,166,63,.025)),
-    #060606;
+    #050505;
   box-shadow:
     0 55px 150px rgba(0,0,0,.72),
-    0 0 70px rgba(213,166,63,.05),
+    0 0 90px rgba(213,166,63,.055),
     inset 0 1px 0 rgba(255,255,255,.09);
 }
 
+.pedestalCase::before {
+  content: "CURRENT SUMMIT";
+  position: absolute;
+  z-index: 3;
+  top: .8rem;
+  left: .8rem;
+  padding: .42rem .58rem;
+  border: 1px solid rgba(255,226,154,.24);
+  color: var(--gold-light);
+  background: rgba(4,4,4,.72);
+  font-size: .56rem;
+  letter-spacing: .17em;
+}
+
 .pedestalCase .objectStage {
-  min-height: 40rem;
+  min-height: 42rem;
   border-right: 1px solid rgba(255,255,255,.09);
   border-bottom: 0;
   background:
@@ -169,9 +251,7 @@
   filter: drop-shadow(0 28px 32px rgba(0,0,0,.55));
 }
 
-.pedestalCase .objectStage img {
-  max-height: 45rem;
-}
+.pedestalCase .objectStage img { max-height: 46rem; }
 
 .noPreview {
   display: grid;
@@ -194,6 +274,8 @@
 }
 
 .accession {
+  position: relative;
+  z-index: 1;
   margin: 0;
   color: var(--gold-light);
   font-size: .64rem;
@@ -230,21 +312,13 @@
 }
 
 @media (max-width: 920px) {
-  .room {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .case,
-  .wallCase {
-    grid-column: span 1;
-  }
-
+  .room { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .case, .wallCase { grid-column: span 1; }
   .pedestalCase {
     grid-column: 1 / -1;
     grid-template-columns: 1fr;
     min-height: auto;
   }
-
   .pedestalCase .objectStage {
     min-height: 34rem;
     border-right: 0;
@@ -253,29 +327,12 @@
 }
 
 @media (max-width: 600px) {
-  .collection {
-    width: calc(100% - 1rem);
-  }
-
-  .room {
-    grid-template-columns: 1fr;
-  }
-
-  .case,
-  .wallCase,
-  .pedestalCase {
-    grid-column: 1;
-  }
-
-  .objectStage,
-  .wallCase .objectStage,
-  .pedestalCase .objectStage {
-    min-height: 22rem;
-  }
-
-  .pedestalCase .plaque h2 {
-    font-size: clamp(2rem, 10vw, 3.5rem);
-  }
+  .collection { width: calc(100% - 1rem); }
+  .roomHeader { align-items: flex-start; flex-direction: column; gap: .25rem; }
+  .room { grid-template-columns: 1fr; }
+  .case, .wallCase, .pedestalCase { grid-column: 1; }
+  .objectStage, .wallCase .objectStage, .pedestalCase .objectStage { min-height: 22rem; }
+  .pedestalCase .plaque h2 { font-size: clamp(2rem, 10vw, 3.5rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
