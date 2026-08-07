@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArtifactFeed } from "@/components/ArtifactFeed";
+import { BinarySwipeVoting } from "@/components/BinarySwipeVoting";
 import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 
 export default function HomePage() {
@@ -24,6 +25,7 @@ export default function HomePage() {
       </header>
 
       <section id="field" className="feed-first-field" aria-label="Live Slop Trough artifact field">
+        <BinarySwipeVoting />
         <ArtifactFeed />
       </section>
 
