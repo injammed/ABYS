@@ -1,5 +1,6 @@
 import type { ArtifactPart } from "@/lib/feed";
 import type { MuseumArtifactPresentation } from "@/lib/museum";
+import { LexiconText } from "./LexiconBroadcast";
 import styles from "./MuseumArtifactRuntime.module.css";
 
 function formatBytes(value?: number): string {
@@ -33,10 +34,10 @@ function Experience({ part }: { part: ArtifactPart }) {
 
   if (part.mode === "audio" && part.signedUrl) {
     return (
-      <div className={styles.audioHall}>
+      <div className={styles.audioHall} data-lexicon-surface="true">
         <div className={styles.rings} aria-hidden="true"><i /><i /><i /></div>
-        <p>ACCESSION AUDIO</p>
-        <strong>{partName(part)}</strong>
+        <LexiconText as="p" text="ACCESSION AUDIO" phase={3} />
+        <LexiconText as="strong" text={partName(part)} phase={7} />
         <audio src={part.signedUrl} controls preload="metadata" />
       </div>
     );
@@ -44,8 +45,8 @@ function Experience({ part }: { part: ArtifactPart }) {
 
   if (part.partKind === "text" && part.text) {
     return (
-      <div className={styles.textHall}>
-        <p>ACCESSION TEXT</p>
+      <div className={styles.textHall} data-artifact-payload="verbatim">
+        <LexiconText as="p" text="ACCESSION TEXT" phase={11} />
         <pre>{part.text.length > 6000 ? `${part.text.slice(0, 6000)}\n…` : part.text}</pre>
       </div>
     );
@@ -53,26 +54,31 @@ function Experience({ part }: { part: ArtifactPart }) {
 
   if (part.partKind === "reference" && part.referenceUrl) {
     return (
-      <div className={styles.sealedHall}>
-        <p>EXTERNAL REFERENCE</p>
-        <strong>{partName(part)}</strong>
-        <span>The reference is recorded with the Artifact and is opened only by deliberate visitor action.</span>
-        <a href={part.referenceUrl} target="_blank" rel="noopener noreferrer">Open recorded reference</a>
+      <div className={styles.sealedHall} data-lexicon-surface="true">
+        <LexiconText as="p" text="EXTERNAL REFERENCE" phase={13} />
+        <LexiconText as="strong" text={partName(part)} phase={17} />
+        <LexiconText text="The reference is recorded with the Artifact and is opened only by deliberate visitor action." phase={19} />
+        <a href={part.referenceUrl} target="_blank" rel="noopener noreferrer" aria-label="Open recorded reference">
+          <LexiconText text="Open recorded reference" phase={23} semantic={false} />
+        </a>
       </div>
     );
   }
 
+  const sealedExplanation = part.mode === "code" || part.mode === "website" || part.mode === "simulation"
+    ? "Preserved without execution. The Museum records the material; it does not grant it authority."
+    : "Preserved as constituent material of this Artifact.";
+  const retrieveLabel = `Retrieve preserved material${part.byteSize != null ? ` · ${formatBytes(part.byteSize)}` : ""}`;
+
   return (
-    <div className={styles.sealedHall} data-sealed-mode={part.mode}>
-      <p>{part.mode === "model3d" ? "3D" : part.mode.toUpperCase()} · SEALED MATERIAL</p>
-      <strong>{partName(part)}</strong>
-      <span>
-        {part.mode === "code" || part.mode === "website" || part.mode === "simulation"
-          ? "Preserved without execution. The Museum records the material; it does not grant it authority."
-          : "Preserved as constituent material of this Artifact."}
-      </span>
+    <div className={styles.sealedHall} data-sealed-mode={part.mode} data-lexicon-surface="true">
+      <LexiconText as="p" text={`${part.mode === "model3d" ? "3D" : part.mode.toUpperCase()} · SEALED MATERIAL`} phase={29} />
+      <LexiconText as="strong" text={partName(part)} phase={31} />
+      <LexiconText text={sealedExplanation} phase={37} />
       {part.signedUrl && (
-        <a href={part.signedUrl} download={part.filename || true}>Retrieve preserved material{part.byteSize != null ? ` · ${formatBytes(part.byteSize)}` : ""}</a>
+        <a href={part.signedUrl} download={part.filename || true} aria-label={retrieveLabel}>
+          <LexiconText text={retrieveLabel} phase={41} semantic={false} />
+        </a>
       )}
     </div>
   );
@@ -88,26 +94,30 @@ export function MuseumArtifactRuntime({ artifact }: { artifact: MuseumArtifactPr
       ) : artifact.mediaUrl ? (
         <img className={styles.image} src={artifact.mediaUrl} alt="" loading="lazy" />
       ) : (
-        <div className={styles.sealedHall}>
-          <p>ARTIFACT FORM</p>
-          <strong>{artifact.modes.map((mode) => mode === "model3d" ? "3D" : mode).join(" · ")}</strong>
-          <span>The Artifact exists even when this browser has no native presentation for its form.</span>
+        <div className={styles.sealedHall} data-lexicon-surface="true">
+          <LexiconText as="p" text="ARTIFACT FORM" phase={43} />
+          <LexiconText as="strong" text={artifact.modes.map((mode) => mode === "model3d" ? "3D" : mode).join(" · ")} phase={47} />
+          <LexiconText text="The Artifact exists even when this browser has no native presentation for its form." phase={53} />
         </div>
       )}
 
       {artifact.parts.length > 1 && (
         <details className={styles.materialRegister}>
-          <summary>ARTIFACT MATERIALS · {artifact.parts.length}</summary>
+          <summary><LexiconText text={`ARTIFACT MATERIALS · ${artifact.parts.length}`} phase={59} /></summary>
           <ol>
-            {artifact.parts.map((part) => (
+            {artifact.parts.map((part, index) => (
               <li key={part.id}>
-                <span>{String(part.position + 1).padStart(2, "0")} · {partName(part)}</span>
-                <small>{part.mode === "model3d" ? "3D" : part.mode}</small>
+                <LexiconText text={`${String(part.position + 1).padStart(2, "0")} · ${partName(part)}`} phase={61 + index * 5} />
+                <LexiconText as="small" text={part.mode === "model3d" ? "3D" : part.mode} phase={67 + index * 5} />
                 {part.partKind === "reference" && part.referenceUrl && (
-                  <a href={part.referenceUrl} target="_blank" rel="noopener noreferrer">Open reference</a>
+                  <a href={part.referenceUrl} target="_blank" rel="noopener noreferrer" aria-label="Open reference">
+                    <LexiconText text="Open reference" phase={71 + index * 5} semantic={false} />
+                  </a>
                 )}
                 {part.partKind === "file" && part.signedUrl && (
-                  <a href={part.signedUrl} download={part.filename || true}>Retrieve material</a>
+                  <a href={part.signedUrl} download={part.filename || true} aria-label="Retrieve material">
+                    <LexiconText text="Retrieve material" phase={73 + index * 5} semantic={false} />
+                  </a>
                 )}
               </li>
             ))}
