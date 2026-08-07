@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArtifactFeed } from "@/components/ArtifactFeed";
 import { BinarySwipeVoting } from "@/components/BinarySwipeVoting";
+import { LexiconText } from "@/components/LexiconBroadcast";
 import { MachineGloss } from "@/components/MachineGloss";
 import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 import { SubmissionLandingBridge } from "@/components/SubmissionLandingBridge";
@@ -14,8 +15,8 @@ export default function HomePage() {
         <a className="brand-lockup feed-first-brand" href="#field" aria-label="Return to the live feed">
           <div className="brand-mark" aria-hidden="true">◇</div>
           <div>
-            <p className="eyebrow">SLOP TROUGH™</p>
-            <h1>LIVE FIELD</h1>
+            <LexiconText as="p" className="eyebrow" text="SLOP TROUGH™" phase={3} />
+            <LexiconText as="h1" text="LIVE FIELD" phase={11} />
           </div>
         </a>
 
@@ -31,8 +32,8 @@ export default function HomePage() {
               ar: "ارفع سلوب مصنوعاً بالآلة. مرّر في الحوض العام. صوّت سلوب أو متحف، أو تجاهله واستمر.",
             }}
           />
-          <Link className="upload-trigger header-link" href="/about/">
-            What is this?
+          <Link className="upload-trigger header-link" href="/about/" aria-label="What is this?">
+            <LexiconText text="What is this?" phase={19} semantic={false} />
           </Link>
         </div>
       </header>
