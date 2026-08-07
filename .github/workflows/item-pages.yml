@@ -98,6 +98,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:runtime
 
+      - name: Verify Museum Artifact runtime
+        working-directory: apps/item-web
+        run: npm run verify:museum-runtime
+
       - name: Verify Museum accession lifecycle
         working-directory: apps/item-web
         run: npm run verify:museum-accession

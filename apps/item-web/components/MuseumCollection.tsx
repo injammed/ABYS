@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { loadMuseumCollection, MuseumAccession } from "@/lib/museum";
+import { MuseumArtifactRuntime } from "./MuseumArtifactRuntime";
 import styles from "./MuseumCollection.module.css";
 
 function accessionLabel(value: number): string {
@@ -102,13 +103,7 @@ export function MuseumCollection() {
                 key={accession.accessionNumber}
               >
                 <div className={styles.objectStage}>
-                  {accession.mediaUrl ? (
-                    <img src={accession.mediaUrl} alt="" loading="lazy" />
-                  ) : (
-                    <div className={styles.noPreview} aria-label="No visual preview available">
-                      {accession.modes.map((mode) => mode === "model3d" ? "3D" : mode).join(" · ")}
-                    </div>
-                  )}
+                  <MuseumArtifactRuntime accession={accession} />
                 </div>
 
                 <div className={styles.plaque}>
@@ -116,6 +111,10 @@ export function MuseumCollection() {
                   <h2>{accession.title}</h2>
                   <p className={styles.creator}>{accession.creator}</p>
                   <p className={styles.summary}>{accession.summary}</p>
+                  <p className={styles.form}>
+                    {accession.modes.map((mode) => mode === "model3d" ? "3D" : mode).join(" · ")}
+                    {accession.parts.length > 0 ? ` · ${accession.parts.length} material${accession.parts.length === 1 ? "" : "s"}` : ""}
+                  </p>
                   <p className={styles.date}>Accessioned {new Date(accession.admittedAt).toLocaleDateString()}</p>
                 </div>
               </article>

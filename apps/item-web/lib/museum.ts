@@ -1,3 +1,4 @@
+import type { ArtifactPart } from "@/lib/feed";
 import { requireSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 export type MuseumAccession = {
@@ -10,6 +11,21 @@ export type MuseumAccession = {
   modes: string[];
   museumVotes: number;
   mediaUrl?: string;
+  parts: ArtifactPart[];
+};
+
+type ArtifactPartJoin = {
+  id: string;
+  position: number;
+  part_kind: "file" | "text" | "reference";
+  mode: ArtifactPart["mode"];
+  label: string | null;
+  storage_path: string | null;
+  original_filename: string | null;
+  mime_type: string | null;
+  byte_size: number | string | null;
+  text_content: string | null;
+  reference_url: string | null;
 };
 
 type ArtifactJoin = {
@@ -18,6 +34,7 @@ type ArtifactJoin = {
   summary: string;
   artifact_modes?: string[] | null;
   media_path: string | null;
+  artifact_parts?: ArtifactPartJoin[] | null;
   profiles?: { display_name?: string } | Array<{ display_name?: string }> | null;
 };
 
@@ -46,13 +63,23 @@ function creatorName(artifact: ArtifactJoin): string {
   return profile?.display_name || "Anonymous machine witness";
 }
 
+function safeReferenceUrl(value: string | null): string | undefined {
+  if (!value) return undefined;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.href : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function loadMuseumCollection(limit = 120): Promise<MuseumAccession[]> {
   const client = requireSupabaseBrowserClient();
   const boundedLimit = Math.max(1, Math.min(240, Math.floor(limit)));
 
   const { data, error } = await client
     .from("museum_accessions")
-    .select("accession_number,artifact_id,admitted_at,withdrawn_at,artifacts!museum_accessions_artifact_id_fkey(id,title,summary,artifact_modes,media_path,profiles!artifacts_creator_id_fkey(display_name))")
+    .select("accession_number,artifact_id,admitted_at,withdrawn_at,artifacts!museum_accessions_artifact_id_fkey(id,title,summary,artifact_modes,media_path,artifact_parts(id,position,part_kind,mode,label,storage_path,original_filename,mime_type,byte_size,text_content,reference_url),profiles!artifacts_creator_id_fkey(display_name))")
     .is("withdrawn_at", null)
     .order("accession_number", { ascending: true })
     .limit(boundedLimit);
@@ -76,12 +103,41 @@ export async function loadMuseumCollection(limit = 120): Promise<MuseumAccession
     }
   }
 
-  const signedEntries = await Promise.all(activeRows.map(async ({ row, artifact }) => {
-    let mediaUrl: string | undefined;
-    if (artifact.media_path) {
-      const signed = await client.storage.from("artifact-media").createSignedUrl(artifact.media_path, 60 * 60);
-      if (!signed.error) mediaUrl = signed.data?.signedUrl;
+  const storagePaths = Array.from(new Set(activeRows.flatMap(({ artifact }) => [
+    ...(artifact.artifact_parts ?? []).flatMap((part) => part.storage_path ? [part.storage_path] : []),
+    ...(artifact.media_path ? [artifact.media_path] : []),
+  ])));
+  const signedByPath = new Map<string, string>();
+
+  if (storagePaths.length > 0) {
+    const signed = await client.storage.from("artifact-media").createSignedUrls(storagePaths, 60 * 60);
+    if (!signed.error) {
+      (signed.data ?? []).forEach((entry, index) => {
+        const path = storagePaths[index];
+        if (path && entry.signedUrl) signedByPath.set(path, entry.signedUrl);
+      });
     }
+  }
+
+  const entries = activeRows.map(({ row, artifact }) => {
+    const parts: ArtifactPart[] = (artifact.artifact_parts ?? [])
+      .slice()
+      .sort((a, b) => a.position - b.position)
+      .map((part) => ({
+        id: part.id,
+        position: part.position,
+        partKind: part.part_kind,
+        mode: part.mode,
+        label: part.label || undefined,
+        filename: part.original_filename || undefined,
+        mimeType: part.mime_type || undefined,
+        byteSize: part.byte_size == null ? undefined : Number(part.byte_size),
+        text: part.text_content || undefined,
+        referenceUrl: safeReferenceUrl(part.reference_url),
+        signedUrl: part.storage_path ? signedByPath.get(part.storage_path) : undefined,
+      }));
+
+    const imagePart = parts.find((part) => part.mode === "image" && part.signedUrl);
 
     return {
       accessionNumber: Number(row.accession_number),
@@ -92,14 +148,15 @@ export async function loadMuseumCollection(limit = 120): Promise<MuseumAccession
       creator: creatorName(artifact),
       modes: artifact.artifact_modes?.length ? artifact.artifact_modes : ["image"],
       museumVotes: museumVotesByArtifact.get(row.artifact_id) ?? 0,
-      mediaUrl,
+      mediaUrl: imagePart?.signedUrl ?? (artifact.media_path ? signedByPath.get(artifact.media_path) : undefined),
+      parts,
     } satisfies MuseumAccession;
-  }));
+  });
 
   // No trending window and no recency boost. Current all-time Museum judgment
   // controls spatial prominence only; accession identity and permanence remain
   // unchanged. Accession number is the stable tie-breaker.
-  return signedEntries.sort((a, b) =>
+  return entries.sort((a, b) =>
     b.museumVotes - a.museumVotes || a.accessionNumber - b.accessionNumber
   );
 }
