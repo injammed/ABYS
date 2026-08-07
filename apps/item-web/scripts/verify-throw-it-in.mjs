@@ -19,8 +19,8 @@ const forbidPattern = (label, pattern, source) => {
 };
 
 requirePattern("ALL SLOP WELCOME", /ALL SLOP WELCOME\./, drop);
-requirePattern("simple submit language", />THROW IT IN</, drop);
-requirePattern("material-first picker", />Add material</, drop);
+requirePattern("simple submit language", /"THROW IT IN"/, drop);
+requirePattern("material-first picker", /Add material/, drop);
 requirePattern("optional title", /Name it · optional/, drop);
 requirePattern("one combined attestation", /AI-made\. I can submit it\. It does not contain prohibited material\./, drop);
 requirePattern("collapsed optional detail fold", /<details>[\s\S]*Text, link, provenance & details · optional/, drop);
@@ -41,6 +41,7 @@ forbidPattern("required generator", /name="generator"[^>]*required/, drop);
 forbidPattern("raw HTML injection", /dangerouslySetInnerHTML/, drop);
 forbidPattern("dynamic code execution", /\beval\s*\(|new Function\s*\(/, drop);
 forbidPattern("service role browser secret", /service[_-]?role/i, drop + nav);
+forbidPattern("modality tabs", /image tab|video tab|audio tab|3D tab/i, drop);
 
 if (failures.length > 0) {
   console.error("Throw-it-in simplicity contract failed:");
