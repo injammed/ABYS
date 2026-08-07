@@ -11,16 +11,17 @@ on:
   pull_request:
     paths:
       - "apps/item-web/**"
-      - "supabase/migrations/002_curator_submission_loop.sql"
+      - "supabase/migrations/**"
       - ".github/workflows/item-feed-preview.yml"
   push:
     branches:
       - "fold/**"
       - "feature/**"
       - "fix/**"
+      - "security/**"
     paths:
       - "apps/item-web/**"
-      - "supabase/migrations/002_curator_submission_loop.sql"
+      - "supabase/migrations/**"
       - ".github/workflows/item-feed-preview.yml"
 
 jobs:
@@ -54,6 +55,12 @@ jobs:
 
       - name: Verify binary Slop / Museum voting
         run: npm run verify:binary-vote
+
+      - name: Verify universal artifact intake
+        run: npm run verify:universal-artifact
+
+      - name: Verify semantic Artifact forms
+        run: npm run verify:artifact-forms
 
       - name: Verify curator migration contract
         run: npm run verify:curator

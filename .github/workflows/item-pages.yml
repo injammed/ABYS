@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "apps/item-web/**"
+      - "supabase/migrations/**"
       - ".github/workflows/item-pages.yml"
   workflow_dispatch:
     inputs:
@@ -76,6 +77,14 @@ jobs:
       - name: Verify binary Slop / Museum voting
         working-directory: apps/item-web
         run: npm run verify:binary-vote
+
+      - name: Verify universal artifact intake
+        working-directory: apps/item-web
+        run: npm run verify:universal-artifact
+
+      - name: Verify semantic Artifact forms
+        working-directory: apps/item-web
+        run: npm run verify:artifact-forms
 
       - name: Verify curator migration contract
         working-directory: apps/item-web
