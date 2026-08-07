@@ -1,5 +1,5 @@
 import type { ArtifactPart } from "@/lib/feed";
-import type { MuseumAccession } from "@/lib/museum";
+import type { MuseumArtifactPresentation } from "@/lib/museum";
 import styles from "./MuseumArtifactRuntime.module.css";
 
 function formatBytes(value?: number): string {
@@ -56,7 +56,7 @@ function Experience({ part }: { part: ArtifactPart }) {
       <div className={styles.sealedHall}>
         <p>EXTERNAL REFERENCE</p>
         <strong>{partName(part)}</strong>
-        <span>The reference is recorded with the accession and is opened only by deliberate visitor action.</span>
+        <span>The reference is recorded with the Artifact and is opened only by deliberate visitor action.</span>
         <a href={part.referenceUrl} target="_blank" rel="noopener noreferrer">Open recorded reference</a>
       </div>
     );
@@ -69,7 +69,7 @@ function Experience({ part }: { part: ArtifactPart }) {
       <span>
         {part.mode === "code" || part.mode === "website" || part.mode === "simulation"
           ? "Preserved without execution. The Museum records the material; it does not grant it authority."
-          : "Preserved as constituent material of this accession."}
+          : "Preserved as constituent material of this Artifact."}
       </span>
       {part.signedUrl && (
         <a href={part.signedUrl} download={part.filename || true}>Retrieve preserved material{part.byteSize != null ? ` · ${formatBytes(part.byteSize)}` : ""}</a>
@@ -78,28 +78,28 @@ function Experience({ part }: { part: ArtifactPart }) {
   );
 }
 
-export function MuseumArtifactRuntime({ accession }: { accession: MuseumAccession }) {
-  const lead = leadPart(accession.parts);
+export function MuseumArtifactRuntime({ artifact }: { artifact: MuseumArtifactPresentation }) {
+  const lead = leadPart(artifact.parts);
 
   return (
     <div className={styles.runtime} data-museum-runtime-contract="museum-artifact-runtime-v1">
       {lead ? (
         <Experience part={lead} />
-      ) : accession.mediaUrl ? (
-        <img className={styles.image} src={accession.mediaUrl} alt="" loading="lazy" />
+      ) : artifact.mediaUrl ? (
+        <img className={styles.image} src={artifact.mediaUrl} alt="" loading="lazy" />
       ) : (
         <div className={styles.sealedHall}>
-          <p>ACCESSION FORM</p>
-          <strong>{accession.modes.map((mode) => mode === "model3d" ? "3D" : mode).join(" · ")}</strong>
-          <span>The accession exists even when this browser has no native presentation for its form.</span>
+          <p>ARTIFACT FORM</p>
+          <strong>{artifact.modes.map((mode) => mode === "model3d" ? "3D" : mode).join(" · ")}</strong>
+          <span>The Artifact exists even when this browser has no native presentation for its form.</span>
         </div>
       )}
 
-      {accession.parts.length > 1 && (
+      {artifact.parts.length > 1 && (
         <details className={styles.materialRegister}>
-          <summary>ACCESSION MATERIALS · {accession.parts.length}</summary>
+          <summary>ARTIFACT MATERIALS · {artifact.parts.length}</summary>
           <ol>
-            {accession.parts.map((part) => (
+            {artifact.parts.map((part) => (
               <li key={part.id}>
                 <span>{String(part.position + 1).padStart(2, "0")} · {partName(part)}</span>
                 <small>{part.mode === "model3d" ? "3D" : part.mode}</small>

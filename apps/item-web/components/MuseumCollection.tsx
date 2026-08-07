@@ -82,7 +82,7 @@ export function MuseumCollection() {
           <div className={styles.voidPedestal} aria-hidden="true" />
           <p className={styles.accession}>ACCESSION 000000</p>
           <h2>The hall is empty.</h2>
-          <p>Nothing has earned permanent placement yet.</p>
+          <p>No Artifact has crossed the permanent accession threshold yet.</p>
         </div>
       )}
 
@@ -103,7 +103,7 @@ export function MuseumCollection() {
                 key={accession.accessionNumber}
               >
                 <div className={styles.objectStage}>
-                  <MuseumArtifactRuntime accession={accession} />
+                  <MuseumArtifactRuntime artifact={accession} />
                 </div>
 
                 <div className={styles.plaque}>

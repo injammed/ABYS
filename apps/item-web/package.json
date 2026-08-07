@@ -20,7 +20,8 @@
     "verify:museum-accession": "node scripts/verify-museum-accession.mjs",
     "verify:museum-destination": "node scripts/verify-museum-destination.mjs",
     "verify:runtime": "node scripts/verify-universal-runtime.mjs",
-    "verify:museum-runtime": "node scripts/verify-museum-runtime.mjs"
+    "verify:museum-runtime": "node scripts/verify-museum-runtime.mjs",
+    "verify:museum-summit": "node scripts/verify-museum-summit.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "latest",

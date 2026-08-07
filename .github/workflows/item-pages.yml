@@ -102,6 +102,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:museum-runtime
 
+      - name: Verify Museum Summit
+        working-directory: apps/item-web
+        run: npm run verify:museum-summit
+
       - name: Verify Museum accession lifecycle
         working-directory: apps/item-web
         run: npm run verify:museum-accession
