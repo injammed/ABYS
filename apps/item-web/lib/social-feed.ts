@@ -16,11 +16,13 @@ type ArtifactRow = {
   id: string;
   title: string;
   summary: string;
+  artifact_description?: string;
+  artifact_modes?: string[];
   origin_class: OriginClass;
   generator: string;
   human_role: string;
   provenance_note: string;
-  media_path: string;
+  media_path: string | null;
   lane: FeedLane;
   published_at: string;
   profiles?: { display_name?: string } | Array<{ display_name?: string }> | null;
@@ -33,10 +35,7 @@ type PrivateArtifactRow = Omit<ArtifactRow, "lane" | "published_at"> & {
   status: "quarantine" | "needs_revision";
 };
 
-type VoteRow = {
-  artifact_id: string;
-  judgment: Judgment;
-};
+type VoteRow = { artifact_id: string; judgment: Judgment };
 
 function creatorName(row: ArtifactRow | PrivateArtifactRow): string {
   if (Array.isArray(row.profiles)) return row.profiles[0]?.display_name || "Anonymous machine witness";
@@ -53,6 +52,23 @@ function scoreForVotes(votes: VoteRow[]): number {
   return Math.max(0, Math.min(100, score));
 }
 
+function isUniversalArtifactMigrationMissing(error: { message?: string; code?: string } | null | undefined): boolean {
+  const message = error?.message?.toLowerCase() ?? "";
+  return error?.code === "42703" || message.includes("artifact_description") || message.includes("artifact_modes");
+}
+
+function modeLead(row: ArtifactRow | PrivateArtifactRow): string {
+  const modes = row.artifact_modes?.length ? row.artifact_modes : ["image"];
+  return modes.map((mode) => mode === "model3d" ? "3D" : mode).join(" · ");
+}
+
+async function signedImageUrl(path: string | null): Promise<string | undefined> {
+  if (!path) return undefined;
+  const client = requireSupabaseBrowserClient();
+  const { data, error } = await client.storage.from("artifact-media").createSignedUrl(path, 60 * 60);
+  return error ? undefined : data?.signedUrl;
+}
+
 export async function loadPublicFeedPage(options: {
   cursor?: string | null;
   lane?: FeedLane | "all";
@@ -61,51 +77,54 @@ export async function loadPublicFeedPage(options: {
   const client = requireSupabaseBrowserClient();
   const limit = options.limit ?? PAGE_SIZE;
 
-  let query = client
+  let primary = client
     .from("artifacts")
-    .select(
-      "id,title,summary,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,profiles!artifacts_creator_id_fkey(display_name)"
-    )
+    .select("id,title,summary,artifact_description,artifact_modes,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,profiles!artifacts_creator_id_fkey(display_name)")
     .eq("status", "approved")
     .order("published_at", { ascending: false })
     .order("id", { ascending: false })
     .limit(limit + 1);
 
-  if (options.lane && options.lane !== "all") query = query.eq("lane", options.lane);
-  if (options.cursor) query = query.or(feedCursorFilter(decodeFeedCursor(options.cursor)));
+  if (options.lane && options.lane !== "all") primary = primary.eq("lane", options.lane);
+  if (options.cursor) primary = primary.or(feedCursorFilter(decodeFeedCursor(options.cursor)));
 
-  const { data, error } = await query;
-  if (error) throw error;
+  const primaryResult = await primary;
+  let rawData: unknown[] | null = primaryResult.data as unknown[] | null;
+  let loadError = primaryResult.error;
 
-  const fetchedRows = (data ?? []) as unknown as ArtifactRow[];
+  if (loadError && isUniversalArtifactMigrationMissing(loadError)) {
+    let fallback = client
+      .from("artifacts")
+      .select("id,title,summary,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,profiles!artifacts_creator_id_fkey(display_name)")
+      .eq("status", "approved")
+      .order("published_at", { ascending: false })
+      .order("id", { ascending: false })
+      .limit(limit + 1);
+    if (options.lane && options.lane !== "all") fallback = fallback.eq("lane", options.lane);
+    if (options.cursor) fallback = fallback.or(feedCursorFilter(decodeFeedCursor(options.cursor)));
+    const fallbackResult = await fallback;
+    rawData = fallbackResult.data as unknown[] | null;
+    loadError = fallbackResult.error;
+  }
+
+  if (loadError) throw loadError;
+
+  const fetchedRows = (rawData ?? []) as ArtifactRow[];
   const hasMore = fetchedRows.length > limit;
   const rows = fetchedRows.slice(0, limit);
   const ids = rows.map((row) => row.id);
 
   const votesByArtifact = new Map<string, VoteRow[]>();
   if (ids.length > 0) {
-    const { data: voteData, error: voteError } = await client
-      .from("artifact_votes")
-      .select("artifact_id,judgment")
-      .in("artifact_id", ids);
+    const { data: voteData, error: voteError } = await client.from("artifact_votes").select("artifact_id,judgment").in("artifact_id", ids);
     if (voteError) throw voteError;
-
     for (const vote of (voteData ?? []) as VoteRow[]) {
-      const current = votesByArtifact.get(vote.artifact_id) ?? [];
-      current.push(vote);
-      votesByArtifact.set(vote.artifact_id, current);
+      votesByArtifact.set(vote.artifact_id, [...(votesByArtifact.get(vote.artifact_id) ?? []), vote]);
     }
   }
 
-  const signedUrls = new Map<string, string>();
-  await Promise.all(
-    rows.map(async (row) => {
-      const { data: signed, error: signedError } = await client.storage
-        .from("artifact-media")
-        .createSignedUrl(row.media_path, 60 * 60);
-      if (!signedError && signed?.signedUrl) signedUrls.set(row.media_path, signed.signedUrl);
-    })
-  );
+  const mediaEntries = await Promise.all(rows.map(async (row) => [row.id, await signedImageUrl(row.media_path)] as const));
+  const mediaByArtifact = new Map(mediaEntries);
 
   const artifacts: FeedArtifact[] = rows.map((row) => ({
     id: row.id,
@@ -113,7 +132,7 @@ export async function loadPublicFeedPage(options: {
     creator: creatorName(row),
     lane: row.lane,
     summary: row.summary,
-    modalLead: row.origin_class === "autonomous_ai_run" ? "Autonomous run" : "Provenance-declared",
+    modalLead: modeLead(row),
     aiOrigin: {
       originClass: row.origin_class,
       declaredByCreator: true,
@@ -123,44 +142,46 @@ export async function loadPublicFeedPage(options: {
       confidence: "reviewed",
     },
     gradient: laneGradients[row.lane],
-    mediaUrl: signedUrls.get(row.media_path),
+    mediaUrl: mediaByArtifact.get(row.id),
     score: scoreForVotes(votesByArtifact.get(row.id) ?? []),
     publishedAt: row.published_at,
     visibility: "public",
   }));
 
   const lastRow = rows.at(-1);
-  return {
-    artifacts,
-    nextCursor: hasMore && lastRow ? cursorForRow(lastRow) : null,
-  };
+  return { artifacts, nextCursor: hasMore && lastRow ? cursorForRow(lastRow) : null };
 }
 
 export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArtifact[]> {
   const client = requireSupabaseBrowserClient();
-  const { data, error } = await client
+  const primary = await client
     .from("artifacts")
-    .select(
-      "id,title,summary,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,created_at,status,profiles!artifacts_creator_id_fkey(display_name)"
-    )
+    .select("id,title,summary,artifact_description,artifact_modes,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,created_at,status,profiles!artifacts_creator_id_fkey(display_name)")
     .eq("creator_id", userId)
     .in("status", ["quarantine", "needs_revision"])
     .order("created_at", { ascending: false })
     .limit(20);
 
-  if (error) throw error;
+  let rawData: unknown[] | null = primary.data as unknown[] | null;
+  let loadError = primary.error;
 
-  const rows = (data ?? []) as unknown as PrivateArtifactRow[];
-  const signedUrls = new Map<string, string>();
+  if (loadError && isUniversalArtifactMigrationMissing(loadError)) {
+    const fallback = await client
+      .from("artifacts")
+      .select("id,title,summary,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,created_at,status,profiles!artifacts_creator_id_fkey(display_name)")
+      .eq("creator_id", userId)
+      .in("status", ["quarantine", "needs_revision"])
+      .order("created_at", { ascending: false })
+      .limit(20);
+    rawData = fallback.data as unknown[] | null;
+    loadError = fallback.error;
+  }
 
-  await Promise.all(
-    rows.map(async (row) => {
-      const { data: signed, error: signedError } = await client.storage
-        .from("artifact-media")
-        .createSignedUrl(row.media_path, 60 * 60);
-      if (!signedError && signed?.signedUrl) signedUrls.set(row.media_path, signed.signedUrl);
-    })
-  );
+  if (loadError) throw loadError;
+
+  const rows = (rawData ?? []) as PrivateArtifactRow[];
+  const mediaEntries = await Promise.all(rows.map(async (row) => [row.id, await signedImageUrl(row.media_path)] as const));
+  const mediaByArtifact = new Map(mediaEntries);
 
   return rows.map((row) => ({
     id: row.id,
@@ -168,7 +189,7 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
     creator: creatorName(row),
     lane: "unjudged",
     summary: row.summary,
-    modalLead: row.status === "needs_revision" ? "Private revision requested" : "Private quarantine · awaiting review",
+    modalLead: row.status === "needs_revision" ? `Private revision · ${modeLead(row)}` : `Private quarantine · ${modeLead(row)}`,
     aiOrigin: {
       originClass: row.origin_class,
       declaredByCreator: true,
@@ -178,7 +199,7 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
       confidence: "declared",
     },
     gradient: laneGradients.unjudged,
-    mediaUrl: signedUrls.get(row.media_path),
+    mediaUrl: mediaByArtifact.get(row.id),
     score: 50,
     publishedAt: row.created_at,
     visibility: "creator_preview",
@@ -188,27 +209,13 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
 export async function loadOwnVotes(userId: string, artifactIds: string[]): Promise<Record<string, Judgment>> {
   if (artifactIds.length === 0) return {};
   const client = requireSupabaseBrowserClient();
-  const { data, error } = await client
-    .from("artifact_votes")
-    .select("artifact_id,judgment")
-    .eq("voter_id", userId)
-    .in("artifact_id", artifactIds);
+  const { data, error } = await client.from("artifact_votes").select("artifact_id,judgment").eq("voter_id", userId).in("artifact_id", artifactIds);
   if (error) throw error;
-
-  return Object.fromEntries(
-    ((data ?? []) as VoteRow[]).map((vote) => [vote.artifact_id, vote.judgment])
-  );
+  return Object.fromEntries(((data ?? []) as VoteRow[]).map((vote) => [vote.artifact_id, vote.judgment]));
 }
 
 export async function saveVote(artifactId: string, voterId: string, judgment: Judgment): Promise<void> {
   const client = requireSupabaseBrowserClient();
-  const { error } = await client.from("artifact_votes").upsert(
-    {
-      artifact_id: artifactId,
-      voter_id: voterId,
-      judgment,
-    },
-    { onConflict: "artifact_id,voter_id" }
-  );
+  const { error } = await client.from("artifact_votes").upsert({ artifact_id: artifactId, voter_id: voterId, judgment }, { onConflict: "artifact_id,voter_id" });
   if (error) throw error;
 }
