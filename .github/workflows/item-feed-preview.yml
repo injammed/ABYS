@@ -59,6 +59,9 @@ jobs:
       - name: Verify universal artifact intake
         run: npm run verify:universal-artifact
 
+      - name: Verify semantic Artifact forms
+        run: npm run verify:artifact-forms
+
       - name: Verify curator migration contract
         run: npm run verify:curator
 
