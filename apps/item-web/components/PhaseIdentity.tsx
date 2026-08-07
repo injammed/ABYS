@@ -1,3 +1,4 @@
+import { LexiconText } from "./LexiconBroadcast";
 import styles from "./PhaseIdentity.module.css";
 
 type PhaseIdentityProps = {
@@ -29,13 +30,13 @@ export function PhaseIdentity({ kind, compact = false }: PhaseIdentityProps) {
     .join(" ");
 
   return (
-    <div className={className} aria-label={`${current.longName}, abbreviated ${current.shortName}`}>
+    <div className={className} aria-label={`${current.longName}, abbreviated ${current.shortName}`} data-lexicon-surface="true">
       <div className={styles.iconFrame} aria-hidden="true" />
       <div className={styles.morph} aria-hidden="true">
-        <span className={styles.longName}>{current.longName}</span>
-        <span className={styles.shortName}>{current.shortName}</span>
+        <LexiconText className={styles.longName} text={current.longName} phase={3} semantic={false} />
+        <LexiconText className={styles.shortName} text={current.shortName} phase={7} semantic={false} />
       </div>
-      <p className={styles.expansion}>{current.expansion}</p>
+      <LexiconText as="p" className={styles.expansion} text={current.expansion} phase={11} />
     </div>
   );
 }
