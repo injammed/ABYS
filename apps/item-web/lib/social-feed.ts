@@ -35,10 +35,7 @@ type PrivateArtifactRow = Omit<ArtifactRow, "lane" | "published_at"> & {
   status: "quarantine" | "needs_revision";
 };
 
-type VoteRow = {
-  artifact_id: string;
-  judgment: Judgment;
-};
+type VoteRow = { artifact_id: string; judgment: Judgment };
 
 function creatorName(row: ArtifactRow | PrivateArtifactRow): string {
   if (Array.isArray(row.profiles)) return row.profiles[0]?.display_name || "Anonymous machine witness";
@@ -80,25 +77,22 @@ export async function loadPublicFeedPage(options: {
   const client = requireSupabaseBrowserClient();
   const limit = options.limit ?? PAGE_SIZE;
 
-  const applyFilters = (query: ReturnType<typeof client.from>) => query;
-  void applyFilters;
-
-  let query = client
+  let primary = client
     .from("artifacts")
-    .select(
-      "id,title,summary,artifact_description,artifact_modes,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,profiles!artifacts_creator_id_fkey(display_name)"
-    )
+    .select("id,title,summary,artifact_description,artifact_modes,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,profiles!artifacts_creator_id_fkey(display_name)")
     .eq("status", "approved")
     .order("published_at", { ascending: false })
     .order("id", { ascending: false })
     .limit(limit + 1);
 
-  if (options.lane && options.lane !== "all") query = query.eq("lane", options.lane);
-  if (options.cursor) query = query.or(feedCursorFilter(decodeFeedCursor(options.cursor)));
+  if (options.lane && options.lane !== "all") primary = primary.eq("lane", options.lane);
+  if (options.cursor) primary = primary.or(feedCursorFilter(decodeFeedCursor(options.cursor)));
 
-  let { data, error } = await query;
+  const primaryResult = await primary;
+  let rawData: unknown[] | null = primaryResult.data as unknown[] | null;
+  let loadError = primaryResult.error;
 
-  if (error && isUniversalArtifactMigrationMissing(error)) {
+  if (loadError && isUniversalArtifactMigrationMissing(loadError)) {
     let fallback = client
       .from("artifacts")
       .select("id,title,summary,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,profiles!artifacts_creator_id_fkey(display_name)")
@@ -109,29 +103,23 @@ export async function loadPublicFeedPage(options: {
     if (options.lane && options.lane !== "all") fallback = fallback.eq("lane", options.lane);
     if (options.cursor) fallback = fallback.or(feedCursorFilter(decodeFeedCursor(options.cursor)));
     const fallbackResult = await fallback;
-    data = fallbackResult.data;
-    error = fallbackResult.error;
+    rawData = fallbackResult.data as unknown[] | null;
+    loadError = fallbackResult.error;
   }
 
-  if (error) throw error;
+  if (loadError) throw loadError;
 
-  const fetchedRows = (data ?? []) as unknown as ArtifactRow[];
+  const fetchedRows = (rawData ?? []) as ArtifactRow[];
   const hasMore = fetchedRows.length > limit;
   const rows = fetchedRows.slice(0, limit);
   const ids = rows.map((row) => row.id);
 
   const votesByArtifact = new Map<string, VoteRow[]>();
   if (ids.length > 0) {
-    const { data: voteData, error: voteError } = await client
-      .from("artifact_votes")
-      .select("artifact_id,judgment")
-      .in("artifact_id", ids);
+    const { data: voteData, error: voteError } = await client.from("artifact_votes").select("artifact_id,judgment").in("artifact_id", ids);
     if (voteError) throw voteError;
-
     for (const vote of (voteData ?? []) as VoteRow[]) {
-      const current = votesByArtifact.get(vote.artifact_id) ?? [];
-      current.push(vote);
-      votesByArtifact.set(vote.artifact_id, current);
+      votesByArtifact.set(vote.artifact_id, [...(votesByArtifact.get(vote.artifact_id) ?? []), vote]);
     }
   }
 
@@ -161,25 +149,23 @@ export async function loadPublicFeedPage(options: {
   }));
 
   const lastRow = rows.at(-1);
-  return {
-    artifacts,
-    nextCursor: hasMore && lastRow ? cursorForRow(lastRow) : null,
-  };
+  return { artifacts, nextCursor: hasMore && lastRow ? cursorForRow(lastRow) : null };
 }
 
 export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArtifact[]> {
   const client = requireSupabaseBrowserClient();
-  let { data, error } = await client
+  const primary = await client
     .from("artifacts")
-    .select(
-      "id,title,summary,artifact_description,artifact_modes,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,created_at,status,profiles!artifacts_creator_id_fkey(display_name)"
-    )
+    .select("id,title,summary,artifact_description,artifact_modes,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,created_at,status,profiles!artifacts_creator_id_fkey(display_name)")
     .eq("creator_id", userId)
     .in("status", ["quarantine", "needs_revision"])
     .order("created_at", { ascending: false })
     .limit(20);
 
-  if (error && isUniversalArtifactMigrationMissing(error)) {
+  let rawData: unknown[] | null = primary.data as unknown[] | null;
+  let loadError = primary.error;
+
+  if (loadError && isUniversalArtifactMigrationMissing(loadError)) {
     const fallback = await client
       .from("artifacts")
       .select("id,title,summary,origin_class,generator,human_role,provenance_note,media_path,lane,published_at,created_at,status,profiles!artifacts_creator_id_fkey(display_name)")
@@ -187,13 +173,13 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
       .in("status", ["quarantine", "needs_revision"])
       .order("created_at", { ascending: false })
       .limit(20);
-    data = fallback.data;
-    error = fallback.error;
+    rawData = fallback.data as unknown[] | null;
+    loadError = fallback.error;
   }
 
-  if (error) throw error;
+  if (loadError) throw loadError;
 
-  const rows = (data ?? []) as unknown as PrivateArtifactRow[];
+  const rows = (rawData ?? []) as PrivateArtifactRow[];
   const mediaEntries = await Promise.all(rows.map(async (row) => [row.id, await signedImageUrl(row.media_path)] as const));
   const mediaByArtifact = new Map(mediaEntries);
 
@@ -223,27 +209,13 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
 export async function loadOwnVotes(userId: string, artifactIds: string[]): Promise<Record<string, Judgment>> {
   if (artifactIds.length === 0) return {};
   const client = requireSupabaseBrowserClient();
-  const { data, error } = await client
-    .from("artifact_votes")
-    .select("artifact_id,judgment")
-    .eq("voter_id", userId)
-    .in("artifact_id", artifactIds);
+  const { data, error } = await client.from("artifact_votes").select("artifact_id,judgment").eq("voter_id", userId).in("artifact_id", artifactIds);
   if (error) throw error;
-
-  return Object.fromEntries(
-    ((data ?? []) as VoteRow[]).map((vote) => [vote.artifact_id, vote.judgment])
-  );
+  return Object.fromEntries(((data ?? []) as VoteRow[]).map((vote) => [vote.artifact_id, vote.judgment]));
 }
 
 export async function saveVote(artifactId: string, voterId: string, judgment: Judgment): Promise<void> {
   const client = requireSupabaseBrowserClient();
-  const { error } = await client.from("artifact_votes").upsert(
-    {
-      artifact_id: artifactId,
-      voter_id: voterId,
-      judgment,
-    },
-    { onConflict: "artifact_id,voter_id" }
-  );
+  const { error } = await client.from("artifact_votes").upsert({ artifact_id: artifactId, voter_id: voterId, judgment }, { onConflict: "artifact_id,voter_id" });
   if (error) throw error;
 }
