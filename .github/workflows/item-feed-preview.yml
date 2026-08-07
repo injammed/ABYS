@@ -65,6 +65,9 @@ jobs:
       - name: Verify one-click publication and vote privacy
         run: npm run verify:one-click-feed
 
+      - name: Verify throw-it-in submission simplicity
+        run: npm run verify:throw-it-in
+
       - name: Verify curator migration contract
         run: npm run verify:curator
 
