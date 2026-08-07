@@ -26,9 +26,16 @@ const forbidPattern = (label, pattern, source) => {
   if (pattern.test(source)) failures.push(`forbidden ${label}`);
 };
 
-requirePattern("universal submit label", /Submit artifact/, intake);
+requirePattern("universal submit label", /Submit [Aa]rtifact/, intake);
+requirePattern("all slop welcome surface law", /ALL SLOP WELCOME\./, intake);
+requirePattern("full modality invitation", /Full-modality AI-made Artifacts belong here/, intake);
+requirePattern("one artifact binding copy", /Everything you add becomes one Artifact/, intake);
+requirePattern("same infinite feed copy", /same infinite feed/, intake);
+requirePattern("artifact materials label", /Artifact materials/, intake);
+requirePattern("no-materials state", /No materials added/, intake);
+requirePattern("materials bind as one artifact", /Everything selected is submitted together as one Artifact/, intake);
 requirePattern("multi-file intake", /type="file"[\s\S]*multiple/, intake);
-requirePattern("true nature description", /True nature of the artifact/, intake);
+requirePattern("whole artifact experience description", /How should it be experienced\?/, intake);
 requirePattern("text part", /textPart/, intake);
 requirePattern("reference part", /referenceUrl/, intake);
 requirePattern("atomic artifact RPC", /create_quarantined_artifact/, intake);
@@ -36,7 +43,7 @@ requirePattern("artifact id before upload", /const artifactId = crypto\.randomUU
 requirePattern("private artifact path namespace", /session\.user\.id.*artifactId/s, intake);
 requirePattern("rollback uploaded paths", /storage\.from\("artifact-media"\)\.remove\(uploadedPaths\)/, intake);
 requirePattern("mixed mode detection", /new Set\(parts\.map\(\(part\) => part\.mode\)\)/, intake);
-forbidPattern("image-only intake copy", /Choose an image to upload|AI-made image|JPEG, PNG, WebP, or GIF images/, intake);
+forbidPattern("image-only intake copy", /Choose an image to upload|AI-made image|JPEG, PNG, WebP, or GIF images|No image selected/, intake);
 
 requirePattern("permanent artifact covenant", /## Permanent Artifact Covenant/, architecture);
 requirePattern("one artifact identity law", /Every Artifact has one identity/, architecture);
@@ -81,4 +88,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal artifact intake PASS: one artifact can bind multiple inert modes into private quarantine, curators review the complete manifest, first publication enters Unjudged without requiring an image, and the architecture covenant remains intact.");
+console.log("Universal artifact intake PASS: All Slop Welcome means one Artifact may bind multiple inert modes into private quarantine, curators review the complete manifest, first publication enters Unjudged, every approved Artifact targets the same infinite feed, and the architecture covenant remains intact.");
