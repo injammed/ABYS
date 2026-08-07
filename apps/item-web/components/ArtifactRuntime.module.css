@@ -1,0 +1,182 @@
+.host {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  display: grid;
+  min-height: 100%;
+  place-items: stretch;
+  overflow: hidden;
+}
+
+.image,
+.video {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #030303;
+}
+
+.video {
+  object-fit: contain;
+}
+
+.audioStage,
+.textStage,
+.referenceStage,
+.inert,
+.fallback {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: .8rem;
+  padding: clamp(1.4rem, 5vw, 3.4rem);
+  background:
+    radial-gradient(circle at 50% 30%, rgba(213,166,63,.08), transparent 34%),
+    linear-gradient(180deg, rgba(10,10,10,.96), rgba(3,3,3,.99));
+}
+
+.audioStage,
+.referenceStage,
+.inert,
+.fallback {
+  align-items: center;
+  text-align: center;
+}
+
+.audioGlyph {
+  color: var(--gold-light);
+  font-family: Georgia, serif;
+  font-size: clamp(3rem, 12vw, 7rem);
+  letter-spacing: -.12em;
+  opacity: .72;
+}
+
+.audio {
+  width: min(34rem, 100%);
+}
+
+.textStage {
+  justify-content: flex-start;
+  overflow: auto;
+  text-align: left;
+}
+
+.textStage pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #ded9cd;
+  font: 500 clamp(.78rem, 1.6vw, .95rem)/1.65 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.mode {
+  color: var(--gold-light);
+  font-size: .65rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+
+.referenceStage strong,
+.inert strong,
+.fallback strong,
+.audioStage strong {
+  max-width: 28rem;
+  font-family: Georgia, serif;
+  font-size: clamp(1.5rem, 4vw, 2.4rem);
+  font-weight: 400;
+}
+
+.referenceStage p,
+.inert p,
+.fallback p {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.referenceStage a,
+.materialLink {
+  color: var(--gold-light);
+  text-underline-offset: .2em;
+}
+
+.materials {
+  position: absolute;
+  z-index: 2;
+  right: .8rem;
+  bottom: .8rem;
+  max-width: min(24rem, calc(100% - 1.6rem));
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: .7rem;
+  background: rgba(4,4,4,.88);
+  backdrop-filter: blur(16px);
+  color: var(--muted);
+  font-size: .7rem;
+}
+
+.materials > summary {
+  cursor: pointer;
+  padding: .55rem .7rem;
+  color: #d8d3c7;
+  user-select: none;
+}
+
+.materials ol {
+  display: grid;
+  gap: .45rem;
+  max-height: 14rem;
+  overflow: auto;
+  margin: 0;
+  padding: .25rem .7rem .7rem 1.7rem;
+}
+
+.materials li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: .15rem .6rem;
+  align-items: baseline;
+}
+
+.materials li > span {
+  color: #d4cfc2;
+  overflow-wrap: anywhere;
+}
+
+.materials small {
+  white-space: nowrap;
+}
+
+.materials a {
+  color: var(--gold-light);
+  grid-column: 1 / -1;
+  width: fit-content;
+}
+
+@media (max-width: 520px) {
+  .audioStage,
+  .textStage,
+  .referenceStage,
+  .inert,
+  .fallback {
+    padding: 1.1rem;
+  }
+
+  .materials {
+    left: .6rem;
+    right: .6rem;
+    bottom: .6rem;
+    max-width: none;
+  }
+}
