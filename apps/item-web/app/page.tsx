@@ -2,10 +2,13 @@ import Link from "next/link";
 import { ArtifactFeed } from "@/components/ArtifactFeed";
 import { BinarySwipeVoting } from "@/components/BinarySwipeVoting";
 import { PrimaryNavigation } from "@/components/PrimaryNavigation";
+import { SubmissionLandingBridge } from "@/components/SubmissionLandingBridge";
 
 export default function HomePage() {
   return (
     <main className="feed-first-page" data-interface-contract="slop-feed-root-v1">
+      <SubmissionLandingBridge />
+
       <header className="site-header feed-first-header">
         <a className="brand-lockup feed-first-brand" href="#field" aria-label="Return to the live feed">
           <div className="brand-mark" aria-hidden="true">◇</div>
