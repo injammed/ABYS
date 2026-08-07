@@ -22,8 +22,8 @@ for (const [label, pattern, source] of [
   ["existing saveVote path retained", /saveVote\(id, voterId, judgment\)/, feed],
   ["client Judgment type is binary", /export type Judgment = "preserve" \| "slop";/, socialFeed],
   ["one account one artifact database key", /primary key \(artifact_id, voter_id\)/, schema],
-  ["database rejects new Refine writes", /BINARY_JUDGMENT_REQUIRED/, binaryMigration],
-  ["binary trigger protects inserts and updates", /before insert or update of judgment on public\.artifact_votes/, binaryMigration],
+  ["legacy non-binary rows fail closed", /LEGACY_NON_BINARY_VOTES_REQUIRE_REVIEW/, binaryMigration],
+  ["binary database constraint", /check \(judgment in \('preserve', 'slop'\)\)/, binaryMigration],
 ]) {
   assert.ok(pattern.test(source), `Binary voting contract failed: missing ${label}`);
 }
@@ -33,4 +33,4 @@ assert.ok(!/MutationObserver/.test(swipe), "Binary voting must not depend on DOM
 assert.ok(!/\.textContent\s*=\s*"Museum"/.test(swipe), "Museum must be native markup, not a rewritten legacy label.");
 assert.ok(!/\.textContent\s*=\s*"Slop"/.test(swipe), "Slop must be native markup, not a rewritten legacy label.");
 
-console.log("Binary swipe voting PASS: one account has one active Artifact judgment; Slop and Museum are native choices, left/right swipe share the same persistence path, Refine cannot be newly written, and vertical scrolling remains primary.");
+console.log("Binary swipe voting PASS: one account has one active Artifact judgment; Slop and Museum are native choices, left/right swipe share the same persistence path, Refine is excluded by the database constraint, and vertical scrolling remains primary.");
