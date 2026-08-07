@@ -11,16 +11,17 @@ on:
   pull_request:
     paths:
       - "apps/item-web/**"
-      - "supabase/migrations/002_curator_submission_loop.sql"
+      - "supabase/migrations/**"
       - ".github/workflows/item-feed-preview.yml"
   push:
     branches:
       - "fold/**"
       - "feature/**"
       - "fix/**"
+      - "security/**"
     paths:
       - "apps/item-web/**"
-      - "supabase/migrations/002_curator_submission_loop.sql"
+      - "supabase/migrations/**"
       - ".github/workflows/item-feed-preview.yml"
 
 jobs:
@@ -51,6 +52,9 @@ jobs:
 
       - name: Verify primary 50/50 mode switch
         run: npm run verify:mode-switch
+
+      - name: Verify universal artifact intake
+        run: npm run verify:universal-artifact
 
       - name: Verify curator migration contract
         run: npm run verify:curator
