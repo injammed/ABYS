@@ -5,7 +5,11 @@ import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 
 export default function AetimmPage() {
   return (
-    <main className="about-page museum-page" data-interface-contract="museum-accession-mode-v1">
+    <main
+      className="about-page museum-page"
+      data-interface-contract="museum-spatial-mode-v1"
+      data-accession-contract="museum-accession-v1"
+    >
       <section className="identity-launch identity-launch-aetimm" aria-label="AETIMM Museum entrance">
         <PhaseIdentity kind="aetimm" />
         <p className="identity-launch-copy">
