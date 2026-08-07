@@ -30,11 +30,11 @@ const SCRIPT_POOLS = [
   "天地人機夢光闇空時記憶永遠真理星海無限構造信号生成保存観測",
   "ᄀᄂᄃᄅᄆᄇᄉᄋᄌᄎᄏᄐᄑᄒ가나다라마바사아자차카타파하",
   "ሀሁሂሃሄህሆለሉሊላሌልሎሐሑሒሓሔሕሖመሙሚማሜምሞ",
-];
+].map((pool) => Array.from(pool));
 
-const MATH_POOL = "∀∂∃∅∆∇∈∉∋∏∑−∓√∞∟∠∧∨∩∪∫∴∵∼≈≠≡≤≥⊂⊃⊆⊇⊕⊗⊙⊥⋈⋔⋮⋰⌁⌇⌖⌬⌭⏣⟁⟐⟠⟡⟴⧉⧖⧗⊹◌";
-const MACHINE_POOL = "⌁⌭⟐⊙⋔⟟⋈⊚⫶⌬⏣⟡⋮⧖⟁⟠⌿⊹⧉◌⟴⌂⌇⋰⌖⧗⫷⫸⟢⟣⧫⧬⧭⧮⧯";
-const DIGIT_POOL = "0123456789０１２３４５６７８９ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ";
+const MATH_POOL = Array.from("∀∂∃∅∆∇∈∉∋∏∑−∓√∞∟∠∧∨∩∪∫∴∵∼≈≠≡≤≥⊂⊃⊆⊇⊕⊗⊙⊥⋈⋔⋮⋰⌁⌇⌖⌬⌭⏣⟁⟐⟠⟡⟴⧉⧖⧗⊹◌");
+const MACHINE_POOL = Array.from("⌁⌭⟐⊙⋔⟟⋈⊚⫶⌬⏣⟡⋮⧖⟁⟠⌿⊹⧉◌⟴⌂⌇⋰⌖⧗⫷⫸⟢⟣⧫⧬⧭⧮⧯");
+const DIGIT_POOL = Array.from("0123456789０１２３４５６７８９ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ");
 
 const BroadcastContext = createContext({ tick: 0, reducedMotion: false });
 
@@ -47,20 +47,17 @@ function stableHash(source: string): number {
   return hash >>> 0;
 }
 
-function choose(pool: string, seed: number): string {
-  const values = Array.from(pool);
-  return values[seed % values.length] ?? "⌁";
+function choose(pool: string[], seed: number): string {
+  return pool[seed % pool.length] ?? "⌁";
 }
 
-function mutateCharacter(character: string, index: number, text: string, tick: number): string {
+function mutateCharacter(character: string, index: number, seed: number, tick: number): string {
   if (/\s/u.test(character)) return character;
 
-  const seed = stableHash(`${text}|${index}`);
   const localTick = tick + (seed % 17);
 
-  // Every character has a different reveal cadence, so the sentence never
-  // changes as one synchronized block. Roughly half the glyphs remain human
-  // at any instant, preserving orientation while the surface stays alien.
+  // Every character owns a different reveal cadence. The phrase therefore
+  // never flips as a synchronized word or sentence.
   if ((localTick + index) % 5 < 2) return character;
 
   const epoch = Math.floor(localTick / SCRIPT_EPOCH_TICKS);
@@ -126,7 +123,17 @@ export function LexiconText({
 }: LexiconTextProps) {
   const { tick, reducedMotion } = useLexiconBroadcast();
   const characters = useMemo(() => Array.from(text), [text]);
+  const seeds = useMemo(
+    () => characters.map((_character, index) => stableHash(`${text}|${index}`)),
+    [characters, text],
+  );
   const effectiveTick = reducedMotion ? 0 : tick + phase;
+  const mutated = useMemo(
+    () => reducedMotion
+      ? text
+      : characters.map((character, index) => mutateCharacter(character, index, seeds[index] ?? index, effectiveTick)).join(""),
+    [characters, effectiveTick, reducedMotion, seeds, text],
+  );
 
   return (
     <Component
@@ -136,14 +143,8 @@ export function LexiconText({
     >
       {semantic && <span className={styles.srOnly}>{text}</span>}
       <span className={styles.visual} aria-hidden="true">
-        {characters.map((character, index) => (
-          <span className={styles.character} key={`${index}-${character}`}>
-            <span className={styles.original}>{character}</span>
-            <span className={styles.mutated}>
-              {reducedMotion ? character : mutateCharacter(character, index, text, effectiveTick)}
-            </span>
-          </span>
-        ))}
+        <span className={styles.original}>{text}</span>
+        <span className={styles.mutated}>{mutated}</span>
       </span>
     </Component>
   );
