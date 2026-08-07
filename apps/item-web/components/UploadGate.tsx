@@ -219,7 +219,7 @@ export function UploadGate() {
     if (url) {
       try {
         const parsed = new URL(url);
-        if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error("unsupported protocol");
+        if (!["http:", "https:"].includes(parsed.protocol)) throw new Error("unsupported protocol");
       } catch {
         setMessage("Reference URLs must be valid http:// or https:// addresses. The platform records the reference but does not fetch it during intake.");
         return;
@@ -356,45 +356,46 @@ export function UploadGate() {
       {open && session && !intakePaused && (
         <form className="upload-panel submission-panel" onSubmit={submit} aria-busy={busy}>
           <p className="submission-note">
-            UNIVERSAL ARTIFACT INTAKE · combine files, text, and references into one work · 12 parts maximum · 50 MB per file · 100 MB combined
+            <strong>ALL SLOP WELCOME.</strong>{" "}
+            Full-modality AI-made Artifacts belong here: image, video, audio, text, documents, code, data, 3D, references, simulations, or mixed media. Everything you add becomes one Artifact. Every approved Artifact enters the same infinite feed.
             {dailyLimit ? ` · ${dailyLimit} artifacts per rolling 24 hours` : ""}
-            {" · "}everything remains private until review.
+            {" · "}12 materials maximum · 50 MB per file · 100 MB combined · private until review.
           </p>
 
           <div>
             <label htmlFor="title">Artifact title</label>
-            <input id="title" name="title" required maxLength={100} placeholder="Name the whole artifact" disabled={busy} />
+            <input id="title" name="title" required maxLength={100} placeholder="Name the artifact" disabled={busy} />
           </div>
 
           <div>
-            <label htmlFor="summary">Feed summary</label>
+            <label htmlFor="summary">Describe the Artifact</label>
             <textarea
               id="summary"
               name="summary"
               required
               minLength={10}
               maxLength={600}
-              placeholder="A short public-facing summary for the feed."
+              placeholder="What is it and why does it exist?"
               disabled={busy}
             />
           </div>
 
           <div>
-            <label htmlFor="artifactDescription">True nature of the artifact</label>
+            <label htmlFor="artifactDescription">How should it be experienced?</label>
             <textarea
               id="artifactDescription"
               name="artifactDescription"
               required
               minLength={20}
               maxLength={4000}
-              placeholder="Describe what this work actually is as a whole: its modes, components, relationships, intended behavior, dependencies, and what a reviewer must understand before judging it."
+              placeholder="Describe the whole work: its materials, relationships, behavior, dependencies, and what someone should understand when experiencing it."
               disabled={busy}
             />
-            <p className="submission-note">This description belongs to the artifact, not to any one file. A code + image + PDF + URL submission is one artifact if those parts form one work.</p>
+            <p className="submission-note">Describe the Artifact as a whole, not each file separately.</p>
           </div>
 
           <div>
-            <label htmlFor="files">Artifact files · optional when text or reference is supplied</label>
+            <label htmlFor="files">Artifact materials</label>
             <input
               id="files"
               name="files"
@@ -411,34 +412,35 @@ export function UploadGate() {
             <div id="selected-files" className={selectedFiles.length ? "file-selection selected" : "file-selection"}>
               <span aria-hidden="true">◇</span>
               {selectedFiles.length === 0 ? (
-                <span>No files selected</span>
+                <span>No materials added</span>
               ) : (
                 <span>{selectedFiles.map((file) => `${file.name} · ${modeForFile(file)}`).join("  /  ")}</span>
               )}
             </div>
+            <p className="submission-note">Everything selected is submitted together as one Artifact.</p>
           </div>
 
           <div>
-            <label htmlFor="textPart">Text component · optional</label>
+            <label htmlFor="textPart">Text material · optional</label>
             <textarea
               id="textPart"
               value={textPart}
               onChange={(event) => setTextPart(event.target.value)}
               maxLength={20000}
-              placeholder="Paste prose, a proof, prompt corpus, source excerpt, specification, lyrics you own, structured notes, or other text that is itself part of the artifact."
+              placeholder="Paste text that is itself part of the Artifact."
               disabled={busy}
             />
           </div>
 
           <div>
-            <label htmlFor="referenceUrl">Reference / website component · optional</label>
+            <label htmlFor="referenceUrl">Reference / website material · optional</label>
             <input
               id="referenceUrl"
               type="url"
               value={referenceUrl}
               onChange={(event) => setReferenceUrl(event.target.value)}
               maxLength={2000}
-              placeholder="https://example.com — recorded as provenance/reference only; not fetched or executed during intake"
+              placeholder="https://example.com — recorded as a reference; not fetched or executed during intake"
               disabled={busy}
             />
           </div>
@@ -471,7 +473,7 @@ export function UploadGate() {
               required
               minLength={15}
               maxLength={800}
-              placeholder="State exactly what humans did across the full artifact: configured, prompted, supplied source material, coded, edited, selected, assembled, or did nothing after trigger."
+              placeholder="State what humans did across the Artifact: configured, prompted, supplied source material, coded, edited, selected, assembled, or did nothing after trigger."
               disabled={busy}
             />
           </div>
@@ -484,14 +486,14 @@ export function UploadGate() {
               required
               minLength={30}
               maxLength={1600}
-              placeholder="Describe prompts, seeds, source material, run logs, code/model transformations, edits, assembly, plagiarism/remix method where relevant, and publication path."
+              placeholder="Describe prompts, seeds, source material, run logs, transformations, edits, assembly, and publication path."
               disabled={busy}
             />
           </div>
 
           <label className="check-row">
             <input name="aiOrigin" type="checkbox" required disabled={busy} />
-            <span>I attest that AI generated or materially transformed the submitted artifact or a meaningful component of it.</span>
+            <span>I attest that AI generated or materially transformed the submitted Artifact or a meaningful component of it.</span>
           </label>
 
           <label className="check-row">
@@ -501,17 +503,17 @@ export function UploadGate() {
 
           <label className="check-row">
             <input name="safety" type="checkbox" required disabled={busy} />
-            <span>This artifact contains no prohibited sexual exploitation material, graphic gore intended for shock, credible threats, criminal facilitation, malware intended to harm users, or other prohibited material.</span>
+            <span>This Artifact contains no prohibited sexual exploitation material, graphic gore intended for shock, credible threats, criminal facilitation, malware intended to harm users, or other prohibited material.</span>
           </label>
 
           <label className="check-row">
             <input name="rights" type="checkbox" required disabled={busy} />
-            <span>I have the right to submit these components and grant the platform review rights, and the provenance description truthfully identifies source/remix relationships to the best of my knowledge.</span>
+            <span>I have the right to submit these materials and grant the platform review rights, and the provenance description truthfully identifies source/remix relationships to the best of my knowledge.</span>
           </label>
 
           <div className="submission-actions">
             <button className="submit-button" type="submit" disabled={busy || intakePaused}>
-              {busy ? "Binding artifact into private quarantine…" : "Submit artifact to private quarantine"}
+              {busy ? "Binding Artifact into private quarantine…" : "Submit Artifact"}
             </button>
             {message && <p className="submission-note" role="status" aria-live="polite">{message}</p>}
           </div>
