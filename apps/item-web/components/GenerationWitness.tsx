@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { LexiconText } from "./LexiconBroadcast";
 
 const phases = [
   { mode: "IMAGE", text: "forming impossible orbital anatomy" },
@@ -12,10 +13,10 @@ const phases = [
 ];
 
 const outcomes = [
-  "AETIMM CANDIDATE",
+  "MUSEUM SIGNAL",
+  "UNJUDGED",
+  "SLOP RESIDUE",
   "UNRESOLVED",
-  "SLATRA RESIDUE",
-  "REFINEMENT REQUIRED",
 ];
 
 export function GenerationWitness() {
@@ -39,14 +40,18 @@ export function GenerationWitness() {
   );
 
   return (
-    <section className="witness" aria-label="Witness autonomous AI generation">
+    <section className="witness" aria-label="Witness autonomous AI generation" data-lexicon-surface="true">
       <div className="witness-header">
         <div>
-          <p className="eyebrow">LIVE SYNTHETIC RUN</p>
-          <h3>Witness the machine unfold a Full-Mode Artifact.</h3>
+          <LexiconText as="p" className="eyebrow" text="LIVE SYNTHETIC RUN" phase={3} />
+          <LexiconText as="h3" text="Witness the machine unfold a Full-Mode Artifact." phase={7} />
         </div>
-        <button className="run-toggle" onClick={() => setRunning((value) => !value)}>
-          {running ? "Pause run" : "Resume run"}
+        <button
+          className="run-toggle"
+          onClick={() => setRunning((value) => !value)}
+          aria-label={running ? "Pause run" : "Resume run"}
+        >
+          <LexiconText text={running ? "Pause run" : "Resume run"} phase={11} semantic={false} />
         </button>
       </div>
 
@@ -55,28 +60,33 @@ export function GenerationWitness() {
           <span />
           <span />
           <span />
-          <b>{phase.mode}</b>
+          <b><LexiconText text={phase.mode} phase={13} semantic={false} /></b>
         </div>
         <div className="generation-copy">
-          <p className="machine-line">AI RUN {String(cycle + 1).padStart(4, "0")}</p>
-          <h4>{phase.text}</h4>
+          <LexiconText as="p" className="machine-line" text={`AI RUN ${String(cycle + 1).padStart(4, "0")}`} phase={17} />
+          <LexiconText as="h4" text={phase.text} phase={19} />
           <div className="progress-track"><i style={{ width: `${progress * 100}%` }} /></div>
-          <p className="outcome">Provisional route: <strong>{outcome}</strong></p>
+          <p className="outcome">
+            <LexiconText text={`Provisional route: ${outcome}`} phase={23} />
+          </p>
         </div>
       </div>
 
       <div className="mode-ledger">
-        {fragments.map((fragment) => (
+        {fragments.map((fragment, index) => (
           <div className={fragment.active ? "mode-row active" : "mode-row"} key={fragment.mode}>
-            <span>{fragment.mode}</span>
-            <p>{fragment.text}</p>
+            <LexiconText text={fragment.mode} phase={29 + index * 3} />
+            <LexiconText as="p" text={fragment.text} phase={31 + index * 3} />
           </div>
         ))}
       </div>
 
-      <p className="witness-note">
-        This prototype visualizes an autonomous pipeline. Production runs must expose the trigger, models, tools, logs, safety checks, and any human intervention.
-      </p>
+      <LexiconText
+        as="p"
+        className="witness-note"
+        text="This prototype visualizes an autonomous pipeline. Production runs must expose the trigger, models, tools, logs, safety checks, and any human intervention."
+        phase={53}
+      />
     </section>
   );
 }
