@@ -22,11 +22,29 @@ export type ArtifactEvent = {
   created_at: string;
 };
 
+export type ArtifactPart = {
+  id: string;
+  artifact_id: string;
+  position: number;
+  part_kind: "file" | "text" | "reference";
+  mode: string;
+  label: string;
+  storage_path: string | null;
+  original_filename: string | null;
+  mime_type: string | null;
+  byte_size: number | null;
+  text_content: string | null;
+  reference_url: string | null;
+  mediaUrl?: string;
+};
+
 export type CreatorArtifact = {
   id: string;
   creator_id: string;
   title: string;
   summary: string;
+  artifact_description?: string;
+  artifact_modes?: string[];
   origin_class: OriginClass;
   generator: string;
   human_role: string;
@@ -40,8 +58,9 @@ export type CreatorArtifact = {
 
 export type CuratorArtifact = CreatorArtifact & {
   creatorName: string;
-  media_path: string;
+  media_path: string | null;
   mediaUrl?: string;
+  parts: ArtifactPart[];
   ai_origin_attested: boolean;
   safety_attested: boolean;
   rights_attested: boolean;
@@ -63,6 +82,11 @@ function isLifecycleMigrationMissing(error: { message?: string; code?: string } 
   );
 }
 
+function isUniversalArtifactMigrationMissing(error: { message?: string; code?: string } | null | undefined): boolean {
+  const message = error?.message?.toLowerCase() ?? "";
+  return error?.code === "42703" || error?.code === "42P01" || message.includes("artifact_parts") || message.includes("artifact_description");
+}
+
 function groupEvents(rows: ArtifactEvent[]): Map<string, ArtifactEvent[]> {
   const grouped = new Map<string, ArtifactEvent[]>();
   for (const event of rows) {
@@ -70,6 +94,17 @@ function groupEvents(rows: ArtifactEvent[]): Map<string, ArtifactEvent[]> {
     current.push(event);
     grouped.set(event.artifact_id, current);
   }
+  return grouped;
+}
+
+function groupParts(rows: ArtifactPart[]): Map<string, ArtifactPart[]> {
+  const grouped = new Map<string, ArtifactPart[]>();
+  for (const part of rows) {
+    const current = grouped.get(part.artifact_id) ?? [];
+    current.push(part);
+    grouped.set(part.artifact_id, current);
+  }
+  for (const parts of grouped.values()) parts.sort((a, b) => a.position - b.position);
   return grouped;
 }
 
@@ -92,14 +127,27 @@ export async function loadCurrentRole(userId: string): Promise<ProfileRole> {
 
 export async function loadCreatorArtifacts(userId: string): Promise<CreatorArtifact[]> {
   const client = requireSupabaseBrowserClient();
-  const { data, error } = await client
+  let query = client
     .from("artifacts")
     .select(
-      "id,creator_id,title,summary,origin_class,generator,human_role,provenance_note,status,lane,created_at,published_at"
+      "id,creator_id,title,summary,artifact_description,artifact_modes,origin_class,generator,human_role,provenance_note,status,lane,created_at,published_at"
     )
     .eq("creator_id", userId)
     .order("created_at", { ascending: false })
     .limit(50);
+
+  let { data, error } = await query;
+
+  if (error && isUniversalArtifactMigrationMissing(error)) {
+    const fallback = await client
+      .from("artifacts")
+      .select("id,creator_id,title,summary,origin_class,generator,human_role,provenance_note,status,lane,created_at,published_at")
+      .eq("creator_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    data = fallback.data;
+    error = fallback.error;
+  }
 
   if (error) throw error;
 
@@ -121,6 +169,8 @@ export async function loadCreatorArtifacts(userId: string): Promise<CreatorArtif
 
   return artifacts.map((artifact) => ({
     ...artifact,
+    artifact_description: artifact.artifact_description ?? artifact.summary,
+    artifact_modes: artifact.artifact_modes ?? ["image"],
     events: eventsByArtifact.get(artifact.id) ?? [],
   }));
 }
@@ -152,24 +202,38 @@ export async function resubmitArtifact(artifactId: string): Promise<void> {
 
 export async function loadCuratorQueue(): Promise<CuratorArtifact[]> {
   const client = requireSupabaseBrowserClient();
-  const { data, error } = await client
+  let { data, error } = await client
     .from("artifacts")
     .select(
-      "id,creator_id,title,summary,origin_class,generator,human_role,provenance_note,status,lane,created_at,published_at,media_path,ai_origin_attested,safety_attested,rights_attested,profiles!artifacts_creator_id_fkey(display_name)"
+      "id,creator_id,title,summary,artifact_description,artifact_modes,origin_class,generator,human_role,provenance_note,status,lane,created_at,published_at,media_path,ai_origin_attested,safety_attested,rights_attested,profiles!artifacts_creator_id_fkey(display_name)"
     )
     .eq("status", "quarantine")
     .order("created_at", { ascending: true })
     .limit(100);
 
+  if (error && isUniversalArtifactMigrationMissing(error)) {
+    const fallback = await client
+      .from("artifacts")
+      .select(
+        "id,creator_id,title,summary,origin_class,generator,human_role,provenance_note,status,lane,created_at,published_at,media_path,ai_origin_attested,safety_attested,rights_attested,profiles!artifacts_creator_id_fkey(display_name)"
+      )
+      .eq("status", "quarantine")
+      .order("created_at", { ascending: true })
+      .limit(100);
+    data = fallback.data;
+    error = fallback.error;
+  }
+
   if (error) throw error;
 
-  type QueueRow = Omit<CuratorArtifact, "events" | "creatorName" | "mediaUrl"> & {
+  type QueueRow = Omit<CuratorArtifact, "events" | "creatorName" | "mediaUrl" | "parts"> & {
     profiles?: { display_name?: string } | Array<{ display_name?: string }> | null;
   };
 
   const rows = (data ?? []) as unknown as QueueRow[];
   const ids = rows.map((artifact) => artifact.id);
   let eventsByArtifact = new Map<string, ArtifactEvent[]>();
+  let partsByArtifact = new Map<string, ArtifactPart[]>();
 
   if (ids.length > 0) {
     const { data: eventData, error: eventError } = await client
@@ -180,20 +244,50 @@ export async function loadCuratorQueue(): Promise<CuratorArtifact[]> {
       .order("id", { ascending: false });
     if (eventError) throw eventError;
     eventsByArtifact = groupEvents((eventData ?? []) as ArtifactEvent[]);
+
+    const { data: partData, error: partError } = await client
+      .from("artifact_parts")
+      .select("id,artifact_id,position,part_kind,mode,label,storage_path,original_filename,mime_type,byte_size,text_content,reference_url")
+      .in("artifact_id", ids)
+      .order("position", { ascending: true });
+
+    if (partError && !isUniversalArtifactMigrationMissing(partError)) throw partError;
+    if (!partError) partsByArtifact = groupParts((partData ?? []) as ArtifactPart[]);
   }
 
   return Promise.all(
     rows.map(async (row) => {
       const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
-      const { data: signed, error: signedError } = await client.storage
-        .from("artifact-media")
-        .createSignedUrl(row.media_path, 60 * 30);
+      const parts = partsByArtifact.get(row.id) ?? [];
+      const signedParts = await Promise.all(
+        parts.map(async (part) => {
+          if (part.part_kind !== "file" || !part.storage_path) return part;
+          const { data: signed, error: signedError } = await client.storage
+            .from("artifact-media")
+            .createSignedUrl(part.storage_path, 60 * 30);
+          return {
+            ...part,
+            mediaUrl: signedError ? undefined : signed?.signedUrl,
+          };
+        }),
+      );
+
+      let mediaUrl: string | undefined;
+      if (row.media_path) {
+        const { data: signed, error: signedError } = await client.storage
+          .from("artifact-media")
+          .createSignedUrl(row.media_path, 60 * 30);
+        mediaUrl = signedError ? undefined : signed?.signedUrl;
+      }
 
       return {
         ...row,
+        artifact_description: row.artifact_description ?? row.summary,
+        artifact_modes: row.artifact_modes ?? ["image"],
         creatorName: profile?.display_name || "Anonymous creator",
         events: eventsByArtifact.get(row.id) ?? [],
-        mediaUrl: signedError ? undefined : signed?.signedUrl,
+        parts: signedParts,
+        mediaUrl,
       };
     }),
   );
