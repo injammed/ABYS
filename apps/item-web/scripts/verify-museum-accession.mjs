@@ -40,6 +40,9 @@ for (const [label, pattern, source] of [
 assert.ok(!/data-binary-vote/.test(collection), "Museum presentation must not contain public voting controls.");
 assert.ok(!/delete from public\.museum_accessions/i.test(migration), "Museum accession history must never be deleted by lifecycle code.");
 assert.ok(!/order by[\s\S]{0,300}judgment = 'slop'/i.test(migration), "Slop judgment must not participate in Museum admission ordering.");
-assert.ok(!/grant (select|update|insert|delete)[\s\S]*museum_control[\s\S]*to anon|authenticated/i.test(migration), "Museum cadence configuration must not be client-writable/readable.");
+assert.ok(
+  !/grant\s+(select|update|insert|delete)[^;]*on public\.museum_control[^;]*to\s+(anon|authenticated)/i.test(migration),
+  "Museum cadence configuration must not be client-readable or client-writable.",
+);
 
 console.log("Museum accession PASS: ordinary Artifacts stay public, community Museum votes pace immutable accessions, the most Museum-voted unaccessioned work receives the next slot, public voting cannot deaccession it, cadence configuration stays internal, and exceptional withdrawal preserves a tombstone.");
