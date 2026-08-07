@@ -86,6 +86,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:artifact-forms
 
+      - name: Verify one-click publication and vote privacy
+        working-directory: apps/item-web
+        run: npm run verify:one-click-feed
+
       - name: Verify curator migration contract
         working-directory: apps/item-web
         run: npm run verify:curator
