@@ -17,9 +17,9 @@ function reviewError(error: unknown): string {
   const raw = error instanceof Error ? error.message : String(error ?? "");
   if (raw.includes("CURATOR_ROLE_REQUIRED")) return "This account does not have curator authority.";
   if (raw.includes("CURATOR_NOTE_REQUIRED")) return "Every decision requires a note of at least three characters.";
-  if (raw.includes("INITIAL_PUBLICATION_REQUIRES_UNJUDGED")) return "First publication must enter Unjudged before selection review.";
-  if (raw.includes("ARTIFACT_NOT_REVIEWABLE")) return "This artifact changed state and is no longer reviewable. Refresh the queue.";
-  return raw || "The curator decision failed.";
+  if (raw.includes("INITIAL_PUBLICATION_REQUIRES_UNJUDGED")) return "Release must return the Artifact to public Unjudged.";
+  if (raw.includes("ARTIFACT_NOT_REVIEWABLE")) return "This Artifact changed state and is no longer held. Refresh the queue.";
+  return raw || "The hold decision failed.";
 }
 
 function formatBytes(bytes: number | null): string {
@@ -52,7 +52,7 @@ export function CuratorQueue() {
         return next;
       });
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "The curator queue could not be loaded.");
+      setMessage(error instanceof Error ? error.message : "The exceptional hold queue could not be loaded.");
     } finally {
       setLoading(false);
     }
@@ -116,7 +116,7 @@ export function CuratorQueue() {
   ) {
     const draft = drafts[artifact.id] ?? DEFAULT_DRAFT;
     if (draft.note.trim().length < 3) {
-      setMessage("Write a curator note before making a decision.");
+      setMessage("Write a review note before making a decision.");
       return;
     }
 
@@ -131,7 +131,7 @@ export function CuratorQueue() {
         note: draft.note.trim(),
       });
       const success = decision === "approve"
-        ? `${artifact.title} published to Unjudged.`
+        ? `${artifact.title} released to public Unjudged.`
         : decision === "request_revision"
           ? `Revision requested for ${artifact.title}.`
           : `${artifact.title} rejected.`;
@@ -153,29 +153,29 @@ export function CuratorQueue() {
   }
 
   if (!session) {
-    return <p className="curator-state">Sign in with a curator account to open the review queue.</p>;
+    return <p className="curator-state">Sign in with a curator account to open exceptional holds.</p>;
   }
 
   if (!authorized) {
     return (
       <div className="curator-state">
         <strong>Curator access denied.</strong>
-        <p>This account can submit artifacts but cannot inspect or publish other creators&apos; private work.</p>
+        <p>This account can submit Artifacts but cannot inspect another creator&apos;s exceptional private hold.</p>
         {message && <p role="alert">{message}</p>}
       </div>
     );
   }
 
   return (
-    <section className="curator-shell" aria-label="Private universal artifact review queue">
+    <section className="curator-shell" aria-label="Exceptional Artifact hold review queue">
       <div className="curator-toolbar">
         <div>
-          <p className="eyebrow">PRIVATE QUARANTINE · COMPLETE MANIFEST REVIEW</p>
-          <h2>{queue.length} waiting for review</h2>
-          <p>Every mode and part belongs to one artifact. Approval always publishes to Unjudged first.</p>
+          <p className="eyebrow">EXCEPTIONAL HOLD · COMPLETE MANIFEST REVIEW</p>
+          <h2>{queue.length} held</h2>
+          <p>Ordinary uploads do not wait here. This queue exists for safety, legal, integrity, revision, or technical exceptions—not Museum admission.</p>
         </div>
         <button className="upload-trigger" type="button" onClick={() => void refreshQueue()} disabled={loading}>
-          {loading ? "Refreshing…" : "Refresh queue"}
+          {loading ? "Refreshing…" : "Refresh holds"}
         </button>
       </div>
 
@@ -183,8 +183,8 @@ export function CuratorQueue() {
 
       {!loading && queue.length === 0 && (
         <div className="curator-state">
-          <strong>The quarantine queue is empty.</strong>
-          <p>New universal artifacts appear here oldest first.</p>
+          <strong>No exceptional holds.</strong>
+          <p>That is the normal state. New Artifacts publish directly to the trough after bounded submission checks.</p>
         </div>
       )}
 
@@ -200,7 +200,7 @@ export function CuratorQueue() {
                 ) : (
                   <div className="curator-media-missing">No image lead · inspect manifest below</div>
                 )}
-                <span>PRIVATE QUARANTINE</span>
+                <span>EXCEPTIONAL HOLD</span>
               </div>
 
               <div className="curator-content">
@@ -230,7 +230,7 @@ export function CuratorQueue() {
                 <div className="curator-history">
                   <p className="eyebrow">ARTIFACT MANIFEST · {artifact.parts.length || 1} PART{(artifact.parts.length || 1) === 1 ? "" : "S"}</p>
                   {artifact.parts.length === 0 ? (
-                    <p>Legacy single-image artifact. The original media path remains its implicit first part.</p>
+                    <p>Legacy single-image Artifact. The original media path remains its implicit first part.</p>
                   ) : (
                     artifact.parts.map((part) => (
                       <div key={part.id} className="curator-part">
@@ -271,21 +271,21 @@ export function CuratorQueue() {
                 </div>
 
                 <div className="curator-decision">
-                  <p className="submission-note"><strong>First publication destination: UNJUDGED.</strong> Museum selection happens later.</p>
+                  <p className="submission-note"><strong>This is not Museum selection.</strong> Release returns the held Artifact to the public trough. Museum accession is a separate vote-paced institutional record.</p>
                   <label>
-                    Required curator note
+                    Required review note
                     <textarea
                       value={draft.note}
                       onChange={(event) => updateDraft(artifact.id, event.target.value)}
                       minLength={3}
                       maxLength={1200}
-                      placeholder="State why the complete artifact should enter public judgment, return for revision, or be rejected."
+                      placeholder="State why the Artifact should be released, revised, or rejected."
                       disabled={busy}
                     />
                   </label>
 
                   <div className="curator-actions">
-                    <button type="button" disabled={busy} onClick={() => void decide(artifact, "approve")}>Approve → publish Unjudged</button>
+                    <button type="button" disabled={busy} onClick={() => void decide(artifact, "approve")}>Release → public Unjudged</button>
                     <button type="button" disabled={busy} onClick={() => void decide(artifact, "request_revision")}>Request revision</button>
                     <button type="button" disabled={busy} onClick={() => void decide(artifact, "reject")}>Reject</button>
                   </div>
