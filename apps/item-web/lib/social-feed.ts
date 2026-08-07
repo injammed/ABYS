@@ -44,6 +44,13 @@ type VoteAggregateRow = {
   slop_count: number | string;
 };
 
+type SlopRankRow = {
+  artifact_id: string;
+  slop_rank: number | string;
+  slop_count: number | string;
+  total_votes: number | string;
+};
+
 function creatorName(row: ArtifactRow | PrivateArtifactRow): string {
   if (Array.isArray(row.profiles)) return row.profiles[0]?.display_name || "Anonymous machine witness";
   return row.profiles?.display_name || "Anonymous machine witness";
@@ -120,40 +127,58 @@ export async function loadPublicFeedPage(options: {
   const ids = rows.map((row) => row.id);
 
   const aggregatesByArtifact = new Map<string, VoteAggregateRow>();
+  const slopRanksByArtifact = new Map<string, SlopRankRow>();
+
   if (ids.length > 0) {
-    const { data: aggregateData, error: aggregateError } = await client.rpc("get_artifact_vote_aggregates", {
-      p_artifact_ids: ids,
-    });
-    if (aggregateError) throw aggregateError;
-    for (const aggregate of (aggregateData ?? []) as VoteAggregateRow[]) {
+    const [aggregateResult, rankResult] = await Promise.all([
+      client.rpc("get_artifact_vote_aggregates", { p_artifact_ids: ids }),
+      client.rpc("get_artifact_slop_ranks", { p_artifact_ids: ids }),
+    ]);
+
+    if (aggregateResult.error) throw aggregateResult.error;
+    for (const aggregate of (aggregateResult.data ?? []) as VoteAggregateRow[]) {
       aggregatesByArtifact.set(aggregate.artifact_id, aggregate);
+    }
+
+    // Rank is deliberately additive presentation metadata. A stale client or a
+    // database that has not received the ranking fold must still load the feed.
+    if (!rankResult.error) {
+      for (const rank of (rankResult.data ?? []) as SlopRankRow[]) {
+        slopRanksByArtifact.set(rank.artifact_id, rank);
+      }
     }
   }
 
   const mediaEntries = await Promise.all(rows.map(async (row) => [row.id, await signedImageUrl(row.media_path)] as const));
   const mediaByArtifact = new Map(mediaEntries);
 
-  const artifacts: FeedArtifact[] = rows.map((row) => ({
-    id: row.id,
-    title: row.title,
-    creator: creatorName(row),
-    lane: row.lane,
-    summary: row.summary,
-    modalLead: modeLead(row),
-    aiOrigin: {
-      originClass: row.origin_class,
-      declaredByCreator: true,
-      generator: row.generator,
-      humanRole: row.human_role,
-      provenanceNote: row.provenance_note,
-      confidence: "declared",
-    },
-    gradient: laneGradients[row.lane],
-    mediaUrl: mediaByArtifact.get(row.id),
-    score: scoreForAggregate(aggregatesByArtifact.get(row.id)),
-    publishedAt: row.published_at,
-    visibility: "public",
-  }));
+  const artifacts: FeedArtifact[] = rows.map((row) => {
+    const slopRank = slopRanksByArtifact.get(row.id);
+
+    return {
+      id: row.id,
+      title: row.title,
+      creator: creatorName(row),
+      lane: row.lane,
+      summary: row.summary,
+      modalLead: modeLead(row),
+      aiOrigin: {
+        originClass: row.origin_class,
+        declaredByCreator: true,
+        generator: row.generator,
+        humanRole: row.human_role,
+        provenanceNote: row.provenance_note,
+        confidence: "declared",
+      },
+      gradient: laneGradients[row.lane],
+      mediaUrl: mediaByArtifact.get(row.id),
+      score: scoreForAggregate(aggregatesByArtifact.get(row.id)),
+      slopRank: row.lane === "aetimm" || !slopRank ? undefined : Number(slopRank.slop_rank),
+      slopVotes: row.lane === "aetimm" || !slopRank ? undefined : Number(slopRank.slop_count),
+      publishedAt: row.published_at,
+      visibility: "public",
+    };
+  });
 
   const lastRow = rows.at(-1);
   return { artifacts, nextCursor: hasMore && lastRow ? cursorForRow(lastRow) : null };
