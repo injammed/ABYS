@@ -31,9 +31,9 @@ export type FeedArtifact = {
   aiOrigin: AiOrigin;
   gradient: string;
   mediaUrl?: string;
-  score: number;
-  slopRank?: number;
+  museumVotes?: number;
   slopVotes?: number;
+  slopRank?: number;
   publishedAt?: string;
   visibility?: "public" | "creator_preview";
 };
@@ -62,7 +62,9 @@ export const seedArtifacts: FeedArtifact[] = [
       confidence: "reviewed"
     },
     gradient: "radial-gradient(circle at 50% 42%, #fff1a8 0 2%, #d7a52b 3%, #3b2606 18%, #060606 54%), conic-gradient(from 40deg, #070707, #6d4b0e, #070707)",
-    score: 94
+    museumVotes: 211,
+    slopVotes: 142,
+    slopRank: 1
   },
   {
     id: "SLOP-SEED-0001",
@@ -85,9 +87,9 @@ export const seedArtifacts: FeedArtifact[] = [
       }
     },
     gradient: "radial-gradient(circle at 50% 18%, #d1bd79 0 1%, #5b4d1f 2%, transparent 22%), repeating-radial-gradient(ellipse at center, #0a0d09 0 9px, #313421 10px 12px)",
-    score: 18,
-    slopRank: 1,
-    slopVotes: 142
+    museumVotes: 7,
+    slopVotes: 128,
+    slopRank: 2
   },
   {
     id: "ITEM-SEED-0002",
@@ -105,7 +107,8 @@ export const seedArtifacts: FeedArtifact[] = [
       confidence: "metadata-supported"
     },
     gradient: "radial-gradient(circle at 48% 46%, #000 0 13%, #a56f21 14%, #1b120a 17%, #030303 39%), repeating-conic-gradient(from 15deg, #030303 0 8deg, #34210d 9deg 10deg)",
-    score: 71
+    museumVotes: 63,
+    slopVotes: 4
   },
   {
     id: "SLOP-SEED-0002",
@@ -123,16 +126,15 @@ export const seedArtifacts: FeedArtifact[] = [
       confidence: "declared"
     },
     gradient: "linear-gradient(135deg, #050505 0 30%, #6c3d00 31%, #f6c247 34%, #241300 39%, #050505 70%), radial-gradient(circle, #fff, transparent 30%)",
-    score: 9,
-    slopRank: 78,
-    slopVotes: 41
+    museumVotes: 2,
+    slopVotes: 41,
+    slopRank: 78
   }
 ];
 
 export function makeFeedBatch(batch: number): FeedArtifact[] {
   return seedArtifacts.map((artifact, index) => ({
     ...artifact,
-    id: `${artifact.id}-${batch}-${index}`,
-    score: Math.max(0, Math.min(100, artifact.score + ((batch + index) % 7) - 3))
+    id: `${artifact.id}-${batch}-${index}`
   }));
 }
