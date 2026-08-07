@@ -1,21 +1,19 @@
 import Link from "next/link";
+import { MuseumCollection } from "@/components/MuseumCollection";
 import { PhaseIdentity } from "@/components/PhaseIdentity";
 import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 
 export default function AetimmPage() {
   return (
-    <main className="about-page museum-page" data-interface-contract="museum-spatial-mode-v1">
+    <main className="about-page museum-page" data-interface-contract="museum-accession-mode-v1">
       <section className="identity-launch identity-launch-aetimm" aria-label="AETIMM Museum entrance">
         <PhaseIdentity kind="aetimm" />
         <p className="identity-launch-copy">
-          AETIMM is the Museum: a distinct spatial environment for machine-made work deliberately selected to persist.
-        </p>
-        <p className="identity-launch-copy">
-          Its rooms, walls, shelves, cases, and inspection mechanics will be folded here without turning the Museum into another vertical feed.
+          The Museum is the permanent collection. Public Museum judgment unlocks accessions over time; accession is not a leaderboard and ordinary voting cannot undo it.
         </p>
         <div className="identity-actions">
           <Link className="identity-switch" href="/#field">
-            Return to the Slop Feed
+            Return to the Slop Trough
           </Link>
           <Link className="identity-switch" href="/about/">
             Read the field constitution
@@ -23,6 +21,7 @@ export default function AetimmPage() {
         </div>
       </section>
 
+      <MuseumCollection />
       <PrimaryNavigation mode="museum" />
     </main>
   );
