@@ -23,11 +23,17 @@ create table if not exists public.museum_control (
   id smallint primary key default 1 check (id = 1),
   admission_open boolean not null default true,
   museum_votes_per_accession integer not null default 100 check (museum_votes_per_accession >= 1),
+  minimum_candidate_museum_votes integer not null default 10 check (minimum_candidate_museum_votes >= 1),
   updated_at timestamptz not null default now()
 );
 
-insert into public.museum_control (id, admission_open, museum_votes_per_accession)
-values (1, true, 100)
+insert into public.museum_control (
+  id,
+  admission_open,
+  museum_votes_per_accession,
+  minimum_candidate_museum_votes
+)
+values (1, true, 100, 10)
 on conflict (id) do nothing;
 
 alter table public.museum_control enable row level security;
@@ -52,6 +58,10 @@ create table if not exists public.museum_accessions (
 
 create index if not exists museum_accessions_admitted_idx
   on public.museum_accessions (admitted_at desc, accession_number desc);
+
+create index if not exists artifact_votes_museum_partial_idx
+  on public.artifact_votes (artifact_id)
+  where judgment = 'preserve';
 
 alter table public.museum_accessions enable row level security;
 
@@ -150,9 +160,14 @@ begin
   into issued_accessions
   from public.museum_accessions;
 
-  unlocked_slots := greatest(
-    floor(total_museum_votes::numeric / config.museum_votes_per_accession)::bigint - issued_accessions,
-    0
+  -- Bound each vote transaction even if an operator later changes cadence
+  -- aggressively or imports a large body of historical judgment evidence.
+  unlocked_slots := least(
+    greatest(
+      floor(total_museum_votes::numeric / config.museum_votes_per_accession)::bigint - issued_accessions,
+      0
+    ),
+    25
   );
 
   while unlocked_slots > 0 loop
@@ -172,7 +187,7 @@ begin
     where artifacts.status = 'approved'
       and accessions.artifact_id is null
     group by artifacts.id, artifacts.published_at
-    having count(votes.artifact_id) filter (where votes.judgment = 'preserve') > 0
+    having count(votes.artifact_id) filter (where votes.judgment = 'preserve') >= config.minimum_candidate_museum_votes
     order by
       count(votes.artifact_id) filter (where votes.judgment = 'preserve') desc,
       artifacts.published_at asc nulls last,
