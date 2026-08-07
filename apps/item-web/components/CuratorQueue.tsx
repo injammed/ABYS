@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import type { FeedLane } from "@/lib/feed";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 import {
   CuratorArtifact,
@@ -11,23 +10,23 @@ import {
   reviewArtifact,
 } from "@/lib/moderation";
 
-type ReviewDraft = {
-  lane: FeedLane;
-  note: string;
-};
-
-const DEFAULT_DRAFT: ReviewDraft = {
-  lane: "unjudged",
-  note: "",
-};
+type ReviewDraft = { note: string };
+const DEFAULT_DRAFT: ReviewDraft = { note: "" };
 
 function reviewError(error: unknown): string {
   const raw = error instanceof Error ? error.message : String(error ?? "");
   if (raw.includes("CURATOR_ROLE_REQUIRED")) return "This account does not have curator authority.";
   if (raw.includes("CURATOR_NOTE_REQUIRED")) return "Every decision requires a note of at least three characters.";
-  if (raw.includes("APPROVAL_LANE_REQUIRED")) return "Choose a publication lane before approval.";
+  if (raw.includes("INITIAL_PUBLICATION_REQUIRES_UNJUDGED")) return "First publication must enter Unjudged before selection review.";
   if (raw.includes("ARTIFACT_NOT_REVIEWABLE")) return "This artifact changed state and is no longer reviewable. Refresh the queue.";
   return raw || "The curator decision failed.";
+}
+
+function formatBytes(bytes: number | null): string {
+  if (bytes === null) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export function CuratorQueue() {
@@ -107,14 +106,8 @@ export function CuratorQueue() {
     };
   }, [refreshQueue]);
 
-  function updateDraft(artifactId: string, patch: Partial<ReviewDraft>) {
-    setDrafts((current) => ({
-      ...current,
-      [artifactId]: {
-        ...(current[artifactId] ?? DEFAULT_DRAFT),
-        ...patch,
-      },
-    }));
+  function updateDraft(artifactId: string, note: string) {
+    setDrafts((current) => ({ ...current, [artifactId]: { note } }));
   }
 
   async function decide(
@@ -134,17 +127,16 @@ export function CuratorQueue() {
       await reviewArtifact({
         artifactId: artifact.id,
         decision,
-        lane: decision === "approve" ? draft.lane : null,
+        lane: decision === "approve" ? "unjudged" : null,
         note: draft.note.trim(),
       });
-      setMessage(
-        decision === "approve"
-          ? `${artifact.title} published to ${draft.lane}.`
-          : decision === "request_revision"
-            ? `Revision requested for ${artifact.title}.`
-            : `${artifact.title} rejected.`,
-      );
+      const success = decision === "approve"
+        ? `${artifact.title} published to Unjudged.`
+        : decision === "request_revision"
+          ? `Revision requested for ${artifact.title}.`
+          : `${artifact.title} rejected.`;
       await refreshQueue();
+      setMessage(success);
     } catch (error) {
       setMessage(reviewError(error));
     } finally {
@@ -175,11 +167,12 @@ export function CuratorQueue() {
   }
 
   return (
-    <section className="curator-shell" aria-label="Private artifact review queue">
+    <section className="curator-shell" aria-label="Private universal artifact review queue">
       <div className="curator-toolbar">
         <div>
-          <p className="eyebrow">DATABASE-ENFORCED AUTHORITY</p>
-          <h2>{queue.length} waiting for judgment</h2>
+          <p className="eyebrow">PRIVATE QUARANTINE · COMPLETE MANIFEST REVIEW</p>
+          <h2>{queue.length} waiting for review</h2>
+          <p>Every mode and part belongs to one artifact. Approval always publishes to Unjudged first.</p>
         </div>
         <button className="upload-trigger" type="button" onClick={() => void refreshQueue()} disabled={loading}>
           {loading ? "Refreshing…" : "Refresh queue"}
@@ -191,7 +184,7 @@ export function CuratorQueue() {
       {!loading && queue.length === 0 && (
         <div className="curator-state">
           <strong>The quarantine queue is empty.</strong>
-          <p>New submissions will appear here oldest first.</p>
+          <p>New universal artifacts appear here oldest first.</p>
         </div>
       )}
 
@@ -205,7 +198,7 @@ export function CuratorQueue() {
                 {artifact.mediaUrl ? (
                   <img src={artifact.mediaUrl} alt="" />
                 ) : (
-                  <div className="curator-media-missing">Private preview unavailable</div>
+                  <div className="curator-media-missing">No image lead · inspect manifest below</div>
                 )}
                 <span>PRIVATE QUARANTINE</span>
               </div>
@@ -220,6 +213,8 @@ export function CuratorQueue() {
                 <p className="summary">{artifact.summary}</p>
 
                 <dl className="curator-facts">
+                  <div><dt>Modes</dt><dd>{(artifact.artifact_modes ?? ["image"]).join(" · ")}</dd></div>
+                  <div><dt>True nature</dt><dd>{artifact.artifact_description ?? artifact.summary}</dd></div>
                   <div><dt>Origin</dt><dd>{artifact.origin_class}</dd></div>
                   <div><dt>Generator</dt><dd>{artifact.generator}</dd></div>
                   <div><dt>Human role</dt><dd>{artifact.human_role}</dd></div>
@@ -233,13 +228,42 @@ export function CuratorQueue() {
                 </dl>
 
                 <div className="curator-history">
+                  <p className="eyebrow">ARTIFACT MANIFEST · {artifact.parts.length || 1} PART{(artifact.parts.length || 1) === 1 ? "" : "S"}</p>
+                  {artifact.parts.length === 0 ? (
+                    <p>Legacy single-image artifact. The original media path remains its implicit first part.</p>
+                  ) : (
+                    artifact.parts.map((part) => (
+                      <div key={part.id} className="curator-part">
+                        <p>
+                          <strong>#{part.position + 1} · {part.mode.toUpperCase()} · {part.part_kind}</strong>
+                          {part.original_filename ? ` · ${part.original_filename}` : ""}
+                          {part.byte_size !== null ? ` · ${formatBytes(part.byte_size)}` : ""}
+                        </p>
+                        {part.part_kind === "file" && part.mode === "image" && part.mediaUrl && (
+                          <img src={part.mediaUrl} alt="" style={{ maxWidth: "100%", maxHeight: "28rem", objectFit: "contain" }} />
+                        )}
+                        {part.part_kind === "file" && part.mode !== "image" && part.mediaUrl && (
+                          <p><a href={part.mediaUrl} target="_blank" rel="noreferrer">Open private file part</a> · {part.mime_type ?? "unknown MIME"}</p>
+                        )}
+                        {part.part_kind === "text" && (
+                          <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{part.text_content}</pre>
+                        )}
+                        {part.part_kind === "reference" && (
+                          <p><strong>Reference recorded, not fetched:</strong> {part.reference_url}</p>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="curator-history">
                   <p className="eyebrow">LIFECYCLE HISTORY</p>
                   {artifact.events.length === 0 ? (
                     <p>No lifecycle events recorded.</p>
                   ) : (
                     artifact.events.map((event) => (
                       <p key={event.id}>
-                        <strong>{event.event_type.replace("_", " ")}</strong> · {new Date(event.created_at).toLocaleString()}<br />
+                        <strong>{event.event_type.replaceAll("_", " ")}</strong> · {new Date(event.created_at).toLocaleString()}<br />
                         {event.note}
                       </p>
                     ))
@@ -247,33 +271,21 @@ export function CuratorQueue() {
                 </div>
 
                 <div className="curator-decision">
-                  <label>
-                    Publication lane
-                    <select
-                      value={draft.lane}
-                      onChange={(event) => updateDraft(artifact.id, { lane: event.target.value as FeedLane })}
-                      disabled={busy}
-                    >
-                      <option value="unjudged">Unjudged — public judgment begins here</option>
-                      <option value="aetimm">AETIMM — preserved artifact</option>
-                      <option value="slatra">SLOP TROUGH — contained slop</option>
-                    </select>
-                  </label>
-
+                  <p className="submission-note"><strong>First publication destination: UNJUDGED.</strong> Museum selection happens later.</p>
                   <label>
                     Required curator note
                     <textarea
                       value={draft.note}
-                      onChange={(event) => updateDraft(artifact.id, { note: event.target.value })}
+                      onChange={(event) => updateDraft(artifact.id, event.target.value)}
                       minLength={3}
                       maxLength={1200}
-                      placeholder="State why this should be published, revised, or rejected. This note becomes append-only lifecycle evidence."
+                      placeholder="State why the complete artifact should enter public judgment, return for revision, or be rejected."
                       disabled={busy}
                     />
                   </label>
 
                   <div className="curator-actions">
-                    <button type="button" disabled={busy} onClick={() => void decide(artifact, "approve")}>Approve + publish</button>
+                    <button type="button" disabled={busy} onClick={() => void decide(artifact, "approve")}>Approve → publish Unjudged</button>
                     <button type="button" disabled={busy} onClick={() => void decide(artifact, "request_revision")}>Request revision</button>
                     <button type="button" disabled={busy} onClick={() => void decide(artifact, "reject")}>Reject</button>
                   </div>
