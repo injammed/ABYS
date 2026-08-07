@@ -71,6 +71,9 @@ jobs:
       - name: Verify universal Artifact runtime
         run: npm run verify:runtime
 
+      - name: Verify Museum Artifact runtime
+        run: npm run verify:museum-runtime
+
       - name: Verify Museum accession lifecycle
         run: npm run verify:museum-accession
 
