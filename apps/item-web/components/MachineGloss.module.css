@@ -1,10 +1,13 @@
 .gloss {
   width: 100%;
-  min-height: 2.75rem;
+  height: 4.9rem;
+  min-height: 4.9rem;
+  max-height: 4.9rem;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) 3.5rem;
   align-items: center;
   gap: .7rem;
+  overflow: hidden;
   padding: .55rem .7rem;
   border: 1px solid rgba(213,166,63,.12);
   border-radius: .45rem;
@@ -14,10 +17,13 @@
   color: rgba(231,204,132,.78);
   text-align: left;
   cursor: default;
+  contain: layout paint;
 }
 
 .text {
   min-width: 0;
+  max-height: 3.65rem;
+  overflow: hidden;
   overflow-wrap: anywhere;
   line-height: 1.55;
   letter-spacing: .09em;
@@ -29,12 +35,16 @@
 }
 
 .quiet {
+  height: 4.2rem;
+  min-height: 4.2rem;
+  max-height: 4.2rem;
   border-color: rgba(255,255,255,.07);
   background: transparent;
   color: rgba(201,196,184,.6);
 }
 
 .quiet .text {
+  max-height: 3rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: clamp(.46rem, 1vw, .58rem);
 }
@@ -47,12 +57,18 @@
 }
 
 .language {
+  width: 3.5rem;
+  min-width: 3.5rem;
+  max-width: 3.5rem;
   align-self: start;
+  justify-self: end;
+  overflow: hidden;
   padding-top: .08rem;
   color: rgba(255,226,154,.45);
   font: 600 .5rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   letter-spacing: .08em;
   white-space: nowrap;
+  text-align: right;
 }
 
 .gloss[data-language="machine"] {
@@ -63,6 +79,27 @@
 
 :global(.feed-first-page[data-language-contract="machine-first-gloss-v1"] .feed-rule) {
   display: none;
+}
+
+@media (max-width: 520px) {
+  .gloss {
+    height: 5.35rem;
+    min-height: 5.35rem;
+    max-height: 5.35rem;
+    grid-template-columns: minmax(0, 1fr) 3.1rem;
+  }
+
+  .quiet {
+    height: 4.6rem;
+    min-height: 4.6rem;
+    max-height: 4.6rem;
+  }
+
+  .language {
+    width: 3.1rem;
+    min-width: 3.1rem;
+    max-width: 3.1rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
