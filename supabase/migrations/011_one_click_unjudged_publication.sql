@@ -5,6 +5,12 @@
 --   account -> submit one Artifact -> server validates/binds it -> public Unjudged
 --   Museum remains a later judgment/selection state.
 --
+-- Release law:
+--   this migration ships the mechanism DARK. The operator enables
+--   intake_control.automatic_unjudged_publication only after the matching web
+--   client is confirmed live. That prevents old clients from claiming a private
+--   quarantine result while the database has already published it.
+--
 -- The existing intake RPC still creates the Artifact as private quarantine first.
 -- This AFTER INSERT trigger promotes it inside the same database transaction, so
 -- no half-built public Artifact can be observed before its manifest transaction commits.
@@ -12,7 +18,7 @@
 begin;
 
 alter table public.intake_control
-  add column if not exists automatic_unjudged_publication boolean not null default true;
+  add column if not exists automatic_unjudged_publication boolean not null default false;
 
 alter table public.artifact_events
   drop constraint if exists artifact_events_event_type_check;
