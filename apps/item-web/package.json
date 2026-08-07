@@ -16,7 +16,8 @@
     "verify:universal-artifact": "node scripts/verify-universal-artifact-intake.mjs",
     "verify:artifact-forms": "node scripts/verify-artifact-forms.mjs",
     "verify:one-click-feed": "node scripts/verify-one-click-feed.mjs",
-    "verify:throw-it-in": "node scripts/verify-throw-it-in.mjs"
+    "verify:throw-it-in": "node scripts/verify-throw-it-in.mjs",
+    "verify:museum-accession": "node scripts/verify-museum-accession.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "latest",
