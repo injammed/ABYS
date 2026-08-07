@@ -3,6 +3,7 @@
 import { ChangeEvent, DragEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
+import { LexiconText } from "./LexiconBroadcast";
 import styles from "./UploadGate.module.css";
 
 const MAX_FILE_BYTES = 50 * 1024 * 1024;
@@ -426,41 +427,53 @@ export function SlopDrop() {
   }
 
   if (!socialBackendEnabled) {
-    return <button className="upload-trigger" type="button" disabled>Intake unavailable</button>;
+    return (
+      <button className="upload-trigger" type="button" disabled aria-label="Intake unavailable">
+        <LexiconText text="Intake unavailable" phase={3} semantic={false} />
+      </button>
+    );
   }
 
+  const triggerText = open ? "Close" : intakePaused ? "Intake paused" : "Submit";
+
   return (
-    <div className="upload-wrap">
+    <div className="upload-wrap" data-lexicon-surface="true">
       <button
         className="upload-trigger"
         type="button"
         onClick={() => !busy && setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls="artifact-intake-panel"
+        aria-label={triggerText}
         disabled={busy}
       >
-        {open ? "Close" : intakePaused ? "Intake paused" : "Submit"}
+        <LexiconText text={triggerText} phase={5} semantic={false} />
       </button>
 
       {open && !session && (
-        <div id="artifact-intake-panel" className="upload-panel" role="status">
-          <p className="submission-note"><strong>HAVE SLOP?</strong> Make an account or sign in, then throw it in.</p>
+        <div id="artifact-intake-panel" className="upload-panel" role="status" aria-label="Have slop? Make an account or sign in, then throw it in.">
+          <LexiconText as="p" className="submission-note" text="HAVE SLOP? Make an account or sign in, then throw it in." phase={11} semantic={false} />
         </div>
       )}
 
       {open && session && (
         <form id="artifact-intake-panel" className="upload-panel submission-panel" onSubmit={submit} aria-busy={busy}>
           <fieldset className={styles.formFieldset} disabled={busy || intakePaused}>
-            <p className="submission-note">
-              <strong>ALL SLOP WELCOME.</strong>{" "}
-              One Artifact. Any modality. It lands in Unjudged and joins the endless feed.
-              {dailyLimit ? ` · ${dailyLimit}/24h` : ""}
-            </p>
+            <LexiconText
+              as="p"
+              className="submission-note"
+              text={`ALL SLOP WELCOME. One Artifact. Any modality. It lands in Unjudged and joins the endless feed.${dailyLimit ? ` · ${dailyLimit}/24h` : ""}`}
+              phase={13}
+            />
 
-            {intakePaused && <p className="submission-note" role="status"><strong>TROUGH PAUSED.</strong> The form stays visible; throwing is temporarily locked.</p>}
+            {intakePaused && (
+              <p className="submission-note" role="status" aria-label="Trough paused. The form stays visible; throwing is temporarily locked.">
+                <LexiconText text="TROUGH PAUSED. The form stays visible; throwing is temporarily locked." phase={17} semantic={false} />
+              </p>
+            )}
 
             <div>
-              <label htmlFor="files">AI-made Artifact</label>
+              <label htmlFor="files"><LexiconText text="AI-made Artifact" phase={19} /></label>
               <div
                 className={styles.dropZone}
                 data-dragging={dragging ? "true" : undefined}
@@ -482,64 +495,81 @@ export function SlopDrop() {
                 />
                 <label className={styles.materialPicker} htmlFor="files" data-disabled={busy || intakePaused ? "true" : undefined}>
                   <span className={styles.materialPlus} aria-hidden="true">+</span>
-                  <span className={styles.materialAction}>{dragging ? "Drop it" : "Add material"}</span>
-                  <span className={styles.materialModes}>image · video · audio · PDF · code · data · 3D · more</span>
+                  <LexiconText className={styles.materialAction} text={dragging ? "Drop it" : "Add material"} phase={23} />
+                  <LexiconText className={styles.materialModes} text="image · video · audio · PDF · code · data · 3D · more" phase={29} />
                 </label>
               </div>
 
               <div className={styles.materialSummary}>
-                <span>{materialPartCount}/{MAX_PARTS}</span>
-                <span>{formatBytes(totalFileBytes)} / 100 MB</span>
+                <LexiconText text={`${materialPartCount}/${MAX_PARTS}`} phase={31} />
+                <LexiconText text={`${formatBytes(totalFileBytes)} / 100 MB`} phase={37} />
               </div>
 
               <div className={styles.materialList} aria-live="polite">
                 {selectedFiles.length === 0 ? (
-                  <div className={styles.materialEmpty}><span aria-hidden="true">◇</span><span>No slop added</span></div>
-                ) : selectedFiles.map((file) => {
+                  <div className={styles.materialEmpty}>
+                    <span aria-hidden="true">◇</span>
+                    <LexiconText text="No slop added" phase={41} />
+                  </div>
+                ) : selectedFiles.map((file, fileIndex) => {
                   const identity = fileIdentity(file);
                   return (
                     <div className={styles.materialRow} key={identity}>
                       <span aria-hidden="true">◇</span>
-                      <span>{file.name}<span className={styles.materialMeta}>{modeForFile(file)} · {formatBytes(file.size)}</span></span>
-                      <button className={styles.removeMaterial} type="button" onClick={() => removeSelectedFile(identity)} aria-label={`Remove ${file.name}`}>Remove</button>
+                      <span>
+                        <LexiconText text={file.name} phase={43 + fileIndex * 3} />
+                        <LexiconText className={styles.materialMeta} text={`${modeForFile(file)} · ${formatBytes(file.size)}`} phase={47 + fileIndex * 3} />
+                      </span>
+                      <button className={styles.removeMaterial} type="button" onClick={() => removeSelectedFile(identity)} aria-label={`Remove ${file.name}`}>
+                        <LexiconText text="Remove" phase={53 + fileIndex * 3} semantic={false} />
+                      </button>
                     </div>
                   );
                 })}
               </div>
-              <p id="slop-material-help" className="submission-note">Files are treated as untrusted. Code is not executed and links are not fetched during intake.</p>
-              {materialLimitExceeded && <p className={styles.limitWarning} role="alert">Too much slop for one Artifact. Remove something.</p>}
+              <LexiconText
+                as="p"
+                className="submission-note"
+                text="Files are treated as untrusted. Code is not executed and links are not fetched during intake."
+                phase={59}
+              />
+              {materialLimitExceeded && (
+                <p className={styles.limitWarning} role="alert" aria-label="Too much slop for one Artifact. Remove something.">
+                  <LexiconText text="Too much slop for one Artifact. Remove something." phase={61} semantic={false} />
+                </p>
+              )}
             </div>
 
             <div>
-              <label htmlFor="title">Name it · optional</label>
+              <label htmlFor="title"><LexiconText text="Name it · optional" phase={67} /></label>
               <input id="title" name="title" maxLength={100} placeholder="Leave blank and we'll use the material name" />
             </div>
 
             <details>
-              <summary>Text, link, provenance & details · optional</summary>
+              <summary><LexiconText text="Text, link, provenance & details · optional" phase={71} /></summary>
 
               <div>
-                <label htmlFor="textPart">Text material</label>
+                <label htmlFor="textPart"><LexiconText text="Text material" phase={73} /></label>
                 <textarea id="textPart" value={textPart} onChange={(event) => setTextPart(event.target.value)} maxLength={20000} placeholder="Paste text that is part of the Artifact." />
               </div>
 
               <div>
-                <label htmlFor="referenceUrl">Link material</label>
+                <label htmlFor="referenceUrl"><LexiconText text="Link material" phase={79} /></label>
                 <input id="referenceUrl" type="url" value={referenceUrl} onChange={(event) => setReferenceUrl(event.target.value)} maxLength={2000} placeholder="https://…" />
               </div>
 
               <div>
-                <label htmlFor="summary">Description</label>
+                <label htmlFor="summary"><LexiconText text="Description" phase={83} /></label>
                 <textarea id="summary" name="summary" minLength={10} maxLength={600} placeholder="Optional. What is this slop?" />
               </div>
 
               <div>
-                <label htmlFor="artifactDescription">Experience notes</label>
+                <label htmlFor="artifactDescription"><LexiconText text="Experience notes" phase={89} /></label>
                 <textarea id="artifactDescription" name="artifactDescription" minLength={20} maxLength={4000} placeholder="Optional. How should the whole Artifact behave or be experienced?" />
               </div>
 
               <div>
-                <label htmlFor="originClass">Origin</label>
+                <label htmlFor="originClass"><LexiconText text="Origin" phase={97} /></label>
                 <select id="originClass" name="originClass" defaultValue="ai_origin_unverified">
                   <option value="ai_origin_unverified">AI-made · details not supplied</option>
                   <option value="ai_directed">Human-directed AI</option>
@@ -549,31 +579,40 @@ export function SlopDrop() {
               </div>
 
               <div>
-                <label htmlFor="generator">Generator / model / tools</label>
+                <label htmlFor="generator"><LexiconText text="Generator / model / tools" phase={101} /></label>
                 <input id="generator" name="generator" maxLength={120} placeholder="Optional" />
               </div>
 
               <div>
-                <label htmlFor="humanRole">Human role</label>
+                <label htmlFor="humanRole"><LexiconText text="Human role" phase={103} /></label>
                 <textarea id="humanRole" name="humanRole" minLength={15} maxLength={800} placeholder="Optional" />
               </div>
 
               <div>
-                <label htmlFor="provenance">Provenance</label>
+                <label htmlFor="provenance"><LexiconText text="Provenance" phase={107} /></label>
                 <textarea id="provenance" name="provenance" minLength={30} maxLength={1600} placeholder="Optional prompts, seeds, sources, edits, run logs…" />
               </div>
             </details>
 
             <label className="check-row">
               <input name="submitAttestation" type="checkbox" required />
-              <span>AI-made. I can submit it. It does not contain prohibited material.</span>
+              <LexiconText text="AI-made. I can submit it. It does not contain prohibited material." phase={109} />
             </label>
 
             <div className="submission-actions">
-              <button className="submit-button" type="submit" disabled={busy || intakePaused || materialLimitExceeded || materialPartCount < 1}>
-                {busy ? "THROWING…" : intakePaused ? "TROUGH PAUSED" : "THROW IT IN"}
+              <button
+                className="submit-button"
+                type="submit"
+                disabled={busy || intakePaused || materialLimitExceeded || materialPartCount < 1}
+                aria-label={busy ? "Throwing" : intakePaused ? "Trough paused" : "Throw it in"}
+              >
+                <LexiconText text={busy ? "THROWING…" : intakePaused ? "TROUGH PAUSED" : "THROW IT IN"} phase={113} semantic={false} />
               </button>
-              {message && <p className="submission-note" role="status" aria-live="polite">{message}</p>}
+              {message && (
+                <p className="submission-note" role="status" aria-live="polite" aria-label={message}>
+                  <LexiconText text={message} phase={127} semantic={false} />
+                </p>
+              )}
             </div>
           </fieldset>
         </form>
