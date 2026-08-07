@@ -6,6 +6,33 @@ export type OriginClass =
   | "autonomous_ai_run"
   | "ai_origin_unverified";
 
+export type ArtifactPartMode =
+  | "image"
+  | "video"
+  | "audio"
+  | "text"
+  | "document"
+  | "code"
+  | "data"
+  | "model3d"
+  | "website"
+  | "simulation"
+  | "other";
+
+export type ArtifactPart = {
+  id: string;
+  position: number;
+  partKind: "file" | "text" | "reference";
+  mode: ArtifactPartMode;
+  label?: string;
+  filename?: string;
+  mimeType?: string;
+  byteSize?: number;
+  text?: string;
+  referenceUrl?: string;
+  signedUrl?: string;
+};
+
 export type AiOrigin = {
   originClass: OriginClass;
   declaredByCreator: boolean;
@@ -31,6 +58,7 @@ export type FeedArtifact = {
   aiOrigin: AiOrigin;
   gradient: string;
   mediaUrl?: string;
+  parts?: ArtifactPart[];
   museumVotes?: number;
   slopVotes?: number;
   slopRank?: number;
