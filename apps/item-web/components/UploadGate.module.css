@@ -1,0 +1,159 @@
+.materialInput {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.materialPicker {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .2rem .75rem;
+  align-items: center;
+  margin: 0;
+  padding: .9rem;
+  border: 1px solid rgba(213,166,63,.36);
+  border-radius: .8rem;
+  background: linear-gradient(180deg, rgba(213,166,63,.09), rgba(213,166,63,.025));
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+}
+
+.materialPicker:hover,
+.dropZone[data-dragging="true"] .materialPicker {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(213,166,63,.15), rgba(213,166,63,.04));
+}
+
+.materialPicker:active {
+  transform: translateY(1px);
+}
+
+.materialInput:focus-visible + .materialPicker {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 3px;
+}
+
+.materialPicker[data-disabled="true"] {
+  opacity: .55;
+  cursor: wait;
+}
+
+.materialPlus {
+  grid-row: 1 / span 2;
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 1px solid rgba(213,166,63,.42);
+  border-radius: .65rem;
+  color: var(--gold-light);
+  font-size: 1.1rem;
+}
+
+.materialAction {
+  color: var(--text);
+  font-size: .9rem;
+  font-weight: 650;
+}
+
+.materialModes {
+  color: var(--muted);
+  font-size: .68rem;
+  line-height: 1.35;
+}
+
+.dropZone {
+  border-radius: .8rem;
+}
+
+.materialSummary {
+  display: flex;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-top: .5rem;
+  color: var(--muted);
+  font-size: .7rem;
+  line-height: 1.35;
+}
+
+.materialList {
+  display: grid;
+  gap: .4rem;
+  margin-top: .55rem;
+}
+
+.materialEmpty,
+.materialRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: .5rem;
+  align-items: center;
+  padding: .6rem .65rem;
+  border: 1px solid var(--line);
+  border-radius: .65rem;
+  color: var(--muted);
+  font-size: .72rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.materialEmpty {
+  grid-template-columns: auto 1fr;
+}
+
+.materialRow {
+  color: var(--gold-light);
+  border-color: rgba(213,166,63,.24);
+}
+
+.materialMeta {
+  display: block;
+  margin-top: .12rem;
+  color: var(--muted);
+  font-size: .66rem;
+}
+
+.removeMaterial {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #070707;
+  color: var(--muted);
+  padding: .3rem .5rem;
+  cursor: pointer;
+}
+
+.removeMaterial:hover,
+.removeMaterial:focus-visible {
+  border-color: rgba(255,255,255,.35);
+  color: var(--text);
+}
+
+.removeMaterial:disabled {
+  opacity: .45;
+  cursor: wait;
+}
+
+.limitWarning {
+  margin-top: .45rem;
+  color: var(--danger);
+  font-size: .7rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 430px) {
+  .materialPicker {
+    padding: .75rem;
+  }
+
+  .materialSummary {
+    display: grid;
+    gap: .15rem;
+  }
+}
