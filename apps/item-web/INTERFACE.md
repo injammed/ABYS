@@ -56,7 +56,7 @@ This mapping is enforced by the executable `verify:mode-duality` contract. A fut
 
 ## Primary Two-Mode Switch
 
-The product has two equal primary experiential modes:
+The product has two equal primary experiential modes. This is the permanent **50/50 switch law**:
 
 ```txt
 [ SLOP TROUGH 50% ][ AETIMM MUSEUM 50% ]
@@ -72,6 +72,25 @@ Neither mode is buried inside a generic five-button navigation bar. They receive
 Submit, About, Account, Search, Filters, accessibility, and creator tools remain secondary. They are essential utilities, not competing product modes.
 
 This hierarchy is enforced by the executable `verify:mode-switch` contract. Visual restyling may evolve indefinitely, but the two-mode hierarchy must not disappear accidentally.
+
+---
+
+## Public Voting Covenant
+
+The public artifact ballot is binary:
+
+```txt
+LEFT  = SLOP
+RIGHT = MUSEUM
+```
+
+One authenticated account has one active vote per Artifact. Choosing again replaces that account's prior vote; it does not create a second vote.
+
+Buttons and swipe gestures must resolve through the same persistence path. A deliberate left swipe votes Slop. A deliberate right swipe votes Museum. Vertical movement remains feed scrolling and must not accidentally become a vote.
+
+`Refine` is not a third public ballot choice. Refinement remains part of creator, curator, selection, and revision workflows.
+
+The interface may evolve visually, but the public vote remains a two-pole judgment unless this covenant and its executable voting contract are explicitly revised.
 
 ---
 
@@ -157,7 +176,7 @@ The persistent base layer:
 
 - continuously loading artifacts;
 - immediate media presentation;
-- Preserve / Refine / Slop judgment;
+- binary Slop / Museum judgment;
 - visible loading, empty, retry, and end-of-availability states;
 - stable scroll and deterministic pagination.
 
@@ -245,7 +264,7 @@ Every interface fold must measurably strengthen at least one primary without wea
 
 1. Feed-first root.
 2. Equal Slop Trough / Museum primary switch.
-3. One-handed artifact presentation and voting.
+3. One-handed artifact presentation and binary voting.
 4. Deterministic infinite loading and media prefetch.
 5. Visible vote culture and orthogonal Foam boards.
 6. Museum rooms, bounded spatial navigation, and artifact journey.
