@@ -5,13 +5,15 @@ const root = process.cwd();
 const intakePath = path.join(root, "components", "UploadGate.tsx");
 const curatorPath = path.join(root, "components", "CuratorQueue.tsx");
 const socialFeedPath = path.join(root, "lib", "social-feed.ts");
+const architecturePath = path.join(root, "ARTIFACT_ARCHITECTURE.md");
 const migration8Path = path.resolve(root, "..", "..", "supabase", "migrations", "008_universal_artifact_intake.sql");
 const migration9Path = path.resolve(root, "..", "..", "supabase", "migrations", "009_universal_artifact_review.sql");
 
-const [intake, curator, socialFeed, migration8, migration9] = await Promise.all([
+const [intake, curator, socialFeed, architecture, migration8, migration9] = await Promise.all([
   readFile(intakePath, "utf8"),
   readFile(curatorPath, "utf8"),
   readFile(socialFeedPath, "utf8"),
+  readFile(architecturePath, "utf8"),
   readFile(migration8Path, "utf8"),
   readFile(migration9Path, "utf8"),
 ]);
@@ -35,6 +37,17 @@ requirePattern("private artifact path namespace", /session\.user\.id.*artifactId
 requirePattern("rollback uploaded paths", /storage\.from\("artifact-media"\)\.remove\(uploadedPaths\)/, intake);
 requirePattern("mixed mode detection", /new Set\(parts\.map\(\(part\) => part\.mode\)\)/, intake);
 forbidPattern("image-only intake copy", /Choose an image to upload|AI-made image|JPEG, PNG, WebP, or GIF images/, intake);
+
+requirePattern("permanent artifact covenant", /## Permanent Artifact Covenant/, architecture);
+requirePattern("one artifact identity law", /Every Artifact has one identity/, architecture);
+requirePattern("ordered manifest law", /## Ordered Manifest/, architecture);
+requirePattern("true-nature architecture law", /## True-Nature Description/, architecture);
+requirePattern("simple case remains simple", /## Simple Case Must Stay Simple/, architecture);
+requirePattern("storage is not execution", /UPLOAD ≠ EXECUTE/, architecture);
+requirePattern("one lifecycle law", /## One Lifecycle/, architecture);
+requirePattern("feed consumes artifacts", /The Slop Feed consumes Artifacts, not images/, architecture);
+requirePattern("new-mode extension rule", /How does this mode become a part of an Artifact safely\?/, architecture);
+forbidPattern("architectural image requirement", /Every Artifact must contain an image/, architecture);
 
 requirePattern("artifact description column", /artifact_description text/, migration8);
 requirePattern("artifact modes column", /artifact_modes text\[\]/, migration8);
@@ -68,4 +81,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal artifact intake PASS: one artifact can bind multiple inert modes into private quarantine, curators review the complete manifest, and first publication enters Unjudged without requiring an image.");
+console.log("Universal artifact intake PASS: one artifact can bind multiple inert modes into private quarantine, curators review the complete manifest, first publication enters Unjudged without requiring an image, and the architecture covenant remains intact.");
