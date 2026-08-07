@@ -15,10 +15,13 @@ const [migration, museumClient, collection, page, curator, architecture] = await
 for (const [label, pattern, source] of [
   ["Museum control table", /create table if not exists public\.museum_control/, migration],
   ["vote-paced accession cadence", /museum_votes_per_accession integer not null default 100/, migration],
+  ["minimum crowd evidence", /minimum_candidate_museum_votes integer not null default 10/, migration],
+  ["bounded accessions per vote transaction", /unlocked_slots := least\([\s\S]*25\s*\);/, migration],
   ["internal-only Museum cadence config", /revoke all on public\.museum_control from public, anon, authenticated;/, migration],
   ["append-only accession table", /create table if not exists public\.museum_accessions/, migration],
   ["one accession per Artifact", /artifact_id uuid not null unique references public\.artifacts/, migration],
   ["highest Museum-voted candidate first", /order by\s+count\(votes\.artifact_id\) filter \(where votes\.judgment = 'preserve'\) desc,/, migration],
+  ["candidate crowd threshold enforced", /having count\(votes\.artifact_id\) filter \(where votes\.judgment = 'preserve'\) >= config\.minimum_candidate_museum_votes/, migration],
   ["Museum votes unlock slots", /floor\(total_museum_votes::numeric \/ config\.museum_votes_per_accession\)/, migration],
   ["public vote trigger only refreshes on Museum", /if new\.judgment = 'preserve'/, migration],
   ["public cannot execute internal accession refresh", /revoke all on function public\.refresh_museum_accessions\(\) from public, anon, authenticated;/, migration],
@@ -45,4 +48,4 @@ assert.ok(
   "Museum cadence configuration must not be client-readable or client-writable.",
 );
 
-console.log("Museum accession PASS: ordinary Artifacts stay public, community Museum votes pace immutable accessions, the most Museum-voted unaccessioned work receives the next slot, public voting cannot deaccession it, cadence configuration stays internal, and exceptional withdrawal preserves a tombstone.");
+console.log("Museum accession PASS: ordinary Artifacts stay public, community Museum votes pace immutable accessions, candidate admission requires crowd evidence, each refresh is bounded, the most Museum-voted unaccessioned work receives the next slot, public voting cannot deaccession it, and exceptional withdrawal preserves a tombstone.");
