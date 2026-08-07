@@ -52,13 +52,14 @@
 
 .room {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: clamp(1.1rem, 3vw, 2.2rem);
   align-items: start;
   perspective: 1400px;
 }
 
 .case {
+  grid-column: span 2;
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,.13);
@@ -82,6 +83,70 @@
   mix-blend-mode: screen;
 }
 
+.pedestalCase {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(18rem, .55fr);
+  min-height: 40rem;
+  border-color: rgba(255,226,154,.3);
+  background:
+    radial-gradient(circle at 42% 35%, rgba(213,166,63,.09), transparent 30rem),
+    linear-gradient(145deg, rgba(255,255,255,.04), rgba(213,166,63,.025)),
+    #060606;
+  box-shadow:
+    0 55px 150px rgba(0,0,0,.72),
+    0 0 70px rgba(213,166,63,.05),
+    inset 0 1px 0 rgba(255,255,255,.09);
+}
+
+.pedestalCase .objectStage {
+  min-height: 40rem;
+  border-right: 1px solid rgba(255,255,255,.09);
+  border-bottom: 0;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgba(255,226,154,.16), rgba(213,166,63,.035) 24%, transparent 52%),
+    linear-gradient(180deg, #0c0b09, #030303);
+}
+
+.pedestalCase .objectStage::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 7%;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: rgba(213,166,63,.12);
+  filter: blur(12px);
+}
+
+.pedestalCase .plaque {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.pedestalCase .plaque h2 {
+  font-size: clamp(2.35rem, 6vw, 4.7rem);
+}
+
+.wallCase {
+  grid-column: span 2;
+  border-color: rgba(213,166,63,.22);
+  box-shadow:
+    0 42px 120px rgba(0,0,0,.62),
+    0 0 36px rgba(213,166,63,.035),
+    inset 0 1px 0 rgba(255,255,255,.07);
+}
+
+.wallCase .objectStage {
+  min-height: 30rem;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(213,166,63,.15), transparent 36%),
+    linear-gradient(180deg, #0b0a08, #040404);
+}
+
 .objectStage {
   position: relative;
   display: grid;
@@ -95,11 +160,17 @@
 }
 
 .objectStage img {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   max-height: 34rem;
   object-fit: contain;
   filter: drop-shadow(0 28px 32px rgba(0,0,0,.55));
+}
+
+.pedestalCase .objectStage img {
+  max-height: 45rem;
 }
 
 .noPreview {
@@ -115,10 +186,6 @@
   font-family: Georgia, serif;
   text-align: center;
   transform: rotate(45deg) scale(.72);
-}
-
-.noPreview::first-line {
-  transform: rotate(-45deg);
 }
 
 .plaque {
@@ -162,6 +229,29 @@
   text-transform: uppercase;
 }
 
+@media (max-width: 920px) {
+  .room {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .case,
+  .wallCase {
+    grid-column: span 1;
+  }
+
+  .pedestalCase {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .pedestalCase .objectStage {
+    min-height: 34rem;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255,255,255,.09);
+  }
+}
+
 @media (max-width: 600px) {
   .collection {
     width: calc(100% - 1rem);
@@ -171,8 +261,20 @@
     grid-template-columns: 1fr;
   }
 
-  .objectStage {
+  .case,
+  .wallCase,
+  .pedestalCase {
+    grid-column: 1;
+  }
+
+  .objectStage,
+  .wallCase .objectStage,
+  .pedestalCase .objectStage {
     min-height: 22rem;
+  }
+
+  .pedestalCase .plaque h2 {
+    font-size: clamp(2rem, 10vw, 3.5rem);
   }
 }
 
