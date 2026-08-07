@@ -94,6 +94,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:throw-it-in
 
+      - name: Verify machine-first translation surface
+        working-directory: apps/item-web
+        run: npm run verify:machine-gloss
+
       - name: Verify universal Artifact runtime
         working-directory: apps/item-web
         run: npm run verify:runtime
