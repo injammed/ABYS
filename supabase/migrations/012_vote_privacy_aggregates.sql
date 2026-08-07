@@ -1,24 +1,12 @@
--- AETIMM / SLOP TROUGH vote privacy hardening
--- Apply after the social beta schema and the one-click publication fold.
+-- AETIMM / SLOP TROUGH vote aggregate compatibility stage
+-- Apply before deploying the client that consumes aggregate vote counts.
 --
--- Security law:
---   public sees aggregate signal
---   an authenticated account sees its own judgment
---   nobody sees another account's raw vote row
+-- This migration is intentionally additive. It creates the safe aggregate RPC
+-- while leaving the legacy raw-vote read policy untouched for the brief client
+-- cutover window. Migration 013 removes that legacy access after the matching
+-- web client is confirmed live.
 
 begin;
-
--- Raw vote rows contain a stable voter UUID and must not be a public dataset.
-drop policy if exists "votes are publicly readable" on public.artifact_votes;
-drop policy if exists "users read their own votes" on public.artifact_votes;
-
-create policy "users read their own votes"
-  on public.artifact_votes for select
-  to authenticated
-  using (auth.uid() = voter_id);
-
-revoke select on public.artifact_votes from anon, authenticated;
-grant select (artifact_id, voter_id, judgment) on public.artifact_votes to authenticated;
 
 create or replace function public.get_artifact_vote_aggregates(
   p_artifact_ids uuid[]
