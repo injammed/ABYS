@@ -19,11 +19,11 @@ ONE INTAKE
 → PRIVATE ATOMIC STAGING
 → PUBLIC UNJUDGED
 → SLOP / MUSEUM JUDGMENT
-→ LATER SELECTION / PRESERVATION
-→ MUSEUM PRESENTATION
+→ VOTE-PACED ACCESSION
+→ PERMANENT MUSEUM COLLECTION
 ```
 
-Exceptional moderation, abuse, integrity, or technical failures may hold an Artifact before or after publication. Exceptional holds do not redefine the ordinary path.
+Exceptional moderation, abuse, integrity, legal, or technical failures may hold an Artifact before or after publication. Exceptional holds do not redefine the ordinary path and are not the Museum-admission mechanism.
 
 The complexity belongs to the Artifact and the machinery underneath it—not to modality-specific product silos and not to more buttons.
 
@@ -54,7 +54,7 @@ I have slop
 → THROW IT IN
 ```
 
-Provenance, advanced descriptions, tool stacks, manifests, runtime details, security controls, storage, moderation, and publication evidence remain available underneath or behind progressive disclosure.
+Provenance, advanced descriptions, tool stacks, manifests, runtime details, security controls, storage, moderation, and preservation evidence remain available underneath or behind progressive disclosure.
 
 ---
 
@@ -77,7 +77,7 @@ Artifact
 ├── lifecycle state
 ├── revision lineage
 ├── judgment evidence
-└── selection / Museum evidence
+└── Museum accession evidence
 ```
 
 A file is not an Artifact merely because it was uploaded. A file is a **part** of an Artifact.
@@ -225,14 +225,16 @@ submit
 → private atomic storage + manifest staging
 → server attestation / intake checks
 → public Unjudged
-→ public judgment
-→ later selection / preservation
-→ Museum presentation
+→ public Slop / Museum judgment
+→ Museum votes accumulate
+→ accession slot unlocks
+→ highest-Museum-voted unaccessioned Artifact is accessioned
+→ permanent Museum presentation
 ```
 
-The private staging step exists so half-built Artifacts cannot leak into public view. When automatic Unjudged publication is enabled, staging and promotion occur within the same trusted submission transaction.
+The private staging step exists only so half-built Artifacts cannot leak into public view. When automatic Unjudged publication is enabled, staging and promotion occur inside the same trusted submission transaction and are experienced by the creator as one action.
 
-Moderation, reports, technical failures, abuse controls, legal obligations, or provenance concerns may route an Artifact into an exceptional private hold. Curators remain available for those exceptions and for later Museum selection; they are not the ordinary feed gate.
+A persisted `quarantine` row is therefore **exceptional state**, not the ordinary lifecycle. Reports, technical failures, abuse controls, legal obligations, provenance concerns, or deliberate revision may create a private hold. Those holds are reviewed separately and never function as a Museum waiting room.
 
 Neither complexity, technical sophistication, creator identity, nor Artifact mode permits direct upload into Museum presentation.
 
@@ -246,13 +248,13 @@ The public ballot has exactly two active choices:
 ← SLOP        MUSEUM →
 ```
 
-The database may retain the historical internal spelling `preserve` for Museum compatibility, but the public concept is Museum.
+The database retains the internal spelling `preserve` for Museum compatibility, but the public concept is Museum.
 
 For each `(artifact_id, voter_id)` there is at most one active judgment. Choosing the other side replaces the prior judgment. A person may also simply continue scrolling and never vote.
 
 **No vote is silence.** It is not a neutral score and it does not add evidence.
 
-Museum and Slop are independent upward accumulators:
+Museum and Slop are independent signals:
 
 ```txt
 Museum votes:  8,421
@@ -264,14 +266,12 @@ There is no subtraction, net score, ratio, zero-sum normalization, or requiremen
 An Artifact may therefore be simultaneously:
 
 ```txt
-MUSEUM-ADMITTED
+MUSEUM-ACCESSIONED
 and
 TOP SLOP #1
 ```
 
 That is valid evidence, not an inconsistent state.
-
-Legacy `refine` judgments are historical neutral rows. New public voting does not create them.
 
 ---
 
@@ -299,31 +299,90 @@ When an image exists it may act as a lead visual preview. When no compatible pre
 
 The voting identity attaches to the Artifact ID. All parts of the same Artifact share that judgment surface.
 
-In the trough, preservation and ridicule may be shown together. A Museum-admitted Artifact can still wear a `TOP SLOP #N` scar in the feed.
+In the trough, preservation and ridicule may be shown together. A Museum-accessioned Artifact can still wear a `TOP SLOP #N` scar and can continue receiving either public judgment.
 
 ---
 
-## Museum Law
+## Museum Accession Law
 
-The Museum admits and presents Artifacts.
+The Museum does not maintain a live popularity leaderboard. It maintains **accessions**.
 
-Museum admission does **not** erase Slop votes, Slop rank history, or contradictory public judgment. It changes presentation and preservation treatment.
+The first automatic admission rule is deliberately simple and hidden beneath the interface:
 
-The Museum itself is not a product leaderboard. It should use rooms, placement, accession, cases, spatial hierarchy, chronology, thematic relationships, provenance, and curatorial presentation rather than `#1`, `#2`, `#3` competitive ranking.
+```txt
+community Museum votes accrue across the trough
+→ every 100 active Museum votes unlock one accession slot
+→ choose the highest-Museum-voted Artifact not already accessioned
+→ issue the next permanent accession number
+```
 
-A Museum work can therefore be an image, mixed-media work, proof, codebase, simulation, model, document, sound work, dataset, interactive system, or a future mode not yet invented.
+`100` is operational configuration, not a user-facing concept. It may be tuned without changing the ballot or teaching users a new workflow.
 
-Museum architecture may create modality-specific rooms and presentation techniques, but admission evidence remains attached to the same Artifact identity and lineage.
+The purpose of the global cadence is to make the Museum grow slower than the trough while still allowing public judgment—not a curator queue—to drive ordinary machine-content admission.
+
+Museum votes cast for already-accessioned work continue to exist. They do not eject anything, and they may contribute to future accession capacity.
+
+An accession records the Artifact identity, accession number, admission time, and vote evidence at admission. The accession record is the institutional source of truth. Legacy `artifacts.lane = 'aetimm'` may mirror that state for older presentation code but must never become the preservation authority.
 
 ---
 
-## Curator Review Law
+## Museum Permanence and Withdrawal Law
 
-Curators review the Artifact, not merely its lead preview.
+Once accessioned, an Artifact cannot be removed, replaced, or deaccessioned by public voting.
 
-Curator machinery serves exceptional holds, abuse/provenance review, restoration, and later preservation/selection decisions. It must expose whole-work description, detected modes, complete ordered manifest, safe previews where available, provenance, human role, attestations, and lifecycle history.
+A later wave of Slop votes cannot eject it. A creator cannot replace the accession with a different Artifact. A different Artifact receiving more Museum votes does not displace it.
+
+Real institutions still require an exceptional response path for illegality, safety, court orders, rights failures, corrupted evidence, or severe integrity problems. Therefore AETIMM permits **administrative withdrawal**, not deletion:
+
+```txt
+ACCESSION
+→ active Museum presentation
+→ exceptional admin withdrawal, with reason
+→ presentation removed
+→ accession record remains as tombstone
+```
+
+Withdrawal requires authenticated administrative authority and a recorded reason. Ordinary users and ordinary votes have no path to this operation.
+
+The Museum collection itself displays accessions by institutional identity and placement—not by competitive rank. Accession number is an archival address, not a score.
+
+---
+
+## Museum Presentation Law
+
+Museum treatment and trough treatment are deliberately different views of the same Artifact.
+
+The trough may be rough, temporal, ranked, scarred, and disposable-looking.
+
+The Museum should use cases, rooms, shelves, accession plaques, spatial hierarchy, chronology, thematic relationships, provenance, and material-like presentation. It should feel as though machine-made work has crossed from disposable output into an institutional collection.
+
+A Museum work can be an image, mixed-media work, proof, codebase, simulation, model, document, sound work, dataset, interactive system, or a future mode not yet invented.
+
+Museum architecture may create modality-specific presentation techniques, but accession evidence remains attached to the same Artifact identity and lineage.
+
+---
+
+## Exceptional Hold Law
+
+A private hold is not an aspirational state and not a Museum audition.
+
+It exists only when ordinary immediate publication cannot safely or correctly proceed, or when an already-public Artifact requires exceptional intervention.
+
+The curator/admin hold surface must therefore say what it is: an **exception queue** for safety, legal, integrity, provenance, revision, or technical cases.
+
+Releasing a pre-publication hold returns the Artifact to public Unjudged. It never directly creates a Museum accession.
+
+---
+
+## Curator / Administrative Review Law
+
+Human curator/admin machinery remains valuable for the exceptional cases where care, judgment, legal compliance, restoration, provenance analysis, or institutional withdrawal is actually needed.
+
+That machinery reviews the Artifact, not merely its lead preview, and must expose whole-work description, detected modes, complete ordered manifest, safe previews where available, provenance, human role, attestations, lifecycle history, and relevant accession evidence.
 
 A renderer being unavailable must be represented as an unavailable renderer—not as an absent part.
+
+Ordinary machine-content Museum admission does not wait for a human curator.
 
 ---
 
@@ -338,12 +397,12 @@ Artifact identity
 ├── revision 1
 ├── revision 2
 ├── revision 3
-└── selected / Museum revision
+└── accession evidence
 ```
 
 Replacing a file, editing text, changing order, or updating provenance must not erase prior evidence once versioned revision support is active.
 
-Artifact Engine v1 establishes the envelope; later folds deepen versioning without changing the identity primitive.
+A Museum accession must eventually pin an explicit preserved revision/runtime snapshot. Until full revision snapshots exist, approved public Artifacts should remain effectively immutable through ordinary creator controls.
 
 ---
 
@@ -361,9 +420,14 @@ Do not:
 - silently unpack archives or run simulations;
 - hide manifest parts that lack a rich renderer;
 - turn Museum and Slop into a subtractive net score;
-- exclude Museum-admitted work from Top Slop eligibility;
+- exclude Museum-accessioned work from Top Slop eligibility;
 - use mutable Slop rank as the canonical infinite-scroll cursor;
 - turn Museum presentation into a ranked product leaderboard;
+- make Museum candidacy private;
+- require ordinary uploads to wait for curator publication;
+- allow public votes to delete, replace, or withdraw a Museum accession;
+- delete accession history during exceptional withdrawal;
+- treat `artifacts.lane` as more authoritative than the accession registry;
 - let a future UI rename turn the underlying Artifact model back into `image`.
 
 ---
