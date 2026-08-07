@@ -16,7 +16,10 @@ alter table public.artifacts
   add column if not exists artifact_description text;
 
 update public.artifacts
-set artifact_description = summary
+set artifact_description = case
+  when char_length(summary) >= 20 then summary
+  else summary || ' · legacy artifact description'
+end
 where artifact_description is null;
 
 alter table public.artifacts
@@ -167,8 +170,7 @@ declare
   uid uuid := auth.uid();
   part jsonb;
   part_count integer;
-  first_file_path text;
-  first_mode text;
+  image_preview_path text;
   normalized_modes text[];
 begin
   if uid is null then
@@ -204,6 +206,10 @@ begin
     raise exception 'ARTIFACT_MODES_INVALID';
   end if;
 
+  if char_length(trim(coalesce(p_artifact_description, ''))) < 20 then
+    raise exception 'ARTIFACT_DESCRIPTION_REQUIRED';
+  end if;
+
   -- Validate every file path belongs to the caller and this artifact before
   -- any database rows are created. URLs remain references; they are not fetched.
   for part in select value from jsonb_array_elements(p_parts)
@@ -225,12 +231,14 @@ begin
     end if;
   end loop;
 
-  select
-    part ->> 'storage_path',
-    part ->> 'mode'
-  into first_file_path, first_mode
+  -- Legacy feed rendering uses artifacts.media_path as an image preview. Keep
+  -- that field image-only; non-image and text-only artifacts render as rich
+  -- textual cards until later modality renderers are folded in.
+  select part ->> 'storage_path'
+  into image_preview_path
   from jsonb_array_elements(p_parts) as part
   where part ->> 'part_kind' = 'file'
+    and part ->> 'mode' = 'image'
   order by coalesce((part ->> 'position')::integer, 0)
   limit 1;
 
@@ -264,7 +272,7 @@ begin
     trim(p_generator),
     trim(p_human_role),
     trim(p_provenance_note),
-    first_file_path,
+    image_preview_path,
     case
       when cardinality(normalized_modes) > 1 then 'mixed'
       else normalized_modes[1]
