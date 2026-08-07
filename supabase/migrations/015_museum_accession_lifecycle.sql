@@ -12,6 +12,10 @@
 --   accession is append-only evidence
 --   exceptional withdrawal is administrative, reasoned, and tombstoned
 --   withdrawal never deletes the accession record
+--
+-- Compatibility law:
+--   museum_accessions is the source of truth
+--   artifacts.lane='aetimm' is only a legacy presentation mirror
 
 begin;
 
@@ -201,6 +205,13 @@ begin
     )
     on conflict (artifact_id) do nothing;
 
+    -- Legacy lane is a projection for existing feed presentation only. The
+    -- accession row above is the permanent institutional record.
+    update public.artifacts
+    set lane = 'aetimm'
+    where id = candidate_id
+      and status = 'approved';
+
     unlocked_slots := unlocked_slots - 1;
     candidate_id := null;
   end loop;
@@ -276,6 +287,15 @@ begin
       errcode = 'P0001',
       message = 'ACTIVE_MUSEUM_ACCESSION_NOT_FOUND';
   end if;
+
+  -- Withdrawal is exceptional administrative action, never a public vote. The
+  -- accession row remains as a tombstone; only the legacy presentation mirror
+  -- returns to Unjudged.
+  update public.artifacts
+  set lane = 'unjudged'
+  where id = p_artifact_id
+    and status = 'approved'
+    and lane = 'aetimm';
 end;
 $$;
 
