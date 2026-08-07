@@ -73,6 +73,10 @@
     linear-gradient(180deg, rgba(213,166,63,.016), rgba(0,0,0,.06));
 }
 
+:global(.feed-first-page[data-language-contract="machine-first-gloss-v1"] .feed-rule) {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gloss { transition: none; }
 }
