@@ -88,6 +88,7 @@ export function MachineGloss({ translations, className = "", density = "dense" }
     <span
       className={`${styles.gloss} ${styles[density]} ${className}`.trim()}
       data-machine-gloss="character-semantic-broadcast-v3"
+      data-layout-contract="fixed-translation-box-v1"
       data-language={language}
       data-cycle-ms="500"
       role="note"
