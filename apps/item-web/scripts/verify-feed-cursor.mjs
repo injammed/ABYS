@@ -14,11 +14,16 @@ for (const required of [
   '.order("published_at", { ascending: false })',
   '.order("id", { ascending: false })',
   ".limit(limit + 1)",
-  "query.or(feedCursorFilter(decodeFeedCursor(options.cursor)))",
   "cursorForRow(lastRow)",
 ]) {
   assert.ok(feedSource.includes(required), `Missing composite pagination contract: ${required}`);
 }
+
+const cursorApplications = feedSource.match(/\.or\(feedCursorFilter\(decodeFeedCursor\(options\.cursor\)\)\)/g) ?? [];
+assert.ok(
+  cursorApplications.length >= 1,
+  "Missing composite pagination contract: a feed query must apply feedCursorFilter(decodeFeedCursor(options.cursor)).",
+);
 
 for (const required of [
   "published_at.lt.${cursor.publishedAt}",
@@ -41,18 +46,13 @@ const rows = [
 ];
 
 function compareDescending(left, right) {
-  if (left.publishedAt !== right.publishedAt) {
-    return left.publishedAt > right.publishedAt ? -1 : 1;
-  }
+  if (left.publishedAt !== right.publishedAt) return left.publishedAt > right.publishedAt ? -1 : 1;
   if (left.id === right.id) return 0;
   return left.id > right.id ? -1 : 1;
 }
 
 function isAfterCursor(row, cursor) {
-  return (
-    row.publishedAt < cursor.publishedAt ||
-    (row.publishedAt === cursor.publishedAt && row.id < cursor.id)
-  );
+  return row.publishedAt < cursor.publishedAt || (row.publishedAt === cursor.publishedAt && row.id < cursor.id);
 }
 
 function loadFixturePage({ cursor = null, lane = "all", limit = 3 } = {}) {
@@ -65,9 +65,7 @@ function loadFixturePage({ cursor = null, lane = "all", limit = 3 } = {}) {
   const last = pageRows.at(-1);
   return {
     rows: pageRows,
-    nextCursor: fetched.length > limit && last
-      ? { publishedAt: last.publishedAt, id: last.id }
-      : null,
+    nextCursor: fetched.length > limit && last ? { publishedAt: last.publishedAt, id: last.id } : null,
   };
 }
 
@@ -89,15 +87,10 @@ assert.equal(new Set(allIds).size, rows.length, "Every fixture artifact must app
 const unjudgedRows = rows.filter((row) => row.lane === "unjudged");
 const unjudgedIds = collectAll("unjudged");
 assert.equal(unjudgedIds.length, unjudgedRows.length, "Lane pagination must retain every eligible artifact.");
-assert.ok(
-  unjudgedIds.every((id) => unjudgedRows.some((row) => row.id === id)),
-  "Lane pagination must not cross-contaminate lanes.",
-);
+assert.ok(unjudgedIds.every((id) => unjudgedRows.some((row) => row.id === id)), "Lane pagination must not cross-contaminate lanes.");
 
-const finalPage = loadFixturePage({
-  cursor: { publishedAt: olderTimestamp, id: "00000000-0000-0000-0000-000000000098" },
-});
+const finalPage = loadFixturePage({ cursor: { publishedAt: olderTimestamp, id: "00000000-0000-0000-0000-000000000098" } });
 assert.deepEqual(finalPage.rows, [], "A cursor beyond the last row must return an empty final page.");
 assert.equal(finalPage.nextCursor, null, "An empty final page must terminate pagination.");
 
-console.log("Composite feed cursor contract verified across tied timestamps, lanes, and final-page termination.");
+console.log("Composite feed cursor contract verified across tied timestamps, lanes, refactors, and final-page termination.");
