@@ -16,6 +16,7 @@ import {
   replaceHydratedVotes,
   shouldApplyVoteHydration,
 } from "@/lib/vote-state";
+import styles from "./ArtifactFeed.module.css";
 
 type VoteRequestState = {
   state: "saving" | "saved" | "error";
@@ -317,11 +318,11 @@ export function ArtifactFeed() {
                 )}
                 <div className="visual-noise" />
 
-                <div className="artifact-status-marks" aria-label="Artifact status">
-                  {creatorPreview && <span className="private-mark">PRIVATE HOLD</span>}
-                  {museumAdmitted && <span className="museum-mark">MUSEUM</span>}
+                <div className={styles.statusMarks} aria-label="Artifact status">
+                  {creatorPreview && <span className={styles.privateMark}>PRIVATE HOLD</span>}
+                  {museumAdmitted && <span className={styles.museumMark}>MUSEUM</span>}
                   {!creatorPreview && artifact.slopRank && (
-                    <span className="slop-rank-scar" aria-label={`Top Slop rank ${artifact.slopRank}`}>
+                    <span className={styles.slopRankScar} aria-label={`Top Slop rank ${artifact.slopRank}`}>
                       TOP SLOP #{artifact.slopRank}
                     </span>
                   )}
@@ -343,7 +344,7 @@ export function ArtifactFeed() {
                   </p>
                 )}
 
-                <details className="artifact-details">
+                <details className={styles.details}>
                   <summary>Provenance</summary>
                   <div className="origin-strip">
                     <span className={autonomous ? "origin-pill autonomous" : "origin-pill"}>
