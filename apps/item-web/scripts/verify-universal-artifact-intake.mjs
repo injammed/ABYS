@@ -9,8 +9,9 @@ const socialFeedPath = path.join(root, "lib", "social-feed.ts");
 const architecturePath = path.join(root, "ARTIFACT_ARCHITECTURE.md");
 const migration8Path = path.resolve(root, "..", "..", "supabase", "migrations", "008_universal_artifact_intake.sql");
 const migration9Path = path.resolve(root, "..", "..", "supabase", "migrations", "009_universal_artifact_review.sql");
+const migration10Path = path.resolve(root, "..", "..", "supabase", "migrations", "010_security_definer_lockdown.sql");
 
-const [intake, intakeStyles, curator, socialFeed, architecture, migration8, migration9] = await Promise.all([
+const [intake, intakeStyles, curator, socialFeed, architecture, migration8, migration9, migration10] = await Promise.all([
   readFile(intakePath, "utf8"),
   readFile(intakeStylesPath, "utf8"),
   readFile(curatorPath, "utf8"),
@@ -18,6 +19,7 @@ const [intake, intakeStyles, curator, socialFeed, architecture, migration8, migr
   readFile(architecturePath, "utf8"),
   readFile(migration8Path, "utf8"),
   readFile(migration9Path, "utf8"),
+  readFile(migration10Path, "utf8"),
 ]);
 
 const failures = [];
@@ -102,6 +104,17 @@ requirePattern("archive support", /application\/zip/, migration8);
 requirePattern("curator manifest access", /curators read all artifact parts/, migration9);
 requirePattern("first publication Unjudged", /INITIAL_PUBLICATION_REQUIRES_UNJUDGED/, migration9);
 requirePattern("approval lane hardcoded", /lane = 'unjudged'/, migration9);
+
+// Database privilege hardening: explicit role grants beat implicit/default ACL assumptions.
+requirePattern("explicit anon revoke for intake RPC", /revoke all on function public\.create_quarantined_artifact\([\s\S]*\) from public, anon, authenticated;/, migration10);
+requirePattern("authenticated-only intake RPC restore", /grant execute on function public\.create_quarantined_artifact\([\s\S]*\) to authenticated;/, migration10);
+requirePattern("explicit anon revoke for curator RPC", /revoke all on function public\.review_artifact\(uuid,text,text,text\) from public, anon, authenticated;/, migration10);
+requirePattern("authenticated-only curator RPC restore", /grant execute on function public\.review_artifact\(uuid,text,text,text\) to authenticated;/, migration10);
+requirePattern("internal trigger helper lockdown", /revoke all on function public\.record_artifact_submission\(\) from public, anon, authenticated;/, migration10);
+requirePattern("intake trigger helper lockdown", /revoke all on function public\.enforce_artifact_intake_limits\(\) from public, anon, authenticated;/, migration10);
+requirePattern("auth trigger helper lockdown", /revoke all on function public\.handle_new_user\(\) from public, anon, authenticated;/, migration10);
+requirePattern("touch trigger search path pin", /alter function public\.touch_updated_at\(\)[\s\S]*set search_path = public, pg_temp;/, migration10);
+
 requirePattern("curator UI Unjudged action", /Approve → publish Unjudged/, curator);
 requirePattern("curator true nature review", /True nature/, curator);
 requirePattern("curator manifest review", /ARTIFACT MANIFEST/, curator);
@@ -119,4 +132,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal Artifact intake PASS: All Slop Welcome uses one hardened material picker, all selection paths share bounded validation, duplicate/size/count/double-submit failures are guarded, code stays inert, URLs stay unfetched, private quarantine remains the boundary, and every approved Artifact targets the same infinite feed.");
+console.log("Universal Artifact intake PASS: All Slop Welcome uses one hardened material picker, all selection paths share bounded validation, database RPC grants are explicit and least-privilege, code stays inert, URLs stay unfetched, private quarantine remains the boundary, and every approved Artifact targets the same infinite feed.");
