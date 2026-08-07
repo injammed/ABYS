@@ -1,8 +1,9 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, DragEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
+import styles from "./UploadGate.module.css";
 
 const MAX_FILE_BYTES = 50 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 100 * 1024 * 1024;
@@ -27,6 +28,21 @@ const FILE_ACCEPT = [
   "model/gltf+json", "model/gltf-binary", "application/octet-stream",
   ...ACCEPTED_EXTENSIONS,
 ].join(",");
+
+const ACCEPTED_MIME_TYPES = new Set([
+  "application/pdf",
+  "application/json",
+  "application/javascript",
+  "application/typescript",
+  "application/xml",
+  "application/zip",
+  "application/x-zip-compressed",
+  "application/gzip",
+  "application/x-tar",
+  "model/gltf+json",
+  "model/gltf-binary",
+  "application/octet-stream",
+]);
 
 type ArtifactMode =
   | "image"
@@ -114,17 +130,37 @@ function safeExtension(file: File): string {
   return extensionOf(file.name).replace(/[^.a-z0-9]/g, "").slice(0, 12) || ".bin";
 }
 
+function fileIdentity(file: File): string {
+  return `${file.name}\u0000${file.size}\u0000${file.lastModified}`;
+}
+
+function fileIsAccepted(file: File): boolean {
+  const extension = extensionOf(file.name);
+  const mime = normalizedMime(file);
+  return ACCEPTED_EXTENSIONS.includes(extension)
+    || mime.startsWith("image/")
+    || mime.startsWith("video/")
+    || mime.startsWith("audio/")
+    || mime.startsWith("text/")
+    || ACCEPTED_MIME_TYPES.has(mime);
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(bytes >= 10 * 1024 * 1024 ? 0 : 1)} MB`;
+}
+
 function submissionErrorMessage(error: unknown): string {
   const raw = error instanceof Error ? error.message : String(error ?? "");
 
   if (raw.includes("INTAKE_CLOSED")) return "Public intake is temporarily paused. Existing private submissions remain safe.";
-  if (raw.includes("DAILY_SUBMISSION_LIMIT_REACHED")) return "Daily artifact limit reached. Try again after the rolling 24-hour window clears.";
+  if (raw.includes("DAILY_SUBMISSION_LIMIT_REACHED")) return "Daily Artifact limit reached. Try again after the rolling 24-hour window clears.";
   if (raw.includes("QUARANTINE_BACKLOG_LIMIT_REACHED")) return "Your private quarantine queue is full. Wait for review before submitting more.";
-  if (raw.includes("ARTIFACT_PART_COUNT_INVALID")) return "An artifact can contain between 1 and 12 parts in this fold.";
-  if (raw.includes("ARTIFACT_PART_STORAGE")) return "One uploaded file could not be attached to the artifact manifest. The uploaded files were rolled back where possible.";
-  if (raw.includes("ARTIFACT_MODES_INVALID")) return "One or more artifact modes are not supported yet.";
+  if (raw.includes("ARTIFACT_PART_COUNT_INVALID")) return "An Artifact can contain between 1 and 12 materials in this fold.";
+  if (raw.includes("ARTIFACT_PART_STORAGE")) return "One uploaded material could not be bound to the Artifact. Uploaded files were rolled back where possible.";
+  if (raw.includes("ARTIFACT_MODES_INVALID")) return "One or more Artifact materials are not supported yet.";
   if (raw.includes("INTAKE_IDENTITY_MISMATCH") || raw.includes("INTAKE_REQUIRES_PRIVATE_QUARANTINE")) return "Submission authorization failed. Sign out, sign back in, and retry.";
-  if (raw.toLowerCase().includes("row-level security")) return "Intake rejected this artifact. The queue may be paused or your account may have reached its limit.";
+  if (raw.toLowerCase().includes("row-level security")) return "Intake rejected this Artifact. The queue may be paused or your account may have reached its limit.";
 
   return raw || "Artifact submission failed.";
 }
@@ -138,6 +174,7 @@ export function UploadGate() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [textPart, setTextPart] = useState("");
   const [referenceUrl, setReferenceUrl] = useState("");
+  const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
     const client = getSupabaseBrowserClient();
@@ -165,11 +202,83 @@ export function UploadGate() {
     return [...modes];
   }, [referenceUrl, selectedFiles, textPart]);
 
+  const totalFileBytes = useMemo(
+    () => selectedFiles.reduce((sum, file) => sum + file.size, 0),
+    [selectedFiles],
+  );
+
+  const materialPartCount = selectedFiles.length + (textPart.trim() ? 1 : 0) + (referenceUrl.trim() ? 1 : 0);
+  const materialLimitExceeded = materialPartCount > MAX_PARTS || totalFileBytes > MAX_TOTAL_BYTES;
+
+  function validateIncomingFiles(incoming: File[]): void {
+    if (busy || incoming.length === 0) return;
+
+    const unsupported = incoming.find((file) => !fileIsAccepted(file));
+    if (unsupported) {
+      setMessage(`${unsupported.name} is not an accepted material type. Add it in a supported document, archive, code, data, media, or 3D format.`);
+      return;
+    }
+
+    const oversized = incoming.find((file) => file.size > MAX_FILE_BYTES);
+    if (oversized) {
+      setMessage(`${oversized.name} exceeds the 50 MB per-file limit.`);
+      return;
+    }
+
+    const existing = new Set(selectedFiles.map(fileIdentity));
+    const merged = [...selectedFiles];
+    let duplicateCount = 0;
+
+    for (const file of incoming) {
+      const key = fileIdentity(file);
+      if (existing.has(key)) {
+        duplicateCount += 1;
+        continue;
+      }
+      existing.add(key);
+      merged.push(file);
+    }
+
+    const nonFileParts = (textPart.trim() ? 1 : 0) + (referenceUrl.trim() ? 1 : 0);
+    if (merged.length + nonFileParts > MAX_PARTS) {
+      setMessage(`One Artifact can contain up to ${MAX_PARTS} total materials. Remove something before adding more.`);
+      return;
+    }
+
+    const mergedBytes = merged.reduce((sum, file) => sum + file.size, 0);
+    if (mergedBytes > MAX_TOTAL_BYTES) {
+      setMessage("Combined uploaded files would exceed the 100 MB Artifact limit.");
+      return;
+    }
+
+    setSelectedFiles(merged);
+    setMessage(duplicateCount ? `${duplicateCount} duplicate material${duplicateCount === 1 ? " was" : "s were"} skipped.` : null);
+  }
+
+  function handleFileInput(event: ChangeEvent<HTMLInputElement>): void {
+    validateIncomingFiles(Array.from(event.currentTarget.files ?? []));
+    event.currentTarget.value = "";
+  }
+
+  function handleDrop(event: DragEvent<HTMLDivElement>): void {
+    event.preventDefault();
+    setDragging(false);
+    validateIncomingFiles(Array.from(event.dataTransfer.files ?? []));
+  }
+
+  function removeSelectedFile(identity: string): void {
+    if (busy) return;
+    setSelectedFiles((current) => current.filter((file) => fileIdentity(file) !== identity));
+    setMessage(null);
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (busy) return;
+
     const client = getSupabaseBrowserClient();
     if (!client || !session) {
-      setMessage("Sign in before submitting an artifact.");
+      setMessage("Sign in before submitting an Artifact.");
       return;
     }
 
@@ -196,11 +305,17 @@ export function UploadGate() {
     const totalParts = files.length + (bodyText ? 1 : 0) + (url ? 1 : 0);
 
     if (totalParts < 1) {
-      setMessage("Add at least one file, text component, or reference URL.");
+      setMessage("Add at least one material, text component, or reference URL.");
       return;
     }
     if (totalParts > MAX_PARTS) {
-      setMessage(`This fold accepts up to ${MAX_PARTS} ordered parts per artifact.`);
+      setMessage(`One Artifact can contain up to ${MAX_PARTS} total materials.`);
+      return;
+    }
+
+    const unsupported = files.find((file) => !fileIsAccepted(file));
+    if (unsupported) {
+      setMessage(`${unsupported.name} is not an accepted material type.`);
       return;
     }
 
@@ -212,7 +327,7 @@ export function UploadGate() {
 
     const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
     if (totalBytes > MAX_TOTAL_BYTES) {
-      setMessage("Combined uploaded files exceed the 100 MB artifact limit.");
+      setMessage("Combined uploaded files exceed the 100 MB Artifact limit.");
       return;
     }
 
@@ -231,7 +346,7 @@ export function UploadGate() {
     const parts: ArtifactPartInput[] = [];
 
     setBusy(true);
-    setMessage("Creating artifact envelope…");
+    setMessage("Creating private Artifact envelope…");
 
     try {
       for (let index = 0; index < files.length; index += 1) {
@@ -240,7 +355,7 @@ export function UploadGate() {
         const mode = modeForFile(file);
         const storagePath = `${session.user.id}/${artifactId}/${String(index).padStart(2, "0")}-${crypto.randomUUID()}${safeExtension(file)}`;
 
-        setMessage(`Uploading part ${index + 1} of ${files.length} · ${file.name}`);
+        setMessage(`Uploading material ${index + 1} of ${files.length} · ${file.name}`);
         const { error: uploadError } = await client.storage
           .from("artifact-media")
           .upload(storagePath, file, {
@@ -284,7 +399,7 @@ export function UploadGate() {
       }
 
       const modes = [...new Set(parts.map((part) => part.mode))];
-      setMessage("Binding parts into one private artifact…");
+      setMessage("Binding materials into one private Artifact…");
 
       const { data: createdId, error: createError } = await client.rpc("create_quarantined_artifact", {
         p_artifact_id: artifactId,
@@ -307,7 +422,7 @@ export function UploadGate() {
       setSelectedFiles([]);
       setTextPart("");
       setReferenceUrl("");
-      setMessage(`Artifact ${String(createdId ?? artifactId)} submitted to private quarantine with ${parts.length} part${parts.length === 1 ? "" : "s"}.`);
+      setMessage(`Artifact ${String(createdId ?? artifactId)} submitted to private quarantine with ${parts.length} material${parts.length === 1 ? "" : "s"}.`);
       window.dispatchEvent(new CustomEvent("aetimm:submission-created", { detail: { artifactId } }));
     } catch (error) {
       if (uploadedPaths.length > 0) {
@@ -332,126 +447,41 @@ export function UploadGate() {
 
   return (
     <div className="upload-wrap">
-      <style>{`
-        .artifact-file-input {
-          position: absolute !important;
-          width: 1px !important;
-          height: 1px !important;
-          padding: 0 !important;
-          margin: -1px !important;
-          overflow: hidden !important;
-          clip: rect(0, 0, 0, 0) !important;
-          white-space: nowrap !important;
-          border: 0 !important;
-        }
-
-        .upload-panel .artifact-material-picker {
-          display: grid;
-          grid-template-columns: auto 1fr;
-          gap: .2rem .75rem;
-          align-items: center;
-          margin: 0;
-          padding: .85rem;
-          border: 1px solid rgba(213,166,63,.36);
-          border-radius: .75rem;
-          background: linear-gradient(180deg, rgba(213,166,63,.09), rgba(213,166,63,.025));
-          color: var(--text);
-          cursor: pointer;
-          transition: border-color 120ms ease, background 120ms ease;
-        }
-
-        .upload-panel .artifact-material-picker:hover {
-          border-color: var(--gold);
-          background: linear-gradient(180deg, rgba(213,166,63,.14), rgba(213,166,63,.035));
-        }
-
-        .artifact-file-input:focus-visible + .artifact-material-picker {
-          outline: 2px solid var(--gold-light);
-          outline-offset: 3px;
-        }
-
-        .artifact-material-picker[data-disabled="true"] {
-          opacity: .55;
-          cursor: wait;
-        }
-
-        .artifact-material-plus {
-          grid-row: 1 / span 2;
-          display: grid;
-          width: 2.25rem;
-          height: 2.25rem;
-          place-items: center;
-          border: 1px solid rgba(213,166,63,.42);
-          border-radius: .65rem;
-          color: var(--gold-light);
-          font-size: 1.1rem;
-        }
-
-        .artifact-material-action {
-          color: var(--text);
-          font-size: .88rem;
-          font-weight: 600;
-        }
-
-        .artifact-material-modes {
-          color: var(--muted);
-          font-size: .68rem;
-          line-height: 1.35;
-        }
-
-        .artifact-material-status {
-          display: flex;
-          gap: .45rem;
-          align-items: flex-start;
-          margin-top: .5rem;
-          padding: .55rem .65rem;
-          border: 1px solid var(--line);
-          border-radius: .65rem;
-          color: var(--muted);
-          font-size: .72rem;
-          line-height: 1.4;
-          overflow-wrap: anywhere;
-        }
-
-        .artifact-material-status.selected {
-          color: var(--gold-light);
-          border-color: rgba(213,166,63,.24);
-        }
-      `}</style>
-
       <button
         className="upload-trigger"
         type="button"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => !busy && setOpen((value) => !value)}
         aria-expanded={open}
+        aria-controls="artifact-intake-panel"
+        disabled={busy}
       >
         {open ? "Close artifact intake" : intakePaused ? "Intake paused" : "Submit artifact"}
       </button>
 
       {open && !session && (
-        <div className="upload-panel" role="status">
+        <div id="artifact-intake-panel" className="upload-panel" role="status">
           <p className="submission-note">Create an account or sign in before uploading.</p>
         </div>
       )}
 
       {open && session && intakePaused && (
-        <div className="upload-panel" role="status">
+        <div id="artifact-intake-panel" className="upload-panel" role="status">
           <p className="submission-note">Public intake is temporarily paused. Existing private submissions remain safe.</p>
         </div>
       )}
 
       {open && session && !intakePaused && (
-        <form className="upload-panel submission-panel" onSubmit={submit} aria-busy={busy}>
+        <form id="artifact-intake-panel" className="upload-panel submission-panel" onSubmit={submit} aria-busy={busy}>
           <p className="submission-note">
             <strong>ALL SLOP WELCOME.</strong>{" "}
             Full-modality AI-made Artifacts belong here: image, video, audio, text, documents, code, data, 3D, references, simulations, or mixed media. Everything you add becomes one Artifact. Every approved Artifact enters the same infinite feed.
-            {dailyLimit ? ` · ${dailyLimit} artifacts per rolling 24 hours` : ""}
+            {dailyLimit ? ` · ${dailyLimit} Artifacts per rolling 24 hours` : ""}
             {" · "}12 materials maximum · 50 MB per file · 100 MB combined · private until review.
           </p>
 
           <div>
             <label htmlFor="title">Artifact title</label>
-            <input id="title" name="title" required maxLength={100} placeholder="Name the artifact" disabled={busy} />
+            <input id="title" name="title" required maxLength={100} placeholder="Name the Artifact" disabled={busy} />
           </div>
 
           <div>
@@ -483,34 +513,74 @@ export function UploadGate() {
 
           <div>
             <label htmlFor="files">AI-made Artifact</label>
-            <input
-              id="files"
-              className="artifact-file-input"
-              name="files"
-              type="file"
-              accept={FILE_ACCEPT}
-              multiple
-              disabled={busy}
-              aria-describedby="material-help selected-files"
-              onChange={(event) => {
-                setSelectedFiles(Array.from(event.currentTarget.files ?? []));
-                setMessage(null);
+            <div
+              className={styles.dropZone}
+              data-dragging={dragging ? "true" : undefined}
+              onDragEnter={(event) => {
+                event.preventDefault();
+                if (!busy) setDragging(true);
               }}
-            />
-            <label className="artifact-material-picker" htmlFor="files" data-disabled={busy ? "true" : undefined}>
-              <span className="artifact-material-plus" aria-hidden="true">+</span>
-              <span className="artifact-material-action">Add material</span>
-              <span className="artifact-material-modes">image · video · audio · PDF · code · data · 3D · archive · more</span>
-            </label>
-            <div id="selected-files" className={selectedFiles.length ? "artifact-material-status selected" : "artifact-material-status"}>
-              <span aria-hidden="true">◇</span>
-              {selectedFiles.length === 0 ? (
-                <span>No materials added</span>
-              ) : (
-                <span>{selectedFiles.length} material{selectedFiles.length === 1 ? "" : "s"} · {selectedFiles.map((file) => `${file.name} · ${modeForFile(file)}`).join("  /  ")}</span>
-              )}
+              onDragOver={(event) => event.preventDefault()}
+              onDragLeave={(event) => {
+                event.preventDefault();
+                setDragging(false);
+              }}
+              onDrop={handleDrop}
+            >
+              <input
+                id="files"
+                className={styles.materialInput}
+                name="files"
+                type="file"
+                accept={FILE_ACCEPT}
+                multiple
+                disabled={busy}
+                aria-describedby="material-help selected-files material-limits"
+                onChange={handleFileInput}
+              />
+              <label className={styles.materialPicker} htmlFor="files" data-disabled={busy ? "true" : undefined}>
+                <span className={styles.materialPlus} aria-hidden="true">+</span>
+                <span className={styles.materialAction}>{dragging ? "Drop material here" : "Add material"}</span>
+                <span className={styles.materialModes}>image · video · audio · PDF · code · data · 3D · archive · more</span>
+              </label>
             </div>
-            <p id="material-help" className="submission-note">Everything added here belongs to one Artifact. Text and references below join that same Artifact.</p>
+
+            <div id="material-limits" className={styles.materialSummary}>
+              <span>{materialPartCount}/{MAX_PARTS} total materials</span>
+              <span>{formatBytes(totalFileBytes)} / 100 MB files</span>
+            </div>
+
+            <div id="selected-files" className={styles.materialList} aria-live="polite">
+              {selectedFiles.length === 0 ? (
+                <div className={styles.materialEmpty}>
+                  <span aria-hidden="true">◇</span>
+                  <span>No materials added</span>
+                </div>
+              ) : selectedFiles.map((file) => {
+                const identity = fileIdentity(file);
+                return (
+                  <div className={styles.materialRow} key={identity}>
+                    <span aria-hidden="true">◇</span>
+                    <span>
+                      {file.name}
+                      <span className={styles.materialMeta}>{modeForFile(file)} · {formatBytes(file.size)}</span>
+                    </span>
+                    <button
+                      className={styles.removeMaterial}
+                      type="button"
+                      disabled={busy}
+                      onClick={() => removeSelectedFile(identity)}
+                      aria-label={`Remove ${file.name}`}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            <p id="material-help" className="submission-note">Everything added here belongs to one Artifact. Drop files here or use Add material. Files remain private and are treated as untrusted until review. Text and references below join that same Artifact.</p>
+            {materialLimitExceeded && <p className={styles.limitWarning} role="alert">Material limits exceeded. Remove material before submitting.</p>}
           </div>
 
           <div>
@@ -518,7 +588,10 @@ export function UploadGate() {
             <textarea
               id="textPart"
               value={textPart}
-              onChange={(event) => setTextPart(event.target.value)}
+              onChange={(event) => {
+                setTextPart(event.target.value);
+                setMessage(null);
+              }}
               maxLength={20000}
               placeholder="Paste text that is itself part of the Artifact."
               disabled={busy}
@@ -531,8 +604,15 @@ export function UploadGate() {
               id="referenceUrl"
               type="url"
               value={referenceUrl}
-              onChange={(event) => setReferenceUrl(event.target.value)}
+              onChange={(event) => {
+                setReferenceUrl(event.target.value);
+                setMessage(null);
+              }}
               maxLength={2000}
+              inputMode="url"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               placeholder="https://example.com — recorded as a reference; not fetched or executed during intake"
               disabled={busy}
             />
@@ -605,7 +685,7 @@ export function UploadGate() {
           </label>
 
           <div className="submission-actions">
-            <button className="submit-button" type="submit" disabled={busy || intakePaused}>
+            <button className="submit-button" type="submit" disabled={busy || intakePaused || materialLimitExceeded || materialPartCount < 1}>
               {busy ? "Binding Artifact into private quarantine…" : "Submit Artifact"}
             </button>
             {message && <p className="submission-note" role="status" aria-live="polite">{message}</p>}
