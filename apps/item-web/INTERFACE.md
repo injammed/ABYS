@@ -56,7 +56,7 @@ This mapping is enforced by the executable `verify:mode-duality` contract. A fut
 
 ## Primary Two-Mode Switch
 
-The product has two equal primary experiential modes:
+The product has two equal primary experiential modes. This is the permanent **50/50 switch law**:
 
 ```txt
 [ SLOP TROUGH 50% ][ AETIMM MUSEUM 50% ]
