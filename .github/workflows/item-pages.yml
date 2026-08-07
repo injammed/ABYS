@@ -82,6 +82,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:universal-artifact
 
+      - name: Verify semantic Artifact forms
+        working-directory: apps/item-web
+        run: npm run verify:artifact-forms
+
       - name: Verify curator migration contract
         working-directory: apps/item-web
         run: npm run verify:curator
