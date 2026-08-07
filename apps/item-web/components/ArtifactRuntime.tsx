@@ -1,4 +1,5 @@
 import type { ArtifactPart, FeedArtifact } from "@/lib/feed";
+import { LexiconText } from "./LexiconBroadcast";
 import styles from "./ArtifactRuntime.module.css";
 
 function formatBytes(value?: number): string {
@@ -35,18 +36,19 @@ function partName(part: ArtifactPart): string {
 
 function InertMaterial({ part }: { part: ArtifactPart }) {
   const size = formatBytes(part.byteSize);
+  const explanation = part.mode === "code" || part.mode === "website" || part.mode === "simulation"
+    ? "Stored as inert Artifact material. It does not execute inside the trough."
+    : "This material is preserved as part of the Artifact.";
+  const downloadLabel = `Download material${size ? ` · ${size}` : ""}`;
+
   return (
-    <div className={styles.inert} data-inert-material={part.mode}>
-      <span className={styles.mode}>{part.mode === "model3d" ? "3D" : part.mode}</span>
-      <strong>{partName(part)}</strong>
-      <p>
-        {part.mode === "code" || part.mode === "website" || part.mode === "simulation"
-          ? "Stored as inert Artifact material. It does not execute inside the trough."
-          : "This material is preserved as part of the Artifact."}
-      </p>
+    <div className={styles.inert} data-inert-material={part.mode} data-lexicon-surface="true">
+      <LexiconText className={styles.mode} text={part.mode === "model3d" ? "3D" : part.mode} phase={3} />
+      <LexiconText as="strong" text={partName(part)} phase={7} />
+      <LexiconText as="p" text={explanation} phase={11} />
       {part.signedUrl && (
-        <a className={styles.materialLink} href={part.signedUrl} download={part.filename || true}>
-          Download material{size ? ` · ${size}` : ""}
+        <a className={styles.materialLink} href={part.signedUrl} download={part.filename || true} aria-label={downloadLabel}>
+          <LexiconText text={downloadLabel} phase={13} semantic={false} />
         </a>
       )}
     </div>
@@ -70,7 +72,7 @@ function LeadRuntime({ part }: { part: ArtifactPart }) {
     return (
       <div className={styles.audioStage}>
         <div className={styles.audioGlyph} aria-hidden="true">∿∿∿</div>
-        <strong>{partName(part)}</strong>
+        <LexiconText as="strong" text={partName(part)} phase={17} />
         <audio className={styles.audio} src={part.signedUrl} controls preload="metadata">
           Your browser cannot play this Artifact audio.
         </audio>
@@ -81,8 +83,8 @@ function LeadRuntime({ part }: { part: ArtifactPart }) {
   if (part.partKind === "text" && part.text) {
     const excerpt = part.text.length > 3200 ? `${part.text.slice(0, 3200)}\n…` : part.text;
     return (
-      <div className={styles.textStage}>
-        <span className={styles.mode}>{part.mode}</span>
+      <div className={styles.textStage} data-artifact-payload="verbatim">
+        <LexiconText className={styles.mode} text={part.mode} phase={19} />
         <pre>{excerpt}</pre>
       </div>
     );
@@ -91,10 +93,12 @@ function LeadRuntime({ part }: { part: ArtifactPart }) {
   if (part.partKind === "reference" && part.referenceUrl) {
     return (
       <div className={styles.referenceStage}>
-        <span className={styles.mode}>reference</span>
-        <strong>{hostLabel(part.referenceUrl)}</strong>
-        <p>External Artifact reference. AETIMM does not fetch or execute it automatically.</p>
-        <a href={part.referenceUrl} target="_blank" rel="noopener noreferrer">Open reference</a>
+        <LexiconText className={styles.mode} text="reference" phase={23} />
+        <LexiconText as="strong" text={hostLabel(part.referenceUrl)} phase={29} />
+        <LexiconText as="p" text="External Artifact reference. AETIMM does not fetch or execute it automatically." phase={31} />
+        <a href={part.referenceUrl} target="_blank" rel="noopener noreferrer" aria-label="Open reference">
+          <LexiconText text="Open reference" phase={37} semantic={false} />
+        </a>
       </div>
     );
   }
@@ -107,20 +111,27 @@ function MaterialList({ parts }: { parts: ArtifactPart[] }) {
 
   return (
     <details className={styles.materials}>
-      <summary>{parts.length} materials</summary>
+      <summary><LexiconText text={`${parts.length} materials`} phase={41} /></summary>
       <ol>
-        {parts.map((part) => (
-          <li key={part.id}>
-            <span>{part.position + 1}. {partName(part)}</span>
-            <small>{part.mode === "model3d" ? "3D" : part.mode}{part.byteSize != null ? ` · ${formatBytes(part.byteSize)}` : ""}</small>
-            {part.partKind === "reference" && part.referenceUrl && (
-              <a href={part.referenceUrl} target="_blank" rel="noopener noreferrer">Open</a>
-            )}
-            {part.partKind === "file" && part.signedUrl && (
-              <a href={part.signedUrl} download={part.filename || true}>Download</a>
-            )}
-          </li>
-        ))}
+        {parts.map((part, index) => {
+          const metadata = `${part.mode === "model3d" ? "3D" : part.mode}${part.byteSize != null ? ` · ${formatBytes(part.byteSize)}` : ""}`;
+          return (
+            <li key={part.id}>
+              <LexiconText text={`${part.position + 1}. ${partName(part)}`} phase={43 + index * 5} />
+              <LexiconText as="small" text={metadata} phase={47 + index * 5} />
+              {part.partKind === "reference" && part.referenceUrl && (
+                <a href={part.referenceUrl} target="_blank" rel="noopener noreferrer" aria-label="Open">
+                  <LexiconText text="Open" phase={53 + index * 5} semantic={false} />
+                </a>
+              )}
+              {part.partKind === "file" && part.signedUrl && (
+                <a href={part.signedUrl} download={part.filename || true} aria-label="Download">
+                  <LexiconText text="Download" phase={59 + index * 5} semantic={false} />
+                </a>
+              )}
+            </li>
+          );
+        })}
       </ol>
     </details>
   );
@@ -138,10 +149,10 @@ export function ArtifactRuntime({ artifact }: { artifact: FeedArtifact }) {
         ) : artifact.mediaUrl ? (
           <img className={styles.image} src={artifact.mediaUrl} alt="" loading="lazy" />
         ) : (
-          <div className={styles.fallback}>
-            <span>{artifact.modalLead || "Artifact"}</span>
-            <strong>{artifact.title}</strong>
-            <p>No native preview is available yet. The Artifact remains present and voteable.</p>
+          <div className={styles.fallback} data-lexicon-surface="true">
+            <LexiconText text={artifact.modalLead || "Artifact"} phase={61} />
+            <LexiconText as="strong" text={artifact.title} phase={67} />
+            <LexiconText as="p" text="No native preview is available yet. The Artifact remains present and voteable." phase={71} />
           </div>
         )}
       </div>
