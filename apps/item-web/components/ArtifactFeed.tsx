@@ -16,6 +16,7 @@ import {
   replaceHydratedVotes,
   shouldApplyVoteHydration,
 } from "@/lib/vote-state";
+import { ArtifactRuntime } from "./ArtifactRuntime";
 import styles from "./ArtifactFeed.module.css";
 
 type VoteRequestState = {
@@ -332,14 +333,7 @@ export function ArtifactFeed() {
               data-museum-admitted={museumAdmitted ? "true" : undefined}
             >
               <div className="artifact-visual" style={{ background: artifact.gradient }}>
-                {artifact.mediaUrl && (
-                  <img
-                    src={artifact.mediaUrl}
-                    alt=""
-                    loading="lazy"
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                  />
-                )}
+                <ArtifactRuntime artifact={artifact} />
                 <div className="visual-noise" />
 
                 <div className={styles.statusMarks} aria-label="Artifact status">
