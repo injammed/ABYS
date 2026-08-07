@@ -62,6 +62,9 @@ jobs:
       - name: Verify semantic Artifact forms
         run: npm run verify:artifact-forms
 
+      - name: Verify one-click publication and vote privacy
+        run: npm run verify:one-click-feed
+
       - name: Verify curator migration contract
         run: npm run verify:curator
 
