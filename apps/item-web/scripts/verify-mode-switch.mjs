@@ -28,7 +28,7 @@ requirePattern("AETIMM Museum primary mode", /<strong>AETIMM MUSEUM<\/strong>/, 
 requirePattern("Slop Feed destination", /href=["']\/#field["']/, navigation);
 requirePattern("Museum destination", /href=["']\/aetimm\/["']/, navigation);
 requirePattern("secondary utility rail", /className=["']primary-utility-rail["']/, navigation);
-requirePattern("Submit utility", /<UploadGate\s*\/>/, navigation);
+requirePattern("Submit utility", /<SlopDrop\s*\/>/, navigation);
 requirePattern("About utility", /href=["']\/about\/["']/, navigation);
 requirePattern("Account utility", /<AccountGate\s*\/>/, navigation);
 
