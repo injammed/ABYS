@@ -13,7 +13,8 @@
     "verify:binary-vote": "node scripts/verify-binary-swipe-voting.mjs",
     "verify:curator": "node scripts/verify-curator-contract.mjs",
     "verify:feed-cursor": "node scripts/verify-feed-cursor.mjs",
-    "verify:universal-artifact": "node scripts/verify-universal-artifact-intake.mjs"
+    "verify:universal-artifact": "node scripts/verify-universal-artifact-intake.mjs",
+    "verify:artifact-forms": "node scripts/verify-artifact-forms.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "latest",
