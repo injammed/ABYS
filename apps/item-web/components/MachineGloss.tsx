@@ -1,14 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./MachineGloss.module.css";
 
 export type MachineGlossTranslations = {
   en: string;
-  es?: string;
-  zh?: string;
-  ja?: string;
-  ar?: string;
+  [language: string]: string | undefined;
 };
 
 type MachineGlossProps = {
@@ -17,14 +14,24 @@ type MachineGlossProps = {
   density?: "quiet" | "dense";
 };
 
-const LANGUAGE_ORDER: Array<keyof MachineGlossTranslations> = ["en", "es", "zh", "ja", "ar"];
-const LANGUAGE_LABELS: Record<keyof MachineGlossTranslations, string> = {
+const CYCLE_MS = 500;
+const LANGUAGE_LABELS: Record<string, string> = {
   en: "EN",
   es: "ES",
   zh: "中文",
   ja: "日本語",
   ar: "العربية",
+  hi: "हिन्दी",
+  fr: "FR",
+  de: "DE",
+  pt: "PT",
+  ru: "РУ",
+  ko: "한국어",
+  sw: "SW",
+  id: "ID",
+  tr: "TR",
 };
+const RTL_LANGUAGES = new Set(["ar", "fa", "he", "ur"]);
 
 const GLYPHS = [
   "⌁", "⌭", "⟐", "⊙", "⋔", "⟟", "⋈", "⊚", "⫶", "⌬", "⏣", "⟡", "⋮",
@@ -46,27 +53,86 @@ function machineEncode(source: string): string {
   return output.replace(/\s{3,}/g, "  ").trim();
 }
 
+function stableHash(source: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < source.length; index += 1) {
+    hash ^= source.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
 export function MachineGloss({ translations, className = "", density = "dense" }: MachineGlossProps) {
-  const availableLanguages = LANGUAGE_ORDER.filter((language) => Boolean(translations[language]));
-  const [stage, setStage] = useState(0);
   const glyphs = useMemo(() => machineEncode(translations.en), [translations.en]);
-  const showingGlyphs = stage === 0;
-  const language = showingGlyphs ? null : availableLanguages[(stage - 1) % availableLanguages.length];
-  const visibleText = language ? translations[language] ?? translations.en : glyphs;
+  const languages = useMemo(
+    () => ["en", ...Object.keys(translations).filter((language) => language !== "en" && Boolean(translations[language]))],
+    [translations],
+  );
+  const stages = useMemo(
+    () => [
+      { language: "machine", text: glyphs },
+      ...languages.map((language) => ({ language, text: translations[language] ?? translations.en })),
+    ],
+    [glyphs, languages, translations],
+  );
+  const [stage, setStage] = useState(0);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let interval: ReturnType<typeof setInterval> | undefined;
+
+    const stop = () => {
+      if (timeout) clearTimeout(timeout);
+      if (interval) clearInterval(interval);
+      timeout = undefined;
+      interval = undefined;
+    };
+
+    const start = () => {
+      stop();
+      if (media.matches || stages.length <= 1) {
+        setStage(0);
+        return;
+      }
+
+      const seed = stableHash(translations.en);
+      setStage(seed % stages.length);
+      const phaseDelay = stableHash(`${translations.en}|phase`) % CYCLE_MS;
+
+      timeout = setTimeout(() => {
+        setStage((current) => (current + 1) % stages.length);
+        interval = setInterval(() => {
+          setStage((current) => (current + 1) % stages.length);
+        }, CYCLE_MS);
+      }, phaseDelay);
+    };
+
+    start();
+    media.addEventListener("change", start);
+    return () => {
+      media.removeEventListener("change", start);
+      stop();
+    };
+  }, [stages, translations.en]);
+
+  const visible = stages[stage] ?? stages[0];
+  const language = visible.language;
+  const languageLabel = LANGUAGE_LABELS[language] ?? language.toUpperCase();
 
   return (
-    <button
-      type="button"
+    <span
       className={`${styles.gloss} ${styles[density]} ${className}`.trim()}
-      data-machine-gloss="machine-first-translation-cycle-v1"
-      data-language={language ?? "machine"}
-      onClick={() => setStage((current) => (current + 1) % (availableLanguages.length + 1))}
-      aria-label={`${translations.en}. Activate to ${showingGlyphs ? "show English translation" : "cycle translation language"}.`}
-      title="Translate / cycle language"
-      dir={language === "ar" ? "rtl" : "ltr"}
+      data-machine-gloss="ambient-translation-broadcast-v2"
+      data-language={language}
+      data-cycle-ms={CYCLE_MS}
+      role="note"
+      aria-label={translations.en}
+      aria-live="off"
+      dir={RTL_LANGUAGES.has(language) ? "rtl" : "ltr"}
     >
-      <span className={styles.text} aria-hidden="true">{visibleText}</span>
-      <span className={styles.language} aria-hidden="true">{language ? LANGUAGE_LABELS[language] : "⌁⌬"}</span>
-    </button>
+      <span className={styles.text} aria-hidden="true">{visible.text}</span>
+      <span className={styles.language} aria-hidden="true">{language === "machine" ? "⌁⌬" : languageLabel}</span>
+    </span>
   );
 }

@@ -13,15 +13,7 @@
     rgba(3,3,3,.42);
   color: rgba(231,204,132,.78);
   text-align: left;
-  cursor: pointer;
-  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
-}
-
-.gloss:hover,
-.gloss:focus-visible {
-  border-color: rgba(255,226,154,.34);
-  color: rgba(255,226,154,.96);
-  outline: none;
+  cursor: default;
 }
 
 .text {
@@ -47,11 +39,7 @@
   font-size: clamp(.46rem, 1vw, .58rem);
 }
 
-.gloss[data-language="en"] .text,
-.gloss[data-language="es"] .text,
-.gloss[data-language="zh"] .text,
-.gloss[data-language="ja"] .text,
-.gloss[data-language="ar"] .text {
+.gloss:not([data-language="machine"]) .text {
   font-family: inherit;
   font-size: clamp(.62rem, 1.6vw, .82rem);
   letter-spacing: .035em;
@@ -78,5 +66,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .gloss { transition: none; }
+  .gloss {
+    transition: none;
+  }
 }
