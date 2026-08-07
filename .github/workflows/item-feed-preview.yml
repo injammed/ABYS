@@ -71,6 +71,9 @@ jobs:
       - name: Verify Museum accession lifecycle
         run: npm run verify:museum-accession
 
+      - name: Verify Museum always-arrive destination
+        run: npm run verify:museum-destination
+
       - name: Verify curator migration contract
         run: npm run verify:curator
 

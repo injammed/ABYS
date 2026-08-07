@@ -98,6 +98,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:museum-accession
 
+      - name: Verify Museum always-arrive destination
+        working-directory: apps/item-web
+        run: npm run verify:museum-destination
+
       - name: Verify curator migration contract
         working-directory: apps/item-web
         run: npm run verify:curator
