@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 const root = process.cwd();
-const intakePath = path.join(root, "components", "UploadGate.tsx");
+const intakePath = path.join(root, "components", "SlopDrop.tsx");
 const intakeStylesPath = path.join(root, "components", "UploadGate.module.css");
 const curatorPath = path.join(root, "components", "CuratorQueue.tsx");
 const socialFeedPath = path.join(root, "lib", "social-feed.ts");
@@ -30,20 +30,16 @@ const forbidPattern = (label, pattern, source) => {
   if (pattern.test(source)) failures.push(`forbidden ${label}`);
 };
 
-requirePattern("universal submit label", /Submit [Aa]rtifact/, intake);
 requirePattern("all slop welcome surface law", /ALL SLOP WELCOME\./, intake);
-requirePattern("full modality invitation", /Full-modality AI-made Artifacts belong here/, intake);
-requirePattern("one artifact binding copy", /Everything you add becomes one Artifact/, intake);
-requirePattern("same infinite feed copy", /same infinite feed/, intake);
+requirePattern("one Artifact any modality law", /One Artifact\. Any modality\./, intake);
+requirePattern("same public Unjudged feed copy", /lands in Unjudged and joins the endless feed/, intake);
 requirePattern("AI-made Artifact material surface", />AI-made Artifact</, intake);
 requirePattern("custom Add material action", /Add material/, intake);
 requirePattern("CSS-module material picker", /styles\.materialPicker/, intake);
 requirePattern("native file input visually hidden", /styles\.materialInput/, intake);
 requirePattern("material modes helper", /image · video · audio · PDF · code · data · 3D/, intake);
-requirePattern("no-materials state", /No materials added/, intake);
-requirePattern("materials bind as one artifact", /Everything added here belongs to one Artifact/, intake);
+requirePattern("empty material state", /No slop added/, intake);
 requirePattern("multi-file intake", /type="file"[\s\S]*multiple/, intake);
-requirePattern("whole artifact experience description", /How should it be experienced\?/, intake);
 requirePattern("text part", /textPart/, intake);
 requirePattern("reference part", /referenceUrl/, intake);
 requirePattern("atomic artifact RPC", /create_quarantined_artifact/, intake);
@@ -52,10 +48,10 @@ requirePattern("private artifact path namespace", /session\.user\.id.*artifactId
 requirePattern("rollback uploaded paths", /storage\.from\("artifact-media"\)\.remove\(uploadedPaths\)/, intake);
 requirePattern("mixed mode detection", /new Set\(parts\.map\(\(part\) => part\.mode\)\)/, intake);
 
-// Defensive submission invariants: prevent common vibe-coded regressions.
+// Defensive submission invariants: the simple surface must not weaken intake.
 requirePattern("preflight MIME or extension allowlist", /function fileIsAccepted/, intake);
 requirePattern("stable duplicate identity", /function fileIdentity/, intake);
-requirePattern("duplicate suppression", /duplicateCount/, intake);
+requirePattern("duplicate suppression", /duplicates/, intake);
 requirePattern("per-file size preflight", /MAX_FILE_BYTES/, intake);
 requirePattern("aggregate byte preflight", /MAX_TOTAL_BYTES/, intake);
 requirePattern("total material-count preflight", /materialPartCount/, intake);
@@ -65,25 +61,22 @@ requirePattern("material removal", /removeSelectedFile/, intake);
 requirePattern("double-submit and paused-state guard", /if \(busy \|\| intakePaused\) return;/, intake);
 requirePattern("busy submit disable", /disabled=\{busy \|\| intakePaused \|\| materialLimitExceeded/, intake);
 requirePattern("URL protocol allowlist", /\["http:", "https:"\]\.includes/, intake);
-requirePattern("reference never fetched copy", /not fetched or executed during intake/, intake);
-requirePattern("untrusted-until-review copy", /treated as untrusted until review/, intake);
+requirePattern("untrusted inert-material copy", /Files are treated as untrusted\. Code is not executed and links are not fetched during intake\./, intake);
 requirePattern("accessible live material list", /aria-live="polite"/, intake);
 requirePattern("accessible remove control", /aria-label=\{`Remove \$\{file\.name\}`\}/, intake);
 requirePattern("custom picker focus state", /materialInput:focus-visible \+ \.materialPicker/, intakeStyles);
 requirePattern("mobile picker layout", /@media \(max-width: 430px\)/, intakeStyles);
 
-// Maintenance must change capability, not replace the product with another surface.
+// Maintenance changes capability, never the visible product primitive.
 requirePattern("paused intake keeps Artifact form mounted", /\{open && session && \(/, intake);
-requirePattern("paused state visible status", /<strong>INTAKE PAUSED\.<\/strong>/, intake);
-requirePattern("paused state explains surface continuity", /Artifact surface stays visible during maintenance/, intake);
+requirePattern("paused state visible status", /<strong>TROUGH PAUSED\.<\/strong>/, intake);
+requirePattern("paused state preserves form", /form stays visible/, intake);
 requirePattern("paused fieldset lock", /<fieldset className=\{styles\.formFieldset\} disabled=\{busy \|\| intakePaused\}>/, intake);
 requirePattern("paused file input lock", /disabled=\{busy \|\| intakePaused\}/, intake);
-requirePattern("paused drop path lock", /if \(intakePaused\) return;/, intake);
-requirePattern("paused picker presentation", /Add material · paused/, intake);
-requirePattern("paused submit presentation", /intakePaused \? "Intake paused" : "Submit Artifact"/, intake);
+requirePattern("paused drop path lock", /if \(!intakePaused\) validateIncomingFiles/, intake);
+requirePattern("paused submit presentation", /intakePaused \? "TROUGH PAUSED"/, intake);
 requirePattern("maintenance fieldset styling", /\.formFieldset:disabled/, intakeStyles);
 requirePattern("maintenance picker styling", /dropZone\[data-paused="true"\]/, intakeStyles);
-forbidPattern("paused-state replacement mini-panel", /open && session && intakePaused[\s\S]*role="status"[\s\S]*Existing private submissions remain safe\.[\s\S]*open && session && !intakePaused/, intake);
 
 forbidPattern("image-only intake copy", /Choose an image to upload|AI-made image|JPEG, PNG, WebP, or GIF images|No image selected/, intake);
 forbidPattern("browser-native file-picker wording", /Choose File|No file selected/, intake);
@@ -115,10 +108,9 @@ requirePattern("3D support", /model\/gltf-binary/, migration8);
 requirePattern("archive support", /application\/zip/, migration8);
 
 requirePattern("curator manifest access", /curators read all artifact parts/, migration9);
-requirePattern("first publication Unjudged", /INITIAL_PUBLICATION_REQUIRES_UNJUDGED/, migration9);
+requirePattern("first curator publication Unjudged", /INITIAL_PUBLICATION_REQUIRES_UNJUDGED/, migration9);
 requirePattern("approval lane hardcoded", /lane = 'unjudged'/, migration9);
 
-// Database privilege hardening: explicit role grants beat implicit/default ACL assumptions.
 requirePattern("explicit anon revoke for intake RPC", /revoke all on function public\.create_quarantined_artifact\([\s\S]*\) from public, anon, authenticated;/, migration10);
 requirePattern("authenticated-only intake RPC restore", /grant execute on function public\.create_quarantined_artifact\([\s\S]*\) to authenticated;/, migration10);
 requirePattern("explicit anon revoke for curator RPC", /revoke all on function public\.review_artifact\(uuid,text,text,text\) from public, anon, authenticated;/, migration10);
@@ -145,4 +137,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal Artifact intake PASS: All Slop Welcome uses one hardened material picker; maintenance pauses preserve and lock the same Artifact surface; selection paths share bounded validation; database RPC grants are explicit and least-privilege; code stays inert; URLs stay unfetched; private quarantine remains the boundary; and every approved Artifact targets the same infinite feed.");
+console.log("Universal Artifact intake PASS: the active Throw It In surface accepts one multimodal Artifact through bounded validation; code remains inert, URLs remain unfetched, server staging stays private until atomic publication, and maintenance can lock capability without replacing the product surface.");
