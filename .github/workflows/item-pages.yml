@@ -90,6 +90,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:one-click-feed
 
+      - name: Verify throw-it-in submission simplicity
+        working-directory: apps/item-web
+        run: npm run verify:throw-it-in
+
       - name: Verify curator migration contract
         working-directory: apps/item-web
         run: npm run verify:curator

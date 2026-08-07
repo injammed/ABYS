@@ -2,7 +2,7 @@ import { FeedArtifact, FeedLane, OriginClass } from "@/lib/feed";
 import { cursorForRow, decodeFeedCursor, feedCursorFilter } from "@/lib/feed-cursor";
 import { requireSupabaseBrowserClient } from "@/lib/supabase-browser";
 
-export type Judgment = "preserve" | "refine" | "slop";
+export type Judgment = "preserve" | "slop";
 
 const PAGE_SIZE = 8;
 
@@ -35,26 +35,24 @@ type PrivateArtifactRow = Omit<ArtifactRow, "lane" | "published_at"> & {
   status: "quarantine" | "needs_revision";
 };
 
-type VoteRow = { artifact_id: string; judgment: Judgment };
+type RawVoteRow = { artifact_id: string; judgment: string };
 
-type VoteAggregateRow = {
+type BinaryJudgmentRow = {
   artifact_id: string;
-  preserve_count: number | string;
-  refine_count: number | string;
+  museum_count: number | string;
+  slop_count: number | string;
+  total_binary_votes: number | string;
+};
+
+type SlopRankRow = {
+  artifact_id: string;
+  slop_rank: number | string;
   slop_count: number | string;
 };
 
 function creatorName(row: ArtifactRow | PrivateArtifactRow): string {
   if (Array.isArray(row.profiles)) return row.profiles[0]?.display_name || "Anonymous machine witness";
   return row.profiles?.display_name || "Anonymous machine witness";
-}
-
-function scoreForAggregate(aggregate?: VoteAggregateRow): number {
-  if (!aggregate) return 50;
-  const preserve = Number(aggregate.preserve_count) || 0;
-  const refine = Number(aggregate.refine_count) || 0;
-  const slop = Number(aggregate.slop_count) || 0;
-  return Math.max(0, Math.min(100, 50 + preserve * 4 + refine - slop * 4));
 }
 
 function isUniversalArtifactMigrationMissing(error: { message?: string; code?: string } | null | undefined): boolean {
@@ -76,7 +74,6 @@ async function signedImageUrl(path: string | null): Promise<string | undefined> 
 
 export async function loadPublicFeedPage(options: {
   cursor?: string | null;
-  lane?: FeedLane | "all";
   limit?: number;
 } = {}): Promise<{ artifacts: FeedArtifact[]; nextCursor: string | null }> {
   const client = requireSupabaseBrowserClient();
@@ -90,7 +87,6 @@ export async function loadPublicFeedPage(options: {
     .order("id", { ascending: false })
     .limit(limit + 1);
 
-  if (options.lane && options.lane !== "all") primary = primary.eq("lane", options.lane);
   if (options.cursor) primary = primary.or(feedCursorFilter(decodeFeedCursor(options.cursor)));
 
   const primaryResult = await primary;
@@ -105,7 +101,6 @@ export async function loadPublicFeedPage(options: {
       .order("published_at", { ascending: false })
       .order("id", { ascending: false })
       .limit(limit + 1);
-    if (options.lane && options.lane !== "all") fallback = fallback.eq("lane", options.lane);
     if (options.cursor) fallback = fallback.or(feedCursorFilter(decodeFeedCursor(options.cursor)));
     const fallbackResult = await fallback;
     rawData = fallbackResult.data as unknown[] | null;
@@ -119,41 +114,60 @@ export async function loadPublicFeedPage(options: {
   const rows = fetchedRows.slice(0, limit);
   const ids = rows.map((row) => row.id);
 
-  const aggregatesByArtifact = new Map<string, VoteAggregateRow>();
+  const judgmentsByArtifact = new Map<string, BinaryJudgmentRow>();
+  const slopRanksByArtifact = new Map<string, SlopRankRow>();
+
   if (ids.length > 0) {
-    const { data: aggregateData, error: aggregateError } = await client.rpc("get_artifact_vote_aggregates", {
-      p_artifact_ids: ids,
-    });
-    if (aggregateError) throw aggregateError;
-    for (const aggregate of (aggregateData ?? []) as VoteAggregateRow[]) {
-      aggregatesByArtifact.set(aggregate.artifact_id, aggregate);
+    const [judgmentResult, rankResult] = await Promise.all([
+      client.rpc("get_artifact_binary_judgments", { p_artifact_ids: ids }),
+      client.rpc("get_artifact_slop_ranks", { p_artifact_ids: ids }),
+    ]);
+
+    if (judgmentResult.error) throw judgmentResult.error;
+    for (const judgment of (judgmentResult.data ?? []) as BinaryJudgmentRow[]) {
+      judgmentsByArtifact.set(judgment.artifact_id, judgment);
+    }
+
+    // Rank is additive display metadata. If ranking temporarily fails, the
+    // infinite feed remains available rather than disappearing.
+    if (!rankResult.error) {
+      for (const rank of (rankResult.data ?? []) as SlopRankRow[]) {
+        slopRanksByArtifact.set(rank.artifact_id, rank);
+      }
     }
   }
 
   const mediaEntries = await Promise.all(rows.map(async (row) => [row.id, await signedImageUrl(row.media_path)] as const));
   const mediaByArtifact = new Map(mediaEntries);
 
-  const artifacts: FeedArtifact[] = rows.map((row) => ({
-    id: row.id,
-    title: row.title,
-    creator: creatorName(row),
-    lane: row.lane,
-    summary: row.summary,
-    modalLead: modeLead(row),
-    aiOrigin: {
-      originClass: row.origin_class,
-      declaredByCreator: true,
-      generator: row.generator,
-      humanRole: row.human_role,
-      provenanceNote: row.provenance_note,
-      confidence: "declared",
-    },
-    gradient: laneGradients[row.lane],
-    mediaUrl: mediaByArtifact.get(row.id),
-    score: scoreForAggregate(aggregatesByArtifact.get(row.id)),
-    publishedAt: row.published_at,
-    visibility: "public",
-  }));
+  const artifacts: FeedArtifact[] = rows.map((row) => {
+    const judgments = judgmentsByArtifact.get(row.id);
+    const slopRank = slopRanksByArtifact.get(row.id);
+
+    return {
+      id: row.id,
+      title: row.title,
+      creator: creatorName(row),
+      lane: row.lane,
+      summary: row.summary,
+      modalLead: modeLead(row),
+      aiOrigin: {
+        originClass: row.origin_class,
+        declaredByCreator: true,
+        generator: row.generator,
+        humanRole: row.human_role,
+        provenanceNote: row.provenance_note,
+        confidence: "declared",
+      },
+      gradient: laneGradients[row.lane],
+      mediaUrl: mediaByArtifact.get(row.id),
+      museumVotes: judgments ? Number(judgments.museum_count) : 0,
+      slopVotes: judgments ? Number(judgments.slop_count) : 0,
+      slopRank: slopRank ? Number(slopRank.slop_rank) : undefined,
+      publishedAt: row.published_at,
+      visibility: "public",
+    };
+  });
 
   const lastRow = rows.at(-1);
   return { artifacts, nextCursor: hasMore && lastRow ? cursorForRow(lastRow) : null };
@@ -207,7 +221,8 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
     },
     gradient: laneGradients.unjudged,
     mediaUrl: mediaByArtifact.get(row.id),
-    score: 50,
+    museumVotes: 0,
+    slopVotes: 0,
     publishedAt: row.created_at,
     visibility: "creator_preview",
   }));
@@ -216,13 +231,23 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
 export async function loadOwnVotes(userId: string, artifactIds: string[]): Promise<Record<string, Judgment>> {
   if (artifactIds.length === 0) return {};
   const client = requireSupabaseBrowserClient();
-  const { data, error } = await client.from("artifact_votes").select("artifact_id,judgment").eq("voter_id", userId).in("artifact_id", artifactIds);
+  const { data, error } = await client
+    .from("artifact_votes")
+    .select("artifact_id,judgment")
+    .eq("voter_id", userId)
+    .in("artifact_id", artifactIds);
   if (error) throw error;
-  return Object.fromEntries(((data ?? []) as VoteRow[]).map((vote) => [vote.artifact_id, vote.judgment]));
+
+  const activeVotes = ((data ?? []) as RawVoteRow[]).filter(
+    (vote): vote is { artifact_id: string; judgment: Judgment } => vote.judgment === "preserve" || vote.judgment === "slop",
+  );
+  return Object.fromEntries(activeVotes.map((vote) => [vote.artifact_id, vote.judgment]));
 }
 
 export async function saveVote(artifactId: string, voterId: string, judgment: Judgment): Promise<void> {
   const client = requireSupabaseBrowserClient();
-  const { error } = await client.from("artifact_votes").upsert({ artifact_id: artifactId, voter_id: voterId, judgment }, { onConflict: "artifact_id,voter_id" });
+  const { error } = await client
+    .from("artifact_votes")
+    .upsert({ artifact_id: artifactId, voter_id: voterId, judgment }, { onConflict: "artifact_id,voter_id" });
   if (error) throw error;
 }
