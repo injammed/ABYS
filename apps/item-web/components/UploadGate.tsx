@@ -332,6 +332,93 @@ export function UploadGate() {
 
   return (
     <div className="upload-wrap">
+      <style>{`
+        .artifact-file-input {
+          position: absolute !important;
+          width: 1px !important;
+          height: 1px !important;
+          padding: 0 !important;
+          margin: -1px !important;
+          overflow: hidden !important;
+          clip: rect(0, 0, 0, 0) !important;
+          white-space: nowrap !important;
+          border: 0 !important;
+        }
+
+        .upload-panel .artifact-material-picker {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: .2rem .75rem;
+          align-items: center;
+          margin: 0;
+          padding: .85rem;
+          border: 1px solid rgba(213,166,63,.36);
+          border-radius: .75rem;
+          background: linear-gradient(180deg, rgba(213,166,63,.09), rgba(213,166,63,.025));
+          color: var(--text);
+          cursor: pointer;
+          transition: border-color 120ms ease, background 120ms ease;
+        }
+
+        .upload-panel .artifact-material-picker:hover {
+          border-color: var(--gold);
+          background: linear-gradient(180deg, rgba(213,166,63,.14), rgba(213,166,63,.035));
+        }
+
+        .artifact-file-input:focus-visible + .artifact-material-picker {
+          outline: 2px solid var(--gold-light);
+          outline-offset: 3px;
+        }
+
+        .artifact-material-picker[data-disabled="true"] {
+          opacity: .55;
+          cursor: wait;
+        }
+
+        .artifact-material-plus {
+          grid-row: 1 / span 2;
+          display: grid;
+          width: 2.25rem;
+          height: 2.25rem;
+          place-items: center;
+          border: 1px solid rgba(213,166,63,.42);
+          border-radius: .65rem;
+          color: var(--gold-light);
+          font-size: 1.1rem;
+        }
+
+        .artifact-material-action {
+          color: var(--text);
+          font-size: .88rem;
+          font-weight: 600;
+        }
+
+        .artifact-material-modes {
+          color: var(--muted);
+          font-size: .68rem;
+          line-height: 1.35;
+        }
+
+        .artifact-material-status {
+          display: flex;
+          gap: .45rem;
+          align-items: flex-start;
+          margin-top: .5rem;
+          padding: .55rem .65rem;
+          border: 1px solid var(--line);
+          border-radius: .65rem;
+          color: var(--muted);
+          font-size: .72rem;
+          line-height: 1.4;
+          overflow-wrap: anywhere;
+        }
+
+        .artifact-material-status.selected {
+          color: var(--gold-light);
+          border-color: rgba(213,166,63,.24);
+        }
+      `}</style>
+
       <button
         className="upload-trigger"
         type="button"
@@ -395,29 +482,35 @@ export function UploadGate() {
           </div>
 
           <div>
-            <label htmlFor="files">Artifact materials</label>
+            <label htmlFor="files">AI-made Artifact</label>
             <input
               id="files"
+              className="artifact-file-input"
               name="files"
               type="file"
               accept={FILE_ACCEPT}
               multiple
               disabled={busy}
-              aria-describedby="selected-files"
+              aria-describedby="material-help selected-files"
               onChange={(event) => {
                 setSelectedFiles(Array.from(event.currentTarget.files ?? []));
                 setMessage(null);
               }}
             />
-            <div id="selected-files" className={selectedFiles.length ? "file-selection selected" : "file-selection"}>
+            <label className="artifact-material-picker" htmlFor="files" data-disabled={busy ? "true" : undefined}>
+              <span className="artifact-material-plus" aria-hidden="true">+</span>
+              <span className="artifact-material-action">Add material</span>
+              <span className="artifact-material-modes">image · video · audio · PDF · code · data · 3D · archive · more</span>
+            </label>
+            <div id="selected-files" className={selectedFiles.length ? "artifact-material-status selected" : "artifact-material-status"}>
               <span aria-hidden="true">◇</span>
               {selectedFiles.length === 0 ? (
                 <span>No materials added</span>
               ) : (
-                <span>{selectedFiles.map((file) => `${file.name} · ${modeForFile(file)}`).join("  /  ")}</span>
+                <span>{selectedFiles.length} material{selectedFiles.length === 1 ? "" : "s"} · {selectedFiles.map((file) => `${file.name} · ${modeForFile(file)}`).join("  /  ")}</span>
               )}
             </div>
-            <p className="submission-note">Everything selected is submitted together as one Artifact.</p>
+            <p id="material-help" className="submission-note">Everything added here belongs to one Artifact. Text and references below join that same Artifact.</p>
           </div>
 
           <div>
