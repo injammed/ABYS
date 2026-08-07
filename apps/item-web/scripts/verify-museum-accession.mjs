@@ -52,13 +52,13 @@ for (const [label, pattern, source] of [
 }
 
 assert.ok(!/published_at|created_at|interval|extract\(|now\(\)\s*-/.test(allTimePriority), "Museum priority must not contain a time/recency signal.");
+assert.ok(!/Date\.now\(|getTime\(|publishedAt|createdAt/.test(museumClient), "Museum placement must not contain client-side time weighting.");
 assert.ok(!/data-binary-vote/.test(collection), "Museum presentation must not contain public voting controls.");
 assert.ok(!/delete from public\.museum_accessions/i.test(migration), "Museum accession history must never be deleted by lifecycle code.");
 assert.ok(!/order by[\s\S]{0,300}judgment = 'slop'/i.test(allTimePriority), "Slop judgment must not participate in Museum admission ordering.");
-assert.ok(!/trending|velocity|recent boost|hot score/i.test(museumClient), "Museum client must not introduce trending or velocity ranking.");
 assert.ok(
   !/grant\s+(select|update|insert|delete)[^;]*on public\.museum_control[^;]*to\s+(anon|authenticated)/i.test(migration),
   "Museum cadence configuration must not be client-readable or client-writable.",
 );
 
-console.log("Museum accession PASS: ordinary Artifacts stay public; Museum admission and placement use all-time Museum votes without trending, age, velocity, or recency; the strongest accession receives architectural prominence; public voting cannot deaccession it; and exceptional withdrawal preserves a tombstone.");
+console.log("Museum accession PASS: ordinary Artifacts stay public; Museum admission and placement use all-time Museum votes without time weighting; the strongest accession receives architectural prominence; public voting cannot deaccession it; and exceptional withdrawal preserves a tombstone.");
