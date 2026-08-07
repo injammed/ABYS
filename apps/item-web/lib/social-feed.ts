@@ -1,4 +1,4 @@
-import { FeedArtifact, FeedLane, OriginClass } from "@/lib/feed";
+import { ArtifactPart, FeedArtifact, FeedLane, OriginClass } from "@/lib/feed";
 import { cursorForRow, decodeFeedCursor, feedCursorFilter } from "@/lib/feed-cursor";
 import { requireSupabaseBrowserClient } from "@/lib/supabase-browser";
 
@@ -35,6 +35,21 @@ type PrivateArtifactRow = Omit<ArtifactRow, "lane" | "published_at"> & {
   status: "quarantine" | "needs_revision";
 };
 
+type ArtifactPartRow = {
+  id: string;
+  artifact_id: string;
+  position: number;
+  part_kind: "file" | "text" | "reference";
+  mode: ArtifactPart["mode"];
+  label: string | null;
+  storage_path: string | null;
+  original_filename: string | null;
+  mime_type: string | null;
+  byte_size: number | string | null;
+  text_content: string | null;
+  reference_url: string | null;
+};
+
 type RawVoteRow = { artifact_id: string; judgment: string };
 
 type BinaryJudgmentRow = {
@@ -57,7 +72,7 @@ function creatorName(row: ArtifactRow | PrivateArtifactRow): string {
 
 function isUniversalArtifactMigrationMissing(error: { message?: string; code?: string } | null | undefined): boolean {
   const message = error?.message?.toLowerCase() ?? "";
-  return error?.code === "42703" || message.includes("artifact_description") || message.includes("artifact_modes");
+  return error?.code === "42703" || error?.code === "42P01" || message.includes("artifact_description") || message.includes("artifact_modes") || message.includes("artifact_parts");
 }
 
 function modeLead(row: ArtifactRow | PrivateArtifactRow): string {
@@ -65,11 +80,79 @@ function modeLead(row: ArtifactRow | PrivateArtifactRow): string {
   return modes.map((mode) => mode === "model3d" ? "3D" : mode).join(" · ");
 }
 
+function safeReferenceUrl(value: string | null): string | undefined {
+  if (!value) return undefined;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.href : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 async function signedImageUrl(path: string | null): Promise<string | undefined> {
   if (!path) return undefined;
   const client = requireSupabaseBrowserClient();
   const { data, error } = await client.storage.from("artifact-media").createSignedUrl(path, 60 * 60);
   return error ? undefined : data?.signedUrl;
+}
+
+async function loadArtifactParts(artifactIds: string[]): Promise<Map<string, ArtifactPart[]>> {
+  const byArtifact = new Map<string, ArtifactPart[]>();
+  if (artifactIds.length === 0) return byArtifact;
+
+  const client = requireSupabaseBrowserClient();
+  const { data, error } = await client
+    .from("artifact_parts")
+    .select("id,artifact_id,position,part_kind,mode,label,storage_path,original_filename,mime_type,byte_size,text_content,reference_url")
+    .in("artifact_id", artifactIds)
+    .order("position", { ascending: true });
+
+  if (error) {
+    if (isUniversalArtifactMigrationMissing(error)) return byArtifact;
+    throw error;
+  }
+
+  const rows = (data ?? []) as ArtifactPartRow[];
+  const storagePaths = Array.from(new Set(rows.flatMap((row) => row.storage_path ? [row.storage_path] : [])));
+  const signedByPath = new Map<string, string>();
+
+  if (storagePaths.length > 0) {
+    const signed = await client.storage.from("artifact-media").createSignedUrls(storagePaths, 60 * 60);
+    if (!signed.error) {
+      (signed.data ?? []).forEach((entry, index) => {
+        const path = storagePaths[index];
+        if (path && entry.signedUrl) signedByPath.set(path, entry.signedUrl);
+      });
+    }
+  }
+
+  for (const row of rows) {
+    const referenceUrl = safeReferenceUrl(row.reference_url);
+    const part: ArtifactPart = {
+      id: row.id,
+      position: row.position,
+      partKind: row.part_kind,
+      mode: row.mode,
+      label: row.label || undefined,
+      filename: row.original_filename || undefined,
+      mimeType: row.mime_type || undefined,
+      byteSize: row.byte_size == null ? undefined : Number(row.byte_size),
+      text: row.text_content || undefined,
+      referenceUrl,
+      signedUrl: row.storage_path ? signedByPath.get(row.storage_path) : undefined,
+    };
+
+    const current = byArtifact.get(row.artifact_id) ?? [];
+    current.push(part);
+    byArtifact.set(row.artifact_id, current);
+  }
+
+  return byArtifact;
+}
+
+function firstImageUrl(parts: ArtifactPart[] | undefined): string | undefined {
+  return parts?.find((part) => part.mode === "image" && part.signedUrl)?.signedUrl;
 }
 
 export async function loadPublicFeedPage(options: {
@@ -117,28 +200,32 @@ export async function loadPublicFeedPage(options: {
   const judgmentsByArtifact = new Map<string, BinaryJudgmentRow>();
   const slopRanksByArtifact = new Map<string, SlopRankRow>();
 
-  if (ids.length > 0) {
-    const [judgmentResult, rankResult] = await Promise.all([
-      client.rpc("get_artifact_binary_judgments", { p_artifact_ids: ids }),
-      client.rpc("get_artifact_slop_ranks", { p_artifact_ids: ids }),
-    ]);
+  const [partsByArtifact, judgmentResult, rankResult] = await Promise.all([
+    loadArtifactParts(ids),
+    ids.length > 0 ? client.rpc("get_artifact_binary_judgments", { p_artifact_ids: ids }) : Promise.resolve({ data: [], error: null }),
+    ids.length > 0 ? client.rpc("get_artifact_slop_ranks", { p_artifact_ids: ids }) : Promise.resolve({ data: [], error: null }),
+  ]);
 
-    if (judgmentResult.error) throw judgmentResult.error;
-    for (const judgment of (judgmentResult.data ?? []) as BinaryJudgmentRow[]) {
-      judgmentsByArtifact.set(judgment.artifact_id, judgment);
-    }
+  if (judgmentResult.error) throw judgmentResult.error;
+  for (const judgment of (judgmentResult.data ?? []) as BinaryJudgmentRow[]) {
+    judgmentsByArtifact.set(judgment.artifact_id, judgment);
+  }
 
-    // Rank is additive display metadata. If ranking temporarily fails, the
-    // infinite feed remains available rather than disappearing.
-    if (!rankResult.error) {
-      for (const rank of (rankResult.data ?? []) as SlopRankRow[]) {
-        slopRanksByArtifact.set(rank.artifact_id, rank);
-      }
+  // Rank is additive display metadata. If ranking temporarily fails, the
+  // infinite feed remains available rather than disappearing.
+  if (!rankResult.error) {
+    for (const rank of (rankResult.data ?? []) as SlopRankRow[]) {
+      slopRanksByArtifact.set(rank.artifact_id, rank);
     }
   }
 
-  const mediaEntries = await Promise.all(rows.map(async (row) => [row.id, await signedImageUrl(row.media_path)] as const));
-  const mediaByArtifact = new Map(mediaEntries);
+  // Legacy pre-manifest artifacts still get their historical image preview.
+  const legacyMediaEntries = await Promise.all(rows.map(async (row) => {
+    const parts = partsByArtifact.get(row.id);
+    if (firstImageUrl(parts)) return [row.id, firstImageUrl(parts)] as const;
+    return [row.id, await signedImageUrl(row.media_path)] as const;
+  }));
+  const mediaByArtifact = new Map(legacyMediaEntries);
 
   const artifacts: FeedArtifact[] = rows.map((row) => {
     const judgments = judgmentsByArtifact.get(row.id);
@@ -161,6 +248,7 @@ export async function loadPublicFeedPage(options: {
       },
       gradient: laneGradients[row.lane],
       mediaUrl: mediaByArtifact.get(row.id),
+      parts: partsByArtifact.get(row.id) ?? [],
       museumVotes: judgments ? Number(judgments.museum_count) : 0,
       slopVotes: judgments ? Number(judgments.slop_count) : 0,
       slopRank: slopRank ? Number(slopRank.slop_rank) : undefined,
@@ -201,8 +289,14 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
   if (loadError) throw loadError;
 
   const rows = (rawData ?? []) as PrivateArtifactRow[];
-  const mediaEntries = await Promise.all(rows.map(async (row) => [row.id, await signedImageUrl(row.media_path)] as const));
-  const mediaByArtifact = new Map(mediaEntries);
+  const ids = rows.map((row) => row.id);
+  const partsByArtifact = await loadArtifactParts(ids);
+  const legacyMediaEntries = await Promise.all(rows.map(async (row) => {
+    const parts = partsByArtifact.get(row.id);
+    if (firstImageUrl(parts)) return [row.id, firstImageUrl(parts)] as const;
+    return [row.id, await signedImageUrl(row.media_path)] as const;
+  }));
+  const mediaByArtifact = new Map(legacyMediaEntries);
 
   return rows.map((row) => ({
     id: row.id,
@@ -221,6 +315,7 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
     },
     gradient: laneGradients.unjudged,
     mediaUrl: mediaByArtifact.get(row.id),
+    parts: partsByArtifact.get(row.id) ?? [],
     museumVotes: 0,
     slopVotes: 0,
     publishedAt: row.created_at,
