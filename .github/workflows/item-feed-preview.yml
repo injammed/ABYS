@@ -71,6 +71,9 @@ jobs:
       - name: Verify machine-first translation surface
         run: npm run verify:machine-gloss
 
+      - name: Verify translation layout stability
+        run: npm run verify:lexicon-layout
+
       - name: Verify universal Artifact runtime
         run: npm run verify:runtime
 
