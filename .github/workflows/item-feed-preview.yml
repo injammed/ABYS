@@ -68,6 +68,9 @@ jobs:
       - name: Verify throw-it-in submission simplicity
         run: npm run verify:throw-it-in
 
+      - name: Verify machine-first translation surface
+        run: npm run verify:machine-gloss
+
       - name: Verify universal Artifact runtime
         run: npm run verify:runtime
 
