@@ -68,6 +68,9 @@ jobs:
       - name: Verify throw-it-in submission simplicity
         run: npm run verify:throw-it-in
 
+      - name: Verify Museum accession lifecycle
+        run: npm run verify:museum-accession
+
       - name: Verify curator migration contract
         run: npm run verify:curator
 

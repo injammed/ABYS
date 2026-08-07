@@ -94,6 +94,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:throw-it-in
 
+      - name: Verify Museum accession lifecycle
+        working-directory: apps/item-web
+        run: npm run verify:museum-accession
+
       - name: Verify curator migration contract
         working-directory: apps/item-web
         run: npm run verify:curator

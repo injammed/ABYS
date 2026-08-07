@@ -115,7 +115,7 @@ export function BinarySwipeVoting() {
         box-shadow: 20px 24px 90px rgba(213,166,63,.24);
       }
 
-      .artifact-card[data-swipe-voting="enabled"] .judgment-row[data-vote-contract="binary-slop-museum-v2"] {
+      .artifact-card[data-swipe-voting="enabled"] .judgment-row[data-vote-contract="binary-slop-museum-v3-glyph"] {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
@@ -125,12 +125,6 @@ export function BinarySwipeVoting() {
 
       .artifact-card[data-swipe-voting="enabled"] .judge[data-binary-vote="museum"] {
         grid-column: 2;
-      }
-
-      .artifact-card[data-swipe-voting="enabled"] .judge[data-binary-vote="museum"].selected {
-        border-color: var(--gold);
-        color: var(--gold-light);
-        background: rgba(213,166,63,.12);
       }
 
       @media (prefers-reduced-motion: reduce) {

@@ -120,11 +120,12 @@ requirePattern("intake trigger helper lockdown", /revoke all on function public\
 requirePattern("auth trigger helper lockdown", /revoke all on function public\.handle_new_user\(\) from public, anon, authenticated;/, migration10);
 requirePattern("touch trigger search path pin", /alter function public\.touch_updated_at\(\)[\s\S]*set search_path = public, pg_temp;/, migration10);
 
-requirePattern("curator UI Unjudged action", /Approve → publish Unjudged/, curator);
+requirePattern("exception hold release to Unjudged", /Release → public Unjudged/, curator);
 requirePattern("curator true nature review", /True nature/, curator);
 requirePattern("curator manifest review", /ARTIFACT MANIFEST/, curator);
 requirePattern("safe text display", /<pre[\s\S]*part\.text_content/, curator);
 requirePattern("reference not fetched notice", /Reference recorded, not fetched/, curator);
+requirePattern("ordinary uploads bypass curator queue", /Ordinary uploads do not wait here/, curator);
 forbidPattern("direct Museum quarantine option", /option value="aetimm"/, curator);
 
 requirePattern("nullable media path", /media_path: string \| null/, socialFeed);
@@ -137,4 +138,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal Artifact intake PASS: the active Throw It In surface accepts one multimodal Artifact through bounded validation; code remains inert, URLs remain unfetched, server staging stays private until atomic publication, and maintenance can lock capability without replacing the product surface.");
+console.log("Universal Artifact intake PASS: the active Throw It In surface accepts one multimodal Artifact through bounded validation; code remains inert, URLs remain unfetched, server staging stays private until atomic publication, ordinary uploads bypass curator waiting, and exceptional holds remain a separate safety/integrity path.");
