@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { LexiconBroadcastProvider } from "@/components/LexiconBroadcast";
 import "./globals.css";
 import "./witness.css";
 import "./identity.css";
@@ -36,7 +37,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <LexiconBroadcastProvider>{children}</LexiconBroadcastProvider>
+      </body>
     </html>
   );
 }

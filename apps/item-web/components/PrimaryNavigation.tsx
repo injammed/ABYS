@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AccountGate } from "@/components/AccountGate";
+import { LexiconText } from "@/components/LexiconBroadcast";
 import { SlopDrop } from "@/components/SlopDrop";
 
 type PrimaryMode = "feed" | "museum";
@@ -20,11 +21,12 @@ export function PrimaryNavigation({ mode }: PrimaryNavigationProps) {
           className={mode === "feed" ? "primary-mode-link primary-mode-feed active" : "primary-mode-link primary-mode-feed"}
           href="/#field"
           aria-current={mode === "feed" ? "page" : undefined}
+          aria-label="Slop Trough, infinite feed"
         >
           <span className="primary-navigation-mark" aria-hidden="true">≋</span>
-          <span>
-            <strong>SLOP TROUGH</strong>
-            <small>Infinite feed</small>
+          <span aria-hidden="true">
+            <LexiconText as="strong" text="SLOP TROUGH" phase={5} semantic={false} />
+            <LexiconText as="small" text="Infinite feed" phase={13} semantic={false} />
           </span>
         </Link>
 
@@ -32,11 +34,12 @@ export function PrimaryNavigation({ mode }: PrimaryNavigationProps) {
           className={mode === "museum" ? "primary-mode-link primary-mode-museum active" : "primary-mode-link primary-mode-museum"}
           href="/aetimm/"
           aria-current={mode === "museum" ? "page" : undefined}
+          aria-label="AETIMM Museum, spatial selection"
         >
           <span className="primary-navigation-mark" aria-hidden="true">◇</span>
-          <span>
-            <strong>AETIMM MUSEUM</strong>
-            <small>Spatial selection</small>
+          <span aria-hidden="true">
+            <LexiconText as="strong" text="AETIMM MUSEUM" phase={17} semantic={false} />
+            <LexiconText as="small" text="Spatial selection" phase={23} semantic={false} />
           </span>
         </Link>
       </div>
@@ -46,9 +49,9 @@ export function PrimaryNavigation({ mode }: PrimaryNavigationProps) {
           <SlopDrop />
         </div>
 
-        <Link className="primary-navigation-link" href="/about/">
+        <Link className="primary-navigation-link" href="/about/" aria-label="About">
           <span className="primary-navigation-mark" aria-hidden="true">i</span>
-          <span>About</span>
+          <LexiconText text="About" phase={29} semantic={false} />
         </Link>
 
         <div className="primary-navigation-action primary-navigation-account">

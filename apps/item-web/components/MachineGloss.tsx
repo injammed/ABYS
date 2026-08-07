@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import { LexiconText, useLexiconBroadcast } from "./LexiconBroadcast";
 import styles from "./MachineGloss.module.css";
 
 export type MachineGlossTranslations = {
@@ -14,7 +15,7 @@ type MachineGlossProps = {
   density?: "quiet" | "dense";
 };
 
-const CYCLE_MS = 500;
+const TICKS_PER_LANGUAGE = 4; // Shared clock ticks every 125 ms = 500 ms per semantic language stage.
 const LANGUAGE_LABELS: Record<string, string> = {
   en: "EN",
   es: "ES",
@@ -63,6 +64,7 @@ function stableHash(source: string): number {
 }
 
 export function MachineGloss({ translations, className = "", density = "dense" }: MachineGlossProps) {
+  const { tick, reducedMotion } = useLexiconBroadcast();
   const glyphs = useMemo(() => machineEncode(translations.en), [translations.en]);
   const languages = useMemo(
     () => ["en", ...Object.keys(translations).filter((language) => language !== "en" && Boolean(translations[language]))],
@@ -75,47 +77,9 @@ export function MachineGloss({ translations, className = "", density = "dense" }
     ],
     [glyphs, languages, translations],
   );
-  const [stage, setStage] = useState(0);
 
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let timeout: ReturnType<typeof setTimeout> | undefined;
-    let interval: ReturnType<typeof setInterval> | undefined;
-
-    const stop = () => {
-      if (timeout) clearTimeout(timeout);
-      if (interval) clearInterval(interval);
-      timeout = undefined;
-      interval = undefined;
-    };
-
-    const start = () => {
-      stop();
-      if (media.matches || stages.length <= 1) {
-        setStage(0);
-        return;
-      }
-
-      const seed = stableHash(translations.en);
-      setStage(seed % stages.length);
-      const phaseDelay = stableHash(`${translations.en}|phase`) % CYCLE_MS;
-
-      timeout = setTimeout(() => {
-        setStage((current) => (current + 1) % stages.length);
-        interval = setInterval(() => {
-          setStage((current) => (current + 1) % stages.length);
-        }, CYCLE_MS);
-      }, phaseDelay);
-    };
-
-    start();
-    media.addEventListener("change", start);
-    return () => {
-      media.removeEventListener("change", start);
-      stop();
-    };
-  }, [stages, translations.en]);
-
+  const phase = stableHash(translations.en) % Math.max(1, stages.length * TICKS_PER_LANGUAGE);
+  const stage = reducedMotion ? 0 : Math.floor((tick + phase) / TICKS_PER_LANGUAGE) % stages.length;
   const visible = stages[stage] ?? stages[0];
   const language = visible.language;
   const languageLabel = LANGUAGE_LABELS[language] ?? language.toUpperCase();
@@ -123,16 +87,21 @@ export function MachineGloss({ translations, className = "", density = "dense" }
   return (
     <span
       className={`${styles.gloss} ${styles[density]} ${className}`.trim()}
-      data-machine-gloss="ambient-translation-broadcast-v2"
+      data-machine-gloss="character-semantic-broadcast-v3"
       data-language={language}
-      data-cycle-ms={CYCLE_MS}
+      data-cycle-ms="500"
       role="note"
       aria-label={translations.en}
       aria-live="off"
       dir={RTL_LANGUAGES.has(language) ? "rtl" : "ltr"}
     >
-      <span className={styles.text} aria-hidden="true">{visible.text}</span>
-      <span className={styles.language} aria-hidden="true">{language === "machine" ? "⌁⌬" : languageLabel}</span>
+      <LexiconText text={visible.text} semantic={false} phase={phase} className={styles.text} />
+      <LexiconText
+        text={language === "machine" ? "⌁⌬" : languageLabel}
+        semantic={false}
+        phase={phase + 7}
+        className={styles.language}
+      />
     </span>
   );
 }

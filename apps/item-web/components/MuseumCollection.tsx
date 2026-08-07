@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { loadMuseumCollection, MuseumAccession } from "@/lib/museum";
+import { LexiconText } from "./LexiconBroadcast";
 import { MuseumArtifactRuntime } from "./MuseumArtifactRuntime";
 import styles from "./MuseumCollection.module.css";
 
@@ -39,6 +40,11 @@ export function MuseumCollection() {
   }, []);
 
   const state = loading ? "loading" : error ? "error" : accessions.length === 0 ? "empty" : "open";
+  const registerState = loading
+    ? "reading accession register"
+    : error
+      ? "register unavailable"
+      : `${accessions.length} accession${accessions.length === 1 ? "" : "s"}`;
 
   return (
     <section
@@ -47,42 +53,37 @@ export function MuseumCollection() {
       aria-label="AETIMM permanent collection"
       data-collection-state={state}
       data-empty-museum-is-destination="true"
+      data-lexicon-surface="true"
     >
       <div className={styles.roomHeader}>
-        <p>PERMANENT COLLECTION</p>
-        <span>
-          {loading
-            ? "reading accession register"
-            : error
-              ? "register unavailable"
-              : `${accessions.length} accession${accessions.length === 1 ? "" : "s"}`}
-        </span>
+        <LexiconText as="p" text="PERMANENT COLLECTION" phase={5} />
+        <LexiconText text={registerState} phase={11} />
       </div>
 
       {loading && (
         <div className={styles.emptyChamber} aria-live="polite">
           <div className={styles.voidPedestal} aria-hidden="true" />
-          <p className={styles.accession}>ACCESSION REGISTER</p>
-          <h2>Opening the collection.</h2>
-          <p>The room is already here. The register is being read.</p>
+          <LexiconText as="p" className={styles.accession} text="ACCESSION REGISTER" phase={17} />
+          <LexiconText as="h2" text="Opening the collection." phase={19} />
+          <LexiconText as="p" text="The room is already here. The register is being read." phase={23} />
         </div>
       )}
 
       {!loading && error && (
-        <div className={styles.emptyChamber} role="alert">
+        <div className={styles.emptyChamber} role="alert" aria-label="The register is unavailable. The Museum remains open.">
           <div className={styles.voidPedestal} aria-hidden="true" />
-          <p className={styles.accession}>PERMANENT COLLECTION</p>
-          <h2>The register is unavailable.</h2>
-          <p>The Museum remains open. No false collection is substituted.</p>
+          <LexiconText as="p" className={styles.accession} text="PERMANENT COLLECTION" phase={29} semantic={false} />
+          <LexiconText as="h2" text="The register is unavailable." phase={31} semantic={false} />
+          <LexiconText as="p" text="The Museum remains open. No false collection is substituted." phase={37} semantic={false} />
         </div>
       )}
 
       {!loading && !error && accessions.length === 0 && (
         <div className={styles.emptyChamber} aria-label="Empty Museum collection">
           <div className={styles.voidPedestal} aria-hidden="true" />
-          <p className={styles.accession}>ACCESSION 000000</p>
-          <h2>The hall is empty.</h2>
-          <p>No Artifact has crossed the permanent accession threshold yet.</p>
+          <LexiconText as="p" className={styles.accession} text="ACCESSION 000000" phase={41} semantic={false} />
+          <LexiconText as="h2" text="The hall is empty." phase={43} semantic={false} />
+          <LexiconText as="p" text="No Artifact has crossed the permanent accession threshold yet." phase={47} semantic={false} />
         </div>
       )}
 
@@ -95,6 +96,8 @@ export function MuseumCollection() {
               : placement === "wall"
                 ? styles.wallCase
                 : styles.case;
+            const phase = 53 + index * 13;
+            const formText = `${accession.modes.map((mode) => mode === "model3d" ? "3D" : mode).join(" · ")}${accession.parts.length > 0 ? ` · ${accession.parts.length} material${accession.parts.length === 1 ? "" : "s"}` : ""}`;
 
             return (
               <article
@@ -107,15 +110,17 @@ export function MuseumCollection() {
                 </div>
 
                 <div className={styles.plaque}>
-                  <p className={styles.accession}>{accessionLabel(accession.accessionNumber)}</p>
-                  <h2>{accession.title}</h2>
-                  <p className={styles.creator}>{accession.creator}</p>
-                  <p className={styles.summary}>{accession.summary}</p>
-                  <p className={styles.form}>
-                    {accession.modes.map((mode) => mode === "model3d" ? "3D" : mode).join(" · ")}
-                    {accession.parts.length > 0 ? ` · ${accession.parts.length} material${accession.parts.length === 1 ? "" : "s"}` : ""}
-                  </p>
-                  <p className={styles.date}>Accessioned {new Date(accession.admittedAt).toLocaleDateString()}</p>
+                  <LexiconText as="p" className={styles.accession} text={accessionLabel(accession.accessionNumber)} phase={phase} />
+                  <LexiconText as="h2" text={accession.title} phase={phase + 1} />
+                  <LexiconText as="p" className={styles.creator} text={accession.creator} phase={phase + 2} />
+                  <LexiconText as="p" className={styles.summary} text={accession.summary} phase={phase + 3} />
+                  <LexiconText as="p" className={styles.form} text={formText} phase={phase + 4} />
+                  <LexiconText
+                    as="p"
+                    className={styles.date}
+                    text={`Accessioned ${new Date(accession.admittedAt).toLocaleDateString()}`}
+                    phase={phase + 5}
+                  />
                 </div>
               </article>
             );

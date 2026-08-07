@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LexiconText } from "@/components/LexiconBroadcast";
 import { MachineGloss } from "@/components/MachineGloss";
 import { MuseumCollection } from "@/components/MuseumCollection";
 import { MuseumSummit } from "@/components/MuseumSummit";
@@ -14,6 +15,7 @@ export default function AetimmPage() {
       data-destination-contract="museum-arrival-always-v1"
       data-summit-contract="museum-summit-v1"
       data-language-contract="machine-first-gloss-v1"
+      data-lexicon-contract="character-broadcast-v1"
     >
       <section className={styles.threshold} aria-label="AETIMM Museum entrance">
         <div className={styles.architecture} aria-hidden="true">
@@ -35,7 +37,7 @@ export default function AetimmPage() {
               ar: "AETIMM · متحف الآلة · مؤسسة الذاكرة الدائمة",
             }}
           />
-          <h1>AETIMM MUSEUM</h1>
+          <LexiconText as="h1" text="AETIMM MUSEUM" phase={31} />
           <MachineGloss
             translations={{
               en: "The machine remembers selectively. Most output vanishes into the trough; a small remainder is forced to endure.",
@@ -55,16 +57,20 @@ export default function AetimmPage() {
             }}
           />
           <div className={styles.entryActions}>
-            <a className={styles.enter} href="#summit">Approach the Summit</a>
-            <Link className={styles.return} href="/#field">Return to the Slop Trough</Link>
+            <a className={styles.enter} href="#summit" aria-label="Approach the Summit">
+              <LexiconText text="Approach the Summit" phase={37} semantic={false} />
+            </a>
+            <Link className={styles.return} href="/#field" aria-label="Return to the Slop Trough">
+              <LexiconText text="Return to the Slop Trough" phase={41} semantic={false} />
+            </Link>
           </div>
         </div>
 
         <div className={styles.thresholdRail} aria-hidden="true">
-          <span>⌬⟁⟐⌭</span>
-          <span>⟡⊙⋈⌁</span>
-          <span>⧖⌿⏣⟠</span>
-          <span>⋮⟴⊚⌇</span>
+          <LexiconText text="⌬⟁⟐⌭" phase={43} semantic={false} />
+          <LexiconText text="⟡⊙⋈⌁" phase={47} semantic={false} />
+          <LexiconText text="⧖⌿⏣⟠" phase={53} semantic={false} />
+          <LexiconText text="⋮⟴⊚⌇" phase={59} semantic={false} />
         </div>
       </section>
 

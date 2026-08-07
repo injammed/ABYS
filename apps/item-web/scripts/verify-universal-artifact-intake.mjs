@@ -33,7 +33,7 @@ const forbidPattern = (label, pattern, source) => {
 requirePattern("all slop welcome surface law", /ALL SLOP WELCOME\./, intake);
 requirePattern("one Artifact any modality law", /One Artifact\. Any modality\./, intake);
 requirePattern("same public Unjudged feed copy", /lands in Unjudged and joins the endless feed/, intake);
-requirePattern("AI-made Artifact material surface", />AI-made Artifact</, intake);
+requirePattern("AI-made Artifact material surface", /<LexiconText\b[^>]*text="AI-made Artifact"/, intake);
 requirePattern("custom Add material action", /Add material/, intake);
 requirePattern("CSS-module material picker", /styles\.materialPicker/, intake);
 requirePattern("native file input visually hidden", /styles\.materialInput/, intake);
@@ -69,7 +69,7 @@ requirePattern("mobile picker layout", /@media \(max-width: 430px\)/, intakeStyl
 
 // Maintenance changes capability, never the visible product primitive.
 requirePattern("paused intake keeps Artifact form mounted", /\{open && session && \(/, intake);
-requirePattern("paused state visible status", /<strong>TROUGH PAUSED\.<\/strong>/, intake);
+requirePattern("paused state visible status", /TROUGH PAUSED\. The form stays visible; throwing is temporarily locked\./, intake);
 requirePattern("paused state preserves form", /form stays visible/, intake);
 requirePattern("paused fieldset lock", /<fieldset className=\{styles\.formFieldset\} disabled=\{busy \|\| intakePaused\}>/, intake);
 requirePattern("paused file input lock", /disabled=\{busy \|\| intakePaused\}/, intake);
@@ -138,4 +138,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal Artifact intake PASS: the active Throw It In surface accepts one multimodal Artifact through bounded validation; code remains inert, URLs remain unfetched, server staging stays private until atomic publication, ordinary uploads bypass curator waiting, and exceptional holds remain a separate safety/integrity path.");
+console.log("Universal Artifact intake PASS: the active Throw It In surface accepts one multimodal Artifact through bounded validation; character-level interface rendering does not weaken file limits, atomic staging, inert execution boundaries, immediate public publication, or exceptional-hold separation.");
