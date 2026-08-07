@@ -31,9 +31,13 @@ requirePattern("all slop welcome surface law", /ALL SLOP WELCOME\./, intake);
 requirePattern("full modality invitation", /Full-modality AI-made Artifacts belong here/, intake);
 requirePattern("one artifact binding copy", /Everything you add becomes one Artifact/, intake);
 requirePattern("same infinite feed copy", /same infinite feed/, intake);
-requirePattern("artifact materials label", /Artifact materials/, intake);
+requirePattern("AI-made Artifact material surface", />AI-made Artifact</, intake);
+requirePattern("custom Add material action", />Add material</, intake);
+requirePattern("custom material picker class", /artifact-material-picker/, intake);
+requirePattern("native file input visually hidden", /className="artifact-file-input"/, intake);
+requirePattern("material modes helper", /image · video · audio · PDF · code · data · 3D/, intake);
 requirePattern("no-materials state", /No materials added/, intake);
-requirePattern("materials bind as one artifact", /Everything selected is submitted together as one Artifact/, intake);
+requirePattern("materials bind as one artifact", /Everything added here belongs to one Artifact/, intake);
 requirePattern("multi-file intake", /type="file"[\s\S]*multiple/, intake);
 requirePattern("whole artifact experience description", /How should it be experienced\?/, intake);
 requirePattern("text part", /textPart/, intake);
@@ -44,6 +48,7 @@ requirePattern("private artifact path namespace", /session\.user\.id.*artifactId
 requirePattern("rollback uploaded paths", /storage\.from\("artifact-media"\)\.remove\(uploadedPaths\)/, intake);
 requirePattern("mixed mode detection", /new Set\(parts\.map\(\(part\) => part\.mode\)\)/, intake);
 forbidPattern("image-only intake copy", /Choose an image to upload|AI-made image|JPEG, PNG, WebP, or GIF images|No image selected/, intake);
+forbidPattern("browser-native file-picker wording", /Choose File|No file selected/, intake);
 
 requirePattern("permanent artifact covenant", /## Permanent Artifact Covenant/, architecture);
 requirePattern("one artifact identity law", /Every Artifact has one identity/, architecture);
@@ -88,4 +93,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal artifact intake PASS: All Slop Welcome means one Artifact may bind multiple inert modes into private quarantine, curators review the complete manifest, first publication enters Unjudged, every approved Artifact targets the same infinite feed, and the architecture covenant remains intact.");
+console.log("Universal artifact intake PASS: All Slop Welcome means the surface says AI-made Artifact, the native browser file picker is replaced by Add material, one Artifact may bind multiple inert modes into private quarantine, first publication enters Unjudged, and every approved Artifact targets the same infinite feed.");
