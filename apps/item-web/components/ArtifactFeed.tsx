@@ -23,6 +23,30 @@ type VoteRequestState = {
   message: string;
 };
 
+function SlopGlyph() {
+  return (
+    <svg className={styles.voteGlyph} viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M10 17c8-7 17-8 27-3l9 5-13 20c-3 5-8 7-13 4l-7-4c-5-3-7-9-4-14l1-2" />
+      <path d="M31 38c0 7-2 12-5 12s-4-5-2-10" />
+      <path d="M42 29c4 8 3 15-1 16-3 1-5-3-4-8" />
+      <path d="M13 50c8 4 18 4 28 0 5-2 10-2 14 1" />
+    </svg>
+  );
+}
+
+function MuseumGlyph() {
+  return (
+    <svg className={styles.voteGlyph} viewBox="0 0 64 64" aria-hidden="true">
+      <ellipse cx="32" cy="33" rx="23" ry="8" />
+      <ellipse cx="32" cy="33" rx="18" ry="15" transform="rotate(24 32 33)" />
+      <ellipse cx="32" cy="33" rx="18" ry="15" transform="rotate(-24 32 33)" />
+      <path d="M32 48V15" />
+      <path d="m25 22 7-8 7 8" />
+      <circle cx="32" cy="33" r="3" />
+    </svg>
+  );
+}
+
 function appendUnique(current: FeedArtifact[], incoming: FeedArtifact[]): FeedArtifact[] {
   const existing = new Set(current.map((artifact) => artifact.id));
   return [...current, ...incoming.filter((artifact) => !existing.has(artifact.id))];
@@ -369,28 +393,32 @@ export function ArtifactFeed() {
                   <div className="preview-judgment-lock">Voting locked while held.</div>
                 ) : (
                   <div
-                    className="judgment-row"
-                    data-vote-contract="binary-slop-museum-v2"
+                    className={`${styles.ballot} judgment-row`}
+                    data-vote-contract="binary-slop-museum-v3-glyph"
                     aria-label="Vote Slop or Museum"
                     aria-busy={votePending}
                   >
                     <button
-                      className={judgment === "slop" ? "judge slop selected" : "judge slop"}
+                      className={`${styles.voteButton} ${styles.slopVote} judge slop${judgment === "slop" ? " selected" : ""}`}
                       data-binary-vote="slop"
                       onClick={() => void judge(artifact.id, "slop")}
                       disabled={votePending}
+                      aria-label="Vote Slop"
                       aria-pressed={judgment === "slop"}
                     >
-                      Slop
+                      <SlopGlyph />
+                      <span className={styles.srOnly}>Slop</span>
                     </button>
                     <button
-                      className={judgment === "preserve" ? "judge museum selected" : "judge museum"}
+                      className={`${styles.voteButton} ${styles.museumVote} judge museum${judgment === "preserve" ? " selected" : ""}`}
                       data-binary-vote="museum"
                       onClick={() => void judge(artifact.id, "preserve")}
                       disabled={votePending}
+                      aria-label="Vote Museum"
                       aria-pressed={judgment === "preserve"}
                     >
-                      Museum
+                      <MuseumGlyph />
+                      <span className={styles.srOnly}>Museum</span>
                     </button>
                   </div>
                 )}
