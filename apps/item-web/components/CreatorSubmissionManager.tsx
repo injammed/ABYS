@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import type { OriginClass } from "@/lib/feed";
+import { LexiconText } from "@/components/LexiconBroadcast";
 import {
   CreatorArtifact,
   CreatorRevision,
@@ -127,61 +128,73 @@ export function CreatorSubmissionManager({ session }: { session: Session }) {
   }
 
   if (loading && artifacts.length === 0) {
-    return <p className="submission-note">Loading artifact lifecycle…</p>;
+    return <LexiconText as="p" className="submission-note" text="Loading artifact lifecycle…" phase={3} />;
   }
 
   return (
-    <section className="creator-lifecycle" aria-label="My artifact lifecycle">
+    <section className="creator-lifecycle" aria-label="My artifact lifecycle" data-lexicon-surface="true">
       <div className="creator-lifecycle-heading">
-        <p className="eyebrow">MY ARTIFACTS</p>
-        <button type="button" onClick={() => void refresh()} disabled={loading}>
-          {loading ? "Refreshing…" : "Refresh"}
+        <LexiconText as="p" className="eyebrow" text="MY ARTIFACTS" phase={5} />
+        <button type="button" onClick={() => void refresh()} disabled={loading} aria-label={loading ? "Refreshing" : "Refresh"}>
+          <LexiconText text={loading ? "Refreshing…" : "Refresh"} phase={7} semantic={false} />
         </button>
       </div>
 
-      {message && <p className="submission-note" role="status">{message}</p>}
+      {message && (
+        <p className="submission-note" role="status" aria-label={message}>
+          <LexiconText text={message} phase={11} semantic={false} />
+        </p>
+      )}
 
       {artifacts.length === 0 ? (
-        <p className="submission-note">No artifacts submitted yet.</p>
+        <LexiconText as="p" className="submission-note" text="No artifacts submitted yet." phase={13} />
       ) : (
-        artifacts.map((artifact) => {
+        artifacts.map((artifact, artifactIndex) => {
           const decision = latestDecision(artifact);
           const editable = artifact.status === "quarantine" || artifact.status === "needs_revision";
           const editing = editingId === artifact.id;
           const busy = busyId === artifact.id;
           const draft = drafts[artifact.id] ?? revisionFromArtifact(artifact);
+          const phase = 17 + artifactIndex * 29;
+          const submittedText = `Submitted ${new Date(artifact.created_at).toLocaleString()}${artifact.published_at ? ` · published ${new Date(artifact.published_at).toLocaleString()}` : ""}`;
+          const saveLabel = busy
+            ? "Saving…"
+            : artifact.status === "needs_revision"
+              ? "Save + resubmit for review"
+              : "Save private changes";
 
           return (
             <article className={`creator-artifact creator-artifact-${artifact.status}`} key={artifact.id}>
               <div className="creator-artifact-header">
                 <div>
-                  <strong>{artifact.title}</strong>
-                  <span>{statusLabel(artifact)}</span>
+                  <LexiconText as="strong" text={artifact.title} phase={phase} />
+                  <LexiconText text={statusLabel(artifact)} phase={phase + 1} />
                 </div>
                 {editable && !editing && (
-                  <button type="button" onClick={() => setEditingId(artifact.id)}>
-                    {artifact.status === "needs_revision" ? "Revise" : "Edit"}
+                  <button
+                    type="button"
+                    onClick={() => setEditingId(artifact.id)}
+                    aria-label={artifact.status === "needs_revision" ? "Revise" : "Edit"}
+                  >
+                    <LexiconText text={artifact.status === "needs_revision" ? "Revise" : "Edit"} phase={phase + 2} semantic={false} />
                   </button>
                 )}
               </div>
 
-              <p className="creator-artifact-time">
-                Submitted {new Date(artifact.created_at).toLocaleString()}
-                {artifact.published_at ? ` · published ${new Date(artifact.published_at).toLocaleString()}` : ""}
-              </p>
+              <LexiconText as="p" className="creator-artifact-time" text={submittedText} phase={phase + 3} />
 
               {decision && (
                 <div className="creator-decision-note">
-                  <b>{decision.event_type.replace("_", " ")}</b>
-                  <span>{new Date(decision.created_at).toLocaleString()}</span>
-                  <p>{decision.note}</p>
+                  <LexiconText as="b" text={decision.event_type.replace("_", " ")} phase={phase + 4} />
+                  <LexiconText text={new Date(decision.created_at).toLocaleString()} phase={phase + 5} />
+                  <LexiconText as="p" text={decision.note} phase={phase + 6} />
                 </div>
               )}
 
               {editing && (
                 <form className="creator-revision-form" onSubmit={(event) => void save(event, artifact, artifact.status === "needs_revision")}>
                   <label>
-                    Artifact title
+                    <LexiconText text="Artifact title" phase={phase + 7} />
                     <input
                       value={draft.title}
                       onChange={(event) => updateDraft(artifact.id, { title: event.target.value })}
@@ -192,7 +205,7 @@ export function CreatorSubmissionManager({ session }: { session: Session }) {
                   </label>
 
                   <label>
-                    Summary
+                    <LexiconText text="Summary" phase={phase + 8} />
                     <textarea
                       value={draft.summary}
                       onChange={(event) => updateDraft(artifact.id, { summary: event.target.value })}
@@ -204,7 +217,7 @@ export function CreatorSubmissionManager({ session }: { session: Session }) {
                   </label>
 
                   <label>
-                    Origin class
+                    <LexiconText text="Origin class" phase={phase + 9} />
                     <select
                       value={draft.origin_class}
                       onChange={(event) => updateDraft(artifact.id, { origin_class: event.target.value as OriginClass })}
@@ -218,7 +231,7 @@ export function CreatorSubmissionManager({ session }: { session: Session }) {
                   </label>
 
                   <label>
-                    Generator / model
+                    <LexiconText text="Generator / model" phase={phase + 10} />
                     <input
                       value={draft.generator}
                       onChange={(event) => updateDraft(artifact.id, { generator: event.target.value })}
@@ -230,7 +243,7 @@ export function CreatorSubmissionManager({ session }: { session: Session }) {
                   </label>
 
                   <label>
-                    Human role
+                    <LexiconText text="Human role" phase={phase + 11} />
                     <textarea
                       value={draft.human_role}
                       onChange={(event) => updateDraft(artifact.id, { human_role: event.target.value })}
@@ -242,7 +255,7 @@ export function CreatorSubmissionManager({ session }: { session: Session }) {
                   </label>
 
                   <label>
-                    Provenance note
+                    <LexiconText text="Provenance note" phase={phase + 12} />
                     <textarea
                       value={draft.provenance_note}
                       onChange={(event) => updateDraft(artifact.id, { provenance_note: event.target.value })}
@@ -253,32 +266,33 @@ export function CreatorSubmissionManager({ session }: { session: Session }) {
                     />
                   </label>
 
-                  <p className="submission-note">
-                    Image replacement is not part of this fold. Metadata and provenance may be revised without changing the private source file.
-                  </p>
+                  <LexiconText
+                    as="p"
+                    className="submission-note"
+                    text="Image replacement is not part of this fold. Metadata and provenance may be revised without changing the private source file."
+                    phase={phase + 13}
+                  />
 
                   <div className="creator-revision-actions">
-                    <button className="submit-button" type="submit" disabled={busy}>
-                      {busy
-                        ? "Saving…"
-                        : artifact.status === "needs_revision"
-                          ? "Save + resubmit for review"
-                          : "Save private changes"}
+                    <button className="submit-button" type="submit" disabled={busy} aria-label={saveLabel}>
+                      <LexiconText text={saveLabel} phase={phase + 14} semantic={false} />
                     </button>
-                    <button type="button" disabled={busy} onClick={() => setEditingId(null)}>Cancel</button>
+                    <button type="button" disabled={busy} onClick={() => setEditingId(null)} aria-label="Cancel">
+                      <LexiconText text="Cancel" phase={phase + 15} semantic={false} />
+                    </button>
                   </div>
                 </form>
               )}
 
               <details className="creator-history">
-                <summary>Lifecycle history · {artifact.events.length} events</summary>
+                <summary><LexiconText text={`Lifecycle history · ${artifact.events.length} events`} phase={phase + 16} /></summary>
                 {artifact.events.length === 0 ? (
-                  <p>Lifecycle history activates after migration 002 is applied.</p>
+                  <LexiconText as="p" text="Lifecycle history activates after migration 002 is applied." phase={phase + 17} />
                 ) : (
-                  artifact.events.map((event) => (
+                  artifact.events.map((event, eventIndex) => (
                     <p key={event.id}>
-                      <b>{event.event_type.replace("_", " ")}</b> · {new Date(event.created_at).toLocaleString()}<br />
-                      {event.note}
+                      <LexiconText as="b" text={event.event_type.replace("_", " ")} phase={phase + 18 + eventIndex * 2} />
+                      <LexiconText text={` · ${new Date(event.created_at).toLocaleString()} · ${event.note}`} phase={phase + 19 + eventIndex * 2} />
                     </p>
                   ))
                 )}
