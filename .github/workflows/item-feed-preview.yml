@@ -52,6 +52,9 @@ jobs:
       - name: Verify primary 50/50 mode switch
         run: npm run verify:mode-switch
 
+      - name: Verify binary Slop / Museum voting
+        run: npm run verify:binary-vote
+
       - name: Verify curator migration contract
         run: npm run verify:curator
 
