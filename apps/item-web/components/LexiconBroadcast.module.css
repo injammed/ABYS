@@ -12,6 +12,24 @@
   unicode-bidi: isolate;
 }
 
+.original {
+  display: none;
+}
+
+.mutated {
+  display: inline;
+}
+
+.lexicon:hover .original,
+.lexicon:focus-within .original {
+  display: inline;
+}
+
+.lexicon:hover .mutated,
+.lexicon:focus-within .mutated {
+  display: none;
+}
+
 .srOnly {
   position: absolute;
   width: 1px;
@@ -25,7 +43,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .character {
-    transition: none;
+  .original {
+    display: inline;
+  }
+
+  .mutated {
+    display: none;
   }
 }
