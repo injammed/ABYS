@@ -23,8 +23,9 @@ function forbidPattern(label, pattern, source) {
 
 requirePattern("mode-switch interface marker", /data-navigation-contract=["']primary-mode-coin-flip-v1["']/, navigation);
 requirePattern("two-mode switch wrapper", /className=["']primary-mode-switch["']/, navigation);
-requirePattern("Slop Trough primary mode", /<strong>SLOP TROUGH<\/strong>/, navigation);
-requirePattern("AETIMM Museum primary mode", /<strong>AETIMM MUSEUM<\/strong>/, navigation);
+requirePattern("Slop Trough primary mode", /aria-label=["']Slop Trough, infinite feed["'][\s\S]*?<LexiconText\b[^>]*text=["']SLOP TROUGH["']/, navigation);
+requirePattern("AETIMM Museum primary mode", /aria-label=["']AETIMM Museum, spatial selection["'][\s\S]*?<LexiconText\b[^>]*text=["']AETIMM MUSEUM["']/, navigation);
+requirePattern("primary labels use character broadcast", /import \{ LexiconText \} from ["']@\/components\/LexiconBroadcast["']/, navigation);
 requirePattern("Slop Feed destination", /href=["']\/#field["']/, navigation);
 requirePattern("Museum destination", /href=["']\/aetimm\/["']/, navigation);
 requirePattern("secondary utility rail", /className=["']primary-utility-rail["']/, navigation);
@@ -50,4 +51,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Primary mode-switch contract PASS: Slop Trough and AETIMM Museum are the equal primary choices; utilities remain secondary.");
+console.log("Primary mode-switch contract PASS: Slop Trough and AETIMM Museum remain equal 50/50 destinations; lexicon rendering may mutate their visible characters, but stable accessible meaning and destination structure remain fixed.");
