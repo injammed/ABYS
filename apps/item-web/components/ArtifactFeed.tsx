@@ -17,6 +17,7 @@ import {
   shouldApplyVoteHydration,
 } from "@/lib/vote-state";
 import { ArtifactRuntime } from "./ArtifactRuntime";
+import { LexiconText } from "./LexiconBroadcast";
 import styles from "./ArtifactFeed.module.css";
 
 type VoteRequestState = {
@@ -301,29 +302,44 @@ export function ArtifactFeed() {
   }
 
   return (
-    <section className="feed-shell" aria-label="Infinite machine-made Artifact feed">
+    <section className="feed-shell" aria-label="Infinite machine-made Artifact feed" data-lexicon-surface="true">
       <div className="feed-rule">
         <span className="signal-dot" aria-hidden="true" />
-        MACHINE-MADE ONLY · SCROLL · VOTE OR IGNORE
+        <LexiconText text="MACHINE-MADE ONLY · SCROLL · VOTE OR IGNORE" phase={3} />
       </div>
 
       {privatePreviews.length > 0 && (
-        <p className="private-feed-notice" role="status">
-          PRIVATE HOLD · Exceptional held Artifacts appear only to their creator until released or removed.
+        <LexiconText
+          as="p"
+          className="private-feed-notice"
+          text="PRIVATE HOLD · Exceptional held Artifacts appear only to their creator until released or removed."
+          phase={7}
+        />
+      )}
+
+      {voteMessage && (
+        <p className="judgment-confirmation" role="status">
+          <LexiconText text={voteMessage} phase={11} />
+        </p>
+      )}
+      {feedError && (
+        <p className="judgment-confirmation" role="alert" aria-label={feedError}>
+          <LexiconText text={feedError} phase={13} semantic={false} />
         </p>
       )}
 
-      {voteMessage && <p className="judgment-confirmation" role="status">{voteMessage}</p>}
-      {feedError && <p className="judgment-confirmation" role="alert">{feedError}</p>}
-
       <div className="artifact-list">
-        {visible.map((artifact) => {
+        {visible.map((artifact, artifactIndex) => {
           const judgment = judgments[artifact.id];
           const voteState = voteStates[artifact.id];
           const votePending = voteState?.state === "saving";
           const autonomous = artifact.aiOrigin.originClass === "autonomous_ai_run";
           const creatorPreview = artifact.visibility === "creator_preview";
           const museumAdmitted = artifact.lane === "aetimm" && !creatorPreview;
+          const phase = artifactIndex * 17;
+          const automationText = artifact.aiOrigin.automationManifest
+            ? `Automation manifest: ${artifact.aiOrigin.automationManifest.trigger}; run log ${artifact.aiOrigin.automationManifest.runLogAvailable ? "available" : "missing"}; human intervention after trigger ${artifact.aiOrigin.automationManifest.humanInterventionAfterTrigger ? "reported" : "not reported"}.`
+            : null;
 
           return (
             <article
@@ -331,17 +347,18 @@ export function ArtifactFeed() {
               key={artifact.id}
               data-swipe-voting={creatorPreview ? undefined : "enabled"}
               data-museum-admitted={museumAdmitted ? "true" : undefined}
+              data-lexicon-artifact="true"
             >
               <div className="artifact-visual" style={{ background: artifact.gradient }}>
                 <ArtifactRuntime artifact={artifact} />
                 <div className="visual-noise" />
 
                 <div className={styles.statusMarks} aria-label="Artifact status">
-                  {creatorPreview && <span className={styles.privateMark}>PRIVATE HOLD</span>}
-                  {museumAdmitted && <span className={styles.museumMark}>MUSEUM</span>}
+                  {creatorPreview && <LexiconText className={styles.privateMark} text="PRIVATE HOLD" phase={phase + 1} />}
+                  {museumAdmitted && <LexiconText className={styles.museumMark} text="MUSEUM" phase={phase + 2} />}
                   {!creatorPreview && artifact.slopRank && (
                     <span className={styles.slopRankScar} aria-label={`Top Slop rank ${artifact.slopRank}`}>
-                      TOP SLOP #{artifact.slopRank}
+                      <LexiconText text={`TOP SLOP #${artifact.slopRank}`} phase={phase + 3} semantic={false} />
                     </span>
                   )}
                 </div>
@@ -349,42 +366,43 @@ export function ArtifactFeed() {
 
               <div className="artifact-body">
                 <div className="artifact-kicker">
-                  <span>{artifact.id.split("-").slice(0, 3).join("-")}</span>
-                  <span>{artifact.modalLead}</span>
+                  <LexiconText text={artifact.id.split("-").slice(0, 3).join("-")} phase={phase + 4} />
+                  <LexiconText text={artifact.modalLead} phase={phase + 5} />
                 </div>
-                <h2>{artifact.title}</h2>
-                <p className="creator">by {artifact.creator}</p>
-                <p className="summary">{artifact.summary}</p>
+                <LexiconText as="h2" text={artifact.title} phase={phase + 6} />
+                <LexiconText as="p" className="creator" text={`by ${artifact.creator}`} phase={phase + 7} />
+                <LexiconText as="p" className="summary" text={artifact.summary} phase={phase + 8} />
 
                 {creatorPreview && (
-                  <p className="private-preview-note">
-                    Visible only to you. This Artifact has not entered public judgment.
-                  </p>
+                  <LexiconText
+                    as="p"
+                    className="private-preview-note"
+                    text="Visible only to you. This Artifact has not entered public judgment."
+                    phase={phase + 9}
+                  />
                 )}
 
                 <details className={styles.details}>
-                  <summary>Provenance</summary>
+                  <summary><LexiconText text="Provenance" phase={phase + 10} /></summary>
                   <div className="origin-strip">
-                    <span className={autonomous ? "origin-pill autonomous" : "origin-pill"}>
-                      {originClassLabels[artifact.aiOrigin.originClass]}
-                    </span>
-                    <span>{artifact.aiOrigin.confidence}</span>
+                    <LexiconText
+                      className={autonomous ? "origin-pill autonomous" : "origin-pill"}
+                      text={originClassLabels[artifact.aiOrigin.originClass]}
+                      phase={phase + 11}
+                    />
+                    <LexiconText text={artifact.aiOrigin.confidence} phase={phase + 12} />
                   </div>
                   <div className="provenance">
-                    <strong>AI provenance</strong>
-                    <span>{artifact.aiOrigin.generator ?? "Generator undisclosed"}</span>
-                    <p>{artifact.aiOrigin.provenanceNote}</p>
-                    <p><b>Human role:</b> {artifact.aiOrigin.humanRole}</p>
-                    {artifact.aiOrigin.automationManifest && (
-                      <p>
-                        <b>Automation manifest:</b> {artifact.aiOrigin.automationManifest.trigger}; run log {artifact.aiOrigin.automationManifest.runLogAvailable ? "available" : "missing"}; human intervention after trigger {artifact.aiOrigin.automationManifest.humanInterventionAfterTrigger ? "reported" : "not reported"}.
-                      </p>
-                    )}
+                    <LexiconText as="strong" text="AI provenance" phase={phase + 13} />
+                    <LexiconText text={artifact.aiOrigin.generator ?? "Generator undisclosed"} phase={phase + 14} />
+                    <LexiconText as="p" text={artifact.aiOrigin.provenanceNote} phase={phase + 15} />
+                    <LexiconText as="p" text={`Human role: ${artifact.aiOrigin.humanRole}`} phase={phase + 16} />
+                    {automationText && <LexiconText as="p" text={automationText} phase={phase + 17} />}
                   </div>
                 </details>
 
                 {creatorPreview ? (
-                  <div className="preview-judgment-lock">Voting locked while held.</div>
+                  <LexiconText className="preview-judgment-lock" text="Voting locked while held." phase={phase + 18} />
                 ) : (
                   <div
                     className={`${styles.ballot} judgment-row`}
@@ -418,8 +436,13 @@ export function ArtifactFeed() {
                 )}
 
                 {!creatorPreview && voteState && (
-                  <p className={`vote-status ${voteState.state}`} role={voteState.state === "error" ? "alert" : "status"} aria-live="polite">
-                    {voteState.message}
+                  <p
+                    className={`vote-status ${voteState.state}`}
+                    role={voteState.state === "error" ? "alert" : "status"}
+                    aria-live="polite"
+                    aria-label={voteState.message}
+                  >
+                    <LexiconText text={voteState.message} phase={phase + 19} semantic={false} />
                   </p>
                 )}
               </div>
@@ -429,11 +452,15 @@ export function ArtifactFeed() {
       </div>
 
       {socialBackendEnabled && !loading && visible.length === 0 && !feedError && (
-        <p className="judgment-confirmation">The trough is empty. Disturbing.</p>
+        <LexiconText as="p" className="judgment-confirmation" text="The trough is empty. Disturbing." phase={71} />
       )}
 
       <div ref={sentinel} className="feed-sentinel" aria-hidden="true">
-        {loading ? "Loading slop…" : hasMore || !socialBackendEnabled ? "More…" : "You reached the bottom. For now."}
+        <LexiconText
+          text={loading ? "Loading slop…" : hasMore || !socialBackendEnabled ? "More…" : "You reached the bottom. For now."}
+          phase={79}
+          semantic={false}
+        />
       </div>
     </section>
   );
