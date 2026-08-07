@@ -10,6 +10,7 @@
     "verify:feed-root": "node scripts/verify-feed-root.mjs",
     "verify:mode-duality": "node scripts/verify-mode-duality.mjs",
     "verify:mode-switch": "node scripts/verify-mode-switch.mjs",
+    "verify:binary-vote": "node scripts/verify-binary-swipe-voting.mjs",
     "verify:curator": "node scripts/verify-curator-contract.mjs",
     "verify:feed-cursor": "node scripts/verify-feed-cursor.mjs"
   },
