@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LexiconText } from "./LexiconBroadcast";
 import { loadMuseumSummit, MuseumSummitArtifact } from "@/lib/museum";
 import { MuseumArtifactRuntime } from "./MuseumArtifactRuntime";
 import styles from "./MuseumSummit.module.css";
@@ -36,13 +37,14 @@ export function MuseumSummit() {
       aria-label="Current Museum Summit"
       data-summit-law="all-time-museum-votes-only"
       data-summit-state={loading ? "loading" : error ? "error" : summit ? "occupied" : "vacant"}
+      data-lexicon-surface="true"
     >
       <div className={styles.heading}>
         <div>
-          <p>THE SUMMIT</p>
-          <h2>Current Apex Artifact</h2>
+          <LexiconText as="p" text="THE SUMMIT" phase={7} />
+          <LexiconText as="h2" text="Current Apex Artifact" phase={13} />
         </div>
-        <span>NO TRENDING · NO DECAY · NO SLOP SUBTRACTION</span>
+        <LexiconText text="NO TRENDING · NO DECAY · NO SLOP SUBTRACTION" phase={19} />
       </div>
 
       <div className={styles.peak}>
@@ -56,22 +58,22 @@ export function MuseumSummit() {
 
         {loading && (
           <div className={styles.vacant} aria-live="polite">
-            <span>SUMMIT REGISTER</span>
-            <strong>Locating the current apex.</strong>
+            <LexiconText text="SUMMIT REGISTER" phase={23} />
+            <LexiconText as="strong" text="Locating the current apex." phase={29} />
           </div>
         )}
 
         {!loading && error && (
-          <div className={styles.vacant} role="alert">
-            <span>SUMMIT REGISTER</span>
-            <strong>The peak remains, but its register is unavailable.</strong>
+          <div className={styles.vacant} role="alert" aria-label="The peak remains, but its register is unavailable.">
+            <LexiconText text="SUMMIT REGISTER" phase={31} semantic={false} />
+            <LexiconText as="strong" text="The peak remains, but its register is unavailable." phase={37} semantic={false} />
           </div>
         )}
 
         {!loading && !error && !summit && (
           <div className={styles.vacant}>
-            <span>THE PEAK IS UNCLAIMED</span>
-            <strong>One Museum vote can crown the first Artifact.</strong>
+            <LexiconText text="THE PEAK IS UNCLAIMED" phase={41} />
+            <LexiconText as="strong" text="One Museum vote can crown the first Artifact." phase={43} />
           </div>
         )}
 
@@ -88,12 +90,18 @@ export function MuseumSummit() {
             </div>
 
             <div className={styles.plaque}>
-              <p>CURRENT SUMMIT · ALL-TIME MUSEUM SIGNAL {summit.museumVotes.toLocaleString()}</p>
-              <h3>{summit.title}</h3>
-              <span>{summit.creator}</span>
-              <small>
-                Holds the peak until another public Artifact accumulates more Museum judgments.
-              </small>
+              <LexiconText
+                as="p"
+                text={`CURRENT SUMMIT · ALL-TIME MUSEUM SIGNAL ${summit.museumVotes.toLocaleString()}`}
+                phase={47}
+              />
+              <LexiconText as="h3" text={summit.title} phase={53} />
+              <LexiconText text={summit.creator} phase={59} />
+              <LexiconText
+                as="small"
+                text="Holds the peak until another public Artifact accumulates more Museum judgments."
+                phase={61}
+              />
             </div>
           </article>
         )}
