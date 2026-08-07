@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AccountGate } from "@/components/AccountGate";
-import { UploadGate } from "@/components/UploadGate";
+import { SlopDrop } from "@/components/SlopDrop";
 
 type PrimaryMode = "feed" | "museum";
 
@@ -43,7 +43,7 @@ export function PrimaryNavigation({ mode }: PrimaryNavigationProps) {
 
       <div className="primary-utility-rail" aria-label="Secondary controls">
         <div className="primary-navigation-action primary-navigation-submit">
-          <UploadGate />
+          <SlopDrop />
         </div>
 
         <Link className="primary-navigation-link" href="/about/">
