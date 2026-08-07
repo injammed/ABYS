@@ -11,7 +11,8 @@
     "verify:mode-duality": "node scripts/verify-mode-duality.mjs",
     "verify:mode-switch": "node scripts/verify-mode-switch.mjs",
     "verify:curator": "node scripts/verify-curator-contract.mjs",
-    "verify:feed-cursor": "node scripts/verify-feed-cursor.mjs"
+    "verify:feed-cursor": "node scripts/verify-feed-cursor.mjs",
+    "verify:universal-artifact": "node scripts/verify-universal-artifact-intake.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "latest",
