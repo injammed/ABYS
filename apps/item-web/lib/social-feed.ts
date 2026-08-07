@@ -37,19 +37,24 @@ type PrivateArtifactRow = Omit<ArtifactRow, "lane" | "published_at"> & {
 
 type VoteRow = { artifact_id: string; judgment: Judgment };
 
+type VoteAggregateRow = {
+  artifact_id: string;
+  preserve_count: number | string;
+  refine_count: number | string;
+  slop_count: number | string;
+};
+
 function creatorName(row: ArtifactRow | PrivateArtifactRow): string {
   if (Array.isArray(row.profiles)) return row.profiles[0]?.display_name || "Anonymous machine witness";
   return row.profiles?.display_name || "Anonymous machine witness";
 }
 
-function scoreForVotes(votes: VoteRow[]): number {
-  let score = 50;
-  for (const vote of votes) {
-    if (vote.judgment === "preserve") score += 4;
-    if (vote.judgment === "refine") score += 1;
-    if (vote.judgment === "slop") score -= 4;
-  }
-  return Math.max(0, Math.min(100, score));
+function scoreForAggregate(aggregate?: VoteAggregateRow): number {
+  if (!aggregate) return 50;
+  const preserve = Number(aggregate.preserve_count) || 0;
+  const refine = Number(aggregate.refine_count) || 0;
+  const slop = Number(aggregate.slop_count) || 0;
+  return Math.max(0, Math.min(100, 50 + preserve * 4 + refine - slop * 4));
 }
 
 function isUniversalArtifactMigrationMissing(error: { message?: string; code?: string } | null | undefined): boolean {
@@ -114,12 +119,14 @@ export async function loadPublicFeedPage(options: {
   const rows = fetchedRows.slice(0, limit);
   const ids = rows.map((row) => row.id);
 
-  const votesByArtifact = new Map<string, VoteRow[]>();
+  const aggregatesByArtifact = new Map<string, VoteAggregateRow>();
   if (ids.length > 0) {
-    const { data: voteData, error: voteError } = await client.from("artifact_votes").select("artifact_id,judgment").in("artifact_id", ids);
-    if (voteError) throw voteError;
-    for (const vote of (voteData ?? []) as VoteRow[]) {
-      votesByArtifact.set(vote.artifact_id, [...(votesByArtifact.get(vote.artifact_id) ?? []), vote]);
+    const { data: aggregateData, error: aggregateError } = await client.rpc("get_artifact_vote_aggregates", {
+      p_artifact_ids: ids,
+    });
+    if (aggregateError) throw aggregateError;
+    for (const aggregate of (aggregateData ?? []) as VoteAggregateRow[]) {
+      aggregatesByArtifact.set(aggregate.artifact_id, aggregate);
     }
   }
 
@@ -139,11 +146,11 @@ export async function loadPublicFeedPage(options: {
       generator: row.generator,
       humanRole: row.human_role,
       provenanceNote: row.provenance_note,
-      confidence: "reviewed",
+      confidence: "declared",
     },
     gradient: laneGradients[row.lane],
     mediaUrl: mediaByArtifact.get(row.id),
-    score: scoreForVotes(votesByArtifact.get(row.id) ?? []),
+    score: scoreForAggregate(aggregatesByArtifact.get(row.id)),
     publishedAt: row.published_at,
     visibility: "public",
   }));
@@ -189,7 +196,7 @@ export async function loadOwnQuarantinePreviews(userId: string): Promise<FeedArt
     creator: creatorName(row),
     lane: "unjudged",
     summary: row.summary,
-    modalLead: row.status === "needs_revision" ? `Private revision · ${modeLead(row)}` : `Private quarantine · ${modeLead(row)}`,
+    modalLead: row.status === "needs_revision" ? `Private revision · ${modeLead(row)}` : `Private hold · ${modeLead(row)}`,
     aiOrigin: {
       originClass: row.origin_class,
       declaredByCreator: true,
