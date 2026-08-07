@@ -98,6 +98,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:machine-gloss
 
+      - name: Verify translation layout stability
+        working-directory: apps/item-web
+        run: npm run verify:lexicon-layout
+
       - name: Verify universal Artifact runtime
         working-directory: apps/item-web
         run: npm run verify:runtime
