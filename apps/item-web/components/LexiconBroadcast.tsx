@@ -138,7 +138,10 @@ export function LexiconText({
       <span className={styles.visual} aria-hidden="true">
         {characters.map((character, index) => (
           <span className={styles.character} key={`${index}-${character}`}>
-            {reducedMotion ? character : mutateCharacter(character, index, text, effectiveTick)}
+            <span className={styles.original}>{character}</span>
+            <span className={styles.mutated}>
+              {reducedMotion ? character : mutateCharacter(character, index, text, effectiveTick)}
+            </span>
           </span>
         ))}
       </span>
