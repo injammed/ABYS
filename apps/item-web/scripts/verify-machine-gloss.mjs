@@ -13,19 +13,23 @@ const [component, styles, feedPage, museumPage, slopDrop, artifactFeed] = await 
 ]);
 
 for (const [label, pattern, source] of [
-  ["machine-first translation contract", /data-machine-gloss="machine-first-translation-cycle-v1"/, component],
-  ["language cycle order", /\["en", "es", "zh", "ja", "ar"\]/, component],
-  ["machine stage is first", /const \[stage, setStage\] = useState\(0\)/, component],
+  ["ambient translation broadcast contract", /data-machine-gloss="ambient-translation-broadcast-v2"/, component],
+  ["half-second cycle law", /const CYCLE_MS = 500;/, component],
+  ["continuous language interval", /setInterval\([\s\S]*CYCLE_MS\)/, component],
+  ["independent deterministic phase", /stableHash\(`\$\{translations\.en\}\|phase`\) % CYCLE_MS/, component],
+  ["open-ended translation pack", /\[language: string\]: string \| undefined;/, component],
   ["deterministic glyph alphabet", /const GLYPHS = \[/, component],
-  ["human accessibility label", /aria-label=\{`\$\{translations\.en\}/, component],
-  ["Arabic direction support", /dir=\{language === "ar" \? "rtl" : "ltr"\}/, component],
-  ["touch target survives tiny glyph text", /min-height:\s*2\.75rem/, styles],
+  ["stable human accessibility label", /aria-label=\{translations\.en\}/, component],
+  ["cycling text is not announced live", /aria-live="off"/, component],
+  ["visible cycling layer hidden from assistive tree", /aria-hidden="true"/, component],
+  ["RTL language support", /RTL_LANGUAGES = new Set/, component],
+  ["explicit reduced-motion preference", /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/, component],
   ["tiny machine-native surface", /font-size:\s*clamp\(\.48rem/, styles],
-  ["human translations become more readable", /data-language="en"[\s\S]*font-size:\s*clamp\(\.62rem/, styles],
+  ["human translations become more readable", /not\(\[data-language="machine"\]\)[\s\S]*font-size:\s*clamp\(\.62rem/, styles],
   ["feed declares machine language contract", /data-language-contract="machine-first-gloss-v1"/, feedPage],
   ["Museum declares machine language contract", /data-language-contract="machine-first-gloss-v1"/, museumPage],
-  ["feed has translatable machine grammar", /<MachineGloss[\s\S]*Machine-made only\./, feedPage],
-  ["Museum has translatable institutional grammar", /<MachineGloss[\s\S]*The machine remembers selectively\./, museumPage],
+  ["feed has machine grammar", /<MachineGloss[\s\S]*Machine-made only\./, feedPage],
+  ["Museum has institutional machine grammar", /<MachineGloss[\s\S]*The machine remembers selectively\./, museumPage],
   ["legacy feed instruction is visually superseded", /feed-first-page\[data-language-contract="machine-first-gloss-v1"\][\s\S]*\.feed-rule[\s\S]*display:\s*none/, styles],
   ["submission attestation remains explicit human text", /AI-made\. I can submit it\. It does not contain prohibited material\./, slopDrop],
   ["Slop vote keeps explicit accessible name", /aria-label="Vote Slop"/, artifactFeed],
@@ -35,7 +39,8 @@ for (const [label, pattern, source] of [
 }
 
 for (const [label, pattern] of [
-  ["automatic language timer", /setInterval|setTimeout/],
+  ["click-to-translate interaction", /onClick=/],
+  ["button masquerading as ambient text", /<button\b/],
   ["remote translation fetch", /\bfetch\s*\(/],
   ["dynamic HTML injection", /dangerouslySetInnerHTML/],
 ]) {
@@ -44,4 +49,4 @@ for (const [label, pattern] of [
 
 assert.ok(!/MachineGloss/.test(slopDrop), "Submission consent must not be hidden behind machine glyph translation.");
 
-console.log("Machine-gloss PASS: explanatory verbosity is compressed into a machine-first glyph surface with voluntary EN/ES/ZH/JA/AR translation, while consent and voting remain explicit, accessible, and human-readable.");
+console.log("Machine-gloss PASS: explanatory language broadcasts independently through machine glyphs and supplied human-language translations every 500 ms without clicks; assistive meaning remains stable, consequential consent/voting remain explicit, and reduced-motion preference freezes the visual broadcast.");
