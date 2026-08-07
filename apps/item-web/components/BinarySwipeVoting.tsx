@@ -6,7 +6,7 @@ const SWIPE_THRESHOLD = 72;
 const AXIS_DOMINANCE = 1.2;
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
-  return target instanceof Element && Boolean(target.closest("button, a, input, textarea, select, summary, [role='button']"));
+  return target instanceof Element && Boolean(target.closest("button, a, input, textarea, select, summary, video, audio, [role='button']"));
 }
 
 export function BinarySwipeVoting() {
