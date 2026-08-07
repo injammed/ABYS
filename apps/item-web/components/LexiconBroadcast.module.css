@@ -1,33 +1,47 @@
 .lexicon {
   position: relative;
+  min-width: 0;
 }
 
+/*
+ * Layout law: the readable source owns geometry; the cycling machine layer
+ * only paints inside that geometry. Script changes can change glyphs, never
+ * the dimensions of surrounding UI.
+ */
 .visual {
-  display: inline;
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: baseline;
   white-space: pre-wrap;
-}
-
-.character {
-  display: inline;
-  unicode-bidi: isolate;
+  overflow-wrap: anywhere;
 }
 
 .original {
-  display: none;
+  display: inline;
+  visibility: hidden;
+  white-space: inherit;
+  overflow-wrap: inherit;
+  pointer-events: none;
 }
 
 .mutated {
-  display: inline;
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  white-space: inherit;
+  overflow-wrap: inherit;
 }
 
 .lexicon:hover .original,
 .lexicon:focus-within .original {
-  display: inline;
+  visibility: visible;
 }
 
 .lexicon:hover .mutated,
 .lexicon:focus-within .mutated {
-  display: none;
+  visibility: hidden;
 }
 
 .srOnly {
@@ -44,10 +58,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .original {
-    display: inline;
+    visibility: visible;
   }
 
   .mutated {
-    display: none;
+    visibility: hidden;
   }
 }
