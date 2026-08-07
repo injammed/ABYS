@@ -3,14 +3,16 @@ import path from "node:path";
 
 const root = process.cwd();
 const intakePath = path.join(root, "components", "UploadGate.tsx");
+const intakeStylesPath = path.join(root, "components", "UploadGate.module.css");
 const curatorPath = path.join(root, "components", "CuratorQueue.tsx");
 const socialFeedPath = path.join(root, "lib", "social-feed.ts");
 const architecturePath = path.join(root, "ARTIFACT_ARCHITECTURE.md");
 const migration8Path = path.resolve(root, "..", "..", "supabase", "migrations", "008_universal_artifact_intake.sql");
 const migration9Path = path.resolve(root, "..", "..", "supabase", "migrations", "009_universal_artifact_review.sql");
 
-const [intake, curator, socialFeed, architecture, migration8, migration9] = await Promise.all([
+const [intake, intakeStyles, curator, socialFeed, architecture, migration8, migration9] = await Promise.all([
   readFile(intakePath, "utf8"),
+  readFile(intakeStylesPath, "utf8"),
   readFile(curatorPath, "utf8"),
   readFile(socialFeedPath, "utf8"),
   readFile(architecturePath, "utf8"),
@@ -32,9 +34,9 @@ requirePattern("full modality invitation", /Full-modality AI-made Artifacts belo
 requirePattern("one artifact binding copy", /Everything you add becomes one Artifact/, intake);
 requirePattern("same infinite feed copy", /same infinite feed/, intake);
 requirePattern("AI-made Artifact material surface", />AI-made Artifact</, intake);
-requirePattern("custom Add material action", />Add material</, intake);
-requirePattern("custom material picker class", /artifact-material-picker/, intake);
-requirePattern("native file input visually hidden", /className="artifact-file-input"/, intake);
+requirePattern("custom Add material action", /"Add material"/, intake);
+requirePattern("CSS-module material picker", /styles\.materialPicker/, intake);
+requirePattern("native file input visually hidden", /styles\.materialInput/, intake);
 requirePattern("material modes helper", /image · video · audio · PDF · code · data · 3D/, intake);
 requirePattern("no-materials state", /No materials added/, intake);
 requirePattern("materials bind as one artifact", /Everything added here belongs to one Artifact/, intake);
@@ -47,8 +49,32 @@ requirePattern("artifact id before upload", /const artifactId = crypto\.randomUU
 requirePattern("private artifact path namespace", /session\.user\.id.*artifactId/s, intake);
 requirePattern("rollback uploaded paths", /storage\.from\("artifact-media"\)\.remove\(uploadedPaths\)/, intake);
 requirePattern("mixed mode detection", /new Set\(parts\.map\(\(part\) => part\.mode\)\)/, intake);
+
+// Defensive submission invariants: prevent common vibe-coded regressions.
+requirePattern("preflight MIME or extension allowlist", /function fileIsAccepted/, intake);
+requirePattern("stable duplicate identity", /function fileIdentity/, intake);
+requirePattern("duplicate suppression", /duplicateCount/, intake);
+requirePattern("per-file size preflight", /MAX_FILE_BYTES/, intake);
+requirePattern("aggregate byte preflight", /MAX_TOTAL_BYTES/, intake);
+requirePattern("total material-count preflight", /materialPartCount/, intake);
+requirePattern("drop-zone path uses same validator", /handleDrop[\s\S]*validateIncomingFiles/, intake);
+requirePattern("file-picker path uses same validator", /handleFileInput[\s\S]*validateIncomingFiles/, intake);
+requirePattern("material removal", /removeSelectedFile/, intake);
+requirePattern("double-submit busy guard", /if \(busy\) return;/, intake);
+requirePattern("busy submit disable", /disabled=\{busy \|\| intakePaused \|\| materialLimitExceeded/, intake);
+requirePattern("URL protocol allowlist", /\["http:", "https:"\]\.includes/, intake);
+requirePattern("reference never fetched copy", /not fetched or executed during intake/, intake);
+requirePattern("untrusted-until-review copy", /treated as untrusted until review/, intake);
+requirePattern("accessible live material list", /aria-live="polite"/, intake);
+requirePattern("accessible remove control", /aria-label=\{`Remove \$\{file\.name\}`\}/, intake);
+requirePattern("custom picker focus state", /materialInput:focus-visible \+ \.materialPicker/, intakeStyles);
+requirePattern("mobile picker layout", /@media \(max-width: 430px\)/, intakeStyles);
+
 forbidPattern("image-only intake copy", /Choose an image to upload|AI-made image|JPEG, PNG, WebP, or GIF images|No image selected/, intake);
 forbidPattern("browser-native file-picker wording", /Choose File|No file selected/, intake);
+forbidPattern("unsafe HTML injection", /dangerouslySetInnerHTML/, intake);
+forbidPattern("client code execution", /\beval\s*\(|new Function\s*\(/, intake);
+forbidPattern("object URL preview leak", /URL\.createObjectURL/, intake);
 
 requirePattern("permanent artifact covenant", /## Permanent Artifact Covenant/, architecture);
 requirePattern("one artifact identity law", /Every Artifact has one identity/, architecture);
@@ -88,9 +114,9 @@ requirePattern("mode-led feed card", /function modeLead/, socialFeed);
 requirePattern("no image path returns no preview", /if \(!path\) return undefined/, socialFeed);
 
 if (failures.length > 0) {
-  console.error("Universal artifact intake contract failed:");
+  console.error("Universal Artifact intake contract failed:");
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
 
-console.log("Universal artifact intake PASS: All Slop Welcome means the surface says AI-made Artifact, the native browser file picker is replaced by Add material, one Artifact may bind multiple inert modes into private quarantine, first publication enters Unjudged, and every approved Artifact targets the same infinite feed.");
+console.log("Universal Artifact intake PASS: All Slop Welcome uses one hardened material picker, all selection paths share bounded validation, duplicate/size/count/double-submit failures are guarded, code stays inert, URLs stay unfetched, private quarantine remains the boundary, and every approved Artifact targets the same infinite feed.");
