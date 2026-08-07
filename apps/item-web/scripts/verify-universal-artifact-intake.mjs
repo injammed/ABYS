@@ -36,7 +36,7 @@ requirePattern("full modality invitation", /Full-modality AI-made Artifacts belo
 requirePattern("one artifact binding copy", /Everything you add becomes one Artifact/, intake);
 requirePattern("same infinite feed copy", /same infinite feed/, intake);
 requirePattern("AI-made Artifact material surface", />AI-made Artifact</, intake);
-requirePattern("custom Add material action", /"Add material"/, intake);
+requirePattern("custom Add material action", /Add material/, intake);
 requirePattern("CSS-module material picker", /styles\.materialPicker/, intake);
 requirePattern("native file input visually hidden", /styles\.materialInput/, intake);
 requirePattern("material modes helper", /image · video · audio · PDF · code · data · 3D/, intake);
@@ -62,7 +62,7 @@ requirePattern("total material-count preflight", /materialPartCount/, intake);
 requirePattern("drop-zone path uses same validator", /handleDrop[\s\S]*validateIncomingFiles/, intake);
 requirePattern("file-picker path uses same validator", /handleFileInput[\s\S]*validateIncomingFiles/, intake);
 requirePattern("material removal", /removeSelectedFile/, intake);
-requirePattern("double-submit busy guard", /if \(busy\) return;/, intake);
+requirePattern("double-submit and paused-state guard", /if \(busy \|\| intakePaused\) return;/, intake);
 requirePattern("busy submit disable", /disabled=\{busy \|\| intakePaused \|\| materialLimitExceeded/, intake);
 requirePattern("URL protocol allowlist", /\["http:", "https:"\]\.includes/, intake);
 requirePattern("reference never fetched copy", /not fetched or executed during intake/, intake);
@@ -71,6 +71,19 @@ requirePattern("accessible live material list", /aria-live="polite"/, intake);
 requirePattern("accessible remove control", /aria-label=\{`Remove \$\{file\.name\}`\}/, intake);
 requirePattern("custom picker focus state", /materialInput:focus-visible \+ \.materialPicker/, intakeStyles);
 requirePattern("mobile picker layout", /@media \(max-width: 430px\)/, intakeStyles);
+
+// Maintenance must change capability, not replace the product with another surface.
+requirePattern("paused intake keeps Artifact form mounted", /\{open && session && \(/, intake);
+requirePattern("paused state visible status", /<strong>INTAKE PAUSED\.<\/strong>/, intake);
+requirePattern("paused state explains surface continuity", /Artifact surface stays visible during maintenance/, intake);
+requirePattern("paused fieldset lock", /<fieldset className=\{styles\.formFieldset\} disabled=\{busy \|\| intakePaused\}>/, intake);
+requirePattern("paused file input lock", /disabled=\{busy \|\| intakePaused\}/, intake);
+requirePattern("paused drop path lock", /if \(intakePaused\) return;/, intake);
+requirePattern("paused picker presentation", /Add material · paused/, intake);
+requirePattern("paused submit presentation", /intakePaused \? "Intake paused" : "Submit Artifact"/, intake);
+requirePattern("maintenance fieldset styling", /\.formFieldset:disabled/, intakeStyles);
+requirePattern("maintenance picker styling", /dropZone\[data-paused="true"\]/, intakeStyles);
+forbidPattern("paused-state replacement mini-panel", /open && session && intakePaused[\s\S]*role="status"[\s\S]*Existing private submissions remain safe\.[\s\S]*open && session && !intakePaused/, intake);
 
 forbidPattern("image-only intake copy", /Choose an image to upload|AI-made image|JPEG, PNG, WebP, or GIF images|No image selected/, intake);
 forbidPattern("browser-native file-picker wording", /Choose File|No file selected/, intake);
@@ -132,4 +145,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal Artifact intake PASS: All Slop Welcome uses one hardened material picker, all selection paths share bounded validation, database RPC grants are explicit and least-privilege, code stays inert, URLs stay unfetched, private quarantine remains the boundary, and every approved Artifact targets the same infinite feed.");
+console.log("Universal Artifact intake PASS: All Slop Welcome uses one hardened material picker; maintenance pauses preserve and lock the same Artifact surface; selection paths share bounded validation; database RPC grants are explicit and least-privilege; code stays inert; URLs stay unfetched; private quarantine remains the boundary; and every approved Artifact targets the same infinite feed.");
