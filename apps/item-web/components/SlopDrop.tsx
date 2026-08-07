@@ -1,0 +1,583 @@
+"use client";
+
+import { ChangeEvent, DragEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
+import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
+import styles from "./UploadGate.module.css";
+
+const MAX_FILE_BYTES = 50 * 1024 * 1024;
+const MAX_TOTAL_BYTES = 100 * 1024 * 1024;
+const MAX_PARTS = 12;
+
+const ACCEPTED_EXTENSIONS = [
+  ".jpg", ".jpeg", ".png", ".webp", ".gif",
+  ".mp4", ".webm", ".mov",
+  ".mp3", ".wav", ".ogg", ".m4a",
+  ".pdf", ".txt", ".md", ".csv", ".html", ".css",
+  ".js", ".jsx", ".ts", ".tsx", ".json", ".xml",
+  ".py", ".rb", ".go", ".rs", ".java", ".c", ".h", ".cpp", ".hpp",
+  ".zip", ".gz", ".tar",
+  ".gltf", ".glb", ".obj", ".stl", ".blend",
+];
+
+const FILE_ACCEPT = [
+  "image/*", "video/mp4", "video/webm", "video/quicktime",
+  "audio/*", "application/pdf", "text/*", "application/json",
+  "application/javascript", "application/typescript", "application/xml",
+  "application/zip", "application/x-zip-compressed", "application/gzip", "application/x-tar",
+  "model/gltf+json", "model/gltf-binary", "application/octet-stream",
+  ...ACCEPTED_EXTENSIONS,
+].join(",");
+
+const ACCEPTED_MIME_TYPES = new Set([
+  "application/pdf",
+  "application/json",
+  "application/javascript",
+  "application/typescript",
+  "application/xml",
+  "application/zip",
+  "application/x-zip-compressed",
+  "application/gzip",
+  "application/x-tar",
+  "model/gltf+json",
+  "model/gltf-binary",
+  "application/octet-stream",
+]);
+
+type ArtifactMode =
+  | "image"
+  | "video"
+  | "audio"
+  | "text"
+  | "document"
+  | "code"
+  | "data"
+  | "model3d"
+  | "website"
+  | "simulation"
+  | "other";
+
+type IntakeControl = {
+  intake_open: boolean;
+  daily_submission_limit: number;
+};
+
+type ArtifactPartInput = {
+  position: number;
+  part_kind: "file" | "text" | "reference";
+  mode: ArtifactMode;
+  label: string;
+  storage_path?: string;
+  original_filename?: string;
+  mime_type?: string;
+  byte_size?: number;
+  text_content?: string;
+  reference_url?: string;
+};
+
+function extensionOf(name: string): string {
+  const index = name.lastIndexOf(".");
+  return index >= 0 ? name.slice(index).toLowerCase() : "";
+}
+
+function normalizedMime(file: File): string {
+  const extension = extensionOf(file.name);
+  if ([".jpg", ".jpeg"].includes(extension)) return "image/jpeg";
+  if (extension === ".png") return "image/png";
+  if (extension === ".webp") return "image/webp";
+  if (extension === ".gif") return "image/gif";
+  if (extension === ".mp4") return "video/mp4";
+  if (extension === ".webm") return "video/webm";
+  if (extension === ".mov") return "video/quicktime";
+  if (extension === ".mp3") return "audio/mpeg";
+  if (extension === ".wav") return "audio/wav";
+  if (extension === ".ogg") return "audio/ogg";
+  if (extension === ".m4a") return "audio/mp4";
+  if (extension === ".pdf") return "application/pdf";
+  if ([".txt", ".md", ".py", ".rb", ".go", ".rs", ".java", ".c", ".h", ".cpp", ".hpp"].includes(extension)) return "text/plain";
+  if ([".js", ".jsx"].includes(extension)) return "application/javascript";
+  if ([".ts", ".tsx"].includes(extension)) return "application/typescript";
+  if (extension === ".json") return "application/json";
+  if (extension === ".csv") return "text/csv";
+  if (extension === ".html") return "text/html";
+  if (extension === ".css") return "text/css";
+  if (extension === ".xml") return "application/xml";
+  if (extension === ".zip") return "application/zip";
+  if (extension === ".gz") return "application/gzip";
+  if (extension === ".tar") return "application/x-tar";
+  if (extension === ".gltf") return "model/gltf+json";
+  if (extension === ".glb") return "model/gltf-binary";
+  if ([".obj", ".stl", ".blend"].includes(extension)) return "application/octet-stream";
+  return file.type || "application/octet-stream";
+}
+
+function modeForFile(file: File): ArtifactMode {
+  const extension = extensionOf(file.name);
+  const mime = normalizedMime(file);
+  if (mime.startsWith("image/")) return "image";
+  if (mime.startsWith("video/")) return "video";
+  if (mime.startsWith("audio/")) return "audio";
+  if (mime === "application/pdf") return "document";
+  if ([".js", ".jsx", ".ts", ".tsx", ".py", ".rb", ".go", ".rs", ".java", ".c", ".h", ".cpp", ".hpp"].includes(extension)) return "code";
+  if ([".json", ".csv", ".xml", ".zip", ".gz", ".tar"].includes(extension)) return "data";
+  if ([".gltf", ".glb", ".obj", ".stl", ".blend"].includes(extension)) return "model3d";
+  if (mime.startsWith("text/")) return "text";
+  return "other";
+}
+
+function safeExtension(file: File): string {
+  return extensionOf(file.name).replace(/[^.a-z0-9]/g, "").slice(0, 12) || ".bin";
+}
+
+function fileIdentity(file: File): string {
+  return `${file.name}\u0000${file.size}\u0000${file.lastModified}`;
+}
+
+function fileIsAccepted(file: File): boolean {
+  const extension = extensionOf(file.name);
+  const mime = normalizedMime(file);
+  return ACCEPTED_EXTENSIONS.includes(extension)
+    || mime.startsWith("image/")
+    || mime.startsWith("video/")
+    || mime.startsWith("audio/")
+    || mime.startsWith("text/")
+    || ACCEPTED_MIME_TYPES.has(mime);
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(bytes >= 10 * 1024 * 1024 ? 0 : 1)} MB`;
+}
+
+function stripExtension(name: string): string {
+  const dot = name.lastIndexOf(".");
+  return (dot > 0 ? name.slice(0, dot) : name).trim();
+}
+
+function submissionErrorMessage(error: unknown): string {
+  const raw = error instanceof Error ? error.message : String(error ?? "");
+  if (raw.includes("INTAKE_CLOSED")) return "Trough closed for maintenance. Try again shortly.";
+  if (raw.includes("DAILY_SUBMISSION_LIMIT_REACHED")) return "Daily slop limit reached. Try again when the rolling 24-hour window clears.";
+  if (raw.includes("QUARANTINE_BACKLOG_LIMIT_REACHED")) return "Your intake queue is full. Try again later.";
+  if (raw.includes("ARTIFACT_PART_COUNT_INVALID")) return "One Artifact can contain between 1 and 12 materials.";
+  if (raw.includes("ARTIFACT_PART_STORAGE")) return "One material could not be bound to the Artifact. Uploaded files were rolled back where possible.";
+  if (raw.includes("ARTIFACT_MODES_INVALID")) return "One or more materials are not supported yet.";
+  if (raw.includes("PUBLICATION_ATTESTATIONS_REQUIRED")) return "Confirm the submission attestation before throwing it in.";
+  if (raw.toLowerCase().includes("row-level security")) return "The trough rejected this Artifact. Sign in again or try later.";
+  return raw || "Artifact submission failed.";
+}
+
+export function SlopDrop() {
+  const [open, setOpen] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [intakeControl, setIntakeControl] = useState<IntakeControl | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [textPart, setTextPart] = useState("");
+  const [referenceUrl, setReferenceUrl] = useState("");
+  const [dragging, setDragging] = useState(false);
+
+  useEffect(() => {
+    const client = getSupabaseBrowserClient();
+    if (!client) return;
+
+    void client.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data } = client.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession));
+
+    void client
+      .from("intake_control")
+      .select("intake_open,daily_submission_limit")
+      .eq("id", 1)
+      .maybeSingle()
+      .then(({ data: control, error }) => {
+        if (!error && control) setIntakeControl(control as IntakeControl);
+      });
+
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  const totalFileBytes = useMemo(
+    () => selectedFiles.reduce((sum, file) => sum + file.size, 0),
+    [selectedFiles],
+  );
+  const materialPartCount = selectedFiles.length + (textPart.trim() ? 1 : 0) + (referenceUrl.trim() ? 1 : 0);
+  const materialLimitExceeded = materialPartCount > MAX_PARTS || totalFileBytes > MAX_TOTAL_BYTES;
+  const intakePaused = intakeControl?.intake_open === false;
+  const dailyLimit = intakeControl?.daily_submission_limit;
+
+  function validateIncomingFiles(incoming: File[]): void {
+    if (busy || intakePaused || incoming.length === 0) return;
+
+    const unsupported = incoming.find((file) => !fileIsAccepted(file));
+    if (unsupported) {
+      setMessage(`${unsupported.name} is not an accepted material type.`);
+      return;
+    }
+
+    const oversized = incoming.find((file) => file.size > MAX_FILE_BYTES);
+    if (oversized) {
+      setMessage(`${oversized.name} exceeds the 50 MB per-file limit.`);
+      return;
+    }
+
+    const existing = new Set(selectedFiles.map(fileIdentity));
+    const merged = [...selectedFiles];
+    let duplicates = 0;
+
+    for (const file of incoming) {
+      const identity = fileIdentity(file);
+      if (existing.has(identity)) {
+        duplicates += 1;
+        continue;
+      }
+      existing.add(identity);
+      merged.push(file);
+    }
+
+    const nonFileParts = (textPart.trim() ? 1 : 0) + (referenceUrl.trim() ? 1 : 0);
+    if (merged.length + nonFileParts > MAX_PARTS) {
+      setMessage(`One Artifact can contain up to ${MAX_PARTS} total materials.`);
+      return;
+    }
+
+    if (merged.reduce((sum, file) => sum + file.size, 0) > MAX_TOTAL_BYTES) {
+      setMessage("Combined uploaded files would exceed the 100 MB Artifact limit.");
+      return;
+    }
+
+    setSelectedFiles(merged);
+    setMessage(duplicates ? `${duplicates} duplicate material${duplicates === 1 ? " was" : "s were"} skipped.` : null);
+  }
+
+  function handleFileInput(event: ChangeEvent<HTMLInputElement>): void {
+    validateIncomingFiles(Array.from(event.currentTarget.files ?? []));
+    event.currentTarget.value = "";
+  }
+
+  function handleDrop(event: DragEvent<HTMLDivElement>): void {
+    event.preventDefault();
+    setDragging(false);
+    if (!intakePaused) validateIncomingFiles(Array.from(event.dataTransfer.files ?? []));
+  }
+
+  function removeSelectedFile(identity: string): void {
+    if (busy || intakePaused) return;
+    setSelectedFiles((current) => current.filter((file) => fileIdentity(file) !== identity));
+    setMessage(null);
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busy || intakePaused) return;
+
+    const client = getSupabaseBrowserClient();
+    if (!client || !session) {
+      setMessage("Make an account or sign in first.");
+      return;
+    }
+
+    const { data: currentControl } = await client
+      .from("intake_control")
+      .select("intake_open,daily_submission_limit")
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (currentControl) {
+      const control = currentControl as IntakeControl;
+      setIntakeControl(control);
+      if (!control.intake_open) {
+        setMessage("Trough closed for maintenance. Try again shortly.");
+        return;
+      }
+    }
+
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    const bodyText = textPart.trim();
+    const url = referenceUrl.trim();
+    const files = selectedFiles;
+    const totalParts = files.length + (bodyText ? 1 : 0) + (url ? 1 : 0);
+
+    if (totalParts < 1) {
+      setMessage("Add some slop first.");
+      return;
+    }
+    if (totalParts > MAX_PARTS || totalFileBytes > MAX_TOTAL_BYTES) {
+      setMessage("This Artifact exceeds the current material limits.");
+      return;
+    }
+
+    const unsupported = files.find((file) => !fileIsAccepted(file));
+    if (unsupported) {
+      setMessage(`${unsupported.name} is not an accepted material type.`);
+      return;
+    }
+
+    const oversized = files.find((file) => file.size > MAX_FILE_BYTES);
+    if (oversized) {
+      setMessage(`${oversized.name} exceeds the 50 MB per-file limit.`);
+      return;
+    }
+
+    if (url) {
+      try {
+        const parsed = new URL(url);
+        if (!["http:", "https:"].includes(parsed.protocol)) throw new Error("unsupported protocol");
+      } catch {
+        setMessage("Links must start with http:// or https://. Links are recorded, not fetched during intake.");
+        return;
+      }
+    }
+
+    const attested = form.get("submitAttestation") === "on";
+    if (!attested) {
+      setMessage("Confirm the submission attestation first.");
+      return;
+    }
+
+    const artifactId = crypto.randomUUID();
+    const uploadedPaths: string[] = [];
+    const parts: ArtifactPartInput[] = [];
+
+    setBusy(true);
+    setMessage("Throwing it in…");
+
+    try {
+      for (let index = 0; index < files.length; index += 1) {
+        const file = files[index];
+        const mime = normalizedMime(file);
+        const mode = modeForFile(file);
+        const storagePath = `${session.user.id}/${artifactId}/${String(index).padStart(2, "0")}-${crypto.randomUUID()}${safeExtension(file)}`;
+
+        setMessage(`Uploading ${index + 1}/${files.length} · ${file.name}`);
+        const { error: uploadError } = await client.storage
+          .from("artifact-media")
+          .upload(storagePath, file, { cacheControl: "3600", upsert: false, contentType: mime });
+        if (uploadError) throw uploadError;
+
+        uploadedPaths.push(storagePath);
+        parts.push({
+          position: parts.length,
+          part_kind: "file",
+          mode,
+          label: file.name,
+          storage_path: storagePath,
+          original_filename: file.name,
+          mime_type: mime,
+          byte_size: file.size,
+        });
+      }
+
+      if (bodyText) {
+        parts.push({ position: parts.length, part_kind: "text", mode: "text", label: "Artifact text", text_content: bodyText });
+      }
+      if (url) {
+        parts.push({ position: parts.length, part_kind: "reference", mode: "website", label: "External reference", reference_url: url });
+      }
+
+      const modes = [...new Set(parts.map((part) => part.mode))];
+      const enteredTitle = String(form.get("title") ?? "").trim();
+      const title = enteredTitle
+        || (files[0] ? stripExtension(files[0].name) : "")
+        || (url ? new URL(url).hostname : "")
+        || "Untitled slop";
+      const summary = String(form.get("summary") ?? "").trim()
+        || "AI-made Artifact submitted to the Slop Trough.";
+      const description = String(form.get("artifactDescription") ?? "").trim()
+        || `One Artifact composed of ${parts.length} material${parts.length === 1 ? "" : "s"} submitted for public feed experience.`;
+      const originClass = String(form.get("originClass") ?? "ai_origin_unverified");
+      const generator = String(form.get("generator") ?? "").trim() || "Not specified";
+      const humanRole = String(form.get("humanRole") ?? "").trim()
+        || "Human selected and submitted this AI-made Artifact to the Slop Trough.";
+      const provenance = String(form.get("provenance") ?? "").trim()
+        || "Creator attested AI origin; detailed generation provenance was not supplied at submission.";
+
+      setMessage("Binding one Artifact…");
+      const { data: createdId, error: createError } = await client.rpc("create_quarantined_artifact", {
+        p_artifact_id: artifactId,
+        p_title: title.slice(0, 100),
+        p_summary: summary,
+        p_artifact_description: description,
+        p_artifact_modes: modes,
+        p_origin_class: originClass,
+        p_generator: generator,
+        p_human_role: humanRole,
+        p_provenance_note: provenance,
+        p_ai_origin_attested: attested,
+        p_safety_attested: attested,
+        p_rights_attested: attested,
+        p_parts: parts,
+      });
+      if (createError) throw createError;
+
+      formElement.reset();
+      setSelectedFiles([]);
+      setTextPart("");
+      setReferenceUrl("");
+      setMessage("Thrown. Landing in Unjudged…");
+      window.dispatchEvent(new CustomEvent("aetimm:submission-created", { detail: { artifactId: String(createdId ?? artifactId) } }));
+    } catch (error) {
+      if (uploadedPaths.length > 0) await client.storage.from("artifact-media").remove(uploadedPaths);
+      setMessage(submissionErrorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!socialBackendEnabled) {
+    return <button className="upload-trigger" type="button" disabled>Intake unavailable</button>;
+  }
+
+  return (
+    <div className="upload-wrap">
+      <button
+        className="upload-trigger"
+        type="button"
+        onClick={() => !busy && setOpen((value) => !value)}
+        aria-expanded={open}
+        aria-controls="artifact-intake-panel"
+        disabled={busy}
+      >
+        {open ? "Close" : intakePaused ? "Intake paused" : "Submit"}
+      </button>
+
+      {open && !session && (
+        <div id="artifact-intake-panel" className="upload-panel" role="status">
+          <p className="submission-note"><strong>HAVE SLOP?</strong> Make an account or sign in, then throw it in.</p>
+        </div>
+      )}
+
+      {open && session && (
+        <form id="artifact-intake-panel" className="upload-panel submission-panel" onSubmit={submit} aria-busy={busy}>
+          <fieldset className={styles.formFieldset} disabled={busy || intakePaused}>
+            <p className="submission-note">
+              <strong>ALL SLOP WELCOME.</strong>{" "}
+              One Artifact. Any modality. It lands in Unjudged and joins the endless feed.
+              {dailyLimit ? ` · ${dailyLimit}/24h` : ""}
+            </p>
+
+            {intakePaused && <p className="submission-note" role="status"><strong>TROUGH PAUSED.</strong> The form stays visible; throwing is temporarily locked.</p>}
+
+            <div>
+              <label htmlFor="files">AI-made Artifact</label>
+              <div
+                className={styles.dropZone}
+                data-dragging={dragging ? "true" : undefined}
+                data-paused={intakePaused ? "true" : undefined}
+                onDragEnter={(event) => { event.preventDefault(); if (!busy && !intakePaused) setDragging(true); }}
+                onDragOver={(event) => event.preventDefault()}
+                onDragLeave={(event) => { event.preventDefault(); setDragging(false); }}
+                onDrop={handleDrop}
+              >
+                <input
+                  id="files"
+                  className={styles.materialInput}
+                  type="file"
+                  accept={FILE_ACCEPT}
+                  multiple
+                  disabled={busy || intakePaused}
+                  onChange={handleFileInput}
+                  aria-describedby="slop-material-help"
+                />
+                <label className={styles.materialPicker} htmlFor="files" data-disabled={busy || intakePaused ? "true" : undefined}>
+                  <span className={styles.materialPlus} aria-hidden="true">+</span>
+                  <span className={styles.materialAction}>{dragging ? "Drop it" : "Add material"}</span>
+                  <span className={styles.materialModes}>image · video · audio · PDF · code · data · 3D · more</span>
+                </label>
+              </div>
+
+              <div className={styles.materialSummary}>
+                <span>{materialPartCount}/{MAX_PARTS}</span>
+                <span>{formatBytes(totalFileBytes)} / 100 MB</span>
+              </div>
+
+              <div className={styles.materialList} aria-live="polite">
+                {selectedFiles.length === 0 ? (
+                  <div className={styles.materialEmpty}><span aria-hidden="true">◇</span><span>No slop added</span></div>
+                ) : selectedFiles.map((file) => {
+                  const identity = fileIdentity(file);
+                  return (
+                    <div className={styles.materialRow} key={identity}>
+                      <span aria-hidden="true">◇</span>
+                      <span>{file.name}<span className={styles.materialMeta}>{modeForFile(file)} · {formatBytes(file.size)}</span></span>
+                      <button className={styles.removeMaterial} type="button" onClick={() => removeSelectedFile(identity)} aria-label={`Remove ${file.name}`}>Remove</button>
+                    </div>
+                  );
+                })}
+              </div>
+              <p id="slop-material-help" className="submission-note">Files are treated as untrusted. Code is not executed and links are not fetched during intake.</p>
+              {materialLimitExceeded && <p className={styles.limitWarning} role="alert">Too much slop for one Artifact. Remove something.</p>}
+            </div>
+
+            <div>
+              <label htmlFor="title">Name it · optional</label>
+              <input id="title" name="title" maxLength={100} placeholder="Leave blank and we'll use the material name" />
+            </div>
+
+            <details>
+              <summary>Text, link, provenance & details · optional</summary>
+
+              <div>
+                <label htmlFor="textPart">Text material</label>
+                <textarea id="textPart" value={textPart} onChange={(event) => setTextPart(event.target.value)} maxLength={20000} placeholder="Paste text that is part of the Artifact." />
+              </div>
+
+              <div>
+                <label htmlFor="referenceUrl">Link material</label>
+                <input id="referenceUrl" type="url" value={referenceUrl} onChange={(event) => setReferenceUrl(event.target.value)} maxLength={2000} placeholder="https://…" />
+              </div>
+
+              <div>
+                <label htmlFor="summary">Description</label>
+                <textarea id="summary" name="summary" minLength={10} maxLength={600} placeholder="Optional. What is this slop?" />
+              </div>
+
+              <div>
+                <label htmlFor="artifactDescription">Experience notes</label>
+                <textarea id="artifactDescription" name="artifactDescription" minLength={20} maxLength={4000} placeholder="Optional. How should the whole Artifact behave or be experienced?" />
+              </div>
+
+              <div>
+                <label htmlFor="originClass">Origin</label>
+                <select id="originClass" name="originClass" defaultValue="ai_origin_unverified">
+                  <option value="ai_origin_unverified">AI-made · details not supplied</option>
+                  <option value="ai_directed">Human-directed AI</option>
+                  <option value="human_ai_hybrid">Human–AI hybrid</option>
+                  <option value="autonomous_ai_run">Autonomous AI run</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="generator">Generator / model / tools</label>
+                <input id="generator" name="generator" maxLength={120} placeholder="Optional" />
+              </div>
+
+              <div>
+                <label htmlFor="humanRole">Human role</label>
+                <textarea id="humanRole" name="humanRole" minLength={15} maxLength={800} placeholder="Optional" />
+              </div>
+
+              <div>
+                <label htmlFor="provenance">Provenance</label>
+                <textarea id="provenance" name="provenance" minLength={30} maxLength={1600} placeholder="Optional prompts, seeds, sources, edits, run logs…" />
+              </div>
+            </details>
+
+            <label className="check-row">
+              <input name="submitAttestation" type="checkbox" required />
+              <span>AI-made. I can submit it. It does not contain prohibited material.</span>
+            </label>
+
+            <div className="submission-actions">
+              <button className="submit-button" type="submit" disabled={busy || intakePaused || materialLimitExceeded || materialPartCount < 1}>
+                {busy ? "THROWING…" : intakePaused ? "TROUGH PAUSED" : "THROW IT IN"}
+              </button>
+              {message && <p className="submission-note" role="status" aria-live="polite">{message}</p>}
+            </div>
+          </fieldset>
+        </form>
+      )}
+    </div>
+  );
+}
