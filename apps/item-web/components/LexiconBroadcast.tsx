@@ -54,23 +54,31 @@ function choose(pool: string[], seed: number): string {
 function mutateCharacter(character: string, index: number, seed: number, tick: number): string {
   if (/\s/u.test(character)) return character;
 
-  const localTick = tick + (seed % 17);
-
-  // Every character owns a different reveal cadence. The phrase therefore
-  // never flips as a synchronized word or sentence.
-  if ((localTick + index) % 5 < 2) return character;
-
+  const localTick = tick + (seed % 17) + index * 3;
   const epoch = Math.floor(localTick / SCRIPT_EPOCH_TICKS);
-  const communicationMode = (epoch + seed) % (SCRIPT_POOLS.length + 2);
+  const communicationMode = (epoch + seed + index) % (SCRIPT_POOLS.length + 2);
 
-  if (/\p{N}/u.test(character)) return choose(DIGIT_POOL, seed + localTick);
+  // Every visible non-whitespace character participates on every clock tick.
+  // Per-character seeds plus independent script epochs make whole-word state
+  // combinations combinatorially enormous while preserving fixed geometry.
+  if (/\p{N}/u.test(character)) return choose(DIGIT_POOL, seed + localTick * 13 + index);
   if (/\p{P}|\p{S}/u.test(character)) {
-    return choose(communicationMode % 2 === 0 ? MATH_POOL : MACHINE_POOL, seed + localTick);
+    return choose(
+      communicationMode % 2 === 0 ? MATH_POOL : MACHINE_POOL,
+      seed + localTick * 17 + index,
+    );
   }
-  if (communicationMode === SCRIPT_POOLS.length) return choose(MATH_POOL, seed + localTick);
-  if (communicationMode === SCRIPT_POOLS.length + 1) return choose(MACHINE_POOL, seed + localTick);
+  if (communicationMode === SCRIPT_POOLS.length) {
+    return choose(MATH_POOL, seed + localTick * 19 + index);
+  }
+  if (communicationMode === SCRIPT_POOLS.length + 1) {
+    return choose(MACHINE_POOL, seed + localTick * 23 + index);
+  }
 
-  return choose(SCRIPT_POOLS[communicationMode] ?? MACHINE_POOL, seed + localTick);
+  return choose(
+    SCRIPT_POOLS[communicationMode] ?? MACHINE_POOL,
+    seed + localTick * 29 + index,
+  );
 }
 
 export function LexiconBroadcastProvider({ children }: { children: ReactNode }) {
@@ -139,6 +147,7 @@ export function LexiconText({
     <Component
       className={`${styles.lexicon} ${className}`.trim()}
       data-lexicon-flicker="character-broadcast-v1"
+      data-oscillation-contract="all-visible-interface-words-v1"
       data-cycle-ms="500"
     >
       {semantic && <span className={styles.srOnly}>{text}</span>}
