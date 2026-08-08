@@ -17,6 +17,12 @@
   overflow-wrap: anywhere;
 }
 
+/*
+ * Oscillation law: visible interface language never falls back to a stable
+ * human-source presentation during ordinary interaction. The exact source
+ * remains in-flow only as an invisible geometry skeleton and in the separate
+ * accessibility layer.
+ */
 .original {
   display: inline;
   visibility: hidden;
@@ -34,38 +40,6 @@
   overflow-wrap: inherit;
 }
 
-.lexicon:hover .original,
-.lexicon:focus-within .original {
-  visibility: visible;
-}
-
-.lexicon:hover .mutated,
-.lexicon:focus-within .mutated {
-  visibility: hidden;
-}
-
-/*
- * Arrival law: the lexicon may sandbag reading, never basic operation.
- * Touch users do not have a hover state before committing to an action, so
- * actionable labels stay human-readable while ambient noninteractive text
- * continues the rapid machine-language broadcast.
- */
-@media (hover: none) and (pointer: coarse) {
-  :global(button) .original,
-  :global(a) .original,
-  :global(summary) .original,
-  :global(label) .original {
-    visibility: visible;
-  }
-
-  :global(button) .mutated,
-  :global(a) .mutated,
-  :global(summary) .mutated,
-  :global(label) .mutated {
-    visibility: hidden;
-  }
-}
-
 .srOnly {
   position: absolute;
   width: 1px;
@@ -78,6 +52,7 @@
   border: 0;
 }
 
+/* Explicit user accessibility preference remains the only visible opt-out. */
 @media (prefers-reduced-motion: reduce) {
   .original {
     visibility: visible;
