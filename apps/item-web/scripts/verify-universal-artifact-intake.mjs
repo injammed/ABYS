@@ -4,6 +4,7 @@ import path from "node:path";
 const root = process.cwd();
 const intakePath = path.join(root, "components", "SlopDrop.tsx");
 const intakeStylesPath = path.join(root, "components", "UploadGate.module.css");
+const authSessionPath = path.join(root, "lib", "auth-session.ts");
 const storageReceiptPath = path.join(root, "lib", "storage-upload-receipt.ts");
 const curatorPath = path.join(root, "components", "CuratorQueue.tsx");
 const socialFeedPath = path.join(root, "lib", "social-feed.ts");
@@ -13,9 +14,10 @@ const migration9Path = path.resolve(root, "..", "..", "supabase", "migrations", 
 const migration10Path = path.resolve(root, "..", "..", "supabase", "migrations", "010_security_definer_lockdown.sql");
 const migration17Path = path.resolve(root, "..", "..", "supabase", "migrations", "017_rolling_storage_intake_cap.sql");
 
-const [intake, intakeStyles, storageReceipt, curator, socialFeed, architecture, migration8, migration9, migration10, migration17] = await Promise.all([
+const [intake, intakeStyles, authSession, storageReceipt, curator, socialFeed, architecture, migration8, migration9, migration10, migration17] = await Promise.all([
   readFile(intakePath, "utf8"),
   readFile(intakeStylesPath, "utf8"),
+  readFile(authSessionPath, "utf8"),
   readFile(storageReceiptPath, "utf8"),
   readFile(curatorPath, "utf8"),
   readFile(socialFeedPath, "utf8"),
@@ -75,6 +77,24 @@ requirePattern("accessible remove control", /aria-label=\{`Remove \$\{file\.name
 requirePattern("custom picker focus state", /materialInput:focus-visible \+ \.materialPicker/, intakeStyles);
 requirePattern("mobile picker layout", /@media \(max-width: 430px\)/, intakeStyles);
 
+// Auth-session freshness law: public writes do not discover expiry at the last
+// possible moment. Healthy sessions stay local-only; expired/near-expiry
+// sessions refresh before mutation, with the expected account identity pinned.
+requirePattern("one-minute refresh skew", /SESSION_REFRESH_SKEW_SECONDS = 60/, authSession);
+requirePattern("fresh-session helper reads current session", /auth\.getSession\(\)/, authSession);
+requirePattern("missing session fails before mutation", /AUTH_SESSION_REQUIRED/, authSession);
+requirePattern("account identity pinned before refresh", /session\.user\.id !== expectedUserId[\s\S]*AUTH_SESSION_OWNER_CHANGED/, authSession);
+requirePattern("healthy session returns without refresh", /if \(!needsRefresh\) return session;/, authSession);
+requirePattern("near-expiry session refreshes", /auth\.refreshSession\(\)/, authSession);
+requirePattern("refresh failure fails before mutation", /AUTH_SESSION_REFRESH_FAILED/, authSession);
+requirePattern("account identity pinned after refresh", /session = refreshed\.data\.session;[\s\S]*session\.user\.id !== expectedUserId/, authSession);
+requirePattern("intake preflights before control read", /ensureFreshAuthenticatedSession\(session\.user\.id\)[\s\S]*from\("intake_control"\)/, intake);
+requirePattern("Artifact RPC gets fresh-session preflight", /Binding one Artifact…[\s\S]*ensureFreshAuthenticatedSession\(session\.user\.id\);[\s\S]*client\.rpc\("create_quarantined_artifact"/, intake);
+requirePattern("Artifact creation remains one RPC", /const \{ data: createdId, error: createError \} = await client\.rpc\("create_quarantined_artifact"/, intake);
+requirePattern("expired intake session has concise message", /AUTH_SESSION_[\s\S]*Your sign-in expired before submission/, intake);
+requirePattern("vote path preflights expected voter", /saveVote[\s\S]*ensureFreshAuthenticatedSession\(voterId\)/, socialFeed);
+requirePattern("vote retry rechecks freshness", /for \(const waitMs of VOTE_WRITE_RETRY_DELAYS_MS\)[\s\S]*ensureFreshAuthenticatedSession\(voterId\)[\s\S]*artifact_votes/, socialFeed);
+
 // Storage transport receipt law: the client may retry the exact random object
 // path after an ambiguous transport failure, but never overwrite a different
 // object. If Storage already accepted it, owner-readable access is the receipt.
@@ -85,6 +105,9 @@ requirePattern("exact-path storage receipt", /createSignedUrl\(path, 60\)/, stor
 requirePattern("ambiguous upload reconciles before retry", /if \(await artifactObjectReadable\(path\)\) return;/, storageReceipt);
 requirePattern("final storage receipt before failure", /if \(await artifactObjectReadable\(path\)\) return;[\s\S]*throw lastError/, storageReceipt);
 forbidPattern("storage upsert overwrite", /upsert:\s*true/, storageReceipt);
+requirePattern("storage path pins expected owner", /const expectedUserId = path\.split\("\/", 1\)\[0\] \|\| undefined/, storageReceipt);
+requirePattern("storage preflights fresh session", /await ensureFreshAuthenticatedSession\(expectedUserId\)/, storageReceipt);
+requirePattern("storage retry rechecks fresh session", /for \(const waitMs[\s\S]*ensureFreshAuthenticatedSession\(expectedUserId\)[\s\S]*\.upload\(path, file/, storageReceipt);
 
 // Brief connectivity loss is transport state, not a new user decision. The
 // upload path gets one bounded reconnect budget and resumes automatically.
@@ -178,4 +201,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal Artifact intake PASS: any file format can enter one bounded Artifact; upload transport survives brief disconnects and ambiguous acknowledgements; storage pressure remains bounded over a rolling 24-hour window without turning published history into a lifetime lockout.");
+console.log("Universal Artifact intake PASS: any file format can enter one bounded Artifact; authenticated public writes preflight session freshness without adding a blind Artifact-create retry; upload transport survives disconnects and ambiguous acknowledgements; storage pressure remains rolling rather than lifetime.");

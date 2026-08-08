@@ -2,6 +2,7 @@
 
 import { ChangeEvent, DragEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { ensureFreshAuthenticatedSession } from "@/lib/auth-session";
 import { AUTH_REQUIRED_EVENT, consumeSubmitIntent, rememberSubmitIntent } from "@/lib/public-intents";
 import { waitForPublicArtifactReceipt } from "@/lib/publication-receipt";
 import { uploadArtifactObject } from "@/lib/storage-upload-receipt";
@@ -122,6 +123,7 @@ function submissionErrorMessage(error: unknown): string {
   if (raw.includes("ARTIFACT_PART_STORAGE")) return "One material could not be bound to the Artifact. Uploaded files were rolled back where possible.";
   if (raw.includes("ARTIFACT_MODES_INVALID")) return "One or more materials could not be classified safely.";
   if (raw.includes("PUBLICATION_ATTESTATIONS_REQUIRED")) return "Confirm the submission attestation before throwing it in.";
+  if (raw.includes("AUTH_SESSION_")) return "Your sign-in expired before submission. Sign in and try again.";
   if (raw.toLowerCase().includes("row-level security")) return "The trough rejected this Artifact. Sign in again or try later.";
   return raw || "Artifact submission failed.";
 }
@@ -249,6 +251,13 @@ export function SlopDrop() {
       return;
     }
 
+    try {
+      await ensureFreshAuthenticatedSession(session.user.id);
+    } catch (error) {
+      setMessage(submissionErrorMessage(error));
+      return;
+    }
+
     const { data: currentControl } = await client
       .from("intake_control")
       .select("intake_open,daily_submission_limit")
@@ -358,6 +367,7 @@ export function SlopDrop() {
         || "Creator attested AI origin; detailed generation provenance was not supplied at submission.";
 
       setMessage("Binding one Artifact…");
+      await ensureFreshAuthenticatedSession(session.user.id);
       const { data: createdId, error: createError } = await client.rpc("create_quarantined_artifact", {
         p_artifact_id: artifactId,
         p_title: title.slice(0, 100),
