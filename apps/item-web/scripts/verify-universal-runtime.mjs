@@ -3,10 +3,11 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const root = process.cwd();
-const [feed, runtime, initialLease, renewable, mediaLease, socialFeed, swipe] = await Promise.all([
+const [feed, runtime, initialLease, initialDownload, renewable, mediaLease, socialFeed, swipe] = await Promise.all([
   readFile(resolve(root, "components", "ArtifactFeed.tsx"), "utf8"),
   readFile(resolve(root, "components", "ArtifactRuntime.tsx"), "utf8"),
   readFile(resolve(root, "components", "InitialLeaseArtifactMedia.tsx"), "utf8"),
+  readFile(resolve(root, "components", "InitialLeaseArtifactDownload.tsx"), "utf8"),
   readFile(resolve(root, "components", "RenewableArtifactMedia.tsx"), "utf8"),
   readFile(resolve(root, "lib", "media-lease.ts"), "utf8"),
   readFile(resolve(root, "lib", "social-feed.ts"), "utf8"),
@@ -30,7 +31,16 @@ for (const [label, pattern, source] of [
   ["initial lease resolves exact public part identity", /from\("artifact_parts"\)[\s\S]*select\("storage_path"\)[\s\S]*\.eq\("id", partId\)/, mediaLease],
   ["concurrent initial part acquisition deduplicated", /const partInFlight = new Map<string, Promise<string>>\(\)/, mediaLease],
   ["legacy image fallback also renewable", /artifact\.mediaUrl[\s\S]*RenewableArtifactMedia kind="image"/, runtime],
-  ["download path renews before deliberate access", /RenewableArtifactDownload/, runtime],
+
+  // File access stays one Download action even if batch URL hydration missed.
+  ["inert file always keeps Download action", /part\.partKind === "file"[\s\S]*InitialLeaseArtifactDownload[\s\S]*partId=\{part\.id\}/, runtime],
+  ["material register always keeps file Download action", /part\.partKind === "file"[\s\S]*InitialLeaseArtifactDownload[\s\S]*ariaLabel="Download"/, runtime],
+  ["existing URL delegates to expiry-renewing download", /if \(initialUrl\)[\s\S]*RenewableArtifactDownload[\s\S]*initialUrl=\{initialUrl\}/, initialDownload],
+  ["missing Download URL acquires by exact part identity", /acquireArtifactMediaLeaseByPartId\(partId\)/, initialDownload],
+  ["acquired Download uses browser download semantics", /anchor\.download = filename \|\| "artifact-material"/, initialDownload],
+  ["missing lease action stays same link surface", /data-initial-lease-download="true"[\s\S]*onClick=\{acquireAndDownload\}/, initialDownload],
+  ["failed acquisition invents no recovery UI", /A later click retries the bounded acquisition path\. No new recovery UI\./, initialDownload],
+
   ["media error triggers lease recovery", /onError=\{recoverLease\}/, renewable],
   ["same failed URL cannot storm renewals", /attemptedUrlRef\.current === url/, renewable],
   ["concurrent lease renewal deduplicated", /const inFlight = new Map<string, Promise<string>>\(\)/, mediaLease],
@@ -56,9 +66,9 @@ for (const [label, pattern] of [
   ["Function constructor execution", /new\s+Function\s*\(/],
   ["automatic external reference fetch", /\bfetch\s*\(/],
 ]) {
-  assert.ok(!pattern.test(runtime + initialLease + renewable), `Universal runtime contract failed: forbidden ${label}`);
+  assert.ok(!pattern.test(runtime + initialLease + initialDownload + renewable), `Universal runtime contract failed: forbidden ${label}`);
 }
 
 assert.ok(!/imageFeed|videoFeed|audioFeed|documentFeed|codeFeed|model3dFeed/.test(feed), "Modalities must not branch into separate public feeds.");
 
-console.log("Universal runtime PASS: one trough safely renders every Artifact form; native media can reacquire a missing first short-lived lease by exact public part identity and later renew expiry in place; downloads renew on deliberate access; uploaded code/HTML remain inert; every Artifact stays voteable.");
+console.log("Universal runtime PASS: one trough safely renders every Artifact form; native media and file downloads reacquire missing first short-lived leases by exact public part identity, then use the proven renewal path; uploaded code/HTML remain inert; every Artifact stays voteable.");
