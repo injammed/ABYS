@@ -60,6 +60,21 @@ for (const [label, pattern, source] of [
   ["public Slop rank RPC", /get_artifact_slop_ranks/, publicAggregate],
   ["aggregate requires exact artifact row", /PUBLIC_VOTE_AGGREGATE_MISSING/, publicAggregate],
 
+  // Deep-feed public truth law: already-open cards outside the newest feed head
+  // stay current without per-card requests or publishing raw votes.
+  ["public cards expose bounded observer identity", /data-public-artifact-id=\{creatorPreview \? undefined : artifact\.id\}/, feed],
+  ["near-viewport aggregate observer", /IntersectionObserver[\s\S]*rootMargin: "350px 0px"/, feed],
+  ["visible aggregate refresh cadence", /VISIBLE_AGGREGATE_REFRESH_MS = 15000/, feed],
+  ["visible aggregate client cap", /VISIBLE_AGGREGATE_LIMIT = 100/, feed],
+  ["visible aggregate request is batched", /loadPublicVoteAggregates\(ids\)/, feed],
+  ["hidden tabs skip deep aggregate reads", /document\.visibilityState !== "visible"/, feed],
+  ["offline tabs skip deep aggregate reads", /!navigator\.onLine/, feed],
+  ["one deep aggregate request in flight", /visibleAggregateRefreshInFlightRef\.current/, feed],
+  ["unchanged aggregate avoids state churn", /return changed \? next : current;/, feed],
+  ["aggregate helper hard caps IDs", /MAX_PUBLIC_AGGREGATE_IDS = 100/, publicAggregate],
+  ["aggregate helper deduplicates IDs", /Array\.from\(new Set\(artifactIds\)\)\.slice\(0, MAX_PUBLIC_AGGREGATE_IDS\)/, publicAggregate],
+  ["single aggregate delegates to batch", /loadPublicVoteAggregates\(\[artifactId\]\)/, publicAggregate],
+
   ["one account one artifact database key", /primary key \(artifact_id, voter_id\)/, schema],
   ["legacy non-binary rows fail closed", /LEGACY_NON_BINARY_VOTES_REQUIRE_REVIEW/, binaryMigration],
   ["binary database constraint", /check \(judgment in \('preserve', 'slop'\)\)/, binaryMigration],
@@ -71,4 +86,4 @@ assert.ok(!/button[^>]*judge refine/.test(feed), "Refine must not exist in the p
 assert.ok(!/MutationObserver/.test(swipe), "Binary voting must not depend on DOM mutation normalization.");
 assert.ok(!/👍|👎/.test(feed), "The public ballot must not fall back to generic thumbs-up/thumbs-down icons.");
 
-console.log("Binary swipe voting PASS: one account has one active Artifact judgment; click and swipe share one self-confirming persistence path; background hydration can refresh every other vote but cannot overwrite a saving optimistic vote; committed votes reconcile public Museum/Slop totals; visible totals remain inside the machine lexicon and vertical scrolling remains primary.");
+console.log("Binary swipe voting PASS: one account has one active Artifact judgment; active writes are hydration-safe; confirmed votes reconcile aggregate truth immediately; older near-viewport cards batch-refresh public Museum/Slop state without raw votes, background traffic, or per-card request storms; visible totals remain in the machine lexicon.");
