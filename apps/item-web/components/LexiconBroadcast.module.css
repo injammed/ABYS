@@ -19,10 +19,10 @@
 
 /*
  * Final frozen language law: every visible interface word oscillates during
- * ordinary presentation. A deliberate pointer hover temporarily reveals the
- * exact source text inside the same geometry; leaving hover resumes the field.
- * Touch receives no stable-language exemption and focus alone does not stop
- * oscillation. The separate accessibility layer always retains exact meaning.
+ * ordinary presentation. A deliberate non-touch pointer hover temporarily
+ * reveals the exact source text inside the same geometry; leaving hover resumes
+ * the field. Touch receives no stable-language exemption and focus alone does
+ * not stop oscillation. Accessibility always retains exact meaning.
  */
 .original {
   display: inline;
@@ -41,14 +41,12 @@
   overflow-wrap: inherit;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .lexicon:hover .original {
-    visibility: visible;
-  }
+.pointerTranslated .original {
+  visibility: visible;
+}
 
-  .lexicon:hover .mutated {
-    visibility: hidden;
-  }
+.pointerTranslated .mutated {
+  visibility: hidden;
 }
 
 .srOnly {
