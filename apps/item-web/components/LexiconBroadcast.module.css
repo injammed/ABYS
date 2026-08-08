@@ -4,9 +4,9 @@
 }
 
 /*
- * Layout law: the readable source owns geometry; the cycling machine layer
- * only paints inside that geometry. Script changes can change glyphs, never
- * the dimensions of surrounding UI.
+ * Layout law: the readable source owns geometry; the sampled machine layers
+ * only paint inside that geometry. Carrier speed may be effectively enormous;
+ * surrounding UI dimensions are never allowed to participate.
  */
 .visual {
   position: relative;
@@ -17,13 +17,6 @@
   overflow-wrap: anywhere;
 }
 
-/*
- * Final frozen language law: every visible interface word oscillates during
- * ordinary presentation. A deliberate non-touch pointer hover temporarily
- * reveals the exact source text inside the same geometry; leaving hover resumes
- * the field. Touch receives no stable-language exemption and focus alone does
- * not stop oscillation. Accessibility always retains exact meaning.
- */
 .original {
   display: inline;
   visibility: hidden;
@@ -32,34 +25,54 @@
   pointer-events: none;
 }
 
-.mutated {
+.mutated,
+.echo {
   position: absolute;
   inset: 0;
   display: block;
   overflow: hidden;
   white-space: inherit;
   overflow-wrap: inherit;
+  pointer-events: none;
 }
 
+/*
+ * The echo is a neighboring virtual-carrier sample, not a second animation
+ * loop. A tiny fixed optical displacement makes the sampled field read like a
+ * rim/turbine afterimage while avoiding compositor-heavy per-node animation.
+ */
+.echo {
+  opacity: .13;
+  transform: translate3d(.028em, -.012em, 0);
+  filter: blur(.012em);
+}
+
+.mutated {
+  opacity: .96;
+}
+
+/* Exact source appears in the exact same geometry on deliberate mouse/stylus hover. */
 .pointerTranslated .original {
   visibility: visible;
 }
 
-.pointerTranslated .mutated {
+.pointerTranslated .mutated,
+.pointerTranslated .echo {
   visibility: hidden;
 }
 
 /*
- * Preserve the frozen fine-hover CSS contract, but pointer-event state is the
- * authority. Hybrid devices that synthesize :hover from touch are forced back
- * to oscillation unless the active pointer set pointerTranslated.
+ * Fine-hover CSS mirrors the pointer-state contract. Hybrid devices that
+ * synthesize :hover from touch are forced back to the carrier unless an actual
+ * non-touch pointer set pointerTranslated.
  */
 @media (hover: hover) and (pointer: fine) {
   .lexicon:hover .original {
     visibility: visible;
   }
 
-  .lexicon:hover .mutated {
+  .lexicon:hover .mutated,
+  .lexicon:hover .echo {
     visibility: hidden;
   }
 
@@ -67,7 +80,8 @@
     visibility: hidden;
   }
 
-  .lexicon:not(.pointerTranslated):hover .mutated {
+  .lexicon:not(.pointerTranslated):hover .mutated,
+  .lexicon:not(.pointerTranslated):hover .echo {
     visibility: visible;
   }
 }
@@ -90,7 +104,8 @@
     visibility: visible;
   }
 
-  .mutated {
+  .mutated,
+  .echo {
     visibility: hidden;
   }
 }

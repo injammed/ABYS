@@ -33,24 +33,40 @@ const [
 
 for (const [label, pattern, source] of [
   ["one root broadcast provider", /<LexiconBroadcastProvider>\{children\}<\/LexiconBroadcastProvider>/, layout],
-  ["one shared tick law", /const TICK_MS = 125;/, lexicon],
-  ["500 ms script epoch", /const SCRIPT_EPOCH_TICKS = 4;/, lexicon],
-  ["single shared interval", /window\.setInterval\([\s\S]*TICK_MS/, lexicon],
+  ["cheap semantic clock", /const TICK_MS = 125;/, lexicon],
+  ["500 ms semantic envelope", /const SCRIPT_EPOCH_TICKS = 4;/, lexicon],
+  ["single semantic interval", /window\.setInterval\([\s\S]*TICK_MS/, lexicon],
+  ["c-signature carrier", /const C_SIGNATURE = 299_792_458;/, lexicon],
+  ["safe integer carrier scale", /const VIRTUAL_CARRIER_SCALE = 16_777_216;/, lexicon],
+  ["virtual carrier rate", /const VIRTUAL_CARRIER_STATES_PER_SECOND = C_SIGNATURE \* VIRTUAL_CARRIER_SCALE;/, lexicon],
+  ["stroboscopic sample ceiling", /const MAX_VISIBLE_SAMPLE_FPS = 24;/, lexicon],
+  ["slow apparent alias drift", /const ALIAS_DRIFT_HZ = 0\.075;/, lexicon],
+  ["single shared frame engine", /window\.requestAnimationFrame\(runEngineFrame\)/, lexicon],
+  ["background-tab heat guard", /document\.visibilityState === "hidden"/, lexicon],
+  ["viewport heat guard", /new IntersectionObserver[\s\S]*observation\.isIntersecting/, lexicon],
+  ["bounded visible sample gate", /nowMs - engineLastPaintMs < MIN_VISIBLE_SAMPLE_MS/, lexicon],
+  ["half-rate echo sampling", /engineSampleNumber % 2 === 0/, lexicon],
+  ["carrier wraps inside safe integer window", /const CARRIER_WRAP_MS = 1000;[\s\S]*withinSecond \* VIRTUAL_CARRIER_STATES_PER_SECOND/, lexicon],
   ["character-specific seed", /stableHash\(`\$\{text\}\|\$\{index\}`\)/, lexicon],
-  ["all visible non-whitespace characters mutate every tick", /Every visible non-whitespace character participates on every clock tick/, lexicon],
-  ["near-infinite combinatorial word state law", /combinatorially enormous/, lexicon],
+  ["phase-banded deterministic mutation", /const PHASE_BANDS = 16;[\s\S]*const band = \(index \+ \(seed % PHASE_BANDS\)\)/, lexicon],
+  ["near-light-speed carrier explanation", /roughly five quadrillion deterministic language states per second/, lexicon],
+  ["wagon-wheel alias explanation", /producing a wagon-wheel alias/, lexicon],
   ["many human writing systems", /אבגדה[\s\S]*ابتث[\s\S]*अआइई[\s\S]*あいうえお[\s\S]*天地人機/, lexicon],
   ["mathematical communication pool", /const MATH_POOL = Array\.from\("∀∂∃∅∆∇/, lexicon],
   ["synthetic machine glyph pool", /const MACHINE_POOL = Array\.from\("⌁⌭⟐⊙/, lexicon],
-  ["visual flicker contract", /data-lexicon-flicker="character-broadcast-v1"/, lexicon],
-  ["universal oscillation with hover source contract", /data-oscillation-contract="all-visible-interface-words-v2-hover-source"/, lexicon],
+  ["phase-aliased visual contract", /data-lexicon-flicker="phase-aliased-character-broadcast-v2"/, lexicon],
+  ["light-speed oscillation contract", /data-oscillation-contract="all-visible-interface-words-v3-light-speed-alias"/, lexicon],
+  ["carrier contract", /data-carrier-contract="virtual-c-scale-frame-bounded-v1"/, lexicon],
+  ["carrier rate exposed as metadata", /data-virtual-carrier-states-per-second=\{String\(VIRTUAL_CARRIER_STATES_PER_SECOND\)\}/, lexicon],
+  ["sample ceiling exposed as metadata", /data-visible-sample-fps=\{String\(MAX_VISIBLE_SAMPLE_FPS\)\}/, lexicon],
   ["final hover translation contract", /data-hover-translation-contract="pointer-hover-exact-source-final-v1"/, lexicon],
   ["stable source hidden for accessibility", /className=\{styles\.srOnly\}>\{text\}/, lexicon],
-  ["visual mutation hidden from assistive tree", /className=\{styles\.visual\} aria-hidden="true"/, lexicon],
+  ["visual mutation hidden from assistive tree", /className=\{styles\.visual\}[\s\S]*aria-hidden="true"/, lexicon],
   ["source string owns layout geometry", /\.original[\s\S]*visibility:\s*hidden/, lexiconStyles],
-  ["mutated string is paint-only overlay", /\.mutated[\s\S]*position:\s*absolute[\s\S]*inset:\s*0[\s\S]*overflow:\s*hidden/, lexiconStyles],
+  ["mutated string is paint-only overlay", /\.mutated,[\s\S]*\.echo[\s\S]*position:\s*absolute[\s\S]*inset:\s*0/, lexiconStyles],
+  ["phase echo remains optical only", /\.echo[\s\S]*opacity:\s*\.13[\s\S]*translate3d/, lexiconStyles],
   ["fine-pointer hover reveals exact source", /@media \(hover: hover\) and \(pointer: fine\)[\s\S]*\.lexicon:hover \.original[\s\S]*visibility:\s*visible/, lexiconStyles],
-  ["fine-pointer hover hides mutation", /@media \(hover: hover\) and \(pointer: fine\)[\s\S]*\.lexicon:hover \.mutated[\s\S]*visibility:\s*hidden/, lexiconStyles],
+  ["fine-pointer hover hides both sampled layers", /\.lexicon:hover \.mutated,[\s\S]*\.lexicon:hover \.echo[\s\S]*visibility:\s*hidden/, lexiconStyles],
   ["reduced motion restores exact source without reflow", /prefers-reduced-motion:[\s\S]*\.original[\s\S]*visibility:\s*visible/, lexiconStyles],
   ["semantic language broadcast still open-ended", /\[language: string\]: string \| undefined;/, gloss],
   ["MachineGloss consumes shared clock", /useLexiconBroadcast\(\)/, gloss],
@@ -79,13 +95,14 @@ for (const [label, pattern, source] of [
   assert.ok(pattern.test(source), `Machine lexicon contract failed: missing ${label}`);
 }
 
-assert.equal((lexicon.match(/setInterval/g) ?? []).length, 1, "Character broadcast must use exactly one shared interval.");
-assert.ok(!/setInterval|setTimeout/.test(gloss), "MachineGloss must not create its own timers.");
+assert.equal((lexicon.match(/setInterval/g) ?? []).length, 1, "Only the cheap semantic envelope may use setInterval.");
+assert.ok(!/setTimeout/.test(lexicon), "The carrier must not create timeout storms.");
+assert.ok(!/setInterval|setTimeout|requestAnimationFrame/.test(gloss), "MachineGloss must not create private clocks.");
+assert.ok(!/@keyframes/.test(lexiconStyles), "Per-node CSS animation loops are forbidden; the shared sampler owns motion.");
 assert.ok(!/dangerouslySetInnerHTML/.test(lexicon + gloss), "Machine lexicon must not use dynamic HTML injection.");
 assert.ok(!/\bfetch\s*\(/.test(lexicon + gloss), "Machine lexicon must not call a remote translation or glyph service.");
 assert.ok(!/<LexiconText[^>]*text=\{textPart\}/.test(slopDrop), "User-entered Artifact text must not be transformed while editing.");
 assert.ok(!/\.lexicon:focus-within \.original/.test(lexiconStyles), "Focus alone must not stop visible oscillation.");
 assert.ok(!/@media \(hover: none\) and \(pointer: coarse\)/.test(lexiconStyles), "Touch controls must participate in the same visible oscillation field.");
-assert.ok(!/\(localTick \+ index\) % 5/.test(lexicon), "Visible source-reveal cadence must not interrupt universal oscillation.");
 
-console.log("Machine lexicon PASS: every visible interface word oscillates continuously in the shared near-infinite character field; deliberate fine-pointer hover reveals its exact source in-place, geometry stays fixed, touch remains oscillating, reduced-motion remains respected, and Artifact payloads stay verbatim. FINAL FROZEN CONTRACT.");
+console.log("Machine lexicon PASS: a c-signature virtual carrier traverses roughly five quadrillion deterministic states per second while one viewport-bounded 24 Hz sampler exposes a slow wagon-wheel alias; hover translates exact source in-place, geometry stays fixed, background/offscreen work is suppressed, and Artifact payloads remain verbatim. FINAL MOTION CONTRACT.");
