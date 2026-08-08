@@ -41,14 +41,15 @@ requirePattern("one-click feed landing event", /aetimm:submission-created/, drop
 requirePattern("simple intake mounted", /<SlopDrop \/>/, nav);
 
 // Public intent law: Submit remains one action even when authentication is
-// required. Only the fact that the user intends to submit crosses an OAuth
-// round trip; files/form payload are never placed in web storage.
+// required. Only the fact that the user intends to submit crosses auth; actual
+// Artifact payload is never persisted in web storage.
 requirePattern("named Submit intent key", /SUBMIT_INTENT_STORAGE_KEY = "aetimm:intent:submit:v1"/, intents);
 requirePattern("named auth-required event", /AUTH_REQUIRED_EVENT = "aetimm:auth-required"/, intents);
-requirePattern("signed-out Submit stores intent", /sessionStorage\.setItem\(SUBMIT_INTENT_STORAGE_KEY, "1"\)/, drop);
+requirePattern("signed-out Submit stores tab-local intent", /sessionStorage\.setItem\(SUBMIT_INTENT_STORAGE_KEY, "1"\)/, drop);
 requirePattern("signed-out Submit requests auth", /dispatchEvent\(new Event\(AUTH_REQUIRED_EVENT\)\)/, drop);
 requirePattern("Submit trigger owns auth bridge", /onClick=\{handleTrigger\}/, drop);
 requirePattern("Account listens for required auth", /addEventListener\(AUTH_REQUIRED_EVENT, openForRequiredAuth\)/, account);
+requirePattern("required auth mirrors tiny intent cross-tab", /openForRequiredAuth[\s\S]*mirrorPublicAuthIntentsAcrossTabs\(\)/, account);
 requirePattern("required auth selects sign-in", /openForRequiredAuth[\s\S]*setMode\("signin"\)/, account);
 requirePattern("required auth opens existing account surface", /openForRequiredAuth[\s\S]*setOpen\(true\)/, account);
 requirePattern("Account removes auth event listener", /removeEventListener\(AUTH_REQUIRED_EVENT, openForRequiredAuth\)/, account);
@@ -56,6 +57,24 @@ requirePattern("signed-in Submit intent consumed", /sessionStorage\.getItem\(SUB
 requirePattern("consumed Submit intent removed", /sessionStorage\.removeItem\(SUBMIT_INTENT_STORAGE_KEY\)/, drop);
 requirePattern("signed-in Submit form resumes", /removeItem\(SUBMIT_INTENT_STORAGE_KEY\);[\s\S]*setOpen\(true\)/, drop);
 requirePattern("OAuth returns to same public root", /redirectTo: `\$\{window\.location\.origin\}\/`/, account);
+requirePattern("email confirmation returns to public root", /emailRedirectTo: `\$\{window\.location\.origin\}\/`/, account);
+
+// First-account continuity: confirmation/OAuth may return in another tab. Only
+// bounded action intent may cross that tab boundary, and it expires quickly.
+requirePattern("cross-tab Submit bridge key", /CROSS_TAB_SUBMIT_INTENT_KEY = "aetimm:auth-bridge:submit:v1"/, intents);
+requirePattern("cross-tab Vote bridge key", /CROSS_TAB_VOTE_INTENT_KEY = "aetimm:auth-bridge:vote:v1"/, intents);
+requirePattern("cross-tab intent thirty-minute TTL", /PUBLIC_AUTH_INTENT_TTL_MS = 30 \* 60 \* 1000/, intents);
+requirePattern("cross-tab envelope hard size cap", /MAX_BRIDGED_INTENT_BYTES = 512/, intents);
+requirePattern("bridge reads only existing action intent", /storageGet\(window\.sessionStorage, sessionKey\)/, intents);
+requirePattern("bridge writes only envelope value", /IntentEnvelope = \{ createdAt: now, value \}/, intents);
+requirePattern("bridge restores before component effects", /if \(typeof window !== "undefined"\) restorePublicAuthIntentsForThisTab\(\)/, intents);
+requirePattern("bridge never overwrites newer tab intent", /storageGet\(window\.sessionStorage, sessionKey\) == null/, intents);
+requirePattern("stale bridge expires", /now - parsed\.createdAt > PUBLIC_AUTH_INTENT_TTL_MS/, intents);
+requirePattern("future-dated bridge rejected", /parsed\.createdAt > now \+ 60_000/, intents);
+requirePattern("restricted browser storage fails open", /Restricted browser storage must never block authentication itself/, intents);
+requirePattern("successful existing session clears bridge", /if \(data\.session\) clearCrossTabPublicAuthIntents\(\)/, account);
+requirePattern("SIGNED_IN clears bridge", /event === "SIGNED_IN"\) clearCrossTabPublicAuthIntents\(\)/, account);
+forbidPattern("Artifact payload fields in cross-tab bridge", /selectedFiles|textPart|referenceUrl/, intents);
 forbidPattern("Artifact payload persisted in localStorage", /localStorage\.(?:setItem|getItem)\([^)]*(?:artifact|file|textPart|referenceUrl)/i, drop + account);
 forbidPattern("Artifact payload persisted in sessionStorage", /sessionStorage\.setItem\([^,]+,\s*(?:selectedFiles|textPart|referenceUrl|JSON\.stringify)/, drop + account);
 
@@ -85,4 +104,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Throw-it-in PASS: ordinary submission remains one action; signed-out intent resumes after auth; the account surface exposes only OAuth providers confirmed enabled by the live Auth service while email remains available; no Artifact payload or service secret enters browser storage.");
+console.log("Throw-it-in PASS: Submit/vote intent survives same-tab OAuth and cross-tab email confirmation as a short-lived bounded action envelope; working auth choices are live-derived; actual Artifact payload, credentials, and tokens never enter the bridge.");

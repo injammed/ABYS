@@ -6,7 +6,11 @@ import type { Session } from "@supabase/supabase-js";
 import { CreatorSubmissionManager } from "@/components/CreatorSubmissionManager";
 import { LexiconText } from "@/components/LexiconBroadcast";
 import { loadCurrentRole, type ProfileRole } from "@/lib/moderation";
-import { AUTH_REQUIRED_EVENT } from "@/lib/public-intents";
+import {
+  AUTH_REQUIRED_EVENT,
+  clearCrossTabPublicAuthIntents,
+  mirrorPublicAuthIntentsAcrossTabs,
+} from "@/lib/public-intents";
 import {
   getSupabaseBrowserClient,
   loadEnabledSocialProviders,
@@ -68,6 +72,7 @@ export function AccountGate() {
       if (!mounted) return;
       sessionRef.current = data.session;
       setSession(data.session);
+      if (data.session) clearCrossTabPublicAuthIntents();
       void loadAccountData(data.session).catch((error) => {
         if (mounted) setMessage(error instanceof Error ? error.message : "Account data could not be loaded.");
       });
@@ -76,6 +81,7 @@ export function AccountGate() {
     const { data } = client.auth.onAuthStateChange((event, nextSession) => {
       sessionRef.current = nextSession;
       setSession(nextSession);
+      if (event === "SIGNED_IN") clearCrossTabPublicAuthIntents();
       void loadAccountData(nextSession).catch((error) => {
         if (mounted) setMessage(error instanceof Error ? error.message : "Account data could not be loaded.");
       });
@@ -98,6 +104,7 @@ export function AccountGate() {
     };
     const openForRequiredAuth = () => {
       if (sessionRef.current) return;
+      mirrorPublicAuthIntentsAcrossTabs();
       setMode("signin");
       setMessage(null);
       setOpen(true);
@@ -155,7 +162,10 @@ export function AccountGate() {
         const { error } = await client.auth.signUp({
           email,
           password,
-          options: { data: { display_name: displayName } },
+          options: {
+            data: { display_name: displayName },
+            emailRedirectTo: `${window.location.origin}/`,
+          },
         });
         if (error) throw error;
         setMessage("Account created. Check your email if confirmation is enabled.");
