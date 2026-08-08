@@ -199,14 +199,10 @@ export function ArtifactFeed() {
         .then((page) => {
           if (cancelled) return;
           setFeedError(null);
-          // The newest public page is authoritative for its members. Putting it
-          // first both discovers newly published Artifacts and refreshes public
-          // aggregate metadata without disturbing the older pagination cursor.
           setArtifacts((current) => appendUnique(page.artifacts, current));
         })
         .catch(() => {
-          // Head freshness is additive. Existing feed content remains usable;
-          // the normal self-healing paths will retry without surfacing a new UI.
+          // Head freshness is additive. Existing feed content remains usable.
         })
         .finally(() => {
           publicHeadRefreshInFlightRef.current = false;
@@ -552,11 +548,11 @@ export function ArtifactFeed() {
                       data-binary-vote="slop"
                       onClick={() => void judge(artifact.id, "slop")}
                       disabled={votePending}
-                      aria-label={`Vote Slop · ${artifact.slopVotes ?? 0} public votes`}
+                      aria-label="Vote Slop"
                       aria-pressed={judgment === "slop"}
                     >
                       <SlopGlyph />
-                      <span className={styles.voteCount} aria-hidden="true">{artifact.slopVotes ?? 0}</span>
+                      <LexiconText className={styles.voteCount} text={String(artifact.slopVotes ?? 0)} phase={phase + 20} semantic={false} />
                       <span className={styles.srOnly}>Slop</span>
                     </button>
                     <button
@@ -564,11 +560,11 @@ export function ArtifactFeed() {
                       data-binary-vote="museum"
                       onClick={() => void judge(artifact.id, "preserve")}
                       disabled={votePending}
-                      aria-label={`Vote Museum · ${artifact.museumVotes ?? 0} public votes`}
+                      aria-label="Vote Museum"
                       aria-pressed={judgment === "preserve"}
                     >
                       <MuseumGlyph />
-                      <span className={styles.voteCount} aria-hidden="true">{artifact.museumVotes ?? 0}</span>
+                      <LexiconText className={styles.voteCount} text={String(artifact.museumVotes ?? 0)} phase={phase + 21} semantic={false} />
                       <span className={styles.srOnly}>Museum</span>
                     </button>
                   </div>
