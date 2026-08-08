@@ -66,6 +66,11 @@ requirePattern("receipt requires every file lease", /signed \?\? \[\]\)\.length 
 requirePattern("receipt rejects missing signed URL", /some\(\(entry\) => !entry\.signedUrl\)/, receipt);
 requirePattern("short public media proof lease", /PUBLIC_MEDIA_RECEIPT_SECONDS = 60/, receipt);
 requirePattern("bounded receipt backoff", /PUBLIC_RECEIPT_DELAYS_MS = \[0, 120, 350, 800, 1600, 3000\]/, receipt);
+requirePattern("transient proof error remembered", /let lastError: unknown = null/, receipt);
+requirePattern("each proof attempt is isolated", /for \(const waitMs of PUBLIC_RECEIPT_DELAYS_MS\)[\s\S]*try \{/, receipt);
+requirePattern("transient proof errors stay inside retry loop", /catch \(error\) \{[\s\S]*lastError = error;/, receipt);
+requirePattern("clean proof reads clear earlier errors", /lastError = null;/, receipt);
+requirePattern("final transport error only after all attempts", /if \(lastError\) throw lastError;[\s\S]*return false;/, receipt);
 requirePattern("normal intake waits for public receipt", /await waitForPublicArtifactReceipt\(committedId, parts\.length\)/, slopDrop);
 requirePattern("public confirmation copy", /Thrown\. Public\./, slopDrop);
 requirePattern("commit boundary recorded", /artifactCommitted = true;/, slopDrop);
@@ -102,4 +107,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("One-click feed PASS: 'Public' is proven through a sessionless anonymous reader for the exact approved row, complete manifest, and every file material's short-lived Storage lease; creator RLS cannot create a false positive; ambiguous commit acknowledgements reconcile safely; raw voter rows remain private.");
+console.log("One-click feed PASS: anonymous public proof covers row, manifest, and file leases; transient proof transport errors consume the bounded retry schedule instead of aborting lost-ack reconciliation on the first failed read; creator RLS cannot create a false Public claim; raw votes remain private.");
