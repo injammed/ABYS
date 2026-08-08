@@ -26,6 +26,8 @@ type VoteRequestState = {
 };
 
 const FEED_RETRY_DELAYS_MS = [600, 1800, 5000, 12000, 30000] as const;
+const PUBLIC_HEAD_REFRESH_MS = 15000;
+const PUBLIC_HEAD_REFRESH_LIMIT = 16;
 
 function feedRetryDelay(attempt: number): number {
   return FEED_RETRY_DELAYS_MS[Math.min(attempt, FEED_RETRY_DELAYS_MS.length - 1)] ?? 30000;
@@ -83,6 +85,8 @@ export function ArtifactFeed() {
   const paginationFailureCountRef = useRef(0);
   const paginationRetryAtRef = useRef(0);
   const retryTimersRef = useRef<number[]>([]);
+  const publicHeadReadyRef = useRef(false);
+  const publicHeadRefreshInFlightRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -120,6 +124,7 @@ export function ArtifactFeed() {
 
     setLoading(true);
     if (initialRetryRevision === 0) {
+      publicHeadReadyRef.current = false;
       setFeedError(null);
       setArtifacts([]);
       setCursor(null);
@@ -130,6 +135,7 @@ export function ArtifactFeed() {
       .then((page) => {
         if (cancelled) return;
         initialFailureCountRef.current = 0;
+        publicHeadReadyRef.current = true;
         setFeedError(null);
         setArtifacts(page.artifacts);
         setCursor(page.nextCursor);
@@ -174,20 +180,52 @@ export function ArtifactFeed() {
 
   useEffect(() => {
     if (!socialBackendEnabled) return;
+    let cancelled = false;
 
     const refreshPublicHead = () => {
-      void loadPublicFeedPage()
+      if (
+        cancelled
+        || !publicHeadReadyRef.current
+        || publicHeadRefreshInFlightRef.current
+        || document.visibilityState !== "visible"
+        || !navigator.onLine
+      ) {
+        return;
+      }
+
+      publicHeadRefreshInFlightRef.current = true;
+      void loadPublicFeedPage({ limit: PUBLIC_HEAD_REFRESH_LIMIT })
         .then((page) => {
+          if (cancelled) return;
           setFeedError(null);
+          // The newest public page is authoritative for its members. Putting it
+          // first both discovers newly published Artifacts and refreshes public
+          // aggregate metadata without disturbing the older pagination cursor.
           setArtifacts((current) => appendUnique(page.artifacts, current));
         })
         .catch(() => {
-          // Submission succeeded already; the normal self-healing feed path will recover presentation.
+          // Head freshness is additive. Existing feed content remains usable;
+          // the normal self-healing paths will retry without surfacing a new UI.
+        })
+        .finally(() => {
+          publicHeadRefreshInFlightRef.current = false;
         });
     };
 
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") refreshPublicHead();
+    };
+
+    const interval = window.setInterval(refreshPublicHead, PUBLIC_HEAD_REFRESH_MS);
     window.addEventListener("aetimm:submission-created", refreshPublicHead);
-    return () => window.removeEventListener("aetimm:submission-created", refreshPublicHead);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+      window.removeEventListener("aetimm:submission-created", refreshPublicHead);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
   }, []);
 
   useEffect(() => {
