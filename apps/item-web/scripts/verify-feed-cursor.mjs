@@ -42,13 +42,30 @@ for (const [label, pattern] of [
   ["network reconnection recovery", /window\.addEventListener\("online", recoverConnection\)/],
   ["public-head refresh after submission", /window\.addEventListener\("aetimm:submission-created", refreshPublicHead\)/],
   ["successful pagination clears transient error", /paginationFailureCountRef\.current = 0;[\s\S]*setFeedError\(null\)/],
+
+  // Already-open public Trough sessions must discover newly published work
+  // without turning on database-wide Realtime or inventing another control.
+  ["bounded public-head freshness interval", /const PUBLIC_HEAD_REFRESH_MS = 15000;/],
+  ["bounded public-head sample size", /const PUBLIC_HEAD_REFRESH_LIMIT = 16;/],
+  ["public head only starts after initial feed success", /publicHeadReadyRef\.current = true;/],
+  ["head refresh concurrency guard", /publicHeadRefreshInFlightRef\.current/],
+  ["hidden tabs do not fetch public head", /document\.visibilityState !== "visible"/],
+  ["offline tabs do not fetch public head", /!navigator\.onLine/],
+  ["head pulse samples newest public page", /loadPublicFeedPage\(\{ limit: PUBLIC_HEAD_REFRESH_LIMIT \}\)/],
+  ["newest page replaces stale head members", /setArtifacts\(\(current\) => appendUnique\(page\.artifacts, current\)\)/],
+  ["visible-tab periodic refresh", /window\.setInterval\(refreshPublicHead, PUBLIC_HEAD_REFRESH_MS\)/],
+  ["visibility return refresh", /document\.addEventListener\("visibilitychange", refreshWhenVisible\)/],
 ]) {
-  assert.ok(pattern.test(feedComponentSource), `Missing public trough recovery contract: ${label}`);
+  assert.ok(pattern.test(feedComponentSource), `Missing public trough recovery/freshness contract: ${label}`);
 }
 
 assert.ok(
   !/More slop could not be loaded\.[\s\S]{0,220}setHasMore\(false\)/.test(feedComponentSource),
   "A transient pagination failure must not permanently terminate the public trough.",
+);
+assert.ok(
+  !/supabase_realtime|postgres_changes|\.channel\(/.test(feedComponentSource),
+  "Public-head freshness must not silently enable a persistent Realtime subscription in the feed component.",
 );
 
 const timestamp = "2026-08-06T12:00:00.000Z";
@@ -111,4 +128,4 @@ const finalPage = loadFixturePage({ cursor: { publishedAt: olderTimestamp, id: "
 assert.deepEqual(finalPage.rows, [], "A cursor beyond the last row must return an empty final page.");
 assert.equal(finalPage.nextCursor, null, "An empty final page must terminate pagination.");
 
-console.log("Composite feed cursor and recovery contract verified: tied timestamps remain lossless, transient failures cannot permanently end the trough, reconnects self-heal, and fresh submissions refresh the public head without a new control.");
+console.log("Composite feed cursor, recovery, and freshness contract verified: tied timestamps remain lossless, transient failures cannot permanently end the trough, reconnects self-heal, and visible public sessions resample the newest head without Realtime or a new control.");
