@@ -1,7 +1,8 @@
 import type { ArtifactPart, FeedArtifact } from "@/lib/feed";
+import { InitialLeaseArtifactDownload } from "./InitialLeaseArtifactDownload";
 import { InitialLeaseArtifactMedia } from "./InitialLeaseArtifactMedia";
 import { LexiconText } from "./LexiconBroadcast";
-import { RenewableArtifactDownload, RenewableArtifactMedia } from "./RenewableArtifactMedia";
+import { RenewableArtifactMedia } from "./RenewableArtifactMedia";
 import styles from "./ArtifactRuntime.module.css";
 
 function formatBytes(value?: number): string {
@@ -48,15 +49,16 @@ function InertMaterial({ part }: { part: ArtifactPart }) {
       <LexiconText className={styles.mode} text={part.mode === "model3d" ? "3D" : part.mode} phase={3} />
       <LexiconText as="strong" text={partName(part)} phase={7} />
       <LexiconText as="p" text={explanation} phase={11} />
-      {part.signedUrl && (
-        <RenewableArtifactDownload
+      {part.partKind === "file" && (
+        <InitialLeaseArtifactDownload
           className={styles.materialLink}
           initialUrl={part.signedUrl}
+          partId={part.id}
           filename={part.filename}
           ariaLabel={downloadLabel}
         >
           <LexiconText text={downloadLabel} phase={13} semantic={false} />
-        </RenewableArtifactDownload>
+        </InitialLeaseArtifactDownload>
       )}
     </div>
   );
@@ -146,14 +148,15 @@ function MaterialList({ parts }: { parts: ArtifactPart[] }) {
                   <LexiconText text="Open" phase={53 + index * 5} semantic={false} />
                 </a>
               )}
-              {part.partKind === "file" && part.signedUrl && (
-                <RenewableArtifactDownload
+              {part.partKind === "file" && (
+                <InitialLeaseArtifactDownload
                   initialUrl={part.signedUrl}
+                  partId={part.id}
                   filename={part.filename}
                   ariaLabel="Download"
                 >
                   <LexiconText text="Download" phase={59 + index * 5} semantic={false} />
-                </RenewableArtifactDownload>
+                </InitialLeaseArtifactDownload>
               )}
             </li>
           );
