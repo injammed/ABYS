@@ -6,6 +6,7 @@ import type { Session } from "@supabase/supabase-js";
 import { CreatorSubmissionManager } from "@/components/CreatorSubmissionManager";
 import { LexiconText } from "@/components/LexiconBroadcast";
 import { loadCurrentRole, type ProfileRole } from "@/lib/moderation";
+import { AUTH_REQUIRED_EVENT } from "@/lib/public-intents";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 
 type Mode = "signin" | "signup";
@@ -86,12 +87,21 @@ export function AccountGate() {
     const refreshAccount = () => {
       void loadAccountData(sessionRef.current).catch(() => undefined);
     };
+    const openForRequiredAuth = () => {
+      if (sessionRef.current) return;
+      setMode("signin");
+      setMessage(null);
+      setOpen(true);
+    };
+
     window.addEventListener("aetimm:submission-created", refreshAccount);
     window.addEventListener("aetimm:lifecycle-updated", refreshAccount);
+    window.addEventListener(AUTH_REQUIRED_EVENT, openForRequiredAuth);
 
     return () => {
       window.removeEventListener("aetimm:submission-created", refreshAccount);
       window.removeEventListener("aetimm:lifecycle-updated", refreshAccount);
+      window.removeEventListener(AUTH_REQUIRED_EVENT, openForRequiredAuth);
     };
   }, [loadAccountData]);
 
