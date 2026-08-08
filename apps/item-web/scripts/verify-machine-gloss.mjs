@@ -44,7 +44,7 @@ for (const [label, pattern, source] of [
   ["synthetic machine glyph pool", /const MACHINE_POOL = Array\.from\("⌁⌭⟐⊙/, lexicon],
   ["visual flicker contract", /data-lexicon-flicker="character-broadcast-v1"/, lexicon],
   ["universal oscillation with hover source contract", /data-oscillation-contract="all-visible-interface-words-v2-hover-source"/, lexicon],
-  ["pointer-event hover translation contract", /data-hover-translation-contract="pointer-event-exact-source-final-v2"/, lexicon],
+  ["final hover translation contract", /data-hover-translation-contract="pointer-hover-exact-source-final-v1"/, lexicon],
   ["non-touch pointer gate", /onPointerEnter=\{\(event\) => setPointerTranslated\(event\.pointerType !== "touch" && event\.buttons === 0\)\}/, lexicon],
   ["touch clears translation", /onPointerDown=\{\(event\) => \{[\s\S]*event\.pointerType === "touch"[\s\S]*setPointerTranslated\(false\)/, lexicon],
   ["pointer leave resumes oscillation", /onPointerLeave=\{\(\) => setPointerTranslated\(false\)\}/, lexicon],
