@@ -1,6 +1,7 @@
 import type { ArtifactPart } from "@/lib/feed";
 import type { MuseumArtifactPresentation } from "@/lib/museum";
 import { LexiconText } from "./LexiconBroadcast";
+import { RenewableArtifactDownload, RenewableArtifactMedia } from "./RenewableArtifactMedia";
 import styles from "./MuseumArtifactRuntime.module.css";
 
 function formatBytes(value?: number): string {
@@ -25,11 +26,11 @@ function leadPart(parts: ArtifactPart[]): ArtifactPart | undefined {
 
 function Experience({ part }: { part: ArtifactPart }) {
   if (part.mode === "image" && part.signedUrl) {
-    return <img className={styles.image} src={part.signedUrl} alt="" loading="lazy" />;
+    return <RenewableArtifactMedia kind="image" className={styles.image} initialUrl={part.signedUrl} />;
   }
 
   if (part.mode === "video" && part.signedUrl) {
-    return <video className={styles.video} src={part.signedUrl} controls preload="metadata" playsInline />;
+    return <RenewableArtifactMedia kind="video" className={styles.video} initialUrl={part.signedUrl} ariaLabel="Museum Artifact video" />;
   }
 
   if (part.mode === "audio" && part.signedUrl) {
@@ -38,7 +39,7 @@ function Experience({ part }: { part: ArtifactPart }) {
         <div className={styles.rings} aria-hidden="true"><i /><i /><i /></div>
         <LexiconText as="p" text="ACCESSION AUDIO" phase={3} />
         <LexiconText as="strong" text={partName(part)} phase={7} />
-        <audio src={part.signedUrl} controls preload="metadata" />
+        <RenewableArtifactMedia kind="audio" initialUrl={part.signedUrl} ariaLabel="Museum Artifact audio" />
       </div>
     );
   }
@@ -76,9 +77,13 @@ function Experience({ part }: { part: ArtifactPart }) {
       <LexiconText as="strong" text={partName(part)} phase={31} />
       <LexiconText text={sealedExplanation} phase={37} />
       {part.signedUrl && (
-        <a href={part.signedUrl} download={part.filename || true} aria-label={retrieveLabel}>
+        <RenewableArtifactDownload
+          initialUrl={part.signedUrl}
+          filename={part.filename}
+          ariaLabel={retrieveLabel}
+        >
           <LexiconText text={retrieveLabel} phase={41} semantic={false} />
-        </a>
+        </RenewableArtifactDownload>
       )}
     </div>
   );
@@ -92,7 +97,7 @@ export function MuseumArtifactRuntime({ artifact }: { artifact: MuseumArtifactPr
       {lead ? (
         <Experience part={lead} />
       ) : artifact.mediaUrl ? (
-        <img className={styles.image} src={artifact.mediaUrl} alt="" loading="lazy" />
+        <RenewableArtifactMedia kind="image" className={styles.image} initialUrl={artifact.mediaUrl} />
       ) : (
         <div className={styles.sealedHall} data-lexicon-surface="true">
           <LexiconText as="p" text="ARTIFACT FORM" phase={43} />
@@ -115,9 +120,13 @@ export function MuseumArtifactRuntime({ artifact }: { artifact: MuseumArtifactPr
                   </a>
                 )}
                 {part.partKind === "file" && part.signedUrl && (
-                  <a href={part.signedUrl} download={part.filename || true} aria-label="Retrieve material">
+                  <RenewableArtifactDownload
+                    initialUrl={part.signedUrl}
+                    filename={part.filename}
+                    ariaLabel="Retrieve material"
+                  >
                     <LexiconText text="Retrieve material" phase={73 + index * 5} semantic={false} />
-                  </a>
+                  </RenewableArtifactDownload>
                 )}
               </li>
             ))}

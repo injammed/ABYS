@@ -1,5 +1,6 @@
 import type { ArtifactPart, FeedArtifact } from "@/lib/feed";
 import { LexiconText } from "./LexiconBroadcast";
+import { RenewableArtifactDownload, RenewableArtifactMedia } from "./RenewableArtifactMedia";
 import styles from "./ArtifactRuntime.module.css";
 
 function formatBytes(value?: number): string {
@@ -47,9 +48,14 @@ function InertMaterial({ part }: { part: ArtifactPart }) {
       <LexiconText as="strong" text={partName(part)} phase={7} />
       <LexiconText as="p" text={explanation} phase={11} />
       {part.signedUrl && (
-        <a className={styles.materialLink} href={part.signedUrl} download={part.filename || true} aria-label={downloadLabel}>
+        <RenewableArtifactDownload
+          className={styles.materialLink}
+          initialUrl={part.signedUrl}
+          filename={part.filename}
+          ariaLabel={downloadLabel}
+        >
           <LexiconText text={downloadLabel} phase={13} semantic={false} />
-        </a>
+        </RenewableArtifactDownload>
       )}
     </div>
   );
@@ -57,15 +63,11 @@ function InertMaterial({ part }: { part: ArtifactPart }) {
 
 function LeadRuntime({ part }: { part: ArtifactPart }) {
   if (part.mode === "image" && part.signedUrl) {
-    return <img className={styles.image} src={part.signedUrl} alt="" loading="lazy" />;
+    return <RenewableArtifactMedia kind="image" className={styles.image} initialUrl={part.signedUrl} />;
   }
 
   if (part.mode === "video" && part.signedUrl) {
-    return (
-      <video className={styles.video} src={part.signedUrl} controls preload="metadata" playsInline>
-        Your browser cannot play this Artifact video.
-      </video>
-    );
+    return <RenewableArtifactMedia kind="video" className={styles.video} initialUrl={part.signedUrl} ariaLabel="Artifact video" />;
   }
 
   if (part.mode === "audio" && part.signedUrl) {
@@ -73,9 +75,7 @@ function LeadRuntime({ part }: { part: ArtifactPart }) {
       <div className={styles.audioStage}>
         <div className={styles.audioGlyph} aria-hidden="true">∿∿∿</div>
         <LexiconText as="strong" text={partName(part)} phase={17} />
-        <audio className={styles.audio} src={part.signedUrl} controls preload="metadata">
-          Your browser cannot play this Artifact audio.
-        </audio>
+        <RenewableArtifactMedia kind="audio" className={styles.audio} initialUrl={part.signedUrl} ariaLabel="Artifact audio" />
       </div>
     );
   }
@@ -125,9 +125,13 @@ function MaterialList({ parts }: { parts: ArtifactPart[] }) {
                 </a>
               )}
               {part.partKind === "file" && part.signedUrl && (
-                <a href={part.signedUrl} download={part.filename || true} aria-label="Download">
+                <RenewableArtifactDownload
+                  initialUrl={part.signedUrl}
+                  filename={part.filename}
+                  ariaLabel="Download"
+                >
                   <LexiconText text="Download" phase={59 + index * 5} semantic={false} />
-                </a>
+                </RenewableArtifactDownload>
               )}
             </li>
           );
@@ -147,7 +151,7 @@ export function ArtifactRuntime({ artifact }: { artifact: FeedArtifact }) {
         {lead ? (
           <LeadRuntime part={lead} />
         ) : artifact.mediaUrl ? (
-          <img className={styles.image} src={artifact.mediaUrl} alt="" loading="lazy" />
+          <RenewableArtifactMedia kind="image" className={styles.image} initialUrl={artifact.mediaUrl} />
         ) : (
           <div className={styles.fallback} data-lexicon-surface="true">
             <LexiconText text={artifact.modalLead || "Artifact"} phase={61} />
