@@ -1,9 +1,33 @@
 import { requireSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 const STORAGE_UPLOAD_RETRY_DELAYS_MS = [0, 250, 800, 1800] as const;
+const STORAGE_RECONNECT_GRACE_MS = 30_000;
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function browserIsOnline(): boolean {
+  return typeof navigator === "undefined" || navigator.onLine;
+}
+
+async function waitForOnlineUntil(deadline: number): Promise<void> {
+  if (browserIsOnline() || typeof window === "undefined") return;
+  const remaining = deadline - Date.now();
+  if (remaining <= 0) return;
+
+  await new Promise<void>((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      window.removeEventListener("online", finish);
+      window.clearTimeout(timer);
+      resolve();
+    };
+    const timer = window.setTimeout(finish, remaining);
+    window.addEventListener("online", finish, { once: true });
+  });
 }
 
 async function artifactObjectReadable(path: string): Promise<boolean> {
@@ -24,9 +48,13 @@ export async function uploadArtifactObject(
   contentType: string,
 ): Promise<void> {
   const client = requireSupabaseBrowserClient();
+  const reconnectDeadline = Date.now() + STORAGE_RECONNECT_GRACE_MS;
   let lastError: unknown = new Error("ARTIFACT_STORAGE_UPLOAD_CONFIRMATION_FAILED");
 
   for (const waitMs of STORAGE_UPLOAD_RETRY_DELAYS_MS) {
+    // A brief Wi-Fi/cellular transition is not a meaningful upload failure.
+    // Pause the bounded retry path instead of burning attempts while offline.
+    await waitForOnlineUntil(reconnectDeadline);
     if (waitMs > 0) await delay(waitMs);
 
     const { error } = await client.storage
@@ -47,6 +75,7 @@ export async function uploadArtifactObject(
     if (await artifactObjectReadable(path)) return;
   }
 
+  await waitForOnlineUntil(reconnectDeadline);
   if (await artifactObjectReadable(path)) return;
   throw lastError;
 }
