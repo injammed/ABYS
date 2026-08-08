@@ -47,20 +47,25 @@ requirePattern("feed-root landing", /target\.hash = "field"/, bridge);
 requirePattern("reliable full navigation", /window\.location\.assign/, bridge);
 requirePattern("landing bridge mounted at feed root", /<SubmissionLandingBridge \/>/, page);
 
-// Client completion now means more than RPC success: the exact new Artifact
-// must be observable under the same public-state predicate used by strangers,
-// with its expected manifest present.
 requirePattern("public receipt helper", /waitForPublicArtifactReceipt/, receipt);
 requirePattern("receipt requires approved", /\.eq\("status", "approved"\)/, receipt);
 requirePattern("receipt requires Unjudged", /\.eq\("lane", "unjudged"\)/, receipt);
 requirePattern("receipt requires publication timestamp", /\.not\("published_at", "is", null\)/, receipt);
 requirePattern("receipt counts public manifest", /from\("artifact_parts"\)[\s\S]*count: "exact"/, receipt);
 requirePattern("bounded receipt backoff", /PUBLIC_RECEIPT_DELAYS_MS = \[0, 120, 350, 800, 1600, 3000\]/, receipt);
-requirePattern("intake waits for public receipt", /await waitForPublicArtifactReceipt\(committedId, parts\.length\)/, slopDrop);
+requirePattern("normal intake waits for public receipt", /await waitForPublicArtifactReceipt\(committedId, parts\.length\)/, slopDrop);
 requirePattern("public confirmation copy", /Thrown\. Public\./, slopDrop);
 requirePattern("commit boundary recorded", /artifactCommitted = true;/, slopDrop);
 requirePattern("post-commit receipt failure preserves storage", /if \(!artifactCommitted && uploadedPaths\.length > 0\)/, slopDrop);
 requirePattern("submission event carries public receipt", /detail: \{ artifactId: committedId, publicConfirmed \}/, slopDrop);
+
+// Ambiguous create-RPC law: a transport error is not proof the transaction
+// failed. The immutable client-generated Artifact ID lets the browser prove the
+// exact public commit without issuing a duplicate creation RPC.
+requirePattern("create error enters reconciliation", /if \(createError\) \{[\s\S]*Reconciling Artifact landing/, slopDrop);
+requirePattern("ambiguous create checks exact artifact id", /waitForPublicArtifactReceipt\(artifactId, parts\.length\)/, slopDrop);
+requirePattern("confirmed ambiguous create becomes committed", /if \(!publicConfirmed\) throw createError;[\s\S]*artifactCommitted = true;[\s\S]*committedId = artifactId;/, slopDrop);
+forbidPattern("blind create RPC retry loop", /for \([^)]*\)[\s\S]{0,500}client\.rpc\("create_quarantined_artifact"/, slopDrop);
 
 requirePattern("legacy aggregate compatibility RPC remains bounded", /VOTE_AGGREGATE_REQUEST_TOO_LARGE/, voteAggregate);
 requirePattern("raw public vote policy removed", /drop policy if exists "votes are publicly readable"/, voteLockdown);
@@ -86,4 +91,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("One-click feed PASS: submission can atomically become public Unjudged, the client confirms the exact public row and manifest before declaring Public, post-commit receipt failure cannot destroy the Artifact, raw voter rows stay private, and Museum/Slop remain independent.");
+console.log("One-click feed PASS: submission can atomically become public Unjudged; normal and ambiguous RPC responses reconcile against the exact public Artifact ID and manifest before failure is declared; committed storage is preserved; raw voter rows stay private; Museum and Slop remain independent.");
