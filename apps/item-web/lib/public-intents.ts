@@ -44,6 +44,30 @@ const bridgePairs = [
   [VOTE_INTENT_STORAGE_KEY, CROSS_TAB_VOTE_INTENT_KEY],
 ] as const;
 
+function storageGet(storage: Storage, key: string): string | null {
+  try {
+    return storage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function storageSet(storage: Storage, key: string, value: string): void {
+  try {
+    storage.setItem(key, value);
+  } catch {
+    // Restricted browser storage must never block authentication itself.
+  }
+}
+
+function storageRemove(storage: Storage, key: string): void {
+  try {
+    storage.removeItem(key);
+  } catch {
+    // Best-effort cleanup only.
+  }
+}
+
 function validEnvelope(raw: string | null, now: number): IntentEnvelope | null {
   if (!raw || raw.length > MAX_BRIDGED_INTENT_BYTES) return null;
   try {
@@ -63,10 +87,10 @@ export function mirrorPublicAuthIntentsAcrossTabs(): void {
   const now = Date.now();
 
   for (const [sessionKey, bridgeKey] of bridgePairs) {
-    const value = window.sessionStorage.getItem(sessionKey);
+    const value = storageGet(window.sessionStorage, sessionKey);
     if (value == null || value.length > 256) continue;
     const envelope: IntentEnvelope = { createdAt: now, value };
-    window.localStorage.setItem(bridgeKey, JSON.stringify(envelope));
+    storageSet(window.localStorage, bridgeKey, JSON.stringify(envelope));
   }
 }
 
@@ -75,23 +99,23 @@ export function restorePublicAuthIntentsForThisTab(): void {
   const now = Date.now();
 
   for (const [sessionKey, bridgeKey] of bridgePairs) {
-    const raw = window.localStorage.getItem(bridgeKey);
+    const raw = storageGet(window.localStorage, bridgeKey);
     const envelope = validEnvelope(raw, now);
     if (!envelope) {
-      if (raw != null) window.localStorage.removeItem(bridgeKey);
+      if (raw != null) storageRemove(window.localStorage, bridgeKey);
       continue;
     }
 
     // Never overwrite a newer action already taken in this tab.
-    if (window.sessionStorage.getItem(sessionKey) == null) {
-      window.sessionStorage.setItem(sessionKey, envelope.value);
+    if (storageGet(window.sessionStorage, sessionKey) == null) {
+      storageSet(window.sessionStorage, sessionKey, envelope.value);
     }
   }
 }
 
 export function clearCrossTabPublicAuthIntents(): void {
   if (typeof window === "undefined") return;
-  for (const [, bridgeKey] of bridgePairs) window.localStorage.removeItem(bridgeKey);
+  for (const [, bridgeKey] of bridgePairs) storageRemove(window.localStorage, bridgeKey);
 }
 
 // Restore before component effects ask Auth for a session. The bridge contains
