@@ -3,11 +3,12 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const root = process.cwd();
-const [swipe, feed, feedStyles, socialFeed, schema, binaryMigration] = await Promise.all([
+const [swipe, feed, feedStyles, socialFeed, publicAggregate, schema, binaryMigration] = await Promise.all([
   readFile(resolve(root, "components", "BinarySwipeVoting.tsx"), "utf8"),
   readFile(resolve(root, "components", "ArtifactFeed.tsx"), "utf8"),
   readFile(resolve(root, "components", "ArtifactFeed.module.css"), "utf8"),
   readFile(resolve(root, "lib", "social-feed.ts"), "utf8"),
+  readFile(resolve(root, "lib", "public-vote-aggregate.ts"), "utf8"),
   readFile(resolve(root, "..", "..", "supabase", "migrations", "001_social_beta.sql"), "utf8"),
   readFile(resolve(root, "..", "..", "supabase", "migrations", "014_independent_binary_judgments.sql"), "utf8"),
 ]);
@@ -15,12 +16,15 @@ const [swipe, feed, feedStyles, socialFeed, schema, binaryMigration] = await Pro
 for (const [label, pattern, source] of [
   ["native Museum glyph button", /data-binary-vote="museum"[\s\S]*<MuseumGlyph \/>/, feed],
   ["native Slop glyph button", /data-binary-vote="slop"[\s\S]*<SlopGlyph \/>/, feed],
-  ["Slop accessible name", /aria-label="Vote Slop"/, feed],
-  ["Museum accessible name", /aria-label="Vote Museum"/, feed],
+  ["Slop accessible total", /Vote Slop · \$\{artifact\.slopVotes \?\? 0\} public votes/, feed],
+  ["Museum accessible total", /Vote Museum · \$\{artifact\.museumVotes \?\? 0\} public votes/, feed],
   ["symbolic binary ballot contract marker", /binary-slop-museum-v3-glyph/, feed],
   ["abstract viscous Slop glyph", /function SlopGlyph\(\)[\s\S]*<path d="M10 17/, feed],
   ["abstract rising triple-ring Museum glyph", /function MuseumGlyph\(\)[\s\S]*<ellipse[\s\S]*<ellipse[\s\S]*<ellipse[\s\S]*<path d="M32 48V15"/, feed],
-  ["glyphs are primary visible ballot", /\.srOnly[\s\S]*clip: rect\(0, 0, 0, 0\)/, feedStyles],
+  ["glyphs remain primary visible ballot", /\.srOnly[\s\S]*clip: rect\(0, 0, 0, 0\)/, feedStyles],
+  ["stable numeric vote totals", /\.voteCount[\s\S]*font-variant-numeric: tabular-nums/, feedStyles],
+  ["Slop public total rendered", /styles\.voteCount[\s\S]*artifact\.slopVotes \?\? 0/, feed],
+  ["Museum public total rendered", /styles\.voteCount[\s\S]*artifact\.museumVotes \?\? 0/, feed],
   ["left swipe casts Slop", /deltaX <= -SWIPE_THRESHOLD[\s\S]*data-binary-vote='slop'/, swipe],
   ["right swipe casts Museum", /deltaX >= SWIPE_THRESHOLD[\s\S]*data-binary-vote='museum'/, swipe],
   ["swipe engine targets glyph ballot contract", /binary-slop-museum-v3-glyph/, swipe],
@@ -41,6 +45,18 @@ for (const [label, pattern, source] of [
   ["lost acknowledgement can resolve by private read", /if \(await ownVoteMatches\(artifactId, voterId, judgment\)\) return;/, socialFeed],
   ["final reconciliation before failure", /One final private read[\s\S]*ownVoteMatches\(artifactId, voterId, judgment\)[\s\S]*throw lastError/, socialFeed],
 
+  // Public aggregate law: a confirmed private write is followed by a public
+  // aggregate read. Aggregate failure may delay display freshness but cannot
+  // roll back a vote that is already committed.
+  ["post-commit public aggregate read", /loadPublicVoteAggregate\(id\)/, feed],
+  ["post-commit vote event", /aetimm:vote-committed/, feed],
+  ["Museum aggregate reconciliation", /museumVotes: aggregate\.museumVotes/, feed],
+  ["Slop aggregate reconciliation", /slopVotes: aggregate\.slopVotes/, feed],
+  ["aggregate failure cannot undo committed vote", /The vote is already committed\./, feed],
+  ["bounded public binary aggregate RPC", /get_artifact_binary_judgments/, publicAggregate],
+  ["public Slop rank RPC", /get_artifact_slop_ranks/, publicAggregate],
+  ["aggregate requires exact artifact row", /PUBLIC_VOTE_AGGREGATE_MISSING/, publicAggregate],
+
   ["one account one artifact database key", /primary key \(artifact_id, voter_id\)/, schema],
   ["legacy non-binary rows fail closed", /LEGACY_NON_BINARY_VOTES_REQUIRE_REVIEW/, binaryMigration],
   ["binary database constraint", /check \(judgment in \('preserve', 'slop'\)\)/, binaryMigration],
@@ -52,4 +68,4 @@ assert.ok(!/button[^>]*judge refine/.test(feed), "Refine must not exist in the p
 assert.ok(!/MutationObserver/.test(swipe), "Binary voting must not depend on DOM mutation normalization.");
 assert.ok(!/👍|👎/.test(feed), "The public ballot must not fall back to generic thumbs-up/thumbs-down icons.");
 
-console.log("Binary swipe voting PASS: one account has one active Artifact judgment; click and swipe share one persistence path; vote writes are idempotent, self-confirming, and resolve lost acknowledgements through private own-vote reconciliation before reporting failure; vertical scrolling remains primary.");
+console.log("Binary swipe voting PASS: one account has one active Artifact judgment; click and swipe share one self-confirming persistence path; a committed vote reconciles public Museum/Slop totals without allowing aggregate-read failure to undo it; stable numeric totals remain visible beside the glyphs; vertical scrolling remains primary.");
