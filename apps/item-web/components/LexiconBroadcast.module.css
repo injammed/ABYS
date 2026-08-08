@@ -19,10 +19,10 @@
 
 /*
  * Final frozen language law: every visible interface word oscillates during
- * ordinary presentation. A deliberate pointer hover temporarily reveals the
- * exact source text inside the same geometry; leaving hover resumes the field.
- * Touch receives no stable-language exemption and focus alone does not stop
- * oscillation. The separate accessibility layer always retains exact meaning.
+ * ordinary presentation. A deliberate non-touch pointer hover temporarily
+ * reveals the exact source text inside the same geometry; leaving hover resumes
+ * the field. Touch receives no stable-language exemption and focus alone does
+ * not stop oscillation. Accessibility always retains exact meaning.
  */
 .original {
   display: inline;
@@ -41,6 +41,19 @@
   overflow-wrap: inherit;
 }
 
+.pointerTranslated .original {
+  visibility: visible;
+}
+
+.pointerTranslated .mutated {
+  visibility: hidden;
+}
+
+/*
+ * Preserve the frozen fine-hover CSS contract, but pointer-event state is the
+ * authority. Hybrid devices that synthesize :hover from touch are forced back
+ * to oscillation unless the active pointer set pointerTranslated.
+ */
 @media (hover: hover) and (pointer: fine) {
   .lexicon:hover .original {
     visibility: visible;
@@ -48,6 +61,14 @@
 
   .lexicon:hover .mutated {
     visibility: hidden;
+  }
+
+  .lexicon:not(.pointerTranslated):hover .original {
+    visibility: hidden;
+  }
+
+  .lexicon:not(.pointerTranslated):hover .mutated {
+    visibility: visible;
   }
 }
 

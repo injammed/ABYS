@@ -9,6 +9,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import styles from "./LexiconBroadcast.module.css";
 
 const TICK_MS = 125;
@@ -130,6 +131,7 @@ export function LexiconText({
   semantic = true,
 }: LexiconTextProps) {
   const { tick, reducedMotion } = useLexiconBroadcast();
+  const [pointerTranslated, setPointerTranslated] = useState(false);
   const characters = useMemo(() => Array.from(text), [text]);
   const seeds = useMemo(
     () => characters.map((_character, index) => stableHash(`${text}|${index}`)),
@@ -145,11 +147,16 @@ export function LexiconText({
 
   return (
     <Component
-      className={`${styles.lexicon} ${className}`.trim()}
+      className={`${styles.lexicon} ${pointerTranslated ? styles.pointerTranslated : ""} ${className}`.trim()}
       data-lexicon-flicker="character-broadcast-v1"
       data-oscillation-contract="all-visible-interface-words-v2-hover-source"
       data-hover-translation-contract="pointer-hover-exact-source-final-v1"
       data-cycle-ms="500"
+      onPointerEnter={(event: ReactPointerEvent<Element>) => setPointerTranslated(event.pointerType !== "touch" && event.buttons === 0)}
+      onPointerLeave={() => setPointerTranslated(false)}
+      onPointerDown={(event: ReactPointerEvent<Element>) => {
+        if (event.pointerType === "touch") setPointerTranslated(false);
+      }}
     >
       {semantic && <span className={styles.srOnly}>{text}</span>}
       <span className={styles.visual} aria-hidden="true">
