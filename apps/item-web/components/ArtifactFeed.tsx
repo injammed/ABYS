@@ -14,7 +14,7 @@ import {
 } from "@/lib/social-feed";
 import {
   didVoteOwnerChange,
-  replaceHydratedVotes,
+  mergeHydratedVotesPreservingPending,
   shouldApplyVoteHydration,
 } from "@/lib/vote-state";
 import { ArtifactRuntime } from "./ArtifactRuntime";
@@ -269,6 +269,11 @@ export function ArtifactFeed() {
     let cancelled = false;
     const requestVersion = voteHydrationVersionRef.current + 1;
     voteHydrationVersionRef.current = requestVersion;
+    const pendingArtifactIds = new Set(
+      Object.entries(voteStates)
+        .filter(([, state]) => state.state === "saving")
+        .map(([artifactId]) => artifactId),
+    );
 
     void loadOwnVotes(userId, publicArtifactIds)
       .then((votes) => {
@@ -285,7 +290,7 @@ export function ArtifactFeed() {
           return;
         }
 
-        setJudgments(replaceHydratedVotes(votes));
+        setJudgments((current) => mergeHydratedVotesPreservingPending(current, votes, pendingArtifactIds));
       })
       .catch(() => {
         // The public trough remains usable if personal vote hydration fails.
@@ -294,7 +299,7 @@ export function ArtifactFeed() {
     return () => {
       cancelled = true;
     };
-  }, [session?.user.id, artifacts]);
+  }, [session?.user.id, artifacts, voteStates]);
 
   useEffect(() => {
     const node = sentinel.current;
