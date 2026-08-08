@@ -147,7 +147,8 @@ export function LexiconText({
     <Component
       className={`${styles.lexicon} ${className}`.trim()}
       data-lexicon-flicker="character-broadcast-v1"
-      data-oscillation-contract="all-visible-interface-words-v1"
+      data-oscillation-contract="all-visible-interface-words-v2-hover-source"
+      data-hover-translation-contract="pointer-hover-exact-source-final-v1"
       data-cycle-ms="500"
     >
       {semantic && <span className={styles.srOnly}>{text}</span>}

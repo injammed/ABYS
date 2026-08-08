@@ -43,11 +43,14 @@ for (const [label, pattern, source] of [
   ["mathematical communication pool", /const MATH_POOL = Array\.from\("∀∂∃∅∆∇/, lexicon],
   ["synthetic machine glyph pool", /const MACHINE_POOL = Array\.from\("⌁⌭⟐⊙/, lexicon],
   ["visual flicker contract", /data-lexicon-flicker="character-broadcast-v1"/, lexicon],
-  ["universal oscillation contract", /data-oscillation-contract="all-visible-interface-words-v1"/, lexicon],
+  ["universal oscillation with hover source contract", /data-oscillation-contract="all-visible-interface-words-v2-hover-source"/, lexicon],
+  ["final hover translation contract", /data-hover-translation-contract="pointer-hover-exact-source-final-v1"/, lexicon],
   ["stable source hidden for accessibility", /className=\{styles\.srOnly\}>\{text\}/, lexicon],
   ["visual mutation hidden from assistive tree", /className=\{styles\.visual\} aria-hidden="true"/, lexicon],
   ["source string owns layout geometry", /\.original[\s\S]*visibility:\s*hidden/, lexiconStyles],
   ["mutated string is paint-only overlay", /\.mutated[\s\S]*position:\s*absolute[\s\S]*inset:\s*0[\s\S]*overflow:\s*hidden/, lexiconStyles],
+  ["fine-pointer hover reveals exact source", /@media \(hover: hover\) and \(pointer: fine\)[\s\S]*\.lexicon:hover \.original[\s\S]*visibility:\s*visible/, lexiconStyles],
+  ["fine-pointer hover hides mutation", /@media \(hover: hover\) and \(pointer: fine\)[\s\S]*\.lexicon:hover \.mutated[\s\S]*visibility:\s*hidden/, lexiconStyles],
   ["reduced motion restores exact source without reflow", /prefers-reduced-motion:[\s\S]*\.original[\s\S]*visibility:\s*visible/, lexiconStyles],
   ["semantic language broadcast still open-ended", /\[language: string\]: string \| undefined;/, gloss],
   ["MachineGloss consumes shared clock", /useLexiconBroadcast\(\)/, gloss],
@@ -81,9 +84,8 @@ assert.ok(!/setInterval|setTimeout/.test(gloss), "MachineGloss must not create i
 assert.ok(!/dangerouslySetInnerHTML/.test(lexicon + gloss), "Machine lexicon must not use dynamic HTML injection.");
 assert.ok(!/\bfetch\s*\(/.test(lexicon + gloss), "Machine lexicon must not call a remote translation or glyph service.");
 assert.ok(!/<LexiconText[^>]*text=\{textPart\}/.test(slopDrop), "User-entered Artifact text must not be transformed while editing.");
-assert.ok(!/\.lexicon:hover \.original/.test(lexiconStyles), "Hover must not reveal stable visible interface words.");
-assert.ok(!/\.lexicon:focus-within \.original/.test(lexiconStyles), "Focus must not reveal stable visible interface words.");
+assert.ok(!/\.lexicon:focus-within \.original/.test(lexiconStyles), "Focus alone must not stop visible oscillation.");
 assert.ok(!/@media \(hover: none\) and \(pointer: coarse\)/.test(lexiconStyles), "Touch controls must participate in the same visible oscillation field.");
 assert.ok(!/\(localTick \+ index\) % 5/.test(lexicon), "Visible source-reveal cadence must not interrupt universal oscillation.");
 
-console.log("Machine lexicon PASS: every visible interface word participates continuously in the shared near-infinite character field without layout shift; stable source language remains accessibility-only, reduced-motion remains respected, and Artifact payloads stay verbatim.");
+console.log("Machine lexicon PASS: every visible interface word oscillates continuously in the shared near-infinite character field; deliberate fine-pointer hover reveals its exact source in-place, geometry stays fixed, touch remains oscillating, reduced-motion remains respected, and Artifact payloads stay verbatim. FINAL FROZEN CONTRACT.");
