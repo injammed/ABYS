@@ -149,7 +149,7 @@ export function LexiconText({
       className={`${styles.lexicon} ${pointerTranslated ? styles.pointerTranslated : ""} ${className}`.trim()}
       data-lexicon-flicker="character-broadcast-v1"
       data-oscillation-contract="all-visible-interface-words-v2-hover-source"
-      data-hover-translation-contract="pointer-event-exact-source-final-v2"
+      data-hover-translation-contract="pointer-hover-exact-source-final-v1"
       data-cycle-ms="500"
       onPointerEnter={(event) => setPointerTranslated(event.pointerType !== "touch" && event.buttons === 0)}
       onPointerLeave={() => setPointerTranslated(false)}
