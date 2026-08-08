@@ -1,0 +1,52 @@
+import { requireSupabaseBrowserClient } from "@/lib/supabase-browser";
+
+const STORAGE_UPLOAD_RETRY_DELAYS_MS = [0, 250, 800, 1800] as const;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function artifactObjectReadable(path: string): Promise<boolean> {
+  try {
+    const client = requireSupabaseBrowserClient();
+    const { data, error } = await client.storage
+      .from("artifact-media")
+      .createSignedUrl(path, 60);
+    return !error && Boolean(data?.signedUrl);
+  } catch {
+    return false;
+  }
+}
+
+export async function uploadArtifactObject(
+  path: string,
+  file: File,
+  contentType: string,
+): Promise<void> {
+  const client = requireSupabaseBrowserClient();
+  let lastError: unknown = new Error("ARTIFACT_STORAGE_UPLOAD_CONFIRMATION_FAILED");
+
+  for (const waitMs of STORAGE_UPLOAD_RETRY_DELAYS_MS) {
+    if (waitMs > 0) await delay(waitMs);
+
+    const { error } = await client.storage
+      .from("artifact-media")
+      .upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType,
+      });
+
+    if (!error) return;
+    lastError = error;
+
+    // A transport can fail after Storage accepted the object but before the
+    // acknowledgement reaches the browser. An owner-readable signed URL is the
+    // receipt for that exact random path; if it exists, do not duplicate or
+    // report a false failure.
+    if (await artifactObjectReadable(path)) return;
+  }
+
+  if (await artifactObjectReadable(path)) return;
+  throw lastError;
+}
