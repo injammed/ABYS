@@ -5,6 +5,7 @@ import { requireSupabaseBrowserClient } from "@/lib/supabase-browser";
 export type Judgment = "preserve" | "slop";
 
 const PAGE_SIZE = 8;
+const VOTE_WRITE_RETRY_DELAYS_MS = [0, 180, 550, 1400] as const;
 
 const laneGradients: Record<FeedLane, string> = {
   aetimm: "radial-gradient(circle at 50% 42%, #fff1a8 0 2%, #9e741e 4%, #241805 22%, #050505 62%)",
@@ -51,6 +52,7 @@ type ArtifactPartRow = {
 };
 
 type RawVoteRow = { artifact_id: string; judgment: string };
+type VoteWriteReceipt = { artifact_id: string; judgment: string };
 
 type BinaryJudgmentRow = {
   artifact_id: string;
@@ -88,6 +90,10 @@ function safeReferenceUrl(value: string | null): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
 async function signedImageUrl(path: string | null): Promise<string | undefined> {
@@ -339,10 +345,50 @@ export async function loadOwnVotes(userId: string, artifactIds: string[]): Promi
   return Object.fromEntries(activeVotes.map((vote) => [vote.artifact_id, vote.judgment]));
 }
 
+async function ownVoteMatches(artifactId: string, voterId: string, judgment: Judgment): Promise<boolean> {
+  try {
+    const ownVotes = await loadOwnVotes(voterId, [artifactId]);
+    return ownVotes[artifactId] === judgment;
+  } catch {
+    return false;
+  }
+}
+
 export async function saveVote(artifactId: string, voterId: string, judgment: Judgment): Promise<void> {
   const client = requireSupabaseBrowserClient();
-  const { error } = await client
-    .from("artifact_votes")
-    .upsert({ artifact_id: artifactId, voter_id: voterId, judgment }, { onConflict: "artifact_id,voter_id" });
-  if (error) throw error;
+  let lastError: unknown = new Error("VOTE_WRITE_CONFIRMATION_FAILED");
+
+  for (const waitMs of VOTE_WRITE_RETRY_DELAYS_MS) {
+    if (waitMs > 0) await delay(waitMs);
+
+    const { data, error } = await client
+      .from("artifact_votes")
+      .upsert(
+        { artifact_id: artifactId, voter_id: voterId, judgment },
+        { onConflict: "artifact_id,voter_id" },
+      )
+      .select("artifact_id,judgment")
+      .single();
+
+    const receipt = data as VoteWriteReceipt | null;
+    if (
+      !error
+      && receipt?.artifact_id === artifactId
+      && receipt.judgment === judgment
+    ) {
+      return;
+    }
+
+    lastError = error ?? new Error("VOTE_WRITE_RECEIPT_MISMATCH");
+
+    // A network failure can happen after Postgres committed but before the
+    // response reached the browser. Resolve that ambiguity by reading only the
+    // caller's own private vote before retrying the idempotent upsert.
+    if (await ownVoteMatches(artifactId, voterId, judgment)) return;
+  }
+
+  // One final private read prevents a lost acknowledgement on the last retry
+  // from being reported as a failed vote when the row actually committed.
+  if (await ownVoteMatches(artifactId, voterId, judgment)) return;
+  throw lastError;
 }
