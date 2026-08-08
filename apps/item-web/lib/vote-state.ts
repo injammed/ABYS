@@ -16,6 +16,15 @@ export function shouldApplyVoteHydration(options: {
   );
 }
 
-export function replaceHydratedVotes<T extends string>(votes: Record<string, T>): Record<string, T> {
-  return { ...votes };
+export function mergeHydratedVotes<T extends string>(
+  current: Record<string, T>,
+  hydrated: Record<string, T>,
+  protectedArtifactIds: Iterable<string>,
+): Record<string, T> {
+  const next = { ...hydrated };
+  for (const artifactId of protectedArtifactIds) {
+    const optimistic = current[artifactId];
+    if (optimistic) next[artifactId] = optimistic;
+  }
+  return next;
 }
