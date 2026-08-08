@@ -19,6 +19,7 @@
     "verify:throw-it-in": "node scripts/verify-throw-it-in.mjs",
     "verify:machine-gloss": "node scripts/verify-machine-gloss.mjs",
     "verify:lexicon-layout": "node scripts/verify-lexicon-layout-stability.mjs",
+    "verify:arrival-surface": "node scripts/verify-arrival-surface.mjs",
     "verify:museum-accession": "node scripts/verify-museum-accession.mjs",
     "verify:museum-destination": "node scripts/verify-museum-destination.mjs",
     "verify:runtime": "node scripts/verify-universal-runtime.mjs",
