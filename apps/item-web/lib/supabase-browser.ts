@@ -10,10 +10,15 @@ export const socialBackendEnabled = Boolean(url && browserKey);
 export type SocialProvider = "google" | "github";
 
 const supportedSocialProviders: SocialProvider[] = ["github", "google"];
+const AUTH_SETTINGS_RETRY_DELAYS_MS = [0, 350, 1000, 2500] as const;
 
 let browserClient: SupabaseClient | null = null;
 let publicBrowserClient: SupabaseClient | null = null;
 let socialProviderPromise: Promise<Set<SocialProvider>> | null = null;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export function getSupabaseBrowserClient(): SupabaseClient | null {
   if (!socialBackendEnabled || !url || !browserKey) return null;
@@ -47,23 +52,42 @@ export function getSupabasePublicBrowserClient(): SupabaseClient | null {
   return publicBrowserClient;
 }
 
+async function fetchEnabledSocialProviders(): Promise<Set<SocialProvider>> {
+  if (!url || !browserKey) return new Set();
+  let lastError: unknown = new Error("AUTH_SETTINGS_UNAVAILABLE");
+
+  for (const waitMs of AUTH_SETTINGS_RETRY_DELAYS_MS) {
+    if (waitMs > 0) await delay(waitMs);
+
+    try {
+      const response = await fetch(`${url.replace(/\/$/, "")}/auth/v1/settings`, {
+        method: "GET",
+        headers: { apikey: browserKey },
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error(`AUTH_SETTINGS_${response.status}`);
+
+      const settings = await response.json() as { external?: Record<string, boolean> };
+      return new Set(
+        supportedSocialProviders.filter((provider) => settings.external?.[provider] === true),
+      );
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError;
+}
+
 export async function loadEnabledSocialProviders(): Promise<Set<SocialProvider>> {
   if (!socialBackendEnabled || !url || !browserKey) return new Set();
 
   if (!socialProviderPromise) {
-    socialProviderPromise = fetch(`${url.replace(/\/$/, "")}/auth/v1/settings`, {
-      method: "GET",
-      headers: { apikey: browserKey },
-      cache: "no-store",
-    })
-      .then(async (response) => {
-        if (!response.ok) throw new Error(`AUTH_SETTINGS_${response.status}`);
-        const settings = await response.json() as { external?: Record<string, boolean> };
-        return new Set(
-          supportedSocialProviders.filter((provider) => settings.external?.[provider] === true),
-        );
-      })
-      .catch(() => new Set<SocialProvider>());
+    const request = fetchEnabledSocialProviders().catch(() => {
+      if (socialProviderPromise === request) socialProviderPromise = null;
+      return new Set<SocialProvider>();
+    });
+    socialProviderPromise = request;
   }
 
   return socialProviderPromise;
