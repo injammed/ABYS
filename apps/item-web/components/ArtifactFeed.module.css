@@ -77,7 +77,10 @@
 .voteButton {
   min-height: 4.25rem;
   display: grid;
+  grid-template-rows: auto auto;
   place-items: center;
+  align-content: center;
+  gap: .14rem;
   border: 1px solid var(--line);
   border-radius: 1rem;
   background: #070707;
@@ -104,6 +107,15 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   overflow: visible;
+}
+
+.voteCount {
+  min-width: 2ch;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: .7rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  opacity: .82;
 }
 
 .slopVote {
@@ -186,6 +198,10 @@
   .voteGlyph {
     width: 2.35rem;
     height: 2.35rem;
+  }
+
+  .voteCount {
+    font-size: .66rem;
   }
 }
 
