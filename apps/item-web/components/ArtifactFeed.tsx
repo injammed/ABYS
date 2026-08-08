@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { FeedArtifact, makeFeedBatch, originClassLabels } from "@/lib/feed";
+import { loadPublicVoteAggregate } from "@/lib/public-vote-aggregate";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 import {
   Judgment,
@@ -198,14 +199,10 @@ export function ArtifactFeed() {
         .then((page) => {
           if (cancelled) return;
           setFeedError(null);
-          // The newest public page is authoritative for its members. Putting it
-          // first both discovers newly published Artifacts and refreshes public
-          // aggregate metadata without disturbing the older pagination cursor.
           setArtifacts((current) => appendUnique(page.artifacts, current));
         })
         .catch(() => {
-          // Head freshness is additive. Existing feed content remains usable;
-          // the normal self-healing paths will retry without surfacing a new UI.
+          // Head freshness is additive. Existing feed content remains usable.
         })
         .finally(() => {
           publicHeadRefreshInFlightRef.current = false;
@@ -391,6 +388,26 @@ export function ArtifactFeed() {
       await saveVote(id, voterId, judgment);
       if (voteOwnerRef.current !== voterId) return;
 
+      window.dispatchEvent(new CustomEvent("aetimm:vote-committed", {
+        detail: { artifactId: id, judgment },
+      }));
+
+      try {
+        const aggregate = await loadPublicVoteAggregate(id);
+        if (voteOwnerRef.current === voterId) {
+          setArtifacts((current) => current.map((entry) => entry.id === id ? {
+            ...entry,
+            museumVotes: aggregate.museumVotes,
+            slopVotes: aggregate.slopVotes,
+            slopRank: aggregate.slopRank,
+          } : entry));
+        }
+      } catch {
+        // The vote is already committed. Aggregate freshness is additive and
+        // will converge via the normal public-head refresh without undoing it.
+      }
+
+      if (voteOwnerRef.current !== voterId) return;
       setVoteStates((current) => ({
         ...current,
         [id]: {
@@ -535,6 +552,7 @@ export function ArtifactFeed() {
                       aria-pressed={judgment === "slop"}
                     >
                       <SlopGlyph />
+                      <LexiconText className={styles.voteCount} text={String(artifact.slopVotes ?? 0)} phase={phase + 20} semantic={false} />
                       <span className={styles.srOnly}>Slop</span>
                     </button>
                     <button
@@ -546,6 +564,7 @@ export function ArtifactFeed() {
                       aria-pressed={judgment === "preserve"}
                     >
                       <MuseumGlyph />
+                      <LexiconText className={styles.voteCount} text={String(artifact.museumVotes ?? 0)} phase={phase + 21} semantic={false} />
                       <span className={styles.srOnly}>Museum</span>
                     </button>
                   </div>
