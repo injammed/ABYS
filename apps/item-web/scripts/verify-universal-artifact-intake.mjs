@@ -11,8 +11,9 @@ const architecturePath = path.join(root, "ARTIFACT_ARCHITECTURE.md");
 const migration8Path = path.resolve(root, "..", "..", "supabase", "migrations", "008_universal_artifact_intake.sql");
 const migration9Path = path.resolve(root, "..", "..", "supabase", "migrations", "009_universal_artifact_review.sql");
 const migration10Path = path.resolve(root, "..", "..", "supabase", "migrations", "010_security_definer_lockdown.sql");
+const migration17Path = path.resolve(root, "..", "..", "supabase", "migrations", "017_rolling_storage_intake_cap.sql");
 
-const [intake, intakeStyles, storageReceipt, curator, socialFeed, architecture, migration8, migration9, migration10] = await Promise.all([
+const [intake, intakeStyles, storageReceipt, curator, socialFeed, architecture, migration8, migration9, migration10, migration17] = await Promise.all([
   readFile(intakePath, "utf8"),
   readFile(intakeStylesPath, "utf8"),
   readFile(storageReceiptPath, "utf8"),
@@ -22,6 +23,7 @@ const [intake, intakeStyles, storageReceipt, curator, socialFeed, architecture, 
   readFile(migration8Path, "utf8"),
   readFile(migration9Path, "utf8"),
   readFile(migration10Path, "utf8"),
+  readFile(migration17Path, "utf8"),
 ]);
 
 const failures = [];
@@ -95,6 +97,16 @@ requirePattern("single reconnect deadline per file", /const reconnectDeadline = 
 requirePattern("reconnect wait before transport attempt", /for \(const waitMs[\s\S]*await waitForOnlineUntil\(reconnectDeadline\);[\s\S]*\.upload\(path, file/, storageReceipt);
 requirePattern("final receipt also waits through reconnect budget", /await waitForOnlineUntil\(reconnectDeadline\);[\s\S]*if \(await artifactObjectReadable\(path\)\) return;[\s\S]*throw lastError/, storageReceipt);
 
+// Storage capacity law: max_storage_objects_per_creator limits rolling intake
+// pressure. It must never become a lifetime quota on valid published history.
+requirePattern("rolling storage cap replaces intake helper", /create or replace function public\.can_accept_artifact_media\(object_name text\)/, migration17);
+requirePattern("rolling storage cap preserves per-user lock", /pg_advisory_xact_lock\(hashtextextended\(current_user_id::text, 1\)\)/, migration17);
+requirePattern("rolling storage cap uses configured maximum", /recent_objects < config\.max_storage_objects_per_creator/, migration17);
+requirePattern("rolling storage cap counts exact owner namespace", /split_part\(name, '\/', 1\) = current_user_id::text/, migration17);
+requirePattern("rolling storage cap is 24-hour intake pressure", /created_at >= now\(\) - interval '24 hours'/, migration17);
+requirePattern("rolling storage helper remains authenticated-only", /revoke all on function public\.can_accept_artifact_media\(text\)[\s\S]*from public, anon, authenticated;[\s\S]*grant execute on function public\.can_accept_artifact_media\(text\)[\s\S]*to authenticated;/, migration17);
+forbidPattern("rolling cap deletes historical published media", /delete\s+from\s+storage\.objects/i, migration17);
+
 requirePattern("paused intake keeps Artifact form mounted", /\{open && session && \(/, intake);
 requirePattern("paused state visible status", /TROUGH PAUSED\. The form stays visible; throwing is temporarily locked\./, intake);
 requirePattern("paused state preserves form", /form stays visible/, intake);
@@ -166,4 +178,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal Artifact intake PASS: any file format can enter one bounded Artifact; storage writes pause through brief offline transitions, self-confirm ambiguous acknowledgements on the exact random path without overwrite, and preserve atomic publication boundaries.");
+console.log("Universal Artifact intake PASS: any file format can enter one bounded Artifact; upload transport survives brief disconnects and ambiguous acknowledgements; storage pressure remains bounded over a rolling 24-hour window without turning published history into a lifetime lockout.");
