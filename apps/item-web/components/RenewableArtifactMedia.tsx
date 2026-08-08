@@ -1,6 +1,7 @@
 "use client";
 
-import { MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import { renewArtifactMediaLease, storagePathFromArtifactSignedUrl } from "@/lib/media-lease";
 
 type MediaKind = "image" | "video" | "audio";
