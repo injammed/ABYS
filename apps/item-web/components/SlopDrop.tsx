@@ -2,6 +2,7 @@
 
 import { ChangeEvent, DragEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { waitForPublicArtifactReceipt } from "@/lib/publication-receipt";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 import { LexiconText } from "./LexiconBroadcast";
 import styles from "./UploadGate.module.css";
@@ -288,6 +289,7 @@ export function SlopDrop() {
     const artifactId = crypto.randomUUID();
     const uploadedPaths: string[] = [];
     const parts: ArtifactPartInput[] = [];
+    let artifactCommitted = false;
 
     setBusy(true);
     setMessage("Throwing it in…");
@@ -359,15 +361,34 @@ export function SlopDrop() {
         p_parts: parts,
       });
       if (createError) throw createError;
+      artifactCommitted = true;
+
+      const committedId = String(createdId ?? artifactId);
+      setMessage("Confirming public landing…");
+
+      let publicConfirmed = false;
+      try {
+        publicConfirmed = await waitForPublicArtifactReceipt(committedId, parts.length);
+      } catch {
+        // The Artifact is already committed. Public-feed recovery may still
+        // succeed even if this confirmation read experiences a network error.
+      }
 
       formElement.reset();
       setSelectedFiles([]);
       setTextPart("");
       setReferenceUrl("");
-      setMessage("Thrown. Landing in Unjudged…");
-      window.dispatchEvent(new CustomEvent("aetimm:submission-created", { detail: { artifactId: String(createdId ?? artifactId) } }));
+      setMessage(publicConfirmed ? "Thrown. Public." : "Thrown. Public feed confirmation delayed; recovery is still running.");
+      window.dispatchEvent(new CustomEvent("aetimm:submission-created", {
+        detail: { artifactId: committedId, publicConfirmed },
+      }));
     } catch (error) {
-      if (uploadedPaths.length > 0) await client.storage.from("artifact-media").remove(uploadedPaths);
+      // Before the atomic Artifact RPC commits, uploaded objects are orphan
+      // candidates and should be removed. After commit, storage is part of the
+      // Artifact manifest and must never be destroyed by a later receipt error.
+      if (!artifactCommitted && uploadedPaths.length > 0) {
+        await client.storage.from("artifact-media").remove(uploadedPaths);
+      }
       setMessage(submissionErrorMessage(error));
     } finally {
       setBusy(false);
