@@ -4,6 +4,7 @@ import path from "node:path";
 const root = process.cwd();
 const intakePath = path.join(root, "components", "SlopDrop.tsx");
 const intakeStylesPath = path.join(root, "components", "UploadGate.module.css");
+const storageReceiptPath = path.join(root, "lib", "storage-upload-receipt.ts");
 const curatorPath = path.join(root, "components", "CuratorQueue.tsx");
 const socialFeedPath = path.join(root, "lib", "social-feed.ts");
 const architecturePath = path.join(root, "ARTIFACT_ARCHITECTURE.md");
@@ -11,9 +12,10 @@ const migration8Path = path.resolve(root, "..", "..", "supabase", "migrations", 
 const migration9Path = path.resolve(root, "..", "..", "supabase", "migrations", "009_universal_artifact_review.sql");
 const migration10Path = path.resolve(root, "..", "..", "supabase", "migrations", "010_security_definer_lockdown.sql");
 
-const [intake, intakeStyles, curator, socialFeed, architecture, migration8, migration9, migration10] = await Promise.all([
+const [intake, intakeStyles, storageReceipt, curator, socialFeed, architecture, migration8, migration9, migration10] = await Promise.all([
   readFile(intakePath, "utf8"),
   readFile(intakeStylesPath, "utf8"),
+  readFile(storageReceiptPath, "utf8"),
   readFile(curatorPath, "utf8"),
   readFile(socialFeedPath, "utf8"),
   readFile(architecturePath, "utf8"),
@@ -48,9 +50,6 @@ requirePattern("private artifact path namespace", /session\.user\.id.*artifactId
 requirePattern("rollback uploaded paths", /storage\.from\("artifact-media"\)\.remove\(uploadedPaths\)/, intake);
 requirePattern("mixed mode detection", /new Set\(parts\.map\(\(part\) => part\.mode\)\)/, intake);
 
-// Universal file law: format novelty never blocks intake. Unknown material is
-// preserved as opaque `other`, while bounded size/count and inert execution
-// remain the security boundary.
 requirePattern("opaque MIME fallback", /const OPAQUE_MIME = "application\/octet-stream";/, intake);
 requirePattern("unknown MIME forced opaque", /return OPAQUE_MIME;[\s\S]*function modeForFile/, intake);
 requirePattern("unknown format maps to other", /function modeForFile[\s\S]*return "other";/, intake);
@@ -74,7 +73,17 @@ requirePattern("accessible remove control", /aria-label=\{`Remove \$\{file\.name
 requirePattern("custom picker focus state", /materialInput:focus-visible \+ \.materialPicker/, intakeStyles);
 requirePattern("mobile picker layout", /@media \(max-width: 430px\)/, intakeStyles);
 
-// Maintenance changes capability, never the visible product primitive.
+// Storage transport receipt law: the client may retry the exact random object
+// path after an ambiguous transport failure, but never overwrite a different
+// object. If Storage already accepted it, owner-readable access is the receipt.
+requirePattern("self-confirming upload helper used", /uploadArtifactObject\(storagePath, file, mime\)/, intake);
+requirePattern("bounded storage retry schedule", /STORAGE_UPLOAD_RETRY_DELAYS_MS = \[0, 250, 800, 1800\]/, storageReceipt);
+requirePattern("storage overwrite disabled", /upsert:\s*false/, storageReceipt);
+requirePattern("exact-path storage receipt", /createSignedUrl\(path, 60\)/, storageReceipt);
+requirePattern("ambiguous upload reconciles before retry", /if \(await artifactObjectReadable\(path\)\) return;/, storageReceipt);
+requirePattern("final storage receipt before failure", /if \(await artifactObjectReadable\(path\)\) return;[\s\S]*throw lastError/, storageReceipt);
+forbidPattern("storage upsert overwrite", /upsert:\s*true/, storageReceipt);
+
 requirePattern("paused intake keeps Artifact form mounted", /\{open && session && \(/, intake);
 requirePattern("paused state visible status", /TROUGH PAUSED\. The form stays visible; throwing is temporarily locked\./, intake);
 requirePattern("paused state preserves form", /form stays visible/, intake);
@@ -146,4 +155,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal Artifact intake PASS: any file format can enter one bounded Artifact; known formats retain native modes, unknown formats become opaque inert `other` material, and atomic staging/publication boundaries remain intact.");
+console.log("Universal Artifact intake PASS: any file format can enter one bounded Artifact; storage writes self-confirm ambiguous acknowledgements on the exact random path without overwrite; known formats retain native modes, unknown formats become opaque inert material, and atomic publication boundaries remain intact.");
