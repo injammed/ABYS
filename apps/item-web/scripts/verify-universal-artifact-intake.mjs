@@ -37,7 +37,7 @@ requirePattern("AI-made Artifact material surface", /<LexiconText\b[^>]*text="AI
 requirePattern("custom Add material action", /Add material/, intake);
 requirePattern("CSS-module material picker", /styles\.materialPicker/, intake);
 requirePattern("native file input visually hidden", /styles\.materialInput/, intake);
-requirePattern("material modes helper", /image · video · audio · PDF · code · data · 3D/, intake);
+requirePattern("any-file material helper", /image · video · audio · PDF · code · data · 3D · any file/, intake);
 requirePattern("empty material state", /No slop added/, intake);
 requirePattern("multi-file intake", /type="file"[\s\S]*multiple/, intake);
 requirePattern("text part", /textPart/, intake);
@@ -48,8 +48,15 @@ requirePattern("private artifact path namespace", /session\.user\.id.*artifactId
 requirePattern("rollback uploaded paths", /storage\.from\("artifact-media"\)\.remove\(uploadedPaths\)/, intake);
 requirePattern("mixed mode detection", /new Set\(parts\.map\(\(part\) => part\.mode\)\)/, intake);
 
-// Defensive submission invariants: the simple surface must not weaken intake.
-requirePattern("preflight MIME or extension allowlist", /function fileIsAccepted/, intake);
+// Universal file law: format novelty never blocks intake. Unknown material is
+// preserved as opaque `other`, while bounded size/count and inert execution
+// remain the security boundary.
+requirePattern("opaque MIME fallback", /const OPAQUE_MIME = "application\/octet-stream";/, intake);
+requirePattern("unknown MIME forced opaque", /return OPAQUE_MIME;[\s\S]*function modeForFile/, intake);
+requirePattern("unknown format maps to other", /function modeForFile[\s\S]*return "other";/, intake);
+forbidPattern("browser file accept allowlist", /\baccept=\{/, intake);
+forbidPattern("format rejection helper", /function fileIsAccepted/, intake);
+forbidPattern("unsupported material rejection copy", /is not an accepted material type/, intake);
 requirePattern("stable duplicate identity", /function fileIdentity/, intake);
 requirePattern("duplicate suppression", /duplicates/, intake);
 requirePattern("per-file size preflight", /MAX_FILE_BYTES/, intake);
@@ -61,7 +68,7 @@ requirePattern("material removal", /removeSelectedFile/, intake);
 requirePattern("double-submit and paused-state guard", /if \(busy \|\| intakePaused\) return;/, intake);
 requirePattern("busy submit disable", /disabled=\{busy \|\| intakePaused \|\| materialLimitExceeded/, intake);
 requirePattern("URL protocol allowlist", /\["http:", "https:"\]\.includes/, intake);
-requirePattern("untrusted inert-material copy", /Files are treated as untrusted\. Code is not executed and links are not fetched during intake\./, intake);
+requirePattern("untrusted inert-material copy", /Files are treated as untrusted\. Unknown formats enter as inert data\. Code is not executed and links are not fetched during intake\./, intake);
 requirePattern("accessible live material list", /aria-live="polite"/, intake);
 requirePattern("accessible remove control", /aria-label=\{`Remove \$\{file\.name\}`\}/, intake);
 requirePattern("custom picker focus state", /materialInput:focus-visible \+ \.materialPicker/, intakeStyles);
@@ -106,6 +113,7 @@ requirePattern("private bounded storage", /file_size_limit = 52428800/, migratio
 requirePattern("code mime support", /application\/typescript|text\/plain/, migration8);
 requirePattern("3D support", /model\/gltf-binary/, migration8);
 requirePattern("archive support", /application\/zip/, migration8);
+requirePattern("database other mode support", /'simulation','mixed','other'/, migration8);
 
 requirePattern("curator manifest access", /curators read all artifact parts/, migration9);
 requirePattern("first curator publication Unjudged", /INITIAL_PUBLICATION_REQUIRES_UNJUDGED/, migration9);
@@ -138,4 +146,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal Artifact intake PASS: the active Throw It In surface accepts one multimodal Artifact through bounded validation; character-level interface rendering does not weaken file limits, atomic staging, inert execution boundaries, immediate public publication, or exceptional-hold separation.");
+console.log("Universal Artifact intake PASS: any file format can enter one bounded Artifact; known formats retain native modes, unknown formats become opaque inert `other` material, and atomic staging/publication boundaries remain intact.");
