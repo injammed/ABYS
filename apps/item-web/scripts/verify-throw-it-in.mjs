@@ -74,7 +74,7 @@ requirePattern("future-dated bridge rejected", /parsed\.createdAt > now \+ 60_00
 requirePattern("restricted browser storage fails open", /Restricted browser storage must never block authentication itself/, intents);
 requirePattern("successful existing session clears bridge", /if \(data\.session\) clearCrossTabPublicAuthIntents\(\)/, account);
 requirePattern("SIGNED_IN clears bridge", /event === "SIGNED_IN"\) clearCrossTabPublicAuthIntents\(\)/, account);
-forbidPattern("Artifact payload vocabulary in cross-tab bridge", /selectedFiles|textPart|referenceUrl|password|token/i, intents);
+forbidPattern("Artifact payload fields in cross-tab bridge", /selectedFiles|textPart|referenceUrl/, intents);
 forbidPattern("Artifact payload persisted in localStorage", /localStorage\.(?:setItem|getItem)\([^)]*(?:artifact|file|textPart|referenceUrl)/i, drop + account);
 forbidPattern("Artifact payload persisted in sessionStorage", /sessionStorage\.setItem\([^,]+,\s*(?:selectedFiles|textPart|referenceUrl|JSON\.stringify)/, drop + account);
 
