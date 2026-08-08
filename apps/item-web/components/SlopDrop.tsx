@@ -2,6 +2,7 @@
 
 import { ChangeEvent, DragEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { AUTH_REQUIRED_EVENT, SUBMIT_INTENT_STORAGE_KEY } from "@/lib/public-intents";
 import { waitForPublicArtifactReceipt } from "@/lib/publication-receipt";
 import { uploadArtifactObject } from "@/lib/storage-upload-receipt";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
@@ -140,8 +141,16 @@ export function SlopDrop() {
     const client = getSupabaseBrowserClient();
     if (!client) return;
 
-    void client.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data } = client.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession));
+    const applySession = (nextSession: Session | null) => {
+      setSession(nextSession);
+      if (nextSession && window.sessionStorage.getItem(SUBMIT_INTENT_STORAGE_KEY) === "1") {
+        window.sessionStorage.removeItem(SUBMIT_INTENT_STORAGE_KEY);
+        setOpen(true);
+      }
+    };
+
+    void client.auth.getSession().then(({ data }) => applySession(data.session));
+    const { data } = client.auth.onAuthStateChange((_event, nextSession) => applySession(nextSession));
 
     void client
       .from("intake_control")
@@ -163,6 +172,16 @@ export function SlopDrop() {
   const materialLimitExceeded = materialPartCount > MAX_PARTS || totalFileBytes > MAX_TOTAL_BYTES;
   const intakePaused = intakeControl?.intake_open === false;
   const dailyLimit = intakeControl?.daily_submission_limit;
+
+  function handleTrigger(): void {
+    if (busy) return;
+    if (!session) {
+      window.sessionStorage.setItem(SUBMIT_INTENT_STORAGE_KEY, "1");
+      window.dispatchEvent(new Event(AUTH_REQUIRED_EVENT));
+      return;
+    }
+    setOpen((value) => !value);
+  }
 
   function validateIncomingFiles(incoming: File[]): void {
     if (busy || intakePaused || incoming.length === 0) return;
@@ -225,7 +244,8 @@ export function SlopDrop() {
 
     const client = getSupabaseBrowserClient();
     if (!client || !session) {
-      setMessage("Make an account or sign in first.");
+      window.sessionStorage.setItem(SUBMIT_INTENT_STORAGE_KEY, "1");
+      window.dispatchEvent(new Event(AUTH_REQUIRED_EVENT));
       return;
     }
 
@@ -358,10 +378,6 @@ export function SlopDrop() {
       let publicConfirmed = false;
 
       if (createError) {
-        // The RPC can commit and auto-publish before a transport failure loses
-        // its acknowledgement. The client already knows the immutable
-        // artifactId, so prove that exact public Artifact before declaring the
-        // write failed. Never blind-retry the creation RPC.
         setMessage("Reconciling Artifact landing…");
         try {
           publicConfirmed = await waitForPublicArtifactReceipt(artifactId, parts.length);
@@ -415,7 +431,7 @@ export function SlopDrop() {
       <button
         className="upload-trigger"
         type="button"
-        onClick={() => !busy && setOpen((value) => !value)}
+        onClick={handleTrigger}
         aria-expanded={open}
         aria-controls="artifact-intake-panel"
         aria-label={triggerText}
@@ -425,8 +441,8 @@ export function SlopDrop() {
       </button>
 
       {open && !session && (
-        <div id="artifact-intake-panel" className="upload-panel" role="status" aria-label="Have slop? Make an account or sign in, then throw it in.">
-          <LexiconText as="p" className="submission-note" text="HAVE SLOP? Make an account or sign in, then throw it in." phase={11} semantic={false} />
+        <div id="artifact-intake-panel" className="upload-panel" role="status" aria-label="Signing in before Artifact intake.">
+          <LexiconText as="p" className="submission-note" text="SIGN IN TO THROW IT IN." phase={11} semantic={false} />
         </div>
       )}
 
