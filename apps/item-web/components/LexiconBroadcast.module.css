@@ -49,6 +49,29 @@
   visibility: hidden;
 }
 
+/*
+ * Preserve the frozen fine-hover CSS contract, but pointer-event state is the
+ * authority. Hybrid devices that synthesize :hover from touch are forced back
+ * to oscillation unless the active pointer set pointerTranslated.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .lexicon:hover .original {
+    visibility: visible;
+  }
+
+  .lexicon:hover .mutated {
+    visibility: hidden;
+  }
+
+  .lexicon:not(.pointerTranslated):hover .original {
+    visibility: hidden;
+  }
+
+  .lexicon:not(.pointerTranslated):hover .mutated {
+    visibility: visible;
+  }
+}
+
 .srOnly {
   position: absolute;
   width: 1px;
