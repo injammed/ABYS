@@ -152,7 +152,6 @@ export function AccountGate() {
     const form = new FormData(event.currentTarget);
     const email = String(form.get("email") ?? "").trim();
     const password = String(form.get("password") ?? "");
-    const displayName = String(form.get("displayName") ?? "").trim();
 
     setBusy(true);
     setMessage(null);
@@ -163,7 +162,6 @@ export function AccountGate() {
           email,
           password,
           options: {
-            data: { display_name: displayName },
             emailRedirectTo: `${window.location.origin}/`,
           },
         });
@@ -346,20 +344,6 @@ export function AccountGate() {
               <LexiconText text="Create account" phase={53} semantic={false} />
             </button>
           </div>
-
-          {mode === "signup" && (
-            <div>
-              <label htmlFor="account-display-name"><LexiconText text="Display name" phase={59} /></label>
-              <input
-                id="account-display-name"
-                name="displayName"
-                required
-                minLength={2}
-                maxLength={40}
-                autoComplete="nickname"
-              />
-            </div>
-          )}
 
           <div>
             <label htmlFor="account-email"><LexiconText text="Email" phase={61} /></label>
