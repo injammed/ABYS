@@ -3,13 +3,14 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const root = process.cwd();
-const [swipe, feed, feedStyles, socialFeed, voteState, publicAggregate, schema, binaryMigration] = await Promise.all([
+const [swipe, feed, feedStyles, socialFeed, voteState, publicAggregate, publicIntents, schema, binaryMigration] = await Promise.all([
   readFile(resolve(root, "components", "BinarySwipeVoting.tsx"), "utf8"),
   readFile(resolve(root, "components", "ArtifactFeed.tsx"), "utf8"),
   readFile(resolve(root, "components", "ArtifactFeed.module.css"), "utf8"),
   readFile(resolve(root, "lib", "social-feed.ts"), "utf8"),
   readFile(resolve(root, "lib", "vote-state.ts"), "utf8"),
   readFile(resolve(root, "lib", "public-vote-aggregate.ts"), "utf8"),
+  readFile(resolve(root, "lib", "public-intents.ts"), "utf8"),
   readFile(resolve(root, "..", "..", "supabase", "migrations", "001_social_beta.sql"), "utf8"),
   readFile(resolve(root, "..", "..", "supabase", "migrations", "014_independent_binary_judgments.sql"), "utf8"),
 ]);
@@ -51,6 +52,19 @@ for (const [label, pattern, source] of [
   ["vote-state changes retrigger hydration", /\[session\?\.user\.id, artifacts, voteStates\]/, feed],
   ["stale hydration version guard retained", /shouldApplyVoteHydration/, feed],
 
+  // Signed-out ballot law: the click/swipe is already the intended judgment.
+  // Authentication interrupts the transport, not the user's decision.
+  ["bounded vote-intent storage key", /VOTE_INTENT_STORAGE_KEY = "aetimm:intent:vote:v1"/, publicIntents],
+  ["vote intent contains only Artifact and binary judgment", /type PublicVoteIntent = \{[\s\S]*artifactId: string;[\s\S]*judgment: "preserve" \| "slop";/, publicIntents],
+  ["vote intent rejects oversized storage", /value\.length > 256/, publicIntents],
+  ["vote intent validates UUID", /ARTIFACT_ID_PATTERN\.test\(artifactId\)/, publicIntents],
+  ["vote intent validates binary judgment", /judgment !== "preserve" && judgment !== "slop"/, publicIntents],
+  ["signed-out vote stores exact intent", /sessionStorage\.setItem\([\s\S]*VOTE_INTENT_STORAGE_KEY[\s\S]*encodePublicVoteIntent\(\{ artifactId: id, judgment \}\)/, feed],
+  ["signed-out vote opens existing auth surface", /dispatchEvent\(new Event\(AUTH_REQUIRED_EVENT\)\)/, feed],
+  ["authenticated session consumes vote intent", /sessionStorage\.getItem\(VOTE_INTENT_STORAGE_KEY\)[\s\S]*decodePublicVoteIntent/, feed],
+  ["consumed vote intent is one-shot", /sessionStorage\.removeItem\(VOTE_INTENT_STORAGE_KEY\)/, feed],
+  ["authenticated intent resumes same judge path", /judge\(intent\.artifactId, intent\.judgment, true\)/, feed],
+
   ["post-commit public aggregate read", /loadPublicVoteAggregate\(id\)/, feed],
   ["post-commit vote event", /aetimm:vote-committed/, feed],
   ["Museum aggregate reconciliation", /museumVotes: aggregate\.museumVotes/, feed],
@@ -86,4 +100,4 @@ assert.ok(!/button[^>]*judge refine/.test(feed), "Refine must not exist in the p
 assert.ok(!/MutationObserver/.test(swipe), "Binary voting must not depend on DOM mutation normalization.");
 assert.ok(!/👍|👎/.test(feed), "The public ballot must not fall back to generic thumbs-up/thumbs-down icons.");
 
-console.log("Binary swipe voting PASS: one account has one active Artifact judgment; active writes are hydration-safe; confirmed votes reconcile aggregate truth immediately; older near-viewport cards batch-refresh public Museum/Slop state without raw votes, background traffic, or per-card request storms; visible totals remain in the machine lexicon.");
+console.log("Binary swipe voting PASS: one account has one active Artifact judgment; signed-out votes survive authentication as one bounded binary intent; active writes are hydration-safe; confirmed votes reconcile aggregate truth immediately; older near-viewport cards batch-refresh public Museum/Slop state without raw votes, background traffic, or per-card request storms; visible totals remain in the machine lexicon.");
