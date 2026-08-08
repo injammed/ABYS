@@ -7,13 +7,15 @@ const accountPath = path.join(root, "components", "AccountGate.tsx");
 const intentsPath = path.join(root, "lib", "public-intents.ts");
 const supabasePath = path.join(root, "lib", "supabase-browser.ts");
 const navPath = path.join(root, "components", "PrimaryNavigation.tsx");
+const profileBootstrapPath = path.resolve(root, "..", "..", "supabase", "migrations", "018_total_profile_bootstrap.sql");
 
-const [drop, account, intents, supabaseBrowser, nav] = await Promise.all([
+const [drop, account, intents, supabaseBrowser, nav, profileBootstrap] = await Promise.all([
   readFile(dropPath, "utf8"),
   readFile(accountPath, "utf8"),
   readFile(intentsPath, "utf8"),
   readFile(supabasePath, "utf8"),
   readFile(navPath, "utf8"),
+  readFile(profileBootstrapPath, "utf8"),
 ]);
 
 const failures = [];
@@ -80,6 +82,24 @@ forbidPattern("Artifact payload fields in cross-tab bridge", /selectedFiles|text
 forbidPattern("Artifact payload persisted in localStorage", /localStorage\.(?:setItem|getItem)\([^)]*(?:artifact|file|textPart|referenceUrl)/i, drop + account);
 forbidPattern("Artifact payload persisted in sessionStorage", /sessionStorage\.setItem\([^,]+,\s*(?:selectedFiles|textPart|referenceUrl|JSON\.stringify)/, drop + account);
 
+// First-account simplicity: signup is email + password. Profile identity is
+// bootstrapped server-side into the existing 2..40 character contract and can
+// be edited later after sign-in.
+forbidPattern("signup display-name field", /id="account-display-name"|name="displayName"/, account);
+forbidPattern("signup display-name metadata requirement", /data:\s*\{\s*display_name:/, account);
+requirePattern("email signup remains explicit", /client\.auth\.signUp\(\{[\s\S]*email,[\s\S]*password,[\s\S]*emailRedirectTo/, account);
+requirePattern("signed-in profile remains editable", /name="profileDisplayName"[\s\S]*minLength=\{2\}[\s\S]*maxLength=\{40\}/, account);
+requirePattern("total profile bootstrap function", /create or replace function public\.handle_new_user\(\)/, profileBootstrap);
+requirePattern("profile bootstrap prefers supplied display name", /raw_user_meta_data ->> 'display_name'/, profileBootstrap);
+requirePattern("profile bootstrap accepts OAuth full name", /raw_user_meta_data ->> 'full_name'/, profileBootstrap);
+requirePattern("profile bootstrap accepts OAuth name", /raw_user_meta_data ->> 'name'/, profileBootstrap);
+requirePattern("profile bootstrap falls back to email local part", /split_part\(coalesce\(new\.email, ''\), '@', 1\)/, profileBootstrap);
+requirePattern("profile bootstrap final Creator fallback", /'Creator'/, profileBootstrap);
+requirePattern("profile bootstrap clamps maximum", /initial_name := left\(initial_name, 40\)/, profileBootstrap);
+requirePattern("profile bootstrap repairs one-character names", /char_length\(initial_name\) < 2[\s\S]*initial_name \|\| '_'/, profileBootstrap);
+requirePattern("profile bootstrap search path pinned", /set search_path = public, pg_temp/, profileBootstrap);
+requirePattern("profile bootstrap client execution revoked", /revoke all on function public\.handle_new_user\(\)[\s\S]*from public, anon, authenticated/, profileBootstrap);
+
 // Auth availability law: never advertise an OAuth provider merely because the
 // frontend knows its name. The public Auth service is the source of truth, and
 // temporary failure to read that truth gets a bounded recovery window.
@@ -112,4 +132,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Throw-it-in PASS: Submit opens authentication even when browser storage is restricted; automatic intent resume uses fail-open helpers; first-account cross-tab continuity, live OAuth capability discovery, and Artifact payload isolation remain intact.");
+console.log("Throw-it-in PASS: first account creation requires only email/password or a live-enabled OAuth provider; the database always bootstraps a valid editable profile; Submit/Vote auth continuity and Artifact payload isolation remain intact.");
