@@ -74,6 +74,9 @@ jobs:
       - name: Verify translation layout stability
         run: npm run verify:lexicon-layout
 
+      - name: Verify first-user arrival surface
+        run: npm run verify:arrival-surface
+
       - name: Verify universal Artifact runtime
         run: npm run verify:runtime
 

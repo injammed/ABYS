@@ -102,6 +102,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:lexicon-layout
 
+      - name: Verify first-user arrival surface
+        working-directory: apps/item-web
+        run: npm run verify:arrival-surface
+
       - name: Verify universal Artifact runtime
         working-directory: apps/item-web
         run: npm run verify:runtime

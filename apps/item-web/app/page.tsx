@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArtifactFeed } from "@/components/ArtifactFeed";
 import { BinarySwipeVoting } from "@/components/BinarySwipeVoting";
 import { LexiconText } from "@/components/LexiconBroadcast";
@@ -32,24 +31,11 @@ export default function HomePage() {
               ar: "ارفع سلوب مصنوعاً بالآلة. مرّر في الحوض العام. صوّت سلوب أو متحف، أو تجاهله واستمر.",
             }}
           />
-          <Link className="upload-trigger header-link" href="/about/" aria-label="What is this?">
-            <LexiconText text="What is this?" phase={19} semantic={false} />
-          </Link>
         </div>
       </header>
 
       <section id="field" className="feed-first-field" aria-label="Live Slop Trough artifact field">
         <BinarySwipeVoting />
-        <MachineGloss
-          density="quiet"
-          translations={{
-            en: "Machine-made only. There is no trending command here. Scroll vertically. Judge left or right. Silence is also a judgment: keep scrolling.",
-            es: "Solo hecho por máquinas. Aquí no existe una orden de tendencias. Desplázate verticalmente. Juzga a izquierda o derecha. El silencio también es un juicio: sigue desplazándote.",
-            zh: "仅限机器制造。这里没有趋势命令。纵向滚动。向左或向右判断。沉默也是一种判断：继续滚动。",
-            ja: "機械製のみ。ここにトレンド命令はない。縦にスクロールし、左か右で判断する。沈黙も判断だ。そのまま進め。",
-            ar: "مصنوع بالآلة فقط. لا يوجد أمر للترند هنا. مرّر عمودياً. احكم يساراً أو يميناً. الصمت حكم أيضاً: واصل التمرير.",
-          }}
-        />
         <ArtifactFeed />
       </section>
 
