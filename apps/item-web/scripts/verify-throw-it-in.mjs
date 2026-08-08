@@ -79,10 +79,16 @@ forbidPattern("Artifact payload persisted in localStorage", /localStorage\.(?:se
 forbidPattern("Artifact payload persisted in sessionStorage", /sessionStorage\.setItem\([^,]+,\s*(?:selectedFiles|textPart|referenceUrl|JSON\.stringify)/, drop + account);
 
 // Auth availability law: never advertise an OAuth provider merely because the
-// frontend knows its name. The public Auth service is the source of truth.
+// frontend knows its name. The public Auth service is the source of truth, and
+// temporary failure to read that truth gets a bounded recovery window.
 requirePattern("live Auth settings endpoint", /\/auth\/v1\/settings/, supabaseBrowser);
 requirePattern("browser-safe API key on settings probe", /headers: \{ apikey: browserKey \}/, supabaseBrowser);
 requirePattern("provider enablement comes from Auth settings", /settings\.external\?\.\[provider\] === true/, supabaseBrowser);
+requirePattern("bounded Auth settings retry schedule", /AUTH_SETTINGS_RETRY_DELAYS_MS = \[0, 350, 1000, 2500\]/, supabaseBrowser);
+requirePattern("Auth settings retry loop", /for \(const waitMs of AUTH_SETTINGS_RETRY_DELAYS_MS\)/, supabaseBrowser);
+requirePattern("Auth settings transient failures continue", /catch \(error\)[\s\S]*lastError = error;[\s\S]*throw lastError/, supabaseBrowser);
+requirePattern("failed capability probe is not cached forever", /socialProviderPromise === request\) socialProviderPromise = null/, supabaseBrowser);
+requirePattern("failed capability probe still resolves safely empty", /return new Set<SocialProvider>\(\)/, supabaseBrowser);
 requirePattern("Account loads enabled providers", /loadEnabledSocialProviders\(\)/, account);
 requirePattern("OAuth call refuses disabled provider", /!enabledSocialProviders\.has\(provider\)/, account);
 requirePattern("GitHub button requires live enablement", /\{githubEnabled && \([\s\S]*socialSignIn\("github"\)/, account);
@@ -104,4 +110,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Throw-it-in PASS: Submit/vote intent survives same-tab OAuth and cross-tab email confirmation as a short-lived bounded action envelope; working auth choices are live-derived; actual Artifact payload, credentials, and tokens never enter the bridge.");
+console.log("Throw-it-in PASS: Submit/vote intent survives first-account auth; live OAuth capability discovery retries transient settings failures but never exposes an unverified provider; email remains available; Artifact payload and secrets stay out of browser intent storage.");
