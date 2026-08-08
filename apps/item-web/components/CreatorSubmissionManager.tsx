@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import type { OriginClass } from "@/lib/feed";
 import { LexiconText } from "@/components/LexiconBroadcast";
@@ -60,8 +60,11 @@ export function CreatorSubmissionManager({ session }: { session: Session }) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
+  const refreshInFlightRef = useRef(false);
 
   const refresh = useCallback(async () => {
+    if (refreshInFlightRef.current) return;
+    refreshInFlightRef.current = true;
     setLoading(true);
     try {
       const next = await loadCreatorArtifacts(session.user.id);
@@ -73,9 +76,11 @@ export function CreatorSubmissionManager({ session }: { session: Session }) {
         }
         return updated;
       });
+      setMessage(null);
     } catch (error) {
       setMessage(lifecycleError(error));
     } finally {
+      refreshInFlightRef.current = false;
       setLoading(false);
     }
   }, [session.user.id]);
@@ -83,11 +88,22 @@ export function CreatorSubmissionManager({ session }: { session: Session }) {
   useEffect(() => {
     void refresh();
     const refreshFromEvent = () => void refresh();
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") void refresh();
+    };
+
     window.addEventListener("aetimm:submission-created", refreshFromEvent);
     window.addEventListener("aetimm:lifecycle-updated", refreshFromEvent);
+    window.addEventListener("online", refreshFromEvent);
+    window.addEventListener("focus", refreshFromEvent);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
     return () => {
       window.removeEventListener("aetimm:submission-created", refreshFromEvent);
       window.removeEventListener("aetimm:lifecycle-updated", refreshFromEvent);
+      window.removeEventListener("online", refreshFromEvent);
+      window.removeEventListener("focus", refreshFromEvent);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
   }, [refresh]);
 
@@ -135,9 +151,6 @@ export function CreatorSubmissionManager({ session }: { session: Session }) {
     <section className="creator-lifecycle" aria-label="My artifact lifecycle" data-lexicon-surface="true">
       <div className="creator-lifecycle-heading">
         <LexiconText as="p" className="eyebrow" text="MY ARTIFACTS" phase={5} />
-        <button type="button" onClick={() => void refresh()} disabled={loading} aria-label={loading ? "Refreshing" : "Refresh"}>
-          <LexiconText text={loading ? "Refreshing…" : "Refresh"} phase={7} semantic={false} />
-        </button>
       </div>
 
       {message && (
