@@ -9,41 +9,7 @@ import styles from "./UploadGate.module.css";
 const MAX_FILE_BYTES = 50 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 100 * 1024 * 1024;
 const MAX_PARTS = 12;
-
-const ACCEPTED_EXTENSIONS = [
-  ".jpg", ".jpeg", ".png", ".webp", ".gif",
-  ".mp4", ".webm", ".mov",
-  ".mp3", ".wav", ".ogg", ".m4a",
-  ".pdf", ".txt", ".md", ".csv", ".html", ".css",
-  ".js", ".jsx", ".ts", ".tsx", ".json", ".xml",
-  ".py", ".rb", ".go", ".rs", ".java", ".c", ".h", ".cpp", ".hpp",
-  ".zip", ".gz", ".tar",
-  ".gltf", ".glb", ".obj", ".stl", ".blend",
-];
-
-const FILE_ACCEPT = [
-  "image/*", "video/mp4", "video/webm", "video/quicktime",
-  "audio/*", "application/pdf", "text/*", "application/json",
-  "application/javascript", "application/typescript", "application/xml",
-  "application/zip", "application/x-zip-compressed", "application/gzip", "application/x-tar",
-  "model/gltf+json", "model/gltf-binary", "application/octet-stream",
-  ...ACCEPTED_EXTENSIONS,
-].join(",");
-
-const ACCEPTED_MIME_TYPES = new Set([
-  "application/pdf",
-  "application/json",
-  "application/javascript",
-  "application/typescript",
-  "application/xml",
-  "application/zip",
-  "application/x-zip-compressed",
-  "application/gzip",
-  "application/x-tar",
-  "model/gltf+json",
-  "model/gltf-binary",
-  "application/octet-stream",
-]);
+const OPAQUE_MIME = "application/octet-stream";
 
 type ArtifactMode =
   | "image"
@@ -108,8 +74,13 @@ function normalizedMime(file: File): string {
   if (extension === ".tar") return "application/x-tar";
   if (extension === ".gltf") return "model/gltf+json";
   if (extension === ".glb") return "model/gltf-binary";
-  if ([".obj", ".stl", ".blend"].includes(extension)) return "application/octet-stream";
-  return file.type || "application/octet-stream";
+  if ([".obj", ".stl", ".blend"].includes(extension)) return OPAQUE_MIME;
+
+  // Unknown formats are deliberately accepted but never trusted. Do not use
+  // browser-supplied MIME for an unrecognized extension: storing the object as
+  // opaque data prevents a novel file type from silently becoming executable
+  // or embeddable merely because the client claimed an active content type.
+  return OPAQUE_MIME;
 }
 
 function modeForFile(file: File): ArtifactMode {
@@ -134,17 +105,6 @@ function fileIdentity(file: File): string {
   return `${file.name}\u0000${file.size}\u0000${file.lastModified}`;
 }
 
-function fileIsAccepted(file: File): boolean {
-  const extension = extensionOf(file.name);
-  const mime = normalizedMime(file);
-  return ACCEPTED_EXTENSIONS.includes(extension)
-    || mime.startsWith("image/")
-    || mime.startsWith("video/")
-    || mime.startsWith("audio/")
-    || mime.startsWith("text/")
-    || ACCEPTED_MIME_TYPES.has(mime);
-}
-
 function formatBytes(bytes: number): string {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(bytes >= 10 * 1024 * 1024 ? 0 : 1)} MB`;
@@ -162,7 +122,7 @@ function submissionErrorMessage(error: unknown): string {
   if (raw.includes("QUARANTINE_BACKLOG_LIMIT_REACHED")) return "Your intake queue is full. Try again later.";
   if (raw.includes("ARTIFACT_PART_COUNT_INVALID")) return "One Artifact can contain between 1 and 12 materials.";
   if (raw.includes("ARTIFACT_PART_STORAGE")) return "One material could not be bound to the Artifact. Uploaded files were rolled back where possible.";
-  if (raw.includes("ARTIFACT_MODES_INVALID")) return "One or more materials are not supported yet.";
+  if (raw.includes("ARTIFACT_MODES_INVALID")) return "One or more materials could not be classified safely.";
   if (raw.includes("PUBLICATION_ATTESTATIONS_REQUIRED")) return "Confirm the submission attestation before throwing it in.";
   if (raw.toLowerCase().includes("row-level security")) return "The trough rejected this Artifact. Sign in again or try later.";
   return raw || "Artifact submission failed.";
@@ -209,12 +169,6 @@ export function SlopDrop() {
 
   function validateIncomingFiles(incoming: File[]): void {
     if (busy || intakePaused || incoming.length === 0) return;
-
-    const unsupported = incoming.find((file) => !fileIsAccepted(file));
-    if (unsupported) {
-      setMessage(`${unsupported.name} is not an accepted material type.`);
-      return;
-    }
 
     const oversized = incoming.find((file) => file.size > MAX_FILE_BYTES);
     if (oversized) {
@@ -306,12 +260,6 @@ export function SlopDrop() {
     }
     if (totalParts > MAX_PARTS || totalFileBytes > MAX_TOTAL_BYTES) {
       setMessage("This Artifact exceeds the current material limits.");
-      return;
-    }
-
-    const unsupported = files.find((file) => !fileIsAccepted(file));
-    if (unsupported) {
-      setMessage(`${unsupported.name} is not an accepted material type.`);
       return;
     }
 
@@ -487,7 +435,6 @@ export function SlopDrop() {
                   id="files"
                   className={styles.materialInput}
                   type="file"
-                  accept={FILE_ACCEPT}
                   multiple
                   disabled={busy || intakePaused}
                   onChange={handleFileInput}
@@ -496,7 +443,7 @@ export function SlopDrop() {
                 <label className={styles.materialPicker} htmlFor="files" data-disabled={busy || intakePaused ? "true" : undefined}>
                   <span className={styles.materialPlus} aria-hidden="true">+</span>
                   <LexiconText className={styles.materialAction} text={dragging ? "Drop it" : "Add material"} phase={23} />
-                  <LexiconText className={styles.materialModes} text="image · video · audio · PDF · code · data · 3D · more" phase={29} />
+                  <LexiconText className={styles.materialModes} text="image · video · audio · PDF · code · data · 3D · any file" phase={29} />
                 </label>
               </div>
 
@@ -530,7 +477,7 @@ export function SlopDrop() {
               <LexiconText
                 as="p"
                 className="submission-note"
-                text="Files are treated as untrusted. Code is not executed and links are not fetched during intake."
+                text="Files are treated as untrusted. Unknown formats enter as inert data. Code is not executed and links are not fetched during intake."
                 phase={59}
               />
               {materialLimitExceeded && (
