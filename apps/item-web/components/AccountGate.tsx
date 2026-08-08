@@ -26,6 +26,8 @@ export function AccountGate() {
   const [session, setSession] = useState<Session | null>(null);
   const [profileName, setProfileName] = useState("");
   const [profileRole, setProfileRole] = useState<ProfileRole>("creator");
+  const [authEmail, setAuthEmail] = useState("");
+  const [recoveryMode, setRecoveryMode] = useState(false);
   const [busy, setBusy] = useState(false);
   const [socialProvider, setSocialProvider] = useState<SocialProvider | null>(null);
   const [enabledSocialProviders, setEnabledSocialProviders] = useState<Set<SocialProvider>>(() => new Set());
@@ -86,7 +88,11 @@ export function AccountGate() {
         if (mounted) setMessage(error instanceof Error ? error.message : "Account data could not be loaded.");
       });
 
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+      if (event === "PASSWORD_RECOVERY") {
+        setRecoveryMode(true);
+        setMessage(null);
+        setOpen(true);
+      } else if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
         setOpen(false);
       }
     });
@@ -144,13 +150,65 @@ export function AccountGate() {
     }
   }
 
+  async function requestPasswordReset() {
+    const client = getSupabaseBrowserClient();
+    if (!client || busy) return;
+
+    const email = authEmail.trim();
+    if (!email) {
+      setMessage("Enter your email first.");
+      return;
+    }
+
+    setBusy(true);
+    setMessage(null);
+
+    try {
+      const { error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/`,
+      });
+      if (error) throw error;
+      setMessage("If that email can receive a reset, check it.");
+    } catch {
+      // Keep the public response neutral. A recovery request must not become an
+      // account-existence oracle, and the user can retry the same action later.
+      setMessage("If that email can receive a reset, check it.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function setRecoveredPassword(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const client = getSupabaseBrowserClient();
+    if (!client || busy) return;
+
+    const form = new FormData(event.currentTarget);
+    const password = String(form.get("newPassword") ?? "");
+
+    setBusy(true);
+    setMessage(null);
+
+    try {
+      const { error } = await client.auth.updateUser({ password });
+      if (error) throw error;
+      setRecoveryMode(false);
+      setOpen(true);
+      setMessage("Password updated.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Password could not be updated.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const client = getSupabaseBrowserClient();
     if (!client) return;
 
     const form = new FormData(event.currentTarget);
-    const email = String(form.get("email") ?? "").trim();
+    const email = authEmail.trim();
     const password = String(form.get("password") ?? "");
 
     setBusy(true);
@@ -223,6 +281,42 @@ export function AccountGate() {
       <button className="upload-trigger" type="button" disabled title="Social backend not configured" aria-label="Accounts soon">
         <LexiconText text="Accounts soon" phase={3} semantic={false} />
       </button>
+    );
+  }
+
+  if (recoveryMode) {
+    const recoveryTrigger = open ? "Close recovery" : "Password recovery";
+    const recoverySubmit = busy ? "Updating…" : "Set password";
+
+    return (
+      <div className="upload-wrap" data-lexicon-surface="true">
+        <button className="upload-trigger" type="button" onClick={() => setOpen((value) => !value)} aria-label={recoveryTrigger}>
+          <LexiconText text={recoveryTrigger} phase={3} semantic={false} />
+        </button>
+        {open && (
+          <form className="upload-panel" onSubmit={setRecoveredPassword} aria-label="Set a new password">
+            <div>
+              <label htmlFor="account-new-password"><LexiconText text="New password" phase={5} /></label>
+              <input
+                id="account-new-password"
+                name="newPassword"
+                type="password"
+                required
+                minLength={8}
+                autoComplete="new-password"
+              />
+            </div>
+            <button className="submit-button" type="submit" disabled={busy} aria-label={recoverySubmit}>
+              <LexiconText text={recoverySubmit} phase={7} semantic={false} />
+            </button>
+            {message && (
+              <p className="submission-note" role="status" aria-label={message}>
+                <LexiconText text={message} phase={11} semantic={false} />
+              </p>
+            )}
+          </form>
+        )}
+      </div>
     );
   }
 
@@ -347,7 +441,15 @@ export function AccountGate() {
 
           <div>
             <label htmlFor="account-email"><LexiconText text="Email" phase={61} /></label>
-            <input id="account-email" name="email" type="email" required autoComplete="email" />
+            <input
+              id="account-email"
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+              value={authEmail}
+              onChange={(event) => setAuthEmail(event.target.value)}
+            />
           </div>
 
           <div>
@@ -365,6 +467,17 @@ export function AccountGate() {
           <button className="submit-button" type="submit" disabled={busy} aria-label={submitLabel}>
             <LexiconText text={submitLabel} phase={71} semantic={false} />
           </button>
+
+          {mode === "signin" && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void requestPasswordReset()}
+              aria-label="Forgot password"
+            >
+              <LexiconText text="Forgot password" phase={72} semantic={false} />
+            </button>
+          )}
 
           {message && (
             <p className="submission-note" role="status" aria-label={message}>
