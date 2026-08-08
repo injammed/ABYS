@@ -52,11 +52,13 @@ function storageGet(storage: Storage, key: string): string | null {
   }
 }
 
-function storageSet(storage: Storage, key: string, value: string): void {
+function storageSet(storage: Storage, key: string, value: string): boolean {
   try {
     storage.setItem(key, value);
+    return true;
   } catch {
     // Restricted browser storage must never block authentication itself.
+    return false;
   }
 }
 
@@ -66,6 +68,30 @@ function storageRemove(storage: Storage, key: string): void {
   } catch {
     // Best-effort cleanup only.
   }
+}
+
+export function rememberSubmitIntent(): boolean {
+  if (typeof window === "undefined") return false;
+  return storageSet(window.sessionStorage, SUBMIT_INTENT_STORAGE_KEY, "1");
+}
+
+export function consumeSubmitIntent(): boolean {
+  if (typeof window === "undefined") return false;
+  const value = storageGet(window.sessionStorage, SUBMIT_INTENT_STORAGE_KEY);
+  if (value != null) storageRemove(window.sessionStorage, SUBMIT_INTENT_STORAGE_KEY);
+  return value === "1";
+}
+
+export function rememberVoteIntent(intent: PublicVoteIntent): boolean {
+  if (typeof window === "undefined") return false;
+  return storageSet(window.sessionStorage, VOTE_INTENT_STORAGE_KEY, encodePublicVoteIntent(intent));
+}
+
+export function consumeVoteIntent(): PublicVoteIntent | null {
+  if (typeof window === "undefined") return null;
+  const raw = storageGet(window.sessionStorage, VOTE_INTENT_STORAGE_KEY);
+  if (raw != null) storageRemove(window.sessionStorage, VOTE_INTENT_STORAGE_KEY);
+  return decodePublicVoteIntent(raw);
 }
 
 function validEnvelope(raw: string | null, now: number): IntentEnvelope | null {

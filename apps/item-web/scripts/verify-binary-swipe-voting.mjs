@@ -58,11 +58,13 @@ for (const [label, pattern, source] of [
   ["vote intent rejects oversized storage", /value\.length > 256/, publicIntents],
   ["vote intent validates UUID", /ARTIFACT_ID_PATTERN\.test\(artifactId\)/, publicIntents],
   ["vote intent validates binary judgment", /judgment !== "preserve" && judgment !== "slop"/, publicIntents],
-  ["signed-out vote stores exact intent", /sessionStorage\.setItem\([\s\S]*VOTE_INTENT_STORAGE_KEY[\s\S]*encodePublicVoteIntent\(\{ artifactId: id, judgment \}\)/, feed],
-  ["signed-out vote opens existing auth surface", /dispatchEvent\(new Event\(AUTH_REQUIRED_EVENT\)\)/, feed],
-  ["authenticated session consumes vote intent", /sessionStorage\.getItem\(VOTE_INTENT_STORAGE_KEY\)[\s\S]*decodePublicVoteIntent/, feed],
-  ["consumed vote intent is one-shot", /sessionStorage\.removeItem\(VOTE_INTENT_STORAGE_KEY\)/, feed],
+  ["safe vote remember helper", /function rememberVoteIntent\(intent: PublicVoteIntent\): boolean[\s\S]*storageSet\(window\.sessionStorage, VOTE_INTENT_STORAGE_KEY, encodePublicVoteIntent\(intent\)\)/, publicIntents],
+  ["safe vote consume helper", /function consumeVoteIntent\(\): PublicVoteIntent \| null[\s\S]*storageGet\(window\.sessionStorage, VOTE_INTENT_STORAGE_KEY\)[\s\S]*storageRemove/, publicIntents],
+  ["signed-out vote stores exact intent through safe helper", /rememberVoteIntent\(\{ artifactId: id, judgment \}\)/, feed],
+  ["signed-out vote opens auth even when storage fails", /if \(!rememberVoteIntent[\s\S]*setVoteMessage\("Sign in to vote\."\);[\s\S]*dispatchEvent\(new Event\(AUTH_REQUIRED_EVENT\)\)/, feed],
+  ["authenticated session safely consumes vote intent", /const intent = consumeVoteIntent\(\)/, feed],
   ["authenticated intent resumes same judge path", /judge\(intent\.artifactId, intent\.judgment, true\)/, feed],
+  ["vote surface has no direct sessionStorage dependency", /consumeVoteIntent/, feed],
 
   ["post-commit public aggregate read", /loadPublicVoteAggregate\(id\)/, feed],
   ["post-commit vote event", /aetimm:vote-committed/, feed],
@@ -104,8 +106,9 @@ for (const [label, pattern, source] of [
   assert.ok(pattern.test(source), `Binary voting contract failed: missing ${label}`);
 }
 
+assert.ok(!/window\.sessionStorage\.(?:getItem|setItem|removeItem)/.test(feed), "Public vote surface must not directly depend on readable browser storage.");
 assert.ok(!/button[^>]*judge refine/.test(feed), "Refine must not exist in the public ballot component.");
 assert.ok(!/MutationObserver/.test(swipe), "Binary voting must not depend on DOM mutation normalization.");
 assert.ok(!/👍|👎/.test(feed), "The public ballot must not fall back to generic thumbs-up/thumbs-down icons.");
 
-console.log("Binary swipe voting PASS: one account has one active Artifact judgment; signed-out votes survive authentication; active writes are hydration-safe; visible cards batch-refresh aggregate truth and anonymously revalidate public eligibility; a successfully proven removal evicts stale content while network failure preserves the last good public session.");
+console.log("Binary swipe voting PASS: signed-out voting opens auth even when browser storage is restricted; safe one-shot intent helpers preserve automatic resume when storage is available; writes remain self-confirming and hydration-safe; visible cards converge to public aggregate and visibility truth.");

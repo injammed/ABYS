@@ -41,21 +41,23 @@ requirePattern("one-click feed landing event", /aetimm:submission-created/, drop
 requirePattern("simple intake mounted", /<SlopDrop \/>/, nav);
 
 // Public intent law: Submit remains one action even when authentication is
-// required. Only the fact that the user intends to submit crosses auth; actual
-// Artifact payload is never persisted in web storage.
+// required. Browser storage is an optimization for automatic resume, never a
+// prerequisite for opening the actual authentication path.
 requirePattern("named Submit intent key", /SUBMIT_INTENT_STORAGE_KEY = "aetimm:intent:submit:v1"/, intents);
 requirePattern("named auth-required event", /AUTH_REQUIRED_EVENT = "aetimm:auth-required"/, intents);
-requirePattern("signed-out Submit stores tab-local intent", /sessionStorage\.setItem\(SUBMIT_INTENT_STORAGE_KEY, "1"\)/, drop);
-requirePattern("signed-out Submit requests auth", /dispatchEvent\(new Event\(AUTH_REQUIRED_EVENT\)\)/, drop);
+requirePattern("safe storage setter catches restriction", /function storageSet[\s\S]*try[\s\S]*storage\.setItem[\s\S]*catch[\s\S]*return false/, intents);
+requirePattern("safe Submit intent helper", /function rememberSubmitIntent\(\): boolean[\s\S]*storageSet\(window\.sessionStorage, SUBMIT_INTENT_STORAGE_KEY, "1"\)/, intents);
+requirePattern("safe Submit consume helper", /function consumeSubmitIntent\(\): boolean[\s\S]*storageGet\(window\.sessionStorage, SUBMIT_INTENT_STORAGE_KEY\)[\s\S]*storageRemove/, intents);
+requirePattern("signed-out Submit uses safe helper", /function requestSubmitAuth\(\)[\s\S]*rememberSubmitIntent\(\)[\s\S]*dispatchEvent\(new Event\(AUTH_REQUIRED_EVENT\)\)/, drop);
+requirePattern("Submit auth event fires independent of storage result", /rememberSubmitIntent\(\);[\s\S]*window\.dispatchEvent\(new Event\(AUTH_REQUIRED_EVENT\)\)/, drop);
 requirePattern("Submit trigger owns auth bridge", /onClick=\{handleTrigger\}/, drop);
+requirePattern("signed-in Submit safely consumes intent", /nextSession && consumeSubmitIntent\(\)[\s\S]*setOpen\(true\)/, drop);
+forbidPattern("direct sessionStorage access in Submit surface", /window\.sessionStorage\.(?:getItem|setItem|removeItem)/, drop);
 requirePattern("Account listens for required auth", /addEventListener\(AUTH_REQUIRED_EVENT, openForRequiredAuth\)/, account);
 requirePattern("required auth mirrors tiny intent cross-tab", /openForRequiredAuth[\s\S]*mirrorPublicAuthIntentsAcrossTabs\(\)/, account);
 requirePattern("required auth selects sign-in", /openForRequiredAuth[\s\S]*setMode\("signin"\)/, account);
 requirePattern("required auth opens existing account surface", /openForRequiredAuth[\s\S]*setOpen\(true\)/, account);
 requirePattern("Account removes auth event listener", /removeEventListener\(AUTH_REQUIRED_EVENT, openForRequiredAuth\)/, account);
-requirePattern("signed-in Submit intent consumed", /sessionStorage\.getItem\(SUBMIT_INTENT_STORAGE_KEY\) === "1"/, drop);
-requirePattern("consumed Submit intent removed", /sessionStorage\.removeItem\(SUBMIT_INTENT_STORAGE_KEY\)/, drop);
-requirePattern("signed-in Submit form resumes", /removeItem\(SUBMIT_INTENT_STORAGE_KEY\);[\s\S]*setOpen\(true\)/, drop);
 requirePattern("OAuth returns to same public root", /redirectTo: `\$\{window\.location\.origin\}\/`/, account);
 requirePattern("email confirmation returns to public root", /emailRedirectTo: `\$\{window\.location\.origin\}\/`/, account);
 
@@ -110,4 +112,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Throw-it-in PASS: Submit/vote intent survives first-account auth; live OAuth capability discovery retries transient settings failures but never exposes an unverified provider; email remains available; Artifact payload and secrets stay out of browser intent storage.");
+console.log("Throw-it-in PASS: Submit opens authentication even when browser storage is restricted; automatic intent resume uses fail-open helpers; first-account cross-tab continuity, live OAuth capability discovery, and Artifact payload isolation remain intact.");

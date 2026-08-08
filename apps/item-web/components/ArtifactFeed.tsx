@@ -5,9 +5,8 @@ import type { Session } from "@supabase/supabase-js";
 import { FeedArtifact, makeFeedBatch, originClassLabels } from "@/lib/feed";
 import {
   AUTH_REQUIRED_EVENT,
-  VOTE_INTENT_STORAGE_KEY,
-  decodePublicVoteIntent,
-  encodePublicVoteIntent,
+  consumeVoteIntent,
+  rememberVoteIntent,
 } from "@/lib/public-intents";
 import { loadPublicArtifactVisibility } from "@/lib/public-artifact-visibility";
 import { loadPublicVoteAggregate, loadPublicVoteAggregates } from "@/lib/public-vote-aggregate";
@@ -316,11 +315,7 @@ export function ArtifactFeed() {
     const voterId = session?.user.id;
     if (!socialBackendEnabled || !voterId) return;
 
-    const rawIntent = window.sessionStorage.getItem(VOTE_INTENT_STORAGE_KEY);
-    if (!rawIntent) return;
-    window.sessionStorage.removeItem(VOTE_INTENT_STORAGE_KEY);
-
-    const intent = decodePublicVoteIntent(rawIntent);
+    const intent = consumeVoteIntent();
     if (!intent) return;
     void judge(intent.artifactId, intent.judgment, true);
   }, [session?.user.id]);
@@ -501,12 +496,7 @@ export function ArtifactFeed() {
 
     const voterId = session?.user.id;
     if (!voterId) {
-      try {
-        window.sessionStorage.setItem(
-          VOTE_INTENT_STORAGE_KEY,
-          encodePublicVoteIntent({ artifactId: id, judgment }),
-        );
-      } catch {
+      if (!rememberVoteIntent({ artifactId: id, judgment })) {
         setVoteMessage("Sign in to vote.");
       }
       window.dispatchEvent(new Event(AUTH_REQUIRED_EVENT));
