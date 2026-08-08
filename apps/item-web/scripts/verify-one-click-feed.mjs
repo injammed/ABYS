@@ -7,15 +7,19 @@ const voteAggregatePath = path.resolve(root, "..", "..", "supabase", "migrations
 const voteLockdownPath = path.resolve(root, "..", "..", "supabase", "migrations", "013_vote_privacy_lockdown.sql");
 const binaryJudgmentPath = path.resolve(root, "..", "..", "supabase", "migrations", "014_independent_binary_judgments.sql");
 const bridgePath = path.join(root, "components", "SubmissionLandingBridge.tsx");
+const slopDropPath = path.join(root, "components", "SlopDrop.tsx");
+const receiptPath = path.join(root, "lib", "publication-receipt.ts");
 const pagePath = path.join(root, "app", "page.tsx");
 const socialFeedPath = path.join(root, "lib", "social-feed.ts");
 
-const [publication, voteAggregate, voteLockdown, binaryJudgment, bridge, page, socialFeed] = await Promise.all([
+const [publication, voteAggregate, voteLockdown, binaryJudgment, bridge, slopDrop, receipt, page, socialFeed] = await Promise.all([
   readFile(publicationPath, "utf8"),
   readFile(voteAggregatePath, "utf8"),
   readFile(voteLockdownPath, "utf8"),
   readFile(binaryJudgmentPath, "utf8"),
   readFile(bridgePath, "utf8"),
+  readFile(slopDropPath, "utf8"),
+  readFile(receiptPath, "utf8"),
   readFile(pagePath, "utf8"),
   readFile(socialFeedPath, "utf8"),
 ]);
@@ -43,6 +47,21 @@ requirePattern("feed-root landing", /target\.hash = "field"/, bridge);
 requirePattern("reliable full navigation", /window\.location\.assign/, bridge);
 requirePattern("landing bridge mounted at feed root", /<SubmissionLandingBridge \/>/, page);
 
+// Client completion now means more than RPC success: the exact new Artifact
+// must be observable under the same public-state predicate used by strangers,
+// with its expected manifest present.
+requirePattern("public receipt helper", /waitForPublicArtifactReceipt/, receipt);
+requirePattern("receipt requires approved", /\.eq\("status", "approved"\)/, receipt);
+requirePattern("receipt requires Unjudged", /\.eq\("lane", "unjudged"\)/, receipt);
+requirePattern("receipt requires publication timestamp", /\.not\("published_at", "is", null\)/, receipt);
+requirePattern("receipt counts public manifest", /from\("artifact_parts"\)[\s\S]*count: "exact"/, receipt);
+requirePattern("bounded receipt backoff", /PUBLIC_RECEIPT_DELAYS_MS = \[0, 120, 350, 800, 1600, 3000\]/, receipt);
+requirePattern("intake waits for public receipt", /await waitForPublicArtifactReceipt\(committedId, parts\.length\)/, slopDrop);
+requirePattern("public confirmation copy", /Thrown\. Public\./, slopDrop);
+requirePattern("commit boundary recorded", /artifactCommitted = true;/, slopDrop);
+requirePattern("post-commit receipt failure preserves storage", /if \(!artifactCommitted && uploadedPaths\.length > 0\)/, slopDrop);
+requirePattern("submission event carries public receipt", /detail: \{ artifactId: committedId, publicConfirmed \}/, slopDrop);
+
 requirePattern("legacy aggregate compatibility RPC remains bounded", /VOTE_AGGREGATE_REQUEST_TOO_LARGE/, voteAggregate);
 requirePattern("raw public vote policy removed", /drop policy if exists "votes are publicly readable"/, voteLockdown);
 requirePattern("own-vote read policy", /auth\.uid\(\) = voter_id/, voteLockdown);
@@ -59,7 +78,7 @@ requirePattern("feed consumes Top Slop rank RPC", /client\.rpc\("get_artifact_sl
 requirePattern("public provenance remains declared", /confidence: "declared"/, socialFeed);
 forbidPattern("blended Museum-minus-Slop score", /preserve\s*\*\s*4[\s\S]*slop\s*\*\s*4/, socialFeed);
 forbidPattern("public raw-vote fanout", /from\("artifact_votes"\)\.select\("artifact_id,judgment"\)\.in\("artifact_id", ids\)/, socialFeed);
-forbidPattern("service role browser secret", /service[_-]?role/i, bridge + page + socialFeed);
+forbidPattern("service role browser secret", /service[_-]?role/i, bridge + slopDrop + receipt + page + socialFeed);
 
 if (failures.length > 0) {
   console.error("One-click feed contract failed:");
@@ -67,4 +86,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("One-click feed PASS: submission can atomically become public Unjudged after activation; the browser lands back on the one feed; raw voter rows stay private; Museum and Slop accumulate independently; and Top Slop never subtracts from Museum preservation.");
+console.log("One-click feed PASS: submission can atomically become public Unjudged, the client confirms the exact public row and manifest before declaring Public, post-commit receipt failure cannot destroy the Artifact, raw voter rows stay private, and Museum/Slop remain independent.");
