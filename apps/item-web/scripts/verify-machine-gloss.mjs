@@ -37,17 +37,17 @@ for (const [label, pattern, source] of [
   ["500 ms script epoch", /const SCRIPT_EPOCH_TICKS = 4;/, lexicon],
   ["single shared interval", /window\.setInterval\([\s\S]*TICK_MS/, lexicon],
   ["character-specific seed", /stableHash\(`\$\{text\}\|\$\{index\}`\)/, lexicon],
-  ["character-specific reveal cadence", /\(localTick \+ index\) % 5/, lexicon],
+  ["all visible non-whitespace characters mutate every tick", /Every visible non-whitespace character participates on every clock tick/, lexicon],
+  ["near-infinite combinatorial word state law", /combinatorially enormous/, lexicon],
   ["many human writing systems", /אבגדה[\s\S]*ابتث[\s\S]*अआइई[\s\S]*あいうえお[\s\S]*天地人機/, lexicon],
   ["mathematical communication pool", /const MATH_POOL = Array\.from\("∀∂∃∅∆∇/, lexicon],
   ["synthetic machine glyph pool", /const MACHINE_POOL = Array\.from\("⌁⌭⟐⊙/, lexicon],
   ["visual flicker contract", /data-lexicon-flicker="character-broadcast-v1"/, lexicon],
+  ["universal oscillation contract", /data-oscillation-contract="all-visible-interface-words-v1"/, lexicon],
   ["stable source hidden for accessibility", /className=\{styles\.srOnly\}>\{text\}/, lexicon],
   ["visual mutation hidden from assistive tree", /className=\{styles\.visual\} aria-hidden="true"/, lexicon],
   ["source string owns layout geometry", /\.original[\s\S]*visibility:\s*hidden/, lexiconStyles],
   ["mutated string is paint-only overlay", /\.mutated[\s\S]*position:\s*absolute[\s\S]*inset:\s*0[\s\S]*overflow:\s*hidden/, lexiconStyles],
-  ["hover restores exact source without reflow", /\.lexicon:hover \.original[\s\S]*visibility:\s*visible/, lexiconStyles],
-  ["focus restores exact source without reflow", /\.lexicon:focus-within \.original[\s\S]*visibility:\s*visible/, lexiconStyles],
   ["reduced motion restores exact source without reflow", /prefers-reduced-motion:[\s\S]*\.original[\s\S]*visibility:\s*visible/, lexiconStyles],
   ["semantic language broadcast still open-ended", /\[language: string\]: string \| undefined;/, gloss],
   ["MachineGloss consumes shared clock", /useLexiconBroadcast\(\)/, gloss],
@@ -81,5 +81,9 @@ assert.ok(!/setInterval|setTimeout/.test(gloss), "MachineGloss must not create i
 assert.ok(!/dangerouslySetInnerHTML/.test(lexicon + gloss), "Machine lexicon must not use dynamic HTML injection.");
 assert.ok(!/\bfetch\s*\(/.test(lexicon + gloss), "Machine lexicon must not call a remote translation or glyph service.");
 assert.ok(!/<LexiconText[^>]*text=\{textPart\}/.test(slopDrop), "User-entered Artifact text must not be transformed while editing.");
+assert.ok(!/\.lexicon:hover \.original/.test(lexiconStyles), "Hover must not reveal stable visible interface words.");
+assert.ok(!/\.lexicon:focus-within \.original/.test(lexiconStyles), "Focus must not reveal stable visible interface words.");
+assert.ok(!/@media \(hover: none\) and \(pointer: coarse\)/.test(lexiconStyles), "Touch controls must participate in the same visible oscillation field.");
+assert.ok(!/\(localTick \+ index\) % 5/.test(lexicon), "Visible source-reveal cadence must not interrupt universal oscillation.");
 
-console.log("Machine lexicon PASS: one shared clock drives independent character and language mutation without layout shift; source text owns geometry, translation boxes stay fixed, accessibility stays stable, and Artifact payloads remain verbatim.");
+console.log("Machine lexicon PASS: every visible interface word participates continuously in the shared near-infinite character field without layout shift; stable source language remains accessibility-only, reduced-motion remains respected, and Artifact payloads stay verbatim.");
