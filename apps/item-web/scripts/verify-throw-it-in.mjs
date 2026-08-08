@@ -100,6 +100,21 @@ requirePattern("profile bootstrap repairs one-character names", /char_length\(in
 requirePattern("profile bootstrap search path pinned", /set search_path = public, pg_temp/, profileBootstrap);
 requirePattern("profile bootstrap client execution revoked", /revoke all on function public\.handle_new_user\(\)[\s\S]*from public, anon, authenticated/, profileBootstrap);
 
+// Existing-account recovery law: recovery stays inside AccountGate. The user
+// supplies the same email field, receives a neutral reset response, returns to
+// the root, and the PASSWORD_RECOVERY auth event exposes one new-password form.
+requirePattern("controlled recovery email", /const \[authEmail, setAuthEmail\] = useState\(""\)/, account);
+requirePattern("forgot password action only on sign-in", /mode === "signin"[\s\S]*aria-label="Forgot password"/, account);
+requirePattern("reset request uses Supabase recovery API", /auth\.resetPasswordForEmail\(email,[\s\S]*redirectTo: `\$\{window\.location\.origin\}\/`/, account);
+requirePattern("recovery response is account-neutral", /If that email can receive a reset, check it\./, account);
+requirePattern("reset catch remains account-neutral", /catch \{[\s\S]*If that email can receive a reset, check it\./, account);
+requirePattern("PASSWORD_RECOVERY opens recovery surface", /event === "PASSWORD_RECOVERY"[\s\S]*setRecoveryMode\(true\)[\s\S]*setOpen\(true\)/, account);
+requirePattern("recovery surface precedes normal session branch", /if \(recoveryMode\)[\s\S]*if \(session\)/, account);
+requirePattern("new password minimum unchanged", /name="newPassword"[\s\S]*minLength=\{8\}[\s\S]*autoComplete="new-password"/, account);
+requirePattern("recovered password uses authenticated updateUser", /auth\.updateUser\(\{ password \}\)/, account);
+requirePattern("successful recovery returns to account", /setRecoveryMode\(false\)[\s\S]*setOpen\(true\)[\s\S]*Password updated\./, account);
+forbidPattern("separate password recovery route", /href="\/.*(?:recover|reset|password)/i, account);
+
 // Auth availability law: never advertise an OAuth provider merely because the
 // frontend knows its name. The public Auth service is the source of truth, and
 // temporary failure to read that truth gets a bounded recovery window.
@@ -132,4 +147,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Throw-it-in PASS: first account creation requires only email/password or a live-enabled OAuth provider; the database always bootstraps a valid editable profile; Submit/Vote auth continuity and Artifact payload isolation remain intact.");
+console.log("Throw-it-in PASS: first-time and returning users have one AccountGate path; password recovery stays on the public root with a neutral request response and one new-password action; Submit/Vote continuity, live OAuth discovery, and Artifact payload isolation remain intact.");
