@@ -3,13 +3,14 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const root = process.cwd();
-const [swipe, feed, feedStyles, socialFeed, voteState, publicAggregate, publicIntents, schema, binaryMigration] = await Promise.all([
+const [swipe, feed, feedStyles, socialFeed, voteState, publicAggregate, publicVisibility, publicIntents, schema, binaryMigration] = await Promise.all([
   readFile(resolve(root, "components", "BinarySwipeVoting.tsx"), "utf8"),
   readFile(resolve(root, "components", "ArtifactFeed.tsx"), "utf8"),
   readFile(resolve(root, "components", "ArtifactFeed.module.css"), "utf8"),
   readFile(resolve(root, "lib", "social-feed.ts"), "utf8"),
   readFile(resolve(root, "lib", "vote-state.ts"), "utf8"),
   readFile(resolve(root, "lib", "public-vote-aggregate.ts"), "utf8"),
+  readFile(resolve(root, "lib", "public-artifact-visibility.ts"), "utf8"),
   readFile(resolve(root, "lib", "public-intents.ts"), "utf8"),
   readFile(resolve(root, "..", "..", "supabase", "migrations", "001_social_beta.sql"), "utf8"),
   readFile(resolve(root, "..", "..", "supabase", "migrations", "014_independent_binary_judgments.sql"), "utf8"),
@@ -52,8 +53,6 @@ for (const [label, pattern, source] of [
   ["vote-state changes retrigger hydration", /\[session\?\.user\.id, artifacts, voteStates\]/, feed],
   ["stale hydration version guard retained", /shouldApplyVoteHydration/, feed],
 
-  // Signed-out ballot law: the click/swipe is already the intended judgment.
-  // Authentication interrupts the transport, not the user's decision.
   ["bounded vote-intent storage key", /VOTE_INTENT_STORAGE_KEY = "aetimm:intent:vote:v1"/, publicIntents],
   ["vote intent contains only Artifact and binary judgment", /type PublicVoteIntent = \{[\s\S]*artifactId: string;[\s\S]*judgment: "preserve" \| "slop";/, publicIntents],
   ["vote intent rejects oversized storage", /value\.length > 256/, publicIntents],
@@ -74,8 +73,6 @@ for (const [label, pattern, source] of [
   ["public Slop rank RPC", /get_artifact_slop_ranks/, publicAggregate],
   ["aggregate requires exact artifact row", /PUBLIC_VOTE_AGGREGATE_MISSING/, publicAggregate],
 
-  // Deep-feed public truth law: already-open cards outside the newest feed head
-  // stay current without per-card requests or publishing raw votes.
   ["public cards expose bounded observer identity", /data-public-artifact-id=\{creatorPreview \? undefined : artifact\.id\}/, feed],
   ["near-viewport aggregate observer", /IntersectionObserver[\s\S]*rootMargin: "350px 0px"/, feed],
   ["visible aggregate refresh cadence", /VISIBLE_AGGREGATE_REFRESH_MS = 15000/, feed],
@@ -89,6 +86,17 @@ for (const [label, pattern, source] of [
   ["aggregate helper deduplicates IDs", /Array\.from\(new Set\(artifactIds\)\)\.slice\(0, MAX_PUBLIC_AGGREGATE_IDS\)/, publicAggregate],
   ["single aggregate delegates to batch", /loadPublicVoteAggregates\(\[artifactId\]\)/, publicAggregate],
 
+  // Stale-public eviction law: old sessions may retain last-good content only
+  // until a successful sessionless public read proves the exact card is no
+  // longer public. Transport failure never counts as proof of removal.
+  ["visibility uses sessionless public client", /requireSupabasePublicBrowserClient/, publicVisibility],
+  ["visibility helper hard caps IDs", /MAX_PUBLIC_VISIBILITY_IDS = 100/, publicVisibility],
+  ["visibility helper deduplicates IDs", /Array\.from\(new Set\(artifactIds\)\)\.slice\(0, MAX_PUBLIC_VISIBILITY_IDS\)/, publicVisibility],
+  ["visibility helper requires approved public row", /\.eq\("status", "approved"\)/, publicVisibility],
+  ["aggregate and visibility refresh share one bounded cycle", /Promise\.all\(\[[\s\S]*loadPublicVoteAggregates\(ids\)[\s\S]*loadPublicArtifactVisibility\(ids\)/, feed],
+  ["only checked anonymous absence evicts", /checkedIds\.has\(entry\.id\) && !publicArtifactIds\.has\(entry\.id\)[\s\S]*changed = true;[\s\S]*continue;/, feed],
+  ["failed visibility check retains last good card", /failed anonymous check never[\s\S]*removes the last good card/, feed],
+
   ["one account one artifact database key", /primary key \(artifact_id, voter_id\)/, schema],
   ["legacy non-binary rows fail closed", /LEGACY_NON_BINARY_VOTES_REQUIRE_REVIEW/, binaryMigration],
   ["binary database constraint", /check \(judgment in \('preserve', 'slop'\)\)/, binaryMigration],
@@ -100,4 +108,4 @@ assert.ok(!/button[^>]*judge refine/.test(feed), "Refine must not exist in the p
 assert.ok(!/MutationObserver/.test(swipe), "Binary voting must not depend on DOM mutation normalization.");
 assert.ok(!/👍|👎/.test(feed), "The public ballot must not fall back to generic thumbs-up/thumbs-down icons.");
 
-console.log("Binary swipe voting PASS: one account has one active Artifact judgment; signed-out votes survive authentication as one bounded binary intent; active writes are hydration-safe; confirmed votes reconcile aggregate truth immediately; older near-viewport cards batch-refresh public Museum/Slop state without raw votes, background traffic, or per-card request storms; visible totals remain in the machine lexicon.");
+console.log("Binary swipe voting PASS: one account has one active Artifact judgment; signed-out votes survive authentication; active writes are hydration-safe; visible cards batch-refresh aggregate truth and anonymously revalidate public eligibility; a successfully proven removal evicts stale content while network failure preserves the last good public session.");
