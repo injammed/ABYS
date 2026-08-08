@@ -14,7 +14,7 @@ import {
 } from "@/lib/social-feed";
 import {
   didVoteOwnerChange,
-  replaceHydratedVotes,
+  mergeHydratedVotes,
   shouldApplyVoteHydration,
 } from "@/lib/vote-state";
 import { ArtifactRuntime } from "./ArtifactRuntime";
@@ -82,6 +82,7 @@ export function ArtifactFeed() {
   const sentinel = useRef<HTMLDivElement | null>(null);
   const voteOwnerRef = useRef<string | null>(null);
   const voteHydrationVersionRef = useRef(0);
+  const savingVoteIdsRef = useRef(new Set<string>());
   const initialFailureCountRef = useRef(0);
   const paginationFailureCountRef = useRef(0);
   const paginationRetryAtRef = useRef(0);
@@ -106,6 +107,7 @@ export function ArtifactFeed() {
       if (didVoteOwnerChange(voteOwnerRef.current, nextOwnerId)) {
         voteOwnerRef.current = nextOwnerId;
         voteHydrationVersionRef.current += 1;
+        savingVoteIdsRef.current.clear();
         setJudgments({});
         setVoteStates({});
         setVoteMessage(null);
@@ -285,7 +287,7 @@ export function ArtifactFeed() {
           return;
         }
 
-        setJudgments(replaceHydratedVotes(votes));
+        setJudgments((current) => mergeHydratedVotes(current, votes, savingVoteIdsRef.current));
       })
       .catch(() => {
         // The public trough remains usable if personal vote hydration fails.
@@ -377,6 +379,7 @@ export function ArtifactFeed() {
     if (voteStates[id]?.state === "saving") return;
 
     voteHydrationVersionRef.current += 1;
+    savingVoteIdsRef.current.add(id);
     const prior = judgments[id];
     setJudgments((current) => ({ ...current, [id]: judgment }));
     setVoteStates((current) => ({
@@ -408,6 +411,8 @@ export function ArtifactFeed() {
       }
 
       if (voteOwnerRef.current !== voterId) return;
+      voteHydrationVersionRef.current += 1;
+      savingVoteIdsRef.current.delete(id);
       setVoteStates((current) => ({
         ...current,
         [id]: {
@@ -418,6 +423,8 @@ export function ArtifactFeed() {
     } catch (error) {
       if (voteOwnerRef.current !== voterId) return;
 
+      voteHydrationVersionRef.current += 1;
+      savingVoteIdsRef.current.delete(id);
       setJudgments((current) => {
         const next = { ...current };
         if (prior) next[id] = prior;
