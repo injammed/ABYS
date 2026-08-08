@@ -9,10 +9,11 @@ const binaryJudgmentPath = path.resolve(root, "..", "..", "supabase", "migration
 const bridgePath = path.join(root, "components", "SubmissionLandingBridge.tsx");
 const slopDropPath = path.join(root, "components", "SlopDrop.tsx");
 const receiptPath = path.join(root, "lib", "publication-receipt.ts");
+const supabaseBrowserPath = path.join(root, "lib", "supabase-browser.ts");
 const pagePath = path.join(root, "app", "page.tsx");
 const socialFeedPath = path.join(root, "lib", "social-feed.ts");
 
-const [publication, voteAggregate, voteLockdown, binaryJudgment, bridge, slopDrop, receipt, page, socialFeed] = await Promise.all([
+const [publication, voteAggregate, voteLockdown, binaryJudgment, bridge, slopDrop, receipt, supabaseBrowser, page, socialFeed] = await Promise.all([
   readFile(publicationPath, "utf8"),
   readFile(voteAggregatePath, "utf8"),
   readFile(voteLockdownPath, "utf8"),
@@ -20,6 +21,7 @@ const [publication, voteAggregate, voteLockdown, binaryJudgment, bridge, slopDro
   readFile(bridgePath, "utf8"),
   readFile(slopDropPath, "utf8"),
   readFile(receiptPath, "utf8"),
+  readFile(supabaseBrowserPath, "utf8"),
   readFile(pagePath, "utf8"),
   readFile(socialFeedPath, "utf8"),
 ]);
@@ -48,10 +50,15 @@ requirePattern("reliable full navigation", /window\.location\.assign/, bridge);
 requirePattern("landing bridge mounted at feed root", /<SubmissionLandingBridge \/>/, page);
 
 requirePattern("public receipt helper", /waitForPublicArtifactReceipt/, receipt);
+requirePattern("receipt uses sessionless public client", /requireSupabasePublicBrowserClient/, receipt);
+requirePattern("public client is separate", /let publicBrowserClient: SupabaseClient \| null = null/, supabaseBrowser);
+requirePattern("public client does not persist session", /persistSession: false/, supabaseBrowser);
+requirePattern("public client does not refresh auth", /autoRefreshToken: false/, supabaseBrowser);
+requirePattern("public client ignores auth URL state", /detectSessionInUrl: false/, supabaseBrowser);
 requirePattern("receipt requires approved", /\.eq\("status", "approved"\)/, receipt);
 requirePattern("receipt requires Unjudged", /\.eq\("lane", "unjudged"\)/, receipt);
 requirePattern("receipt requires publication timestamp", /\.not\("published_at", "is", null\)/, receipt);
-requirePattern("receipt counts public manifest", /from\("artifact_parts"\)[\s\S]*count: "exact"/, receipt);
+requirePattern("receipt counts anonymous-readable manifest", /from\("artifact_parts"\)[\s\S]*count: "exact"/, receipt);
 requirePattern("bounded receipt backoff", /PUBLIC_RECEIPT_DELAYS_MS = \[0, 120, 350, 800, 1600, 3000\]/, receipt);
 requirePattern("normal intake waits for public receipt", /await waitForPublicArtifactReceipt\(committedId, parts\.length\)/, slopDrop);
 requirePattern("public confirmation copy", /Thrown\. Public\./, slopDrop);
@@ -59,13 +66,11 @@ requirePattern("commit boundary recorded", /artifactCommitted = true;/, slopDrop
 requirePattern("post-commit receipt failure preserves storage", /if \(!artifactCommitted && uploadedPaths\.length > 0\)/, slopDrop);
 requirePattern("submission event carries public receipt", /detail: \{ artifactId: committedId, publicConfirmed \}/, slopDrop);
 
-// Ambiguous create-RPC law: a transport error is not proof the transaction
-// failed. The immutable client-generated Artifact ID lets the browser prove the
-// exact public commit without issuing a duplicate creation RPC.
 requirePattern("create error enters reconciliation", /if \(createError\) \{[\s\S]*Reconciling Artifact landing/, slopDrop);
 requirePattern("ambiguous create checks exact artifact id", /waitForPublicArtifactReceipt\(artifactId, parts\.length\)/, slopDrop);
 requirePattern("confirmed ambiguous create becomes committed", /if \(!publicConfirmed\) throw createError;[\s\S]*artifactCommitted = true;[\s\S]*committedId = artifactId;/, slopDrop);
 forbidPattern("blind create RPC retry loop", /for \([^)]*\)[\s\S]{0,500}client\.rpc\("create_quarantined_artifact"/, slopDrop);
+forbidPattern("receipt falls back to authenticated client", /requireSupabaseBrowserClient/, receipt);
 
 requirePattern("legacy aggregate compatibility RPC remains bounded", /VOTE_AGGREGATE_REQUEST_TOO_LARGE/, voteAggregate);
 requirePattern("raw public vote policy removed", /drop policy if exists "votes are publicly readable"/, voteLockdown);
@@ -83,7 +88,7 @@ requirePattern("feed consumes Top Slop rank RPC", /client\.rpc\("get_artifact_sl
 requirePattern("public provenance remains declared", /confidence: "declared"/, socialFeed);
 forbidPattern("blended Museum-minus-Slop score", /preserve\s*\*\s*4[\s\S]*slop\s*\*\s*4/, socialFeed);
 forbidPattern("public raw-vote fanout", /from\("artifact_votes"\)\.select\("artifact_id,judgment"\)\.in\("artifact_id", ids\)/, socialFeed);
-forbidPattern("service role browser secret", /service[_-]?role/i, bridge + slopDrop + receipt + page + socialFeed);
+forbidPattern("service role browser secret", /service[_-]?role/i, bridge + slopDrop + receipt + supabaseBrowser + page + socialFeed);
 
 if (failures.length > 0) {
   console.error("One-click feed contract failed:");
@@ -91,4 +96,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("One-click feed PASS: submission can atomically become public Unjudged; normal and ambiguous RPC responses reconcile against the exact public Artifact ID and manifest before failure is declared; committed storage is preserved; raw voter rows stay private; Museum and Slop remain independent.");
+console.log("One-click feed PASS: submission can atomically become public Unjudged; 'Public' is proven by a separate sessionless anonymous reader against the exact Artifact row and manifest, not by the creator owner exception; ambiguous commit acknowledgements reconcile safely; raw voter rows stay private and Museum/Slop remain independent.");
