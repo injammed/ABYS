@@ -1,3 +1,4 @@
+import { ensureFreshAuthenticatedSession } from "@/lib/auth-session";
 import { ArtifactPart, FeedArtifact, FeedLane, OriginClass } from "@/lib/feed";
 import { cursorForRow, decodeFeedCursor, feedCursorFilter } from "@/lib/feed-cursor";
 import { requireSupabaseBrowserClient } from "@/lib/supabase-browser";
@@ -358,8 +359,11 @@ export async function saveVote(artifactId: string, voterId: string, judgment: Ju
   const client = requireSupabaseBrowserClient();
   let lastError: unknown = new Error("VOTE_WRITE_CONFIRMATION_FAILED");
 
+  await ensureFreshAuthenticatedSession(voterId);
+
   for (const waitMs of VOTE_WRITE_RETRY_DELAYS_MS) {
     if (waitMs > 0) await delay(waitMs);
+    await ensureFreshAuthenticatedSession(voterId);
 
     const { data, error } = await client
       .from("artifact_votes")
