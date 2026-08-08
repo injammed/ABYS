@@ -3,6 +3,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { FeedArtifact, makeFeedBatch, originClassLabels } from "@/lib/feed";
+import {
+  AUTH_REQUIRED_EVENT,
+  VOTE_INTENT_STORAGE_KEY,
+  decodePublicVoteIntent,
+  encodePublicVoteIntent,
+} from "@/lib/public-intents";
 import { loadPublicVoteAggregate, loadPublicVoteAggregates } from "@/lib/public-vote-aggregate";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 import {
@@ -306,6 +312,19 @@ export function ArtifactFeed() {
   }, [session?.user.id, artifacts, voteStates]);
 
   useEffect(() => {
+    const voterId = session?.user.id;
+    if (!socialBackendEnabled || !voterId) return;
+
+    const rawIntent = window.sessionStorage.getItem(VOTE_INTENT_STORAGE_KEY);
+    if (!rawIntent) return;
+    window.sessionStorage.removeItem(VOTE_INTENT_STORAGE_KEY);
+
+    const intent = decodePublicVoteIntent(rawIntent);
+    if (!intent) return;
+    void judge(intent.artifactId, intent.judgment, true);
+  }, [session?.user.id]);
+
+  useEffect(() => {
     if (!socialBackendEnabled) return;
     let cancelled = false;
     visibleVoteIdsRef.current.clear();
@@ -441,7 +460,7 @@ export function ArtifactFeed() {
     [artifacts, privatePreviews],
   );
 
-  async function judge(id: string, judgment: Judgment) {
+  async function judge(id: string, judgment: Judgment, resumedFromAuth = false) {
     setVoteMessage(null);
 
     const artifact = visible.find((entry) => entry.id === id);
@@ -461,7 +480,15 @@ export function ArtifactFeed() {
 
     const voterId = session?.user.id;
     if (!voterId) {
-      setVoteMessage("Sign in to vote. Or keep scrolling.");
+      try {
+        window.sessionStorage.setItem(
+          VOTE_INTENT_STORAGE_KEY,
+          encodePublicVoteIntent({ artifactId: id, judgment }),
+        );
+      } catch {
+        setVoteMessage("Sign in to vote.");
+      }
+      window.dispatchEvent(new Event(AUTH_REQUIRED_EVENT));
       return;
     }
 
@@ -506,6 +533,9 @@ export function ArtifactFeed() {
           message: judgment === "preserve" ? "Museum." : "Slop.",
         },
       }));
+      if (resumedFromAuth && !visible.some((entry) => entry.id === id)) {
+        setVoteMessage(judgment === "preserve" ? "Museum vote saved." : "Slop vote saved.");
+      }
     } catch (error) {
       if (voteOwnerRef.current !== voterId) return;
 
@@ -515,13 +545,17 @@ export function ArtifactFeed() {
         else delete next[id];
         return next;
       });
+      const failureMessage = error instanceof Error ? error.message : "Vote could not be saved.";
       setVoteStates((current) => ({
         ...current,
         [id]: {
           state: "error",
-          message: error instanceof Error ? error.message : "Vote could not be saved.",
+          message: failureMessage,
         },
       }));
+      if (resumedFromAuth && !visible.some((entry) => entry.id === id)) {
+        setVoteMessage(failureMessage);
+      }
     }
   }
 
