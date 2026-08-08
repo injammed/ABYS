@@ -43,13 +43,22 @@ assert.ok(
   "Every visible non-whitespace character must mutate continuously outside hover.",
 );
 assert.ok(
-  /@media \(hover: hover\) and \(pointer: fine\)[\s\S]*\.lexicon:hover \.original[\s\S]*visibility:\s*visible/.test(lexiconStyles),
-  "Fine-pointer hover must reveal the exact source text without reflow.",
+  /onPointerEnter=\{\(event\) => setPointerTranslated\(event\.pointerType !== "touch" && event\.buttons === 0\)\}/.test(lexicon),
+  "Only the active non-touch pointer may reveal exact source text.",
 );
 assert.ok(
-  /@media \(hover: hover\) and \(pointer: fine\)[\s\S]*\.lexicon:hover \.mutated[\s\S]*visibility:\s*hidden/.test(lexiconStyles),
-  "Fine-pointer hover must hide the oscillating paint layer while translating.",
+  /onPointerDown=\{\(event\) => \{[\s\S]*event\.pointerType === "touch"[\s\S]*setPointerTranslated\(false\)/.test(lexicon),
+  "Touch interaction must explicitly clear any translated state.",
 );
+assert.ok(
+  /\.pointerTranslated \.original[\s\S]*visibility:\s*visible/.test(lexiconStyles),
+  "Pointer-authorized translation must reveal the exact source without reflow.",
+);
+assert.ok(
+  /\.pointerTranslated \.mutated[\s\S]*visibility:\s*hidden/.test(lexiconStyles),
+  "Pointer-authorized translation must hide the oscillating paint layer.",
+);
+assert.ok(!/@media \(hover: hover\) and \(pointer: fine\)/.test(lexiconStyles), "Device capability queries must not decide which input translated the text.");
 assert.ok(!/\.lexicon:focus-within \.original/.test(lexiconStyles), "Focus alone must not disable oscillation.");
 assert.ok(!/@media \(hover: none\) and \(pointer: coarse\)/.test(lexiconStyles), "Touch controls must not receive a stable visible-language exemption.");
 assert.ok(
@@ -57,4 +66,4 @@ assert.ok(
   "Explicit reduced-motion preference remains the always-visible accessibility opt-out.",
 );
 
-console.log("Arrival surface PASS: duplicate clicks stay removed, one ambient language sandbag remains, all interface words oscillate by default, and deliberate fine-pointer hover translates exact source text in-place. FINAL FROZEN CONTRACT.");
+console.log("Arrival surface PASS: duplicate clicks stay removed, one ambient language sandbag remains, interface words oscillate by default, and exact-source translation is authorized by the actual non-touch pointer rather than device capability. FINAL FROZEN CONTRACT.");
