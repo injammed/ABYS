@@ -3,6 +3,7 @@
 import { ChangeEvent, DragEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { waitForPublicArtifactReceipt } from "@/lib/publication-receipt";
+import { uploadArtifactObject } from "@/lib/storage-upload-receipt";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 import { LexiconText } from "./LexiconBroadcast";
 import styles from "./UploadGate.module.css";
@@ -76,11 +77,6 @@ function normalizedMime(file: File): string {
   if (extension === ".gltf") return "model/gltf+json";
   if (extension === ".glb") return "model/gltf-binary";
   if ([".obj", ".stl", ".blend"].includes(extension)) return OPAQUE_MIME;
-
-  // Unknown formats are deliberately accepted but never trusted. Do not use
-  // browser-supplied MIME for an unrecognized extension: storing the object as
-  // opaque data prevents a novel file type from silently becoming executable
-  // or embeddable merely because the client claimed an active content type.
   return OPAQUE_MIME;
 }
 
@@ -302,10 +298,7 @@ export function SlopDrop() {
         const storagePath = `${session.user.id}/${artifactId}/${String(index).padStart(2, "0")}-${crypto.randomUUID()}${safeExtension(file)}`;
 
         setMessage(`Uploading ${index + 1}/${files.length} · ${file.name}`);
-        const { error: uploadError } = await client.storage
-          .from("artifact-media")
-          .upload(storagePath, file, { cacheControl: "3600", upsert: false, contentType: mime });
-        if (uploadError) throw uploadError;
+        await uploadArtifactObject(storagePath, file, mime);
 
         uploadedPaths.push(storagePath);
         parts.push({
@@ -383,9 +376,6 @@ export function SlopDrop() {
         detail: { artifactId: committedId, publicConfirmed },
       }));
     } catch (error) {
-      // Before the atomic Artifact RPC commits, uploaded objects are orphan
-      // candidates and should be removed. After commit, storage is part of the
-      // Artifact manifest and must never be destroyed by a later receipt error.
       if (!artifactCommitted && uploadedPaths.length > 0) {
         await client.storage.from("artifact-media").remove(uploadedPaths);
       }
