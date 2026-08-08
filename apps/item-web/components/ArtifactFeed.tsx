@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { FeedArtifact, makeFeedBatch, originClassLabels } from "@/lib/feed";
+import { loadPublicVoteAggregate } from "@/lib/public-vote-aggregate";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 import {
   Judgment,
@@ -391,6 +392,26 @@ export function ArtifactFeed() {
       await saveVote(id, voterId, judgment);
       if (voteOwnerRef.current !== voterId) return;
 
+      window.dispatchEvent(new CustomEvent("aetimm:vote-committed", {
+        detail: { artifactId: id, judgment },
+      }));
+
+      try {
+        const aggregate = await loadPublicVoteAggregate(id);
+        if (voteOwnerRef.current === voterId) {
+          setArtifacts((current) => current.map((entry) => entry.id === id ? {
+            ...entry,
+            museumVotes: aggregate.museumVotes,
+            slopVotes: aggregate.slopVotes,
+            slopRank: aggregate.slopRank,
+          } : entry));
+        }
+      } catch {
+        // The vote is already committed. Aggregate freshness is additive and
+        // will converge via the normal public-head refresh without undoing it.
+      }
+
+      if (voteOwnerRef.current !== voterId) return;
       setVoteStates((current) => ({
         ...current,
         [id]: {
@@ -531,10 +552,11 @@ export function ArtifactFeed() {
                       data-binary-vote="slop"
                       onClick={() => void judge(artifact.id, "slop")}
                       disabled={votePending}
-                      aria-label="Vote Slop"
+                      aria-label={`Vote Slop · ${artifact.slopVotes ?? 0} public votes`}
                       aria-pressed={judgment === "slop"}
                     >
                       <SlopGlyph />
+                      <span className={styles.voteCount} aria-hidden="true">{artifact.slopVotes ?? 0}</span>
                       <span className={styles.srOnly}>Slop</span>
                     </button>
                     <button
@@ -542,10 +564,11 @@ export function ArtifactFeed() {
                       data-binary-vote="museum"
                       onClick={() => void judge(artifact.id, "preserve")}
                       disabled={votePending}
-                      aria-label="Vote Museum"
+                      aria-label={`Vote Museum · ${artifact.museumVotes ?? 0} public votes`}
                       aria-pressed={judgment === "preserve"}
                     >
                       <MuseumGlyph />
+                      <span className={styles.voteCount} aria-hidden="true">{artifact.museumVotes ?? 0}</span>
                       <span className={styles.srOnly}>Museum</span>
                     </button>
                   </div>
