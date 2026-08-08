@@ -1,4 +1,4 @@
-import { requireSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { requireSupabasePublicBrowserClient } from "@/lib/supabase-browser";
 
 const PUBLIC_RECEIPT_DELAYS_MS = [0, 120, 350, 800, 1600, 3000] as const;
 
@@ -10,7 +10,10 @@ export async function waitForPublicArtifactReceipt(
   artifactId: string,
   expectedPartCount: number,
 ): Promise<boolean> {
-  const client = requireSupabaseBrowserClient();
+  // Deliberately use a sessionless client. The creator has an owner RLS path;
+  // this receipt must prove the same row and manifest are visible through the
+  // anonymous public boundary before the UI claims "Public".
+  const client = requireSupabasePublicBrowserClient();
 
   for (const waitMs of PUBLIC_RECEIPT_DELAYS_MS) {
     if (waitMs > 0) await delay(waitMs);
