@@ -25,6 +25,12 @@ type VoteRequestState = {
   message: string;
 };
 
+const FEED_RETRY_DELAYS_MS = [600, 1800, 5000, 12000, 30000] as const;
+
+function feedRetryDelay(attempt: number): number {
+  return FEED_RETRY_DELAYS_MS[Math.min(attempt, FEED_RETRY_DELAYS_MS.length - 1)] ?? 30000;
+}
+
 function SlopGlyph() {
   return (
     <svg className={styles.voteGlyph} viewBox="0 0 64 64" aria-hidden="true">
@@ -68,9 +74,22 @@ export function ArtifactFeed() {
   const [loading, setLoading] = useState(socialBackendEnabled);
   const [feedError, setFeedError] = useState<string | null>(null);
   const [voteMessage, setVoteMessage] = useState<string | null>(null);
+  const [initialRetryRevision, setInitialRetryRevision] = useState(0);
+  const [paginationRetryRevision, setPaginationRetryRevision] = useState(0);
   const sentinel = useRef<HTMLDivElement | null>(null);
   const voteOwnerRef = useRef<string | null>(null);
   const voteHydrationVersionRef = useRef(0);
+  const initialFailureCountRef = useRef(0);
+  const paginationFailureCountRef = useRef(0);
+  const paginationRetryAtRef = useRef(0);
+  const retryTimersRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    return () => {
+      retryTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      retryTimersRef.current = [];
+    };
+  }, []);
 
   useEffect(() => {
     const client = getSupabaseBrowserClient();
@@ -100,22 +119,32 @@ export function ArtifactFeed() {
     let cancelled = false;
 
     setLoading(true);
-    setFeedError(null);
-    setArtifacts([]);
-    setCursor(null);
-    setHasMore(true);
+    if (initialRetryRevision === 0) {
+      setFeedError(null);
+      setArtifacts([]);
+      setCursor(null);
+      setHasMore(true);
+    }
 
     void loadPublicFeedPage()
       .then((page) => {
         if (cancelled) return;
+        initialFailureCountRef.current = 0;
+        setFeedError(null);
         setArtifacts(page.artifacts);
         setCursor(page.nextCursor);
         setHasMore(Boolean(page.nextCursor));
       })
       .catch((error) => {
         if (cancelled) return;
+        const attempt = initialFailureCountRef.current;
+        initialFailureCountRef.current += 1;
         setFeedError(error instanceof Error ? error.message : "The trough could not be loaded.");
-        setHasMore(false);
+
+        const timer = window.setTimeout(() => {
+          if (!cancelled) setInitialRetryRevision((value) => value + 1);
+        }, feedRetryDelay(attempt));
+        retryTimersRef.current.push(timer);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -124,6 +153,41 @@ export function ArtifactFeed() {
     return () => {
       cancelled = true;
     };
+  }, [initialRetryRevision]);
+
+  useEffect(() => {
+    if (!socialBackendEnabled) return;
+
+    const recoverConnection = () => {
+      if (loading) return;
+      initialFailureCountRef.current = 0;
+      paginationFailureCountRef.current = 0;
+      paginationRetryAtRef.current = 0;
+
+      if (artifacts.length === 0) setInitialRetryRevision((value) => value + 1);
+      else setPaginationRetryRevision((value) => value + 1);
+    };
+
+    window.addEventListener("online", recoverConnection);
+    return () => window.removeEventListener("online", recoverConnection);
+  }, [artifacts.length, loading]);
+
+  useEffect(() => {
+    if (!socialBackendEnabled) return;
+
+    const refreshPublicHead = () => {
+      void loadPublicFeedPage()
+        .then((page) => {
+          setFeedError(null);
+          setArtifacts((current) => appendUnique(page.artifacts, current));
+        })
+        .catch(() => {
+          // Submission succeeded already; the normal self-healing feed path will recover presentation.
+        });
+    };
+
+    window.addEventListener("aetimm:submission-created", refreshPublicHead);
+    return () => window.removeEventListener("aetimm:submission-created", refreshPublicHead);
   }, []);
 
   useEffect(() => {
@@ -212,16 +276,30 @@ export function ArtifactFeed() {
         }
 
         if (!hasMore || !cursor) return;
+        if (Date.now() < paginationRetryAtRef.current) return;
+
         setLoading(true);
         void loadPublicFeedPage({ cursor })
           .then((page) => {
+            paginationFailureCountRef.current = 0;
+            paginationRetryAtRef.current = 0;
+            setFeedError(null);
             setArtifacts((current) => appendUnique(current, page.artifacts));
             setCursor(page.nextCursor);
             setHasMore(Boolean(page.nextCursor));
           })
           .catch((error) => {
+            const attempt = paginationFailureCountRef.current;
+            paginationFailureCountRef.current += 1;
+            const delay = feedRetryDelay(attempt);
+            paginationRetryAtRef.current = Date.now() + delay;
             setFeedError(error instanceof Error ? error.message : "More slop could not be loaded.");
-            setHasMore(false);
+
+            const timer = window.setTimeout(() => {
+              paginationRetryAtRef.current = 0;
+              setPaginationRetryRevision((value) => value + 1);
+            }, delay);
+            retryTimersRef.current.push(timer);
           })
           .finally(() => setLoading(false));
       },
@@ -230,7 +308,7 @@ export function ArtifactFeed() {
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [batch, cursor, hasMore, loading]);
+  }, [batch, cursor, hasMore, loading, paginationRetryRevision]);
 
   const visible = useMemo(
     () => socialBackendEnabled ? appendUnique(privatePreviews, artifacts) : artifacts,
