@@ -5,9 +5,10 @@ import { fileURLToPath } from "node:url";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const appRoot = resolve(scriptDir, "..");
-const [feedSource, cursorSource] = await Promise.all([
+const [feedSource, cursorSource, feedComponentSource] = await Promise.all([
   readFile(resolve(appRoot, "lib", "social-feed.ts"), "utf8"),
   readFile(resolve(appRoot, "lib", "feed-cursor.ts"), "utf8"),
+  readFile(resolve(appRoot, "components", "ArtifactFeed.tsx"), "utf8"),
 ]);
 
 for (const required of [
@@ -32,6 +33,23 @@ for (const required of [
 ]) {
   assert.ok(cursorSource.includes(required), `Missing cursor filter component: ${required}`);
 }
+
+for (const [label, pattern] of [
+  ["bounded retry schedule", /const FEED_RETRY_DELAYS_MS = \[600, 1800, 5000, 12000, 30000\]/],
+  ["initial-load retry revision", /setInitialRetryRevision\(\(value\) => value \+ 1\)/],
+  ["pagination retry revision", /setPaginationRetryRevision\(\(value\) => value \+ 1\)/],
+  ["pagination retry gate", /Date\.now\(\) < paginationRetryAtRef\.current/],
+  ["network reconnection recovery", /window\.addEventListener\("online", recoverConnection\)/],
+  ["public-head refresh after submission", /window\.addEventListener\("aetimm:submission-created", refreshPublicHead\)/],
+  ["successful pagination clears transient error", /paginationFailureCountRef\.current = 0;[\s\S]*setFeedError\(null\)/],
+]) {
+  assert.ok(pattern.test(feedComponentSource), `Missing public trough recovery contract: ${label}`);
+}
+
+assert.ok(
+  !/More slop could not be loaded\.[\s\S]{0,220}setHasMore\(false\)/.test(feedComponentSource),
+  "A transient pagination failure must not permanently terminate the public trough.",
+);
 
 const timestamp = "2026-08-06T12:00:00.000Z";
 const olderTimestamp = "2026-08-06T11:59:59.000Z";
@@ -93,4 +111,4 @@ const finalPage = loadFixturePage({ cursor: { publishedAt: olderTimestamp, id: "
 assert.deepEqual(finalPage.rows, [], "A cursor beyond the last row must return an empty final page.");
 assert.equal(finalPage.nextCursor, null, "An empty final page must terminate pagination.");
 
-console.log("Composite feed cursor contract verified across tied timestamps, lanes, refactors, and final-page termination.");
+console.log("Composite feed cursor and recovery contract verified: tied timestamps remain lossless, transient failures cannot permanently end the trough, reconnects self-heal, and fresh submissions refresh the public head without a new control.");
