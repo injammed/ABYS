@@ -28,6 +28,19 @@ for (const [label, pattern, source] of [
   ["horizontal intent guard", /Math\.abs\(deltaX\) > Math\.abs\(deltaY\) \* AXIS_DOMINANCE/, swipe],
   ["existing saveVote path retained", /saveVote\(id, voterId, judgment\)/, feed],
   ["client Judgment type is binary", /export type Judgment = "preserve" \| "slop";/, socialFeed],
+
+  // Write receipt law: one click is optimistic at the surface but persistence
+  // is only declared failed after bounded idempotent retries and private
+  // reconciliation prove the requested row did not commit.
+  ["bounded vote retry schedule", /VOTE_WRITE_RETRY_DELAYS_MS = \[0, 180, 550, 1400\]/, socialFeed],
+  ["idempotent vote upsert key", /onConflict: "artifact_id,voter_id"/, socialFeed],
+  ["vote write asks for committed receipt", /\.select\("artifact_id,judgment"\)[\s\S]*\.single\(\)/, socialFeed],
+  ["vote receipt verifies artifact identity", /receipt\?\.artifact_id === artifactId/, socialFeed],
+  ["vote receipt verifies judgment", /receipt\.judgment === judgment/, socialFeed],
+  ["private own-vote reconciliation helper", /async function ownVoteMatches[\s\S]*loadOwnVotes\(voterId, \[artifactId\]\)/, socialFeed],
+  ["lost acknowledgement can resolve by private read", /if \(await ownVoteMatches\(artifactId, voterId, judgment\)\) return;/, socialFeed],
+  ["final reconciliation before failure", /One final private read[\s\S]*ownVoteMatches\(artifactId, voterId, judgment\)[\s\S]*throw lastError/, socialFeed],
+
   ["one account one artifact database key", /primary key \(artifact_id, voter_id\)/, schema],
   ["legacy non-binary rows fail closed", /LEGACY_NON_BINARY_VOTES_REQUIRE_REVIEW/, binaryMigration],
   ["binary database constraint", /check \(judgment in \('preserve', 'slop'\)\)/, binaryMigration],
@@ -39,4 +52,4 @@ assert.ok(!/button[^>]*judge refine/.test(feed), "Refine must not exist in the p
 assert.ok(!/MutationObserver/.test(swipe), "Binary voting must not depend on DOM mutation normalization.");
 assert.ok(!/👍|👎/.test(feed), "The public ballot must not fall back to generic thumbs-up/thumbs-down icons.");
 
-console.log("Binary swipe voting PASS: one account has one active Artifact judgment; the visible ballot is an abstract Slop-pour glyph versus a rising triple-ring Museum glyph, accessible names remain intact, left/right swipe share the same persistence path, Refine is excluded, and vertical scrolling remains primary.");
+console.log("Binary swipe voting PASS: one account has one active Artifact judgment; click and swipe share one persistence path; vote writes are idempotent, self-confirming, and resolve lost acknowledgements through private own-vote reconciliation before reporting failure; vertical scrolling remains primary.");
