@@ -2,7 +2,7 @@
 
 import { ChangeEvent, DragEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { AUTH_REQUIRED_EVENT, SUBMIT_INTENT_STORAGE_KEY } from "@/lib/public-intents";
+import { AUTH_REQUIRED_EVENT, consumeSubmitIntent, rememberSubmitIntent } from "@/lib/public-intents";
 import { waitForPublicArtifactReceipt } from "@/lib/publication-receipt";
 import { uploadArtifactObject } from "@/lib/storage-upload-receipt";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
@@ -143,10 +143,7 @@ export function SlopDrop() {
 
     const applySession = (nextSession: Session | null) => {
       setSession(nextSession);
-      if (nextSession && window.sessionStorage.getItem(SUBMIT_INTENT_STORAGE_KEY) === "1") {
-        window.sessionStorage.removeItem(SUBMIT_INTENT_STORAGE_KEY);
-        setOpen(true);
-      }
+      if (nextSession && consumeSubmitIntent()) setOpen(true);
     };
 
     void client.auth.getSession().then(({ data }) => applySession(data.session));
@@ -173,11 +170,15 @@ export function SlopDrop() {
   const intakePaused = intakeControl?.intake_open === false;
   const dailyLimit = intakeControl?.daily_submission_limit;
 
+  function requestSubmitAuth(): void {
+    rememberSubmitIntent();
+    window.dispatchEvent(new Event(AUTH_REQUIRED_EVENT));
+  }
+
   function handleTrigger(): void {
     if (busy) return;
     if (!session) {
-      window.sessionStorage.setItem(SUBMIT_INTENT_STORAGE_KEY, "1");
-      window.dispatchEvent(new Event(AUTH_REQUIRED_EVENT));
+      requestSubmitAuth();
       return;
     }
     setOpen((value) => !value);
@@ -244,8 +245,7 @@ export function SlopDrop() {
 
     const client = getSupabaseBrowserClient();
     if (!client || !session) {
-      window.sessionStorage.setItem(SUBMIT_INTENT_STORAGE_KEY, "1");
-      window.dispatchEvent(new Event(AUTH_REQUIRED_EVENT));
+      requestSubmitAuth();
       return;
     }
 
