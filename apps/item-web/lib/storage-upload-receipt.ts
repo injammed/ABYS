@@ -1,3 +1,4 @@
+import { ensureFreshAuthenticatedSession } from "@/lib/auth-session";
 import { requireSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 const STORAGE_UPLOAD_RETRY_DELAYS_MS = [0, 250, 800, 1800] as const;
@@ -48,14 +49,22 @@ export async function uploadArtifactObject(
   contentType: string,
 ): Promise<void> {
   const client = requireSupabaseBrowserClient();
+  const expectedUserId = path.split("/", 1)[0] || undefined;
   const reconnectDeadline = Date.now() + STORAGE_RECONNECT_GRACE_MS;
   let lastError: unknown = new Error("ARTIFACT_STORAGE_UPLOAD_CONFIRMATION_FAILED");
+
+  await ensureFreshAuthenticatedSession(expectedUserId);
 
   for (const waitMs of STORAGE_UPLOAD_RETRY_DELAYS_MS) {
     // A brief Wi-Fi/cellular transition is not a meaningful upload failure.
     // Pause the bounded retry path instead of burning attempts while offline.
     await waitForOnlineUntil(reconnectDeadline);
     if (waitMs > 0) await delay(waitMs);
+
+    // A reconnect or long retry delay may cross token expiry. This is a local
+    // preflight only when the session is near expiry; healthy sessions return
+    // without another refresh request.
+    await ensureFreshAuthenticatedSession(expectedUserId);
 
     const { error } = await client.storage
       .from("artifact-media")
@@ -76,6 +85,7 @@ export async function uploadArtifactObject(
   }
 
   await waitForOnlineUntil(reconnectDeadline);
+  await ensureFreshAuthenticatedSession(expectedUserId);
   if (await artifactObjectReadable(path)) return;
   throw lastError;
 }
