@@ -58,7 +58,13 @@ requirePattern("public client ignores auth URL state", /detectSessionInUrl: fals
 requirePattern("receipt requires approved", /\.eq\("status", "approved"\)/, receipt);
 requirePattern("receipt requires Unjudged", /\.eq\("lane", "unjudged"\)/, receipt);
 requirePattern("receipt requires publication timestamp", /\.not\("published_at", "is", null\)/, receipt);
-requirePattern("receipt counts anonymous-readable manifest", /from\("artifact_parts"\)[\s\S]*count: "exact"/, receipt);
+requirePattern("receipt reads anonymous manifest rows", /from\("artifact_parts"\)[\s\S]*select\("id,part_kind,storage_path"\)/, receipt);
+requirePattern("receipt verifies expected manifest cardinality", /visibleParts\.length < expectedPartCount/, receipt);
+requirePattern("receipt isolates file storage paths", /part\.part_kind === "file" && part\.storage_path/, receipt);
+requirePattern("receipt signs file materials anonymously", /from\("artifact-media"\)[\s\S]*createSignedUrls\(storagePaths, PUBLIC_MEDIA_RECEIPT_SECONDS\)/, receipt);
+requirePattern("receipt requires every file lease", /signed \?\? \[\]\)\.length !== storagePaths\.length/, receipt);
+requirePattern("receipt rejects missing signed URL", /some\(\(entry\) => !entry\.signedUrl\)/, receipt);
+requirePattern("short public media proof lease", /PUBLIC_MEDIA_RECEIPT_SECONDS = 60/, receipt);
 requirePattern("bounded receipt backoff", /PUBLIC_RECEIPT_DELAYS_MS = \[0, 120, 350, 800, 1600, 3000\]/, receipt);
 requirePattern("normal intake waits for public receipt", /await waitForPublicArtifactReceipt\(committedId, parts\.length\)/, slopDrop);
 requirePattern("public confirmation copy", /Thrown\. Public\./, slopDrop);
@@ -96,4 +102,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("One-click feed PASS: submission can atomically become public Unjudged; 'Public' is proven by a separate sessionless anonymous reader against the exact Artifact row and manifest, not by the creator owner exception; ambiguous commit acknowledgements reconcile safely; raw voter rows stay private and Museum/Slop remain independent.");
+console.log("One-click feed PASS: 'Public' is proven through a sessionless anonymous reader for the exact approved row, complete manifest, and every file material's short-lived Storage lease; creator RLS cannot create a false positive; ambiguous commit acknowledgements reconcile safely; raw voter rows remain private.");
