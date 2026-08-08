@@ -1,4 +1,5 @@
 import type { ArtifactPart, FeedArtifact } from "@/lib/feed";
+import { InitialLeaseArtifactMedia } from "./InitialLeaseArtifactMedia";
 import { LexiconText } from "./LexiconBroadcast";
 import { RenewableArtifactDownload, RenewableArtifactMedia } from "./RenewableArtifactMedia";
 import styles from "./ArtifactRuntime.module.css";
@@ -24,7 +25,7 @@ function leadPart(parts: ArtifactPart[]): ArtifactPart | undefined {
     const match = parts.find((part) => part.mode === mode && (
       part.partKind === "text"
       || part.partKind === "reference"
-      || Boolean(part.signedUrl)
+      || part.partKind === "file"
     ));
     if (match) return match;
   }
@@ -62,20 +63,41 @@ function InertMaterial({ part }: { part: ArtifactPart }) {
 }
 
 function LeadRuntime({ part }: { part: ArtifactPart }) {
-  if (part.mode === "image" && part.signedUrl) {
-    return <RenewableArtifactMedia kind="image" className={styles.image} initialUrl={part.signedUrl} />;
+  if (part.mode === "image" && part.partKind === "file") {
+    return (
+      <InitialLeaseArtifactMedia
+        kind="image"
+        className={styles.image}
+        initialUrl={part.signedUrl}
+        partId={part.id}
+      />
+    );
   }
 
-  if (part.mode === "video" && part.signedUrl) {
-    return <RenewableArtifactMedia kind="video" className={styles.video} initialUrl={part.signedUrl} ariaLabel="Artifact video" />;
+  if (part.mode === "video" && part.partKind === "file") {
+    return (
+      <InitialLeaseArtifactMedia
+        kind="video"
+        className={styles.video}
+        initialUrl={part.signedUrl}
+        partId={part.id}
+        ariaLabel="Artifact video"
+      />
+    );
   }
 
-  if (part.mode === "audio" && part.signedUrl) {
+  if (part.mode === "audio" && part.partKind === "file") {
     return (
       <div className={styles.audioStage}>
         <div className={styles.audioGlyph} aria-hidden="true">∿∿∿</div>
         <LexiconText as="strong" text={partName(part)} phase={17} />
-        <RenewableArtifactMedia kind="audio" className={styles.audio} initialUrl={part.signedUrl} ariaLabel="Artifact audio" />
+        <InitialLeaseArtifactMedia
+          kind="audio"
+          className={styles.audio}
+          initialUrl={part.signedUrl}
+          partId={part.id}
+          ariaLabel="Artifact audio"
+        />
       </div>
     );
   }
