@@ -9,6 +9,7 @@ import {
   decodePublicVoteIntent,
   encodePublicVoteIntent,
 } from "@/lib/public-intents";
+import { loadPublicArtifactVisibility } from "@/lib/public-artifact-visibility";
 import { loadPublicVoteAggregate, loadPublicVoteAggregates } from "@/lib/public-vote-aggregate";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 import {
@@ -356,34 +357,54 @@ export function ArtifactFeed() {
       if (ids.length === 0) return;
 
       visibleAggregateRefreshInFlightRef.current = true;
-      void loadPublicVoteAggregates(ids)
-        .then((aggregates) => {
-          if (cancelled || aggregates.size === 0) return;
+      void Promise.all([
+        loadPublicVoteAggregates(ids),
+        loadPublicArtifactVisibility(ids),
+      ])
+        .then(([aggregates, publicArtifactIds]) => {
+          if (cancelled) return;
+          const checkedIds = new Set(ids);
+
           setArtifacts((current) => {
             let changed = false;
-            const next = current.map((entry) => {
+            const next: FeedArtifact[] = [];
+
+            for (const entry of current) {
+              if (checkedIds.has(entry.id) && !publicArtifactIds.has(entry.id)) {
+                changed = true;
+                continue;
+              }
+
               const aggregate = aggregates.get(entry.id);
-              if (!aggregate) return entry;
+              if (!aggregate) {
+                next.push(entry);
+                continue;
+              }
+
               if (
                 entry.museumVotes === aggregate.museumVotes
                 && entry.slopVotes === aggregate.slopVotes
                 && entry.slopRank === aggregate.slopRank
               ) {
-                return entry;
+                next.push(entry);
+                continue;
               }
+
               changed = true;
-              return {
+              next.push({
                 ...entry,
                 museumVotes: aggregate.museumVotes,
                 slopVotes: aggregate.slopVotes,
                 slopRank: aggregate.slopRank,
-              };
-            });
+              });
+            }
+
             return changed ? next : current;
           });
         })
         .catch(() => {
-          // Aggregate freshness is additive; cards and voting stay usable.
+          // Public visibility is fail-safe: a failed anonymous check never
+          // removes the last good card. Aggregate freshness is additive too.
         })
         .finally(() => {
           visibleAggregateRefreshInFlightRef.current = false;
