@@ -84,6 +84,17 @@ requirePattern("ambiguous upload reconciles before retry", /if \(await artifactO
 requirePattern("final storage receipt before failure", /if \(await artifactObjectReadable\(path\)\) return;[\s\S]*throw lastError/, storageReceipt);
 forbidPattern("storage upsert overwrite", /upsert:\s*true/, storageReceipt);
 
+// Brief connectivity loss is transport state, not a new user decision. The
+// upload path gets one bounded reconnect budget and resumes automatically.
+requirePattern("bounded reconnect grace", /STORAGE_RECONNECT_GRACE_MS = 30_000/, storageReceipt);
+requirePattern("browser connectivity signal", /navigator\.onLine/, storageReceipt);
+requirePattern("one-shot online wake event", /addEventListener\("online", finish, \{ once: true \}\)/, storageReceipt);
+requirePattern("online listener cleanup", /removeEventListener\("online", finish\)/, storageReceipt);
+requirePattern("reconnect timeout cleanup", /clearTimeout\(timer\)/, storageReceipt);
+requirePattern("single reconnect deadline per file", /const reconnectDeadline = Date\.now\(\) \+ STORAGE_RECONNECT_GRACE_MS/, storageReceipt);
+requirePattern("reconnect wait before transport attempt", /for \(const waitMs[\s\S]*await waitForOnlineUntil\(reconnectDeadline\);[\s\S]*\.upload\(path, file/, storageReceipt);
+requirePattern("final receipt also waits through reconnect budget", /await waitForOnlineUntil\(reconnectDeadline\);[\s\S]*if \(await artifactObjectReadable\(path\)\) return;[\s\S]*throw lastError/, storageReceipt);
+
 requirePattern("paused intake keeps Artifact form mounted", /\{open && session && \(/, intake);
 requirePattern("paused state visible status", /TROUGH PAUSED\. The form stays visible; throwing is temporarily locked\./, intake);
 requirePattern("paused state preserves form", /form stays visible/, intake);
@@ -155,4 +166,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Universal Artifact intake PASS: any file format can enter one bounded Artifact; storage writes self-confirm ambiguous acknowledgements on the exact random path without overwrite; known formats retain native modes, unknown formats become opaque inert material, and atomic publication boundaries remain intact.");
+console.log("Universal Artifact intake PASS: any file format can enter one bounded Artifact; storage writes pause through brief offline transitions, self-confirm ambiguous acknowledgements on the exact random path without overwrite, and preserve atomic publication boundaries.");
