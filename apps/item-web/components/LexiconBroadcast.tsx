@@ -9,6 +9,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import styles from "./LexiconBroadcast.module.css";
 
 const TICK_MS = 125;
@@ -151,9 +152,9 @@ export function LexiconText({
       data-oscillation-contract="all-visible-interface-words-v2-hover-source"
       data-hover-translation-contract="pointer-hover-exact-source-final-v1"
       data-cycle-ms="500"
-      onPointerEnter={(event) => setPointerTranslated(event.pointerType !== "touch" && event.buttons === 0)}
+      onPointerEnter={(event: ReactPointerEvent<Element>) => setPointerTranslated(event.pointerType !== "touch" && event.buttons === 0)}
       onPointerLeave={() => setPointerTranslated(false)}
-      onPointerDown={(event) => {
+      onPointerDown={(event: ReactPointerEvent<Element>) => {
         if (event.pointerType === "touch") setPointerTranslated(false);
       }}
     >
