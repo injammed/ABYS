@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { FeedArtifact, makeFeedBatch, originClassLabels } from "@/lib/feed";
-import { loadPublicVoteAggregate } from "@/lib/public-vote-aggregate";
+import { loadPublicVoteAggregate, loadPublicVoteAggregates } from "@/lib/public-vote-aggregate";
 import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
 import {
   Judgment,
@@ -29,6 +29,8 @@ type VoteRequestState = {
 const FEED_RETRY_DELAYS_MS = [600, 1800, 5000, 12000, 30000] as const;
 const PUBLIC_HEAD_REFRESH_MS = 15000;
 const PUBLIC_HEAD_REFRESH_LIMIT = 16;
+const VISIBLE_AGGREGATE_REFRESH_MS = 15000;
+const VISIBLE_AGGREGATE_LIMIT = 100;
 
 function feedRetryDelay(attempt: number): number {
   return FEED_RETRY_DELAYS_MS[Math.min(attempt, FEED_RETRY_DELAYS_MS.length - 1)] ?? 30000;
@@ -88,6 +90,8 @@ export function ArtifactFeed() {
   const retryTimersRef = useRef<number[]>([]);
   const publicHeadReadyRef = useRef(false);
   const publicHeadRefreshInFlightRef = useRef(false);
+  const visibleVoteIdsRef = useRef<Set<string>>(new Set());
+  const visibleAggregateRefreshInFlightRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -302,6 +306,88 @@ export function ArtifactFeed() {
   }, [session?.user.id, artifacts, voteStates]);
 
   useEffect(() => {
+    if (!socialBackendEnabled) return;
+    let cancelled = false;
+    visibleVoteIdsRef.current.clear();
+
+    const cards = Array.from(document.querySelectorAll<HTMLElement>(".artifact-card[data-public-artifact-id]"));
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        const node = entry.target as HTMLElement;
+        const artifactId = node.dataset.publicArtifactId;
+        if (!artifactId) continue;
+        if (entry.isIntersecting) visibleVoteIdsRef.current.add(artifactId);
+        else visibleVoteIdsRef.current.delete(artifactId);
+      }
+    }, { rootMargin: "350px 0px" });
+
+    cards.forEach((card) => observer.observe(card));
+
+    const refreshVisibleAggregates = () => {
+      if (
+        cancelled
+        || visibleAggregateRefreshInFlightRef.current
+        || document.visibilityState !== "visible"
+        || !navigator.onLine
+      ) {
+        return;
+      }
+
+      const ids = Array.from(visibleVoteIdsRef.current).slice(0, VISIBLE_AGGREGATE_LIMIT);
+      if (ids.length === 0) return;
+
+      visibleAggregateRefreshInFlightRef.current = true;
+      void loadPublicVoteAggregates(ids)
+        .then((aggregates) => {
+          if (cancelled || aggregates.size === 0) return;
+          setArtifacts((current) => {
+            let changed = false;
+            const next = current.map((entry) => {
+              const aggregate = aggregates.get(entry.id);
+              if (!aggregate) return entry;
+              if (
+                entry.museumVotes === aggregate.museumVotes
+                && entry.slopVotes === aggregate.slopVotes
+                && entry.slopRank === aggregate.slopRank
+              ) {
+                return entry;
+              }
+              changed = true;
+              return {
+                ...entry,
+                museumVotes: aggregate.museumVotes,
+                slopVotes: aggregate.slopVotes,
+                slopRank: aggregate.slopRank,
+              };
+            });
+            return changed ? next : current;
+          });
+        })
+        .catch(() => {
+          // Aggregate freshness is additive; cards and voting stay usable.
+        })
+        .finally(() => {
+          visibleAggregateRefreshInFlightRef.current = false;
+        });
+    };
+
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") refreshVisibleAggregates();
+    };
+
+    const interval = window.setInterval(refreshVisibleAggregates, VISIBLE_AGGREGATE_REFRESH_MS);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+      visibleVoteIdsRef.current.clear();
+    };
+  }, [artifacts.length]);
+
+  useEffect(() => {
     const node = sentinel.current;
     if (!node) return;
 
@@ -484,6 +570,7 @@ export function ArtifactFeed() {
               className={creatorPreview ? "artifact-card private-preview-card" : "artifact-card"}
               key={artifact.id}
               data-swipe-voting={creatorPreview ? undefined : "enabled"}
+              data-public-artifact-id={creatorPreview ? undefined : artifact.id}
               data-museum-admitted={museumAdmitted ? "true" : undefined}
               data-lexicon-artifact="true"
             >
