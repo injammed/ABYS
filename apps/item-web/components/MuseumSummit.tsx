@@ -1,22 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { LexiconText } from "./LexiconBroadcast";
 import { loadMuseumSummit, MuseumSummitArtifact } from "@/lib/museum";
 import { MuseumArtifactRuntime } from "./MuseumArtifactRuntime";
+import { useVisiblePublicRefresh } from "./useVisiblePublicRefresh";
 import styles from "./MuseumSummit.module.css";
+
+const SUMMIT_REFRESH_MS = 15000;
+const SUMMIT_REFRESH_EVENTS = ["aetimm:vote-committed"] as const;
 
 export function MuseumSummit() {
   const [summit, setSummit] = useState<MuseumSummitArtifact | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const refreshSummit = useCallback(async () => {
+    const artifact = await loadMuseumSummit();
+    setSummit(artifact);
+    setError(null);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 
     void loadMuseumSummit()
       .then((artifact) => {
-        if (!cancelled) setSummit(artifact);
+        if (!cancelled) {
+          setSummit(artifact);
+          setError(null);
+        }
       })
       .catch((cause) => {
         if (!cancelled) setError(cause instanceof Error ? cause.message : "The Summit register could not be read.");
@@ -29,6 +42,8 @@ export function MuseumSummit() {
       cancelled = true;
     };
   }, []);
+
+  useVisiblePublicRefresh(refreshSummit, SUMMIT_REFRESH_MS, SUMMIT_REFRESH_EVENTS);
 
   return (
     <section
@@ -63,7 +78,7 @@ export function MuseumSummit() {
           </div>
         )}
 
-        {!loading && error && (
+        {!loading && error && !summit && (
           <div className={styles.vacant} role="alert" aria-label="The peak remains, but its register is unavailable.">
             <LexiconText text="SUMMIT REGISTER" phase={31} semantic={false} />
             <LexiconText as="strong" text="The peak remains, but its register is unavailable." phase={37} semantic={false} />
@@ -77,7 +92,7 @@ export function MuseumSummit() {
           </div>
         )}
 
-        {!loading && !error && summit && (
+        {!loading && summit && (
           <article className={styles.apex} data-current-summit-artifact={summit.artifactId}>
             <div className={styles.crown} aria-hidden="true">
               <i />

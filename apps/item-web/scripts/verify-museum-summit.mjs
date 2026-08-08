@@ -3,10 +3,12 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const root = process.cwd();
-const [migration, museum, summit, page] = await Promise.all([
+const [migration, museum, summit, collection, visibleRefresh, page] = await Promise.all([
   readFile(resolve(root, "..", "..", "supabase", "migrations", "016_museum_summit.sql"), "utf8"),
   readFile(resolve(root, "lib", "museum.ts"), "utf8"),
   readFile(resolve(root, "components", "MuseumSummit.tsx"), "utf8"),
+  readFile(resolve(root, "components", "MuseumCollection.tsx"), "utf8"),
+  readFile(resolve(root, "components", "useVisiblePublicRefresh.ts"), "utf8"),
   readFile(resolve(root, "app", "aetimm", "page.tsx"), "utf8"),
 ]);
 
@@ -21,6 +23,15 @@ for (const [label, pattern, source] of [
   ["Summit all-time contract", /data-summit-law="all-time-museum-votes-only"/, summit],
   ["one-vote first crown copy", /One Museum vote can crown the first Artifact\./, summit],
   ["no Slop subtraction copy", /NO TRENDING · NO DECAY · NO SLOP SUBTRACTION/, summit],
+  ["Summit visible refresh every 15 seconds", /SUMMIT_REFRESH_MS = 15000/, summit],
+  ["collection visible refresh every 30 seconds", /COLLECTION_REFRESH_MS = 30000/, collection],
+  ["vote commit wakes Summit", /SUMMIT_REFRESH_EVENTS = \["aetimm:vote-committed"\]/, summit],
+  ["vote commit wakes collection", /COLLECTION_REFRESH_EVENTS = \["aetimm:vote-committed"\]/, collection],
+  ["shared visible-session refresh", /useVisiblePublicRefresh/, summit + collection],
+  ["hidden tabs do no Museum refresh", /document\.visibilityState !== "visible"/, visibleRefresh],
+  ["offline tabs do no Museum refresh", /!navigator\.onLine/, visibleRefresh],
+  ["one Museum refresh in flight", /inFlightRef\.current/, visibleRefresh],
+  ["return to visible wakes Museum", /visibilitychange/, visibleRefresh],
   ["Museum page contains Summit", /<MuseumSummit \/>/, page],
   ["Summit precedes permanent collection", /<MuseumSummit \/>[\s\S]*<MuseumCollection \/>/, page],
 ]) {
@@ -36,4 +47,4 @@ for (const [label, pattern] of [
   assert.ok(!pattern.test(migration), `Museum Summit contract failed: forbidden ${label}`);
 }
 
-console.log("Museum Summit PASS: one live apex is selected only by all-time Museum vote count, one vote can crown the first Artifact, zero-vote works are never crowned, ties are deterministic, Slop does not subtract, and permanent accession remains separate.");
+console.log("Museum Summit PASS: one live apex is selected only by all-time Museum votes; visible Museum sessions converge after local votes and bounded polling while hidden/offline tabs stay quiet; permanent accession remains separate and refreshes without a new control.");

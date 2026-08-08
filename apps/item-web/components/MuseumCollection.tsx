@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { loadMuseumCollection, MuseumAccession } from "@/lib/museum";
 import { LexiconText } from "./LexiconBroadcast";
 import { MuseumArtifactRuntime } from "./MuseumArtifactRuntime";
+import { useVisiblePublicRefresh } from "./useVisiblePublicRefresh";
 import styles from "./MuseumCollection.module.css";
+
+const COLLECTION_REFRESH_MS = 30000;
+const COLLECTION_REFRESH_EVENTS = ["aetimm:vote-committed"] as const;
 
 function accessionLabel(value: number): string {
   return `AETIMM ${String(value).padStart(6, "0")}`;
@@ -21,11 +25,20 @@ export function MuseumCollection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const refreshCollection = useCallback(async () => {
+    const rows = await loadMuseumCollection();
+    setAccessions(rows);
+    setError(null);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     void loadMuseumCollection()
       .then((rows) => {
-        if (!cancelled) setAccessions(rows);
+        if (!cancelled) {
+          setAccessions(rows);
+          setError(null);
+        }
       })
       .catch((cause) => {
         if (!cancelled) setError(cause instanceof Error ? cause.message : "The collection register could not be opened.");
@@ -39,10 +52,12 @@ export function MuseumCollection() {
     };
   }, []);
 
-  const state = loading ? "loading" : error ? "error" : accessions.length === 0 ? "empty" : "open";
+  useVisiblePublicRefresh(refreshCollection, COLLECTION_REFRESH_MS, COLLECTION_REFRESH_EVENTS);
+
+  const state = loading ? "loading" : error && accessions.length === 0 ? "error" : accessions.length === 0 ? "empty" : "open";
   const registerState = loading
     ? "reading accession register"
-    : error
+    : error && accessions.length === 0
       ? "register unavailable"
       : `${accessions.length} accession${accessions.length === 1 ? "" : "s"}`;
 
@@ -69,7 +84,7 @@ export function MuseumCollection() {
         </div>
       )}
 
-      {!loading && error && (
+      {!loading && error && accessions.length === 0 && (
         <div className={styles.emptyChamber} role="alert" aria-label="The register is unavailable. The Museum remains open.">
           <div className={styles.voidPedestal} aria-hidden="true" />
           <LexiconText as="p" className={styles.accession} text="PERMANENT COLLECTION" phase={29} semantic={false} />
@@ -87,7 +102,7 @@ export function MuseumCollection() {
         </div>
       )}
 
-      {!loading && !error && accessions.length > 0 && (
+      {!loading && accessions.length > 0 && (
         <div className={styles.room} data-placement-law="all-time-museum-votes-no-trending">
           {accessions.map((accession, index) => {
             const placement = placementFor(index);
