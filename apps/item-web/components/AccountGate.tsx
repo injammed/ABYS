@@ -7,10 +7,14 @@ import { CreatorSubmissionManager } from "@/components/CreatorSubmissionManager"
 import { LexiconText } from "@/components/LexiconBroadcast";
 import { loadCurrentRole, type ProfileRole } from "@/lib/moderation";
 import { AUTH_REQUIRED_EVENT } from "@/lib/public-intents";
-import { getSupabaseBrowserClient, socialBackendEnabled } from "@/lib/supabase-browser";
+import {
+  getSupabaseBrowserClient,
+  loadEnabledSocialProviders,
+  socialBackendEnabled,
+  type SocialProvider,
+} from "@/lib/supabase-browser";
 
 type Mode = "signin" | "signup";
-type SocialProvider = "google" | "github";
 
 export function AccountGate() {
   const [open, setOpen] = useState(false);
@@ -20,6 +24,7 @@ export function AccountGate() {
   const [profileRole, setProfileRole] = useState<ProfileRole>("creator");
   const [busy, setBusy] = useState(false);
   const [socialProvider, setSocialProvider] = useState<SocialProvider | null>(null);
+  const [enabledSocialProviders, setEnabledSocialProviders] = useState<Set<SocialProvider>>(() => new Set());
   const [message, setMessage] = useState<string | null>(null);
   const sessionRef = useRef<Session | null>(null);
 
@@ -54,6 +59,10 @@ export function AccountGate() {
 
     let mounted = true;
     document.documentElement.dataset.clientReady = "true";
+
+    void loadEnabledSocialProviders().then((providers) => {
+      if (mounted) setEnabledSocialProviders(providers);
+    });
 
     void client.auth.getSession().then(({ data }) => {
       if (!mounted) return;
@@ -107,7 +116,7 @@ export function AccountGate() {
 
   async function socialSignIn(provider: SocialProvider) {
     const client = getSupabaseBrowserClient();
-    if (!client) return;
+    if (!client || !enabledSocialProviders.has(provider)) return;
 
     setBusy(true);
     setSocialProvider(provider);
@@ -267,6 +276,8 @@ export function AccountGate() {
   const googleLabel = socialProvider === "google" ? "Connecting to Google…" : "Continue with Google";
   const githubLabel = socialProvider === "github" ? "Connecting to GitHub…" : "Continue with GitHub";
   const submitLabel = busy ? "Working…" : mode === "signup" ? "Create account" : "Sign in";
+  const googleEnabled = enabledSocialProviders.has("google");
+  const githubEnabled = enabledSocialProviders.has("github");
 
   return (
     <div className="upload-wrap" data-lexicon-surface="true">
@@ -276,28 +287,36 @@ export function AccountGate() {
 
       {open && (
         <form className="upload-panel" onSubmit={submit}>
-          <div style={{ display: "grid", gap: ".55rem" }}>
-            <button
-              className="submit-button"
-              type="button"
-              disabled={busy}
-              onClick={() => void socialSignIn("google")}
-              aria-label={googleLabel}
-            >
-              <LexiconText text={googleLabel} phase={37} semantic={false} />
-            </button>
-            <button
-              className="submit-button"
-              type="button"
-              disabled={busy}
-              onClick={() => void socialSignIn("github")}
-              aria-label={githubLabel}
-            >
-              <LexiconText text={githubLabel} phase={41} semantic={false} />
-            </button>
-          </div>
+          {(githubEnabled || googleEnabled) && (
+            <div style={{ display: "grid", gap: ".55rem" }}>
+              {githubEnabled && (
+                <button
+                  className="submit-button"
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void socialSignIn("github")}
+                  aria-label={githubLabel}
+                >
+                  <LexiconText text={githubLabel} phase={37} semantic={false} />
+                </button>
+              )}
+              {googleEnabled && (
+                <button
+                  className="submit-button"
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void socialSignIn("google")}
+                  aria-label={googleLabel}
+                >
+                  <LexiconText text={googleLabel} phase={41} semantic={false} />
+                </button>
+              )}
+            </div>
+          )}
 
-          <LexiconText as="p" className="eyebrow" text="OR USE EMAIL" phase={43} />
+          {(githubEnabled || googleEnabled) && (
+            <LexiconText as="p" className="eyebrow" text="OR USE EMAIL" phase={43} />
+          )}
 
           <div className="lane-tabs" aria-label="Account action">
             <button

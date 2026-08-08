@@ -5,12 +5,14 @@ const root = process.cwd();
 const dropPath = path.join(root, "components", "SlopDrop.tsx");
 const accountPath = path.join(root, "components", "AccountGate.tsx");
 const intentsPath = path.join(root, "lib", "public-intents.ts");
+const supabasePath = path.join(root, "lib", "supabase-browser.ts");
 const navPath = path.join(root, "components", "PrimaryNavigation.tsx");
 
-const [drop, account, intents, nav] = await Promise.all([
+const [drop, account, intents, supabaseBrowser, nav] = await Promise.all([
   readFile(dropPath, "utf8"),
   readFile(accountPath, "utf8"),
   readFile(intentsPath, "utf8"),
+  readFile(supabasePath, "utf8"),
   readFile(navPath, "utf8"),
 ]);
 
@@ -57,13 +59,24 @@ requirePattern("OAuth returns to same public root", /redirectTo: `\$\{window\.lo
 forbidPattern("Artifact payload persisted in localStorage", /localStorage\.(?:setItem|getItem)\([^)]*(?:artifact|file|textPart|referenceUrl)/i, drop + account);
 forbidPattern("Artifact payload persisted in sessionStorage", /sessionStorage\.setItem\([^,]+,\s*(?:selectedFiles|textPart|referenceUrl|JSON\.stringify)/, drop + account);
 
+// Auth availability law: never advertise an OAuth provider merely because the
+// frontend knows its name. The public Auth service is the source of truth.
+requirePattern("live Auth settings endpoint", /\/auth\/v1\/settings/, supabaseBrowser);
+requirePattern("browser-safe API key on settings probe", /headers: \{ apikey: browserKey \}/, supabaseBrowser);
+requirePattern("provider enablement comes from Auth settings", /settings\.external\?\.\[provider\] === true/, supabaseBrowser);
+requirePattern("Account loads enabled providers", /loadEnabledSocialProviders\(\)/, account);
+requirePattern("OAuth call refuses disabled provider", /!enabledSocialProviders\.has\(provider\)/, account);
+requirePattern("GitHub button requires live enablement", /\{githubEnabled && \([\s\S]*socialSignIn\("github"\)/, account);
+requirePattern("Google button requires live enablement", /\{googleEnabled && \([\s\S]*socialSignIn\("google"\)/, account);
+requirePattern("email auth remains available without OAuth", /id="account-email"[\s\S]*id="account-password"[\s\S]*type="submit"/, account);
+
 forbidPattern("required title", /name="title"[^>]*required/, drop);
 forbidPattern("required summary", /name="summary"[^>]*required/, drop);
 forbidPattern("required provenance", /name="provenance"[^>]*required/, drop);
 forbidPattern("required generator", /name="generator"[^>]*required/, drop);
 forbidPattern("raw HTML injection", /dangerouslySetInnerHTML/, drop);
 forbidPattern("dynamic code execution", /\beval\s*\(|new Function\s*\(/, drop);
-forbidPattern("service role browser secret", /service[_-]?role/i, drop + account + nav);
+forbidPattern("service role browser secret", /service[_-]?role/i, drop + account + supabaseBrowser + nav);
 forbidPattern("modality tabs", /image tab|video tab|audio tab|3D tab/i, drop);
 
 if (failures.length > 0) {
@@ -72,4 +85,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Throw-it-in PASS: ordinary submission remains material + optional name + one attestation + one action; signed-out Submit opens the existing auth surface and resumes the intake form after authentication, including OAuth return, without storing Artifact payloads or adding another user concept.");
+console.log("Throw-it-in PASS: ordinary submission remains one action; signed-out intent resumes after auth; the account surface exposes only OAuth providers confirmed enabled by the live Auth service while email remains available; no Artifact payload or service secret enters browser storage.");

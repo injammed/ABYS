@@ -7,8 +7,13 @@ const browserKey =
 
 export const socialBackendEnabled = Boolean(url && browserKey);
 
+export type SocialProvider = "google" | "github";
+
+const supportedSocialProviders: SocialProvider[] = ["github", "google"];
+
 let browserClient: SupabaseClient | null = null;
 let publicBrowserClient: SupabaseClient | null = null;
+let socialProviderPromise: Promise<Set<SocialProvider>> | null = null;
 
 export function getSupabaseBrowserClient(): SupabaseClient | null {
   if (!socialBackendEnabled || !url || !browserKey) return null;
@@ -40,6 +45,28 @@ export function getSupabasePublicBrowserClient(): SupabaseClient | null {
   }
 
   return publicBrowserClient;
+}
+
+export async function loadEnabledSocialProviders(): Promise<Set<SocialProvider>> {
+  if (!socialBackendEnabled || !url || !browserKey) return new Set();
+
+  if (!socialProviderPromise) {
+    socialProviderPromise = fetch(`${url.replace(/\/$/, "")}/auth/v1/settings`, {
+      method: "GET",
+      headers: { apikey: browserKey },
+      cache: "no-store",
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`AUTH_SETTINGS_${response.status}`);
+        const settings = await response.json() as { external?: Record<string, boolean> };
+        return new Set(
+          supportedSocialProviders.filter((provider) => settings.external?.[provider] === true),
+        );
+      })
+      .catch(() => new Set<SocialProvider>());
+  }
+
+  return socialProviderPromise;
 }
 
 export function requireSupabaseBrowserClient(): SupabaseClient {
