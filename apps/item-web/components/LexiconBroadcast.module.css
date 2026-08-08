@@ -18,10 +18,11 @@
 }
 
 /*
- * Oscillation law: visible interface language never falls back to a stable
- * human-source presentation during ordinary interaction. The exact source
- * remains in-flow only as an invisible geometry skeleton and in the separate
- * accessibility layer.
+ * Final frozen language law: every visible interface word oscillates during
+ * ordinary presentation. A deliberate pointer hover temporarily reveals the
+ * exact source text inside the same geometry; leaving hover resumes the field.
+ * Touch receives no stable-language exemption and focus alone does not stop
+ * oscillation. The separate accessibility layer always retains exact meaning.
  */
 .original {
   display: inline;
@@ -40,6 +41,16 @@
   overflow-wrap: inherit;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .lexicon:hover .original {
+    visibility: visible;
+  }
+
+  .lexicon:hover .mutated {
+    visibility: hidden;
+  }
+}
+
 .srOnly {
   position: absolute;
   width: 1px;
@@ -52,7 +63,7 @@
   border: 0;
 }
 
-/* Explicit user accessibility preference remains the only visible opt-out. */
+/* Explicit user accessibility preference remains the always-visible opt-out. */
 @media (prefers-reduced-motion: reduce) {
   .original {
     visibility: visible;
