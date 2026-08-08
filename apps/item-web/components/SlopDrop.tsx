@@ -353,18 +353,33 @@ export function SlopDrop() {
         p_rights_attested: attested,
         p_parts: parts,
       });
-      if (createError) throw createError;
-      artifactCommitted = true;
 
-      const committedId = String(createdId ?? artifactId);
-      setMessage("Confirming public landing…");
-
+      let committedId = String(createdId ?? artifactId);
       let publicConfirmed = false;
-      try {
-        publicConfirmed = await waitForPublicArtifactReceipt(committedId, parts.length);
-      } catch {
-        // The Artifact is already committed. Public-feed recovery may still
-        // succeed even if this confirmation read experiences a network error.
+
+      if (createError) {
+        // The RPC can commit and auto-publish before a transport failure loses
+        // its acknowledgement. The client already knows the immutable
+        // artifactId, so prove that exact public Artifact before declaring the
+        // write failed. Never blind-retry the creation RPC.
+        setMessage("Reconciling Artifact landing…");
+        try {
+          publicConfirmed = await waitForPublicArtifactReceipt(artifactId, parts.length);
+        } catch {
+          publicConfirmed = false;
+        }
+        if (!publicConfirmed) throw createError;
+        artifactCommitted = true;
+        committedId = artifactId;
+      } else {
+        artifactCommitted = true;
+        setMessage("Confirming public landing…");
+        try {
+          publicConfirmed = await waitForPublicArtifactReceipt(committedId, parts.length);
+        } catch {
+          // The Artifact is already committed. Public-feed recovery may still
+          // succeed even if this confirmation read experiences a network error.
+        }
       }
 
       formElement.reset();
