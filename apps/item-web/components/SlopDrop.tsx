@@ -122,7 +122,7 @@ function submissionErrorMessage(error: unknown): string {
   if (raw.includes("ARTIFACT_PART_COUNT_INVALID")) return "One Artifact can contain between 1 and 12 materials.";
   if (raw.includes("ARTIFACT_PART_STORAGE")) return "One material could not be bound to the Artifact. Uploaded files were rolled back where possible.";
   if (raw.includes("ARTIFACT_MODES_INVALID")) return "One or more materials could not be classified safely.";
-  if (raw.includes("PUBLICATION_ATTESTATIONS_REQUIRED")) return "Confirm the submission attestation before throwing it in.";
+  if (raw.includes("PUBLICATION_ATTESTATIONS_REQUIRED")) return "Confirm the submission attestation before sending slop.";
   if (raw.includes("AUTH_SESSION_")) return "Your sign-in expired before submission. Sign in and try again.";
   if (raw.toLowerCase().includes("row-level security")) return "The trough rejected this Artifact. Sign in again or try later.";
   return raw || "Artifact submission failed.";
@@ -317,7 +317,7 @@ export function SlopDrop() {
     let artifactCommitted = false;
 
     setBusy(true);
-    setMessage("Throwing it in…");
+    setMessage("Sending slop…");
 
     try {
       for (let index = 0; index < files.length; index += 1) {
@@ -452,7 +452,7 @@ export function SlopDrop() {
 
       {open && !session && (
         <div id="artifact-intake-panel" className="upload-panel" role="status" aria-label="Signing in before Artifact intake.">
-          <LexiconText as="p" className="submission-note" text="SIGN IN TO THROW IT IN." phase={11} semantic={false} />
+          <LexiconText as="p" className="submission-note" text="SIGN IN TO SEND SLOP." phase={11} semantic={false} />
         </div>
       )}
 
@@ -603,9 +603,9 @@ export function SlopDrop() {
                 className="submit-button"
                 type="submit"
                 disabled={busy || intakePaused || materialLimitExceeded || materialPartCount < 1}
-                aria-label={busy ? "Throwing" : intakePaused ? "Trough paused" : "Throw it in"}
+                aria-label={busy ? "Sending" : intakePaused ? "Trough paused" : "Send slop"}
               >
-                <LexiconText text={busy ? "THROWING…" : intakePaused ? "TROUGH PAUSED" : "THROW IT IN"} phase={113} semantic={false} />
+                <LexiconText text={busy ? "SENDING…" : intakePaused ? "TROUGH PAUSED" : "SEND SLOP"} phase={113} semantic={false} />
               </button>
               {message && (
                 <p className="submission-note" role="status" aria-live="polite" aria-label={message}>

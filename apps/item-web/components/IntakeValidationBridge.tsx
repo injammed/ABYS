@@ -96,12 +96,13 @@ export function IntakeValidationBridge() {
       const attestation = simplifySlopDrop(form);
       if (!attestation) return;
 
-      // THROW IT IN is the single explicit submission action. That click also
-      // records the existing AI/safety/rights attestation before the unchanged
-      // SlopDrop upload path runs; quarantine and moderation remain untouched.
+      // SEND SLOP is the one explicit submission action. Record the existing
+      // attestation, then enter the browser's real submit pipeline so React's
+      // onSubmit owns the upload transaction. No synthetic submit event.
       event.preventDefault();
       attestation.checked = true;
-      form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+      form.noValidate = true;
+      form.requestSubmit(submit);
     };
 
     const onInvalid = (event: Event) => {
