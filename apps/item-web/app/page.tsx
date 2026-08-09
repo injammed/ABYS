@@ -1,5 +1,6 @@
 import { ArtifactFeed } from "@/components/ArtifactFeed";
 import { BinarySwipeVoting } from "@/components/BinarySwipeVoting";
+import { IntakeValidationBridge } from "@/components/IntakeValidationBridge";
 import { LexiconText } from "@/components/LexiconBroadcast";
 import { MachineGloss } from "@/components/MachineGloss";
 import { PrimaryNavigation } from "@/components/PrimaryNavigation";
@@ -9,6 +10,7 @@ export default function HomePage() {
   return (
     <main className="feed-first-page" data-interface-contract="slop-feed-root-v1" data-language-contract="machine-first-gloss-v1">
       <SubmissionLandingBridge />
+      <IntakeValidationBridge />
 
       <header className="site-header feed-first-header">
         <a className="brand-lockup feed-first-brand" href="#field" aria-label="Return to the live feed">
