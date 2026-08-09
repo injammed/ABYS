@@ -243,6 +243,7 @@ export function SlopDrop() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     if (busy || intakePaused) return;
 
     const client = getSupabaseBrowserClient();
@@ -250,6 +251,8 @@ export function SlopDrop() {
       requestSubmitAuth();
       return;
     }
+
+    setMessage("Sending slop…");
 
     try {
       await ensureFreshAuthenticatedSession(session.user.id);
@@ -273,7 +276,6 @@ export function SlopDrop() {
       }
     }
 
-    const formElement = event.currentTarget;
     const form = new FormData(formElement);
     const bodyText = textPart.trim();
     const url = referenceUrl.trim();
