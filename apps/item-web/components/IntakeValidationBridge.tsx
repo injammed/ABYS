@@ -33,19 +33,27 @@ function ensureValidationMessage(form: HTMLFormElement): HTMLElement {
   return message;
 }
 
+function simplifySlopDrop(form: HTMLFormElement): HTMLInputElement | null {
+  const attestation = form.querySelector<HTMLInputElement>("input[name='submitAttestation']");
+  if (!attestation) return null;
+
+  form.noValidate = true;
+  attestation.required = false;
+  attestation.closest<HTMLElement>("label.check-row")?.setAttribute("hidden", "");
+  form.querySelector<HTMLInputElement>("#title")?.closest<HTMLElement>("div")?.setAttribute("hidden", "");
+  form.querySelector<HTMLElement>("details")?.setAttribute("hidden", "");
+  form.querySelectorAll<HTMLButtonElement>("button[type='button']").forEach((button) => {
+    button.hidden = true;
+  });
+
+  return attestation;
+}
+
 export function IntakeValidationBridge() {
   useEffect(() => {
-    const syncAutonomousRequirement = () => {
+    const syncSubmissionSurface = () => {
       document.querySelectorAll<HTMLFormElement>("form.submission-panel").forEach((form) => {
-        if (form.querySelector("input[name='submitAttestation']")) form.noValidate = true;
-
-        const origin = form.querySelector<HTMLSelectElement>("select[name='originClass']");
-        const autonomous = form.querySelector<HTMLInputElement>("input[name='autonomousAccuracy']");
-        if (!autonomous) return;
-
-        const isAutonomous = origin?.value === "autonomous_ai_run";
-        autonomous.required = isAutonomous;
-        autonomous.setAttribute("aria-required", isAutonomous ? "true" : "false");
+        simplifySlopDrop(form);
       });
     };
 
@@ -53,20 +61,17 @@ export function IntakeValidationBridge() {
       const target = event.target instanceof Element ? event.target : null;
       const submit = target?.closest<HTMLButtonElement>("button[type='submit']");
       const form = submit?.closest<HTMLFormElement>("form.submission-panel");
-      if (!submit || submit.disabled || !form?.querySelector("input[name='submitAttestation']")) return;
+      if (!submit || submit.disabled || !form) return;
 
-      // Safari can consume the default submit action before React receives the
-      // submit event. Own this one click explicitly and dispatch the same form
-      // submit event that SlopDrop already handles and validates.
+      const attestation = simplifySlopDrop(form);
+      if (!attestation) return;
+
+      // THROW IT IN is the single explicit submission action. That click also
+      // records the existing AI/safety/rights attestation before the unchanged
+      // SlopDrop upload path runs; quarantine and moderation remain untouched.
       event.preventDefault();
-      form.noValidate = true;
+      attestation.checked = true;
       form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-    };
-
-    const onChange = (event: Event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLSelectElement) || target.name !== "originClass") return;
-      syncAutonomousRequirement();
     };
 
     const onInvalid = (event: Event) => {
@@ -85,17 +90,15 @@ export function IntakeValidationBridge() {
       });
     };
 
-    const observer = new MutationObserver(syncAutonomousRequirement);
+    const observer = new MutationObserver(syncSubmissionSurface);
     observer.observe(document.body, { childList: true, subtree: true });
     document.addEventListener("click", onClick, true);
-    document.addEventListener("change", onChange, true);
     document.addEventListener("invalid", onInvalid, true);
-    syncAutonomousRequirement();
+    syncSubmissionSurface();
 
     return () => {
       observer.disconnect();
       document.removeEventListener("click", onClick, true);
-      document.removeEventListener("change", onChange, true);
       document.removeEventListener("invalid", onInvalid, true);
     };
   }, []);
