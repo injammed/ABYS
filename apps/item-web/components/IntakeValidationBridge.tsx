@@ -49,6 +49,14 @@ export function IntakeValidationBridge() {
       });
     };
 
+    const onClick = (event: MouseEvent) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const submit = target?.closest<HTMLButtonElement>("button[type='submit']");
+      const form = submit?.closest<HTMLFormElement>("form.submission-panel");
+      if (!form?.querySelector("input[name='submitAttestation']")) return;
+      form.noValidate = true;
+    };
+
     const onChange = (event: Event) => {
       const target = event.target;
       if (!(target instanceof HTMLSelectElement) || target.name !== "originClass") return;
@@ -73,12 +81,14 @@ export function IntakeValidationBridge() {
 
     const observer = new MutationObserver(syncAutonomousRequirement);
     observer.observe(document.body, { childList: true, subtree: true });
+    document.addEventListener("click", onClick, true);
     document.addEventListener("change", onChange, true);
     document.addEventListener("invalid", onInvalid, true);
     syncAutonomousRequirement();
 
     return () => {
       observer.disconnect();
+      document.removeEventListener("click", onClick, true);
       document.removeEventListener("change", onChange, true);
       document.removeEventListener("invalid", onInvalid, true);
     };
