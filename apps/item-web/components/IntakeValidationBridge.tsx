@@ -53,8 +53,14 @@ export function IntakeValidationBridge() {
       const target = event.target instanceof Element ? event.target : null;
       const submit = target?.closest<HTMLButtonElement>("button[type='submit']");
       const form = submit?.closest<HTMLFormElement>("form.submission-panel");
-      if (!form?.querySelector("input[name='submitAttestation']")) return;
+      if (!submit || submit.disabled || !form?.querySelector("input[name='submitAttestation']")) return;
+
+      // Safari can consume the default submit action before React receives the
+      // submit event. Own this one click explicitly and dispatch the same form
+      // submit event that SlopDrop already handles and validates.
+      event.preventDefault();
       form.noValidate = true;
+      form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     };
 
     const onChange = (event: Event) => {
