@@ -40,10 +40,40 @@ function simplifySlopDrop(form: HTMLFormElement): HTMLInputElement | null {
   form.noValidate = true;
   attestation.required = false;
   attestation.closest<HTMLElement>("label.check-row")?.setAttribute("hidden", "");
-  form.querySelector<HTMLInputElement>("#title")?.closest<HTMLElement>("div")?.setAttribute("hidden", "");
-  form.querySelector<HTMLElement>("details")?.setAttribute("hidden", "");
+
+  const title = form.querySelector<HTMLInputElement>("#title");
+  if (title) {
+    title.value = "";
+    title.disabled = true;
+    title.closest<HTMLElement>("div")?.setAttribute("hidden", "");
+  }
+
+  const details = form.querySelector<HTMLDetailsElement>("details");
+  if (details) {
+    details.hidden = false;
+    details.open = true;
+    details.querySelector<HTMLElement>("summary")?.setAttribute("hidden", "");
+
+    const description = details.querySelector<HTMLTextAreaElement>("#summary");
+    const descriptionBlock = description?.closest<HTMLElement>("div") ?? null;
+    Array.from(details.children).forEach((child) => {
+      if (child instanceof HTMLElement && child.tagName === "DIV") {
+        child.hidden = child !== descriptionBlock;
+      }
+    });
+
+    if (description) {
+      description.removeAttribute("minlength");
+      description.placeholder = "Whatever you want.";
+    }
+  }
+
   form.querySelectorAll<HTMLButtonElement>("button[type='button']").forEach((button) => {
     button.hidden = true;
+  });
+
+  form.querySelectorAll<HTMLElement>(".submission-note").forEach((note) => {
+    if (!note.closest(".submission-actions")) note.hidden = true;
   });
 
   return attestation;
