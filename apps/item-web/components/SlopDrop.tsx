@@ -412,7 +412,7 @@ export function SlopDrop() {
       setSelectedFiles([]);
       setTextPart("");
       setReferenceUrl("");
-      setMessage(publicConfirmed ? "Sent. Public." : "Sent. Public feed confirmation delayed; recovery is still running.");
+      setMessage(publicConfirmed ? "Thrown. Public." : "Thrown. Public feed confirmation delayed; recovery is still running.");
       window.dispatchEvent(new CustomEvent("aetimm:submission-created", {
         detail: { artifactId: committedId, publicConfirmed },
       }));
