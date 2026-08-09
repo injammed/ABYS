@@ -2,6 +2,7 @@ import type { ArtifactPart, FeedArtifact } from "@/lib/feed";
 import { InitialLeaseArtifactDownload } from "./InitialLeaseArtifactDownload";
 import { InitialLeaseArtifactMedia } from "./InitialLeaseArtifactMedia";
 import { LexiconText } from "./LexiconBroadcast";
+import { MultiImageDump } from "./MultiImageDump";
 import { RenewableArtifactMedia } from "./RenewableArtifactMedia";
 import styles from "./ArtifactRuntime.module.css";
 
@@ -168,12 +169,15 @@ function MaterialList({ parts }: { parts: ArtifactPart[] }) {
 
 export function ArtifactRuntime({ artifact }: { artifact: FeedArtifact }) {
   const parts = artifact.parts ?? [];
+  const imageParts = parts.filter((part) => part.mode === "image" && part.partKind === "file");
   const lead = leadPart(parts);
 
   return (
     <div className={styles.host} data-runtime-contract="artifact-runtime-v1">
       <div className={styles.stage}>
-        {lead ? (
+        {imageParts.length > 1 ? (
+          <MultiImageDump parts={parts} />
+        ) : lead ? (
           <LeadRuntime part={lead} />
         ) : artifact.mediaUrl ? (
           <RenewableArtifactMedia kind="image" className={styles.image} initialUrl={artifact.mediaUrl} />
