@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AccountGate } from "@/components/AccountGate";
+import { IntakeValidationBridge } from "@/components/IntakeValidationBridge";
 import { LexiconText } from "@/components/LexiconBroadcast";
 import { SlopDrop } from "@/components/SlopDrop";
 
@@ -17,6 +18,8 @@ export function PrimaryNavigation({ mode }: PrimaryNavigationProps) {
       data-navigation-contract="primary-mode-coin-flip-v1"
       data-arrival-contract="active-mode-is-not-a-button-v1"
     >
+      <IntakeValidationBridge />
+
       <div className="primary-mode-switch" aria-label="Choose primary experience">
         {mode === "feed" ? (
           <div
