@@ -27,7 +27,7 @@ const forbidPattern = (label, pattern, source) => {
 };
 
 requirePattern("ALL SLOP WELCOME", /ALL SLOP WELCOME\./, drop);
-requirePattern("simple submit language", /"THROW IT IN"/, drop);
+requirePattern("simple submit language", /"SEND SLOP"/, drop);
 requirePattern("material-first picker", /Add material/, drop);
 requirePattern("optional title", /Name it · optional/, drop);
 requirePattern("one combined attestation", /AI-made\. I can submit it\. It does not contain prohibited material\./, drop);
