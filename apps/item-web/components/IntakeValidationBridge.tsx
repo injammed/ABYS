@@ -37,6 +37,8 @@ export function IntakeValidationBridge() {
   useEffect(() => {
     const syncAutonomousRequirement = () => {
       document.querySelectorAll<HTMLFormElement>("form.submission-panel").forEach((form) => {
+        if (form.querySelector("input[name='submitAttestation']")) form.noValidate = true;
+
         const origin = form.querySelector<HTMLSelectElement>("select[name='originClass']");
         const autonomous = form.querySelector<HTMLInputElement>("input[name='autonomousAccuracy']");
         if (!autonomous) return;
