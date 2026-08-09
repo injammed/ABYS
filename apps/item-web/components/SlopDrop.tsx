@@ -467,8 +467,8 @@ export function SlopDrop() {
             />
 
             {intakePaused && (
-              <p className="submission-note" role="status" aria-label="Trough paused. The form stays visible; sending is temporarily locked.">
-                <LexiconText text="TROUGH PAUSED. The form stays visible; sending is temporarily locked." phase={17} semantic={false} />
+              <p className="submission-note" role="status" aria-label="Trough paused. The form stays visible; throwing is temporarily locked.">
+                <LexiconText text="TROUGH PAUSED. The form stays visible; throwing is temporarily locked." phase={17} semantic={false} />
               </p>
             )}
 
