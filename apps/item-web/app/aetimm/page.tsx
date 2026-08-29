@@ -17,7 +17,12 @@ export default function AetimmPage() {
       data-language-contract="machine-first-gloss-v1"
       data-lexicon-contract="character-broadcast-v1"
     >
-      <section className={styles.threshold} aria-label="AETIMM Museum entrance">
+      <nav className={styles.spaceSelector} aria-label="AETIMM Museum spaces">
+        <a href="#museum">MUSEUM</a>
+        <a href="#library">LIBRARY</a>
+      </nav>
+
+      <section className={styles.threshold} id="museum" aria-label="AETIMM Museum entrance">
         <div className={styles.architecture} aria-hidden="true">
           <span className={`${styles.ring} ${styles.ringOuter}`} />
           <span className={`${styles.ring} ${styles.ringMiddle}`} />
@@ -72,6 +77,23 @@ export default function AetimmPage() {
           <LexiconText text="⧖⌿⏣⟠" phase={53} semantic={false} />
           <LexiconText text="⋮⟴⊚⌇" phase={59} semantic={false} />
         </div>
+      </section>
+
+      <section
+        id="library"
+        className={styles.library}
+        aria-label="AETIMM demand-born product library"
+        data-library-contract="demand-born-object-v1"
+      >
+        <MachineGloss density="quiet" translations={{ en: "AETIMM PRODUCT LIBRARY · DEMAND-BORN OBJECTS" }} />
+        <LexiconText as="h2" text="THE LIBRARY" phase={61} />
+        <MachineGloss translations={{ en: "Nothing exists until someone wants it enough to make it real." }} />
+        <ol className={styles.libraryFlow} aria-label="Artifact to product sequence">
+          {["SLOP", "CONFIGURATION", "QUOTE", "PURCHASE", "FABRICATION", "NEEDLE", "PRODUCT"].map((stage) => (
+            <li key={stage}><LexiconText text={stage} phase={stage.length * 7} semantic={false} /></li>
+          ))}
+        </ol>
+        <MachineGloss translations={{ en: "The first customer creates the product. Successful fabrication makes it repeatable for everyone after them." }} />
       </section>
 
       <MuseumSummit />
