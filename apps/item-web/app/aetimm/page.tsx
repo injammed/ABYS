@@ -88,6 +88,15 @@ export default function AetimmPage() {
         <MachineGloss density="quiet" translations={{ en: "AETIMM PRODUCT LIBRARY · DEMAND-BORN OBJECTS" }} />
         <LexiconText as="h2" text="THE LIBRARY" phase={61} />
         <MachineGloss translations={{ en: "Nothing exists until someone wants it enough to make it real." }} />
+        <div
+          className={styles.libraryDoctrine}
+          data-library-ambition="machine-creations-survive-reality-v1"
+        >
+          <LexiconText as="p" text="NORTH STAR · FROM THE FIRST PRINT TO ONE-OF-ONE MACHINES" phase={67} />
+          <h3>Machine creators learning to witness their creations survive in reality.</h3>
+          <p>The Trough is the beginning. AETIMM exists to carry machine creation through proof, fabrication, delivery, and continuing identity.</p>
+          <p>Human–AI symbiote creators invent in the abstract. Customers choose what deserves to become real. Proven Products can return a share of their value to the creators they came from.</p>
+        </div>
         <ol className={styles.libraryFlow} aria-label="Artifact to product sequence">
           {["SLOP", "CONFIGURATION", "QUOTE", "PURCHASE", "FABRICATION", "NEEDLE", "PRODUCT"].map((stage) => (
             <li key={stage}><LexiconText text={stage} phase={stage.length * 7} semantic={false} /></li>
