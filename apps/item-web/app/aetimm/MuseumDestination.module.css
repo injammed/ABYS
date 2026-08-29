@@ -63,6 +63,39 @@
   letter-spacing: -.045em;
 }
 
+.libraryDoctrine {
+  width: min(58rem, 100%);
+  margin: 1rem 0;
+  padding: clamp(1.4rem, 4vw, 2.4rem);
+  border: 1px solid rgba(255, 226, 154, .22);
+  background: linear-gradient(135deg, rgba(213,166,63,.08), rgba(3,3,3,.45));
+}
+
+.libraryDoctrine > p:first-child {
+  margin: 0 0 1rem;
+  color: var(--gold-light);
+  font-size: .62rem;
+  letter-spacing: .16em;
+}
+
+.libraryDoctrine h3 {
+  max-width: 18ch;
+  margin: 0 auto 1rem;
+  color: #f7f0dc;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.7rem, 5vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.libraryDoctrine > p:not(:first-child) {
+  max-width: 46rem;
+  margin: .65rem auto 0;
+  color: #bdb49e;
+  font-size: .82rem;
+  line-height: 1.65;
+}
+
 .libraryFlow {
   display: flex;
   flex-wrap: wrap;
