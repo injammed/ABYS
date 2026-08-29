@@ -22,6 +22,9 @@ for (const [label, pattern, source] of [
   ["empty permanent hall is not a failure redirect", /No Artifact has crossed the permanent accession threshold yet\./, collection],
   ["ceremonial ring architecture", /\.ringOuter[\s\S]*\.ringMiddle[\s\S]*\.ringInner/, pageStyles],
   ["serious Museum framing", /AETIMM · MACHINE MUSEUM/, page],
+  ["Museum and Library selector", /href="#museum"[\s\S]*href="#library"/, page],
+  ["demand-born Library contract", /data-library-contract="demand-born-object-v1"/, page],
+  ["Artifact-to-product sequence", /SLOP[\s\S]*CONFIGURATION[\s\S]*QUOTE[\s\S]*PURCHASE[\s\S]*FABRICATION[\s\S]*NEEDLE[\s\S]*PRODUCT/, page],
   ["empty chamber is spatially rendered", /\.emptyChamber[\s\S]*min-height:/, collectionStyles],
   ["Summit has vacant state inside destination", /THE PEAK IS UNCLAIMED/, summit],
 ]) {
