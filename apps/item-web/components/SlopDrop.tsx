@@ -436,7 +436,7 @@ export function SlopDrop() {
     );
   }
 
-  const triggerText = open ? "Close" : intakePaused ? "Intake paused" : "Submit";
+  const triggerText = open ? "Close" : intakePaused ? "Intake paused" : "Upload";
 
   return (
     <div className="upload-wrap" data-lexicon-surface="true">
