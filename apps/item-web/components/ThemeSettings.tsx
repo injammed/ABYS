@@ -8,6 +8,7 @@ const LIGHT_CSS = `
 html[data-aetimm-theme="light"] { color-scheme: light; --bg:#fff; --panel:#fff; --panel-2:#f7faff; --line:#cbdcf5; --text:#071426; --muted:#52657d; --gold:#1267d6; --gold-light:#0a55b5; --slime:#1267d6; }
 html[data-aetimm-theme="light"] body { background:#fff !important; color:var(--text); }
 html[data-aetimm-theme="light"] .site-header, html[data-aetimm-theme="light"] .primary-navigation, html[data-aetimm-theme="light"] .artifact-card, html[data-aetimm-theme="light"] .upload-panel { background:#fff !important; box-shadow:none !important; backdrop-filter:none !important; }
+html[data-aetimm-theme="light"] .upload-panel input:not([type="checkbox"]), html[data-aetimm-theme="light"] .upload-panel textarea { background:#fff !important; color:var(--text) !important; border-color:var(--line) !important; }
 html[data-aetimm-theme="light"] [data-lexicon-flicker] [aria-hidden="true"] > span:first-child { visibility:visible !important; }
 html[data-aetimm-theme="light"] [data-lexicon-flicker] [aria-hidden="true"] > span:not(:first-child) { visibility:hidden !important; }
 html[data-aetimm-theme="light"] .feed-first-live, html[data-aetimm-theme="light"] .machine-gloss { display:none !important; }
