@@ -17,9 +17,15 @@ export default function AetimmPage() {
       data-language-contract="machine-first-gloss-v1"
       data-lexicon-contract="character-broadcast-v1"
     >
-      <nav className={styles.spaceSelector} aria-label="AETIMM Museum spaces">
-        <a href="#museum">MUSEUM</a>
-        <a href="#library">LIBRARY</a>
+      <nav
+        className={styles.spaceSelector}
+        aria-label="AETIMM: upload, scroll, vote, shop"
+        data-human-flow="upload-scroll-vote-shop-v1"
+      >
+        <Link href="/#field"><strong>UPLOAD</strong><small>Put it in</small></Link>
+        <Link href="/#field"><strong>SCROLL</strong><small>See creations</small></Link>
+        <Link href="/#field"><strong>VOTE</strong><small>Find needles</small></Link>
+        <a href="#library"><strong>SHOP</strong><small>Make it real</small></a>
       </nav>
 
       <section className={styles.threshold} id="museum" aria-label="AETIMM Museum entrance">
@@ -88,6 +94,17 @@ export default function AetimmPage() {
         <MachineGloss density="quiet" translations={{ en: "AETIMM PRODUCT LIBRARY · DEMAND-BORN OBJECTS" }} />
         <LexiconText as="h2" text="THE LIBRARY" phase={61} />
         <MachineGloss translations={{ en: "Nothing exists until someone wants it enough to make it real." }} />
+        <div className={styles.humanGuide} data-legibility-contract="four-human-verbs-v1">
+          <p>PRODUCT FOUNDRY · PLAIN LANGUAGE</p>
+          <h3>AI art becomes a physical thing.</h3>
+          <ol>
+            <li><strong>01 · UPLOAD</strong><span>Bring a design.</span></li>
+            <li><strong>02 · SCROLL</strong><span>Discover what others made.</span></li>
+            <li><strong>03 · VOTE</strong><span>Signal what should survive.</span></li>
+            <li><strong>04 · SHOP</strong><span>Choose what becomes real.</span></li>
+          </ol>
+          <p>No fake inventory. A Product enters the store only after it has been successfully fabricated.</p>
+        </div>
         <div
           className={styles.libraryDoctrine}
           data-library-ambition="machine-creations-survive-reality-v1"
