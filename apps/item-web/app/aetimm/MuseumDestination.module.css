@@ -8,6 +8,84 @@
     linear-gradient(180deg, #050505 0%, #020202 64%, #050504 100%);
 }
 
+.spaceSelector {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 12rem));
+  justify-content: center;
+  gap: .4rem;
+  padding: .75rem 1rem;
+  border-bottom: 1px solid rgba(255, 226, 154, .16);
+  background: rgba(3, 3, 3, .9);
+  backdrop-filter: blur(20px);
+}
+
+.spaceSelector a {
+  padding: .7rem 1rem;
+  border: 1px solid rgba(255, 226, 154, .2);
+  color: var(--muted);
+  text-align: center;
+  text-decoration: none;
+  letter-spacing: .16em;
+  font-size: .66rem;
+}
+
+.spaceSelector a:hover,
+.spaceSelector a:focus-visible {
+  border-color: rgba(255, 226, 154, .72);
+  color: var(--gold-light);
+  background: rgba(213, 166, 63, .08);
+}
+
+.library {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: clamp(5rem, 11vw, 9rem) 1rem;
+  border-bottom: 1px solid rgba(255, 226, 154, .12);
+  background:
+    linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px),
+    radial-gradient(circle at 50% 42%, rgba(213,166,63,.08), transparent 28rem);
+  background-size: 48px 48px, 48px 48px, auto;
+  text-align: center;
+  scroll-margin-top: 4.5rem;
+}
+
+.library h2 {
+  margin: .35rem 0;
+  color: #f7f0dc;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 9vw, 7rem);
+  font-weight: 400;
+  letter-spacing: -.045em;
+}
+
+.libraryFlow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .45rem;
+  margin: 1rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.libraryFlow li {
+  padding: .62rem .72rem;
+  border: 1px solid rgba(255, 226, 154, .18);
+  color: #d9cfb4;
+  font-size: .58rem;
+  letter-spacing: .1em;
+}
+
+.libraryFlow li:not(:last-child)::after {
+  content: "  →";
+  color: rgba(255, 226, 154, .42);
+}
+
 .threshold {
   position: relative;
   min-height: min(78vh, 58rem);
@@ -228,6 +306,10 @@
 }
 
 @media (max-width: 600px) {
+  .spaceSelector {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .threshold {
     min-height: 72vh;
     padding-top: 5.6rem;
