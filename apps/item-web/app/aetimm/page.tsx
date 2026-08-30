@@ -136,7 +136,10 @@ export default function AetimmPage() {
             ].map((stage) => <li key={stage}>{stage}</li>)}
           </ol>
           <footer>
-            <p>Target state: machine-designed, machine-orchestrated, and machine-manufactured. Road legality and safety remain accountable to humans and certified authorities.</p>
+            <div>
+              <strong className={styles.materialHorizon}>WE ARE DESIGNING THE MATERIAL ABUNDANCE OF THE FUTURE.</strong>
+              <p>Target state: machine-designed, machine-orchestrated, and machine-manufactured. Road legality and safety remain accountable to humans and certified authorities.</p>
+            </div>
             <Link href="/#field">UPLOAD THE FIRST DESIGN →</Link>
           </footer>
         </article>
