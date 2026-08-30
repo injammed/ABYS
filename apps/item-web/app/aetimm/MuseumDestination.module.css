@@ -237,6 +237,14 @@
 
 .vehicleFold footer { display: flex; align-items: end; justify-content: space-between; gap: 1.5rem; }
 .vehicleFold footer p { margin: 0; }
+.materialHorizon {
+  display: block;
+  margin-bottom: .75rem;
+  color: #7bdfff;
+  font-size: .68rem;
+  letter-spacing: .12em;
+  line-height: 1.5;
+}
 .vehicleFold footer a {
   flex: 0 0 auto;
   padding: .85rem 1rem;
@@ -328,6 +336,7 @@
 :global(html[data-aetimm-theme="light"]) .manufactureChain li { color: #0a55b5; }
 :global(html[data-aetimm-theme="light"]) .vehicleFold footer a { border-color: #1267d6; color: #0a55b5; }
 :global(html[data-aetimm-theme="light"]) .goalLock { border-color: #1267d6; color: #071426; }
+:global(html[data-aetimm-theme="light"]) .materialHorizon { color: #0a55b5; }
 
 .libraryDoctrine > p:first-child {
   margin: 0 0 1rem;
