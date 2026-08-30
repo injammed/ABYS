@@ -27,6 +27,7 @@ for (const [label, pattern, source] of [
   ["honest product availability", /No fake inventory\.[\s\S]*successfully fabricated/, page],
   ["sports-car North Star remains an honest concept", /data-north-star-product="one-of-one-hydrogen-electric-sports-car-v1"[\s\S]*CONCEPT · NOT YET ORDERABLE/, page],
   ["two-goal product constitution", /data-product-constitution="four-verbs-to-one-of-one-machine-v1"[\s\S]*UPLOAD · SCROLL · VOTE · SHOP[\s\S]*ONE-OF-ONE MACHINE-MADE SPORTS CARS PURCHASABLE ON AETIMM/, page],
+  ["material-abundance horizon", /WE ARE DESIGNING THE MATERIAL ABUNDANCE OF THE FUTURE\./, page],
   ["four verbs converge on one physical machine", /UPLOAD[\s\S]*SCROLL[\s\S]*VOTE[\s\S]*SHOP[\s\S]*ONE MACHINE/, page],
   ["vehicle manufacture chain", /DESIGN SYNTHESIS[\s\S]*DIGITAL TWIN[\s\S]*SAFETY \+ LEGAL[\s\S]*MACHINE FABRICATION[\s\S]*DELIVERY \+ PROVENANCE/, page],
   ["certified human accountability remains explicit", /Road legality and safety remain accountable to humans and certified authorities\./, page],
