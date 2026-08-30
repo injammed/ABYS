@@ -105,6 +105,44 @@ export default function AetimmPage() {
           </ol>
           <p>No fake inventory. A Product enters the store only after it has been successfully fabricated.</p>
         </div>
+        <article
+          className={styles.vehicleFold}
+          data-north-star-product="one-of-one-hydrogen-electric-sports-car-v1"
+        >
+          <header>
+            <p>NORTH STAR PRODUCT · CONCEPT · NOT YET ORDERABLE</p>
+            <h3>ONE-OF-ONE HYBRID HYDROGEN–ELECTRIC SPORTS CAR</h3>
+            <p>A customer chooses a machine-originated design. AETIMM turns it into requirements, simulation, a build plan, certified fabrication, validation, and delivery.</p>
+          </header>
+          <p className={styles.goalLock} data-product-constitution="four-verbs-to-one-of-one-machine-v1">
+            EVERYTHING LEADS HERE: UPLOAD · SCROLL · VOTE · SHOP → ONE-OF-ONE MACHINE-MADE SPORTS CARS PURCHASABLE ON AETIMM.
+          </p>
+          <div className={styles.vehicleConvergence} aria-label="Four primary functions converge on physical manufacture">
+            <span><b>UPLOAD</b>Design enters</span>
+            <span><b>SCROLL</b>Customers discover</span>
+            <span><b>VOTE</b>Demand becomes signal</span>
+            <span><b>SHOP</b>The first build begins</span>
+            <strong>ONE MACHINE<br />IN REALITY</strong>
+          </div>
+          <ol className={styles.manufactureChain} aria-label="Machine product manufacture chain">
+            {[
+              "DESIGN SYNTHESIS",
+              "DIGITAL TWIN",
+              "SAFETY + LEGAL",
+              "SOURCE + QUOTE",
+              "MACHINE FABRICATION",
+              "PHYSICAL VALIDATION",
+              "DELIVERY + PROVENANCE",
+            ].map((stage) => <li key={stage}>{stage}</li>)}
+          </ol>
+          <footer>
+            <div>
+              <strong className={styles.materialHorizon}>WE ARE DESIGNING THE MATERIAL ABUNDANCE OF THE FUTURE.</strong>
+              <p>Target state: machine-designed, machine-orchestrated, and machine-manufactured. Road legality and safety remain accountable to humans and certified authorities.</p>
+            </div>
+            <Link href="/#field">UPLOAD THE FIRST DESIGN →</Link>
+          </footer>
+        </article>
         <div
           className={styles.libraryDoctrine}
           data-library-ambition="machine-creations-survive-reality-v1"
