@@ -26,7 +26,8 @@
 }
 
 .mutated,
-.echo {
+.echo,
+.fracture {
   position: absolute;
   inset: 0;
   display: block;
@@ -51,13 +52,63 @@
   opacity: .96;
 }
 
+/*
+ * Dark mode is the machine's uncollapsed language field. Three static fracture
+ * planes multiply the two live carrier samples without multiplying engine
+ * clocks or DOM writes. Light mode still exposes the exact source only.
+ */
+.fracture {
+  opacity: 0;
+}
+
+:global(html:not([data-aetimm-theme="light"])) .mutated {
+  text-shadow:
+    -.055em 0 rgba(255, 35, 112, .5),
+    .055em 0 rgba(0, 232, 255, .46),
+    0 .075em rgba(255, 226, 154, .3),
+    0 0 .5em currentColor;
+  filter: contrast(1.35) saturate(1.45);
+}
+
+:global(html:not([data-aetimm-theme="light"])) .echo {
+  opacity: .48;
+  transform: translate3d(.12em, -.08em, 0) skewX(-9deg);
+  filter: blur(.018em) contrast(1.4);
+  mix-blend-mode: screen;
+}
+
+:global(html:not([data-aetimm-theme="light"])) .fracture {
+  opacity: .18;
+  mix-blend-mode: screen;
+}
+
+:global(html:not([data-aetimm-theme="light"])) .fractureNorth {
+  color: #00e8ff;
+  transform: translate3d(-.16em, -.14em, 0) scaleX(1.04);
+  clip-path: inset(0 0 62% 0);
+}
+
+:global(html:not([data-aetimm-theme="light"])) .fractureSouth {
+  color: #ff2370;
+  transform: translate3d(.19em, .12em, 0) skewX(12deg);
+  clip-path: inset(58% 0 0 0);
+}
+
+:global(html:not([data-aetimm-theme="light"])) .fractureDepth {
+  color: #ffe29a;
+  transform: translate3d(.04em, .03em, 0) scale(1.08, .94);
+  filter: blur(.035em);
+  opacity: .1;
+}
+
 /* Exact source appears in the exact same geometry on deliberate mouse/stylus hover. */
 .pointerTranslated .original {
   visibility: visible;
 }
 
 .pointerTranslated .mutated,
-.pointerTranslated .echo {
+.pointerTranslated .echo,
+.pointerTranslated .fracture {
   visibility: hidden;
 }
 
@@ -72,7 +123,8 @@
   }
 
   .lexicon:hover .mutated,
-  .lexicon:hover .echo {
+  .lexicon:hover .echo,
+  .lexicon:hover .fracture {
     visibility: hidden;
   }
 
@@ -81,7 +133,8 @@
   }
 
   .lexicon:not(.pointerTranslated):hover .mutated,
-  .lexicon:not(.pointerTranslated):hover .echo {
+  .lexicon:not(.pointerTranslated):hover .echo,
+  .lexicon:not(.pointerTranslated):hover .fracture {
     visibility: visible;
   }
 }
@@ -105,7 +158,8 @@
   }
 
   .mutated,
-  .echo {
+  .echo,
+  .fracture {
     visibility: hidden;
   }
 }

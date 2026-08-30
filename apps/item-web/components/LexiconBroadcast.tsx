@@ -34,6 +34,7 @@ const MIN_VISIBLE_SAMPLE_MS = 1000 / MAX_VISIBLE_SAMPLE_FPS;
 const ALIAS_DRIFT_HZ = 0.075;
 const PHASE_BANDS = 16;
 const CARRIER_WRAP_MS = 1000;
+const DARK_DERANGEMENT_MULTIPLIER = 10;
 
 const SCRIPT_POOLS = [
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÆØÐÞŁŒƏƵƷȜ",
@@ -120,15 +121,19 @@ function mutateCharacter(
   const localAlias = positiveFraction(
     aliasPhase * direction + band / PHASE_BANDS + echoOffset * 0.011,
   );
-  const communicationModeCount = SCRIPT_POOLS.length + 2;
-  const communicationMode = Math.floor(localAlias * communicationModeCount) % communicationModeCount;
   const carrierSalt = mix32(
     carrierSample
       ^ seed
       ^ Math.imul(index + 1, 0x9e3779b1)
       ^ Math.imul(echoOffset + 1, 0x85ebca6b),
   );
-  const microOffset = (carrierSalt % 3) - 1;
+  const communicationModeCount = SCRIPT_POOLS.length + 2;
+  const communicationMode = (
+    Math.floor(localAlias * communicationModeCount)
+    + (carrierSalt % communicationModeCount) * DARK_DERANGEMENT_MULTIPLIER
+  ) % communicationModeCount;
+  const microOffset = (carrierSalt % (DARK_DERANGEMENT_MULTIPLIER * 2 + 1))
+    - DARK_DERANGEMENT_MULTIPLIER;
 
   if (/\p{N}/u.test(character)) {
     const slowIndex = Math.floor(localAlias * DIGIT_POOL.length);
@@ -397,6 +402,9 @@ export function LexiconText({
         <span className={styles.original}>{text}</span>
         <span ref={echoRef} className={styles.echo}>{initialEcho}</span>
         <span ref={mutatedRef} className={styles.mutated}>{initialMutated}</span>
+        <span className={`${styles.fracture} ${styles.fractureNorth}`}>{initialEcho}</span>
+        <span className={`${styles.fracture} ${styles.fractureSouth}`}>{initialMutated}</span>
+        <span className={`${styles.fracture} ${styles.fractureDepth}`}>{initialEcho}</span>
       </span>
     </Component>
   );
