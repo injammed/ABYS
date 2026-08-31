@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AccountGate } from "@/components/AccountGate";
 import { IntakeValidationBridge } from "@/components/IntakeValidationBridge";
 import { LexiconText } from "@/components/LexiconBroadcast";
+import { PrimaryNavigationMobileStyles } from "@/components/PrimaryNavigationMobileStyles";
 import { SlopDrop } from "@/components/SlopDrop";
 import { ThemeSettings } from "@/components/ThemeSettings";
 
@@ -19,6 +20,7 @@ export function PrimaryNavigation({ mode }: PrimaryNavigationProps) {
       data-navigation-contract="primary-mode-coin-flip-v1"
       data-arrival-contract="active-mode-is-not-a-button-v1"
     >
+      <PrimaryNavigationMobileStyles />
       <IntakeValidationBridge />
 
       <div className="primary-mode-switch" aria-label="Choose primary experience">
