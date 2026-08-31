@@ -48,6 +48,23 @@ html[data-aetimm-theme="light"] .artifact-card h2, html[data-aetimm-theme="light
 html[data-aetimm-theme="light"] .summary { color:#425870; }
 html[data-aetimm-theme="light"] .provenance, html[data-aetimm-theme="light"] .judge { background:#fbfdff; border-color:#e3eaf2; }
 
+@media (max-width:760px) {
+  .primary-navigation { left:.45rem !important; right:.45rem !important; bottom:calc(env(safe-area-inset-bottom) + .35rem) !important; width:auto !important; min-height:54px; display:grid !important; grid-template-columns:repeat(6,minmax(0,1fr)); align-items:stretch; gap:0 !important; padding:.28rem !important; border-radius:18px !important; overflow:visible !important; }
+  .primary-mode-switch, .primary-utility-rail { display:contents !important; }
+  .primary-mode-link, .primary-navigation-link, .primary-navigation-action, .theme-settings { min-width:0 !important; width:100% !important; height:48px !important; min-height:48px !important; margin:0 !important; padding:0 !important; border:0 !important; border-radius:13px !important; display:grid !important; place-items:center !important; }
+  .primary-mode-link > span:last-child, .primary-navigation-link [data-lexicon-flicker] { display:none !important; }
+  .primary-navigation-mark { margin:0 !important; font-size:1.25rem !important; line-height:1 !important; }
+  .primary-navigation-submit .upload-trigger, .primary-navigation-account button, .primary-navigation-account a, .theme-settings > button { width:100% !important; height:48px !important; min-height:48px !important; margin:0 !important; padding:0 !important; border:0 !important; border-radius:13px !important; box-shadow:none !important; display:grid !important; place-items:center !important; background:transparent !important; }
+  .primary-navigation-submit .upload-trigger { font-size:0 !important; color:var(--text) !important; }
+  .primary-navigation-submit .upload-trigger::before { content:"＋"; font-size:1.45rem; line-height:1; font-weight:300; }
+  .primary-navigation-account button, .primary-navigation-account a { font-size:0 !important; color:var(--text) !important; }
+  .primary-navigation-account button::before, .primary-navigation-account a::before { content:"◯"; font-size:1.18rem; line-height:1; }
+  .theme-settings-panel { right:0; bottom:calc(100% + .45rem); }
+  .primary-mode-link.active { background:rgba(213,166,63,.10) !important; }
+  html[data-aetimm-theme="light"] .primary-navigation { background:rgba(255,255,255,.97) !important; box-shadow:0 -1px 0 rgba(20,50,85,.05) !important; }
+  html[data-aetimm-theme="light"] .primary-mode-link.active { background:#edf5ff !important; }
+}
+
 @media (prefers-reduced-motion: reduce) { .site-header, .primary-navigation, .artifact-card, .upload-panel, .primary-mode-switch, .primary-utility-rail, .primary-mode-link, .primary-navigation-link, .theme-settings > button, .upload-trigger, .submit-button { transition:none !important; } }
 `;
 
