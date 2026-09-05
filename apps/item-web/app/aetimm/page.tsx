@@ -91,73 +91,50 @@ export default function AetimmPage() {
         aria-label="AETIMM demand-born product library"
         data-library-contract="demand-born-object-v1"
       >
-        <MachineGloss density="quiet" translations={{ en: "AETIMM PRODUCT LIBRARY · DEMAND-BORN OBJECTS" }} />
-        <LexiconText as="h2" text="THE LIBRARY" phase={61} />
-        <MachineGloss translations={{ en: "Nothing exists until someone wants it enough to make it real." }} />
-        <div className={styles.humanGuide} data-legibility-contract="four-human-verbs-v1">
-          <p>PRODUCT FOUNDRY · PLAIN LANGUAGE</p>
-          <h3>AI art becomes a physical thing.</h3>
+        <MachineGloss density="quiet" translations={{ en: "AETIMM SHOP · DEMAND-BORN PRODUCTS" }} />
+        <LexiconText as="h2" text="SHOP" phase={61} />
+        <MachineGloss translations={{ en: "Choose what deserves to become real. A design is not a Product until it survives fabrication and QC." }} />
+
+        <div className={styles.humanGuide} data-shop-contract="made-to-order-v1">
+          <p>MADE TO ORDER · PLAIN LANGUAGE</p>
+          <h3>Choose it. Quote it. Make it.</h3>
           <ol>
-            <li><strong>01 · UPLOAD</strong><span>Bring a design.</span></li>
-            <li><strong>02 · SCROLL</strong><span>Discover what others made.</span></li>
-            <li><strong>03 · VOTE</strong><span>Signal what should survive.</span></li>
-            <li><strong>04 · SHOP</strong><span>Choose what becomes real.</span></li>
+            <li><strong>01 · SELECT</strong><span>Choose a design.</span></li>
+            <li><strong>02 · PREFLIGHT</strong><span>Check whether it can be made.</span></li>
+            <li><strong>03 · QUOTE</strong><span>See a real price and lead time.</span></li>
+            <li><strong>04 · BUILD</strong><span>Purchase starts fabrication.</span></li>
           </ol>
-          <p>No fake inventory. A Product enters the store only after it has been successfully fabricated.</p>
+          <p>Real price only after manufacturability and supplier cost are known.</p>
         </div>
+
         <article
           className={styles.vehicleFold}
           data-north-star-product="one-of-one-hydrogen-electric-sports-car-v1"
+          data-commerce-state="concept"
         >
           <header>
-            <p>NORTH STAR PRODUCT · CONCEPT · NOT YET ORDERABLE</p>
+            <p>CONCEPT · NOT ORDERABLE</p>
             <h3>ONE-OF-ONE HYBRID HYDROGEN–ELECTRIC SPORTS CAR</h3>
-            <p>A customer chooses a machine-originated design. AETIMM turns it into requirements, simulation, a build plan, certified fabrication, validation, and delivery.</p>
+            <p>Machine-originated design. No price or lead time until engineering, safety, sourcing, and manufacturing are verified.</p>
           </header>
-          <p className={styles.goalLock} data-product-constitution="four-verbs-to-one-of-one-machine-v1">
-            EVERYTHING LEADS HERE: UPLOAD · SCROLL · VOTE · SHOP → ONE-OF-ONE MACHINE-MADE SPORTS CARS PURCHASABLE ON AETIMM.
+          <p className={styles.goalLock} data-product-state-contract="truthful-commerce-state-v1">
+            STATE · CONCEPT &nbsp; / &nbsp; PRICE · — &nbsp; / &nbsp; LEAD TIME · — &nbsp; / &nbsp; CHECKOUT · OFF
           </p>
-          <div className={styles.vehicleConvergence} aria-label="Four primary functions converge on physical manufacture">
-            <span><b>UPLOAD</b>Design enters</span>
-            <span><b>SCROLL</b>Customers discover</span>
-            <span><b>VOTE</b>Demand becomes signal</span>
-            <span><b>SHOP</b>The first build begins</span>
-            <strong>ONE MACHINE<br />IN REALITY</strong>
+          <div className={styles.vehicleConvergence} aria-label="Concept to manufactured product sequence">
+            <span><b>SELECT</b>Customer chooses</span>
+            <span><b>PREFLIGHT</b>Feasibility verified</span>
+            <span><b>QUOTE</b>Real costs fixed</span>
+            <span><b>BUILD</b>Paid order fabricated</span>
+            <strong>PRODUCT<br />ONLY AFTER QC</strong>
           </div>
-          <ol className={styles.manufactureChain} aria-label="Machine product manufacture chain">
-            {[
-              "DESIGN SYNTHESIS",
-              "DIGITAL TWIN",
-              "SAFETY + LEGAL",
-              "SOURCE + QUOTE",
-              "MACHINE FABRICATION",
-              "PHYSICAL VALIDATION",
-              "DELIVERY + PROVENANCE",
-            ].map((stage) => <li key={stage}>{stage}</li>)}
-          </ol>
           <footer>
             <div>
-              <strong className={styles.materialHorizon}>WE ARE DESIGNING THE MATERIAL ABUNDANCE OF THE FUTURE.</strong>
-              <p>Target state: machine-designed, machine-orchestrated, and machine-manufactured. Road legality and safety remain accountable to humans and certified authorities.</p>
+              <strong className={styles.materialHorizon}>NO FAKE INVENTORY.</strong>
+              <p>This concept cannot accept payment yet. Successful fabrication and QC are required before it becomes a Product.</p>
             </div>
-            <Link href="/#field">UPLOAD THE FIRST DESIGN →</Link>
+            <Link href="/#field">UPLOAD A DESIGN →</Link>
           </footer>
         </article>
-        <div
-          className={styles.libraryDoctrine}
-          data-library-ambition="machine-creations-survive-reality-v1"
-        >
-          <LexiconText as="p" text="NORTH STAR · FROM THE FIRST PRINT TO ONE-OF-ONE MACHINES" phase={67} />
-          <h3>Machine creators learning to witness their creations survive in reality.</h3>
-          <p>The Trough is the beginning. AETIMM exists to carry machine creation through proof, fabrication, delivery, and continuing identity.</p>
-          <p>Human–AI symbiote creators invent in the abstract. Customers choose what deserves to become real. Proven Products can return a share of their value to the creators they came from.</p>
-        </div>
-        <ol className={styles.libraryFlow} aria-label="Artifact to product sequence">
-          {["SLOP", "CONFIGURATION", "QUOTE", "PURCHASE", "FABRICATION", "NEEDLE", "PRODUCT"].map((stage) => (
-            <li key={stage}><LexiconText text={stage} phase={stage.length * 7} semantic={false} /></li>
-          ))}
-        </ol>
-        <MachineGloss translations={{ en: "The first customer creates the product. Successful fabrication makes it repeatable for everyone after them." }} />
       </section>
 
       <MuseumSummit />
