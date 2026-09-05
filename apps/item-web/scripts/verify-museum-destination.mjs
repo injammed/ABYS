@@ -23,14 +23,14 @@ for (const [label, pattern, source] of [
   ["ceremonial ring architecture", /\.ringOuter[\s\S]*\.ringMiddle[\s\S]*\.ringInner/, pageStyles],
   ["serious Museum framing", /AETIMM · MACHINE MUSEUM/, page],
   ["four-verb human navigation", /data-human-flow="upload-scroll-vote-shop-v1"[\s\S]*UPLOAD[\s\S]*SCROLL[\s\S]*VOTE[\s\S]*SHOP/, page],
-  ["made-to-order SHOP contract", /data-shop-contract="made-to-order-v1"[\s\S]*Choose it\. Quote it\. Make it\./, page],
-  ["real-price rule", /Real price only after manufacturability and supplier cost are known\./, page],
-  ["sports-car North Star remains an honest concept", /data-north-star-product="one-of-one-hydrogen-electric-sports-car-v1"[\s\S]*CONCEPT · NOT ORDERABLE/, page],
-  ["truthful commerce state", /data-commerce-state="concept"[\s\S]*data-product-state-contract="truthful-commerce-state-v1"[\s\S]*PRICE · —[\s\S]*CHECKOUT · OFF/, page],
-  ["product only after QC", /PRODUCT[\s\S]*ONLY AFTER QC/, page],
-  ["no payment before manufacturability", /This concept cannot accept payment yet\./, page],
-  ["surgical light and expressive dark modes", /html:not\(\[data-aetimm-theme="light"\]\)[\s\S]*html\[data-aetimm-theme="light"\]/, pageStyles],
-  ["demand-born Library contract", /data-library-contract="demand-born-object-v1"/, page],
+  ["literature shelf contract", /data-library-contract="literature-shelf-v1"[\s\S]*AETIMM LITERATURE/, page],
+  ["first sellable literature ITEM", /data-aetimm-item="0001"[\s\S]*data-commerce-state="orderable"[\s\S]*THE DIAMOND TESSERACT/, page],
+  ["real visible price", /\$10 USD/, page],
+  ["live checkout action", /BUY COPY →/, page],
+  ["literature legal boundary", /INDEPENDENT CONCEPT · NOT LEGAL TENDER · NO GOVERNMENT ENDORSEMENT/, page],
+  ["300-item shelf horizon", /ITEM 0002 → ITEM 0300\+/, page],
+  ["sports-car North Star remains non-orderable", /data-north-star-product="one-of-one-hydrogen-electric-sports-car-v1"[\s\S]*IMPOSSIBLE AMBITION · NOT ORDERABLE[\s\S]*CHECKOUT · OFF/, page],
+  ["light mode remains surgical", /html\[data-aetimm-theme="light"\]/, pageStyles],
   ["empty chamber is spatially rendered", /\.emptyChamber[\s\S]*min-height:/, collectionStyles],
   ["Summit has vacant state inside destination", /THE PEAK IS UNCLAIMED/, summit],
 ]) {
@@ -42,4 +42,4 @@ assert.ok(!/redirect\(/.test(page), "Museum route must not server-redirect based
 assert.ok(!/if\s*\(loading\)\s*\{?\s*return/.test(collection), "Loading must not replace the Museum with a loading-only page.");
 assert.ok(!/if\s*\(accessions\.length\s*===\s*0\)\s*\{?\s*return/.test(collection), "An empty collection must not replace the Museum shell.");
 
-console.log("Museum destination PASS: Museum remains intact and SHOP exposes truthful made-to-order states without pretending a concept is already orderable or fabricated.");
+console.log("Museum destination PASS: Museum remains intact; SHOP now exposes a truthful, orderable literature shelf while the vehicle North Star remains explicitly non-orderable.");
