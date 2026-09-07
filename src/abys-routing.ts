@@ -20,7 +20,9 @@ const SYNTEL_TERMS = ["protocol", "envelope", "receipt", "verification", "signat
 const ABYS_TERMS = ["repo", "test", "workflow", "issue", "pr", "code", "deploy", "product", "task", "memory", "dashboard", "codex", "packet", "validator", "validation"];
 const SLOP_TERMS = ["vibes", "infinite", "transcendent", "cosmic", "ultimate", "magic", "just", "somehow"];
 
-export function routeTask(task: ProductTask, signals: WorldSignal[] = []): RouteDecision {
+export function routeTask(task: ProductTask, _signals: WorldSignal[] = []): RouteDecision {
+  // Shared environment signals describe capability, not this task's ownership.
+  // Including them here makes a protocol task split merely because a repo exists.
   const text = normalize([
     task.title,
     task.objective,
@@ -28,7 +30,6 @@ export function routeTask(task: ProductTask, signals: WorldSignal[] = []): Route
     task.monetizationPath,
     ...task.blockers,
     ...task.dependsOn,
-    ...signals.map((signal) => `${signal.summary} ${signal.tags.join(" ")}`),
   ].join(" "));
   const tokens = tokenize(text);
 
