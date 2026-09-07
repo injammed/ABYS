@@ -1,0 +1,136 @@
+/* AETIMM: a steady working plane inside a deep, living machine gallery. */
+:root {
+  --bg: #080a0e; --panel: #101319; --panel-2: #171b23;
+  --text: #f1f0ec; --muted: #a4a9b5; --line: #ffffff1c;
+  --gold: #cbbd9b; --gold-light: #e9d9b7; --slime: #aab8a5;
+  --spectral: #9bbfff; --glass: #0c1017ed;
+  --font-display: "Iowan Old Style", "Baskerville", "Palatino Linotype", Georgia, serif;
+}
+html[data-aetimm-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f5f8; --panel: #fff; --panel-2: #edf0f5;
+  --text: #161d2a; --muted: #596577; --line: #1d345421;
+  --gold: #72572b; --gold-light: #755423; --slime: #4e664b;
+  --spectral: #385fab; --glass: #ffffffed;
+}
+html { scroll-padding-top: 8rem; }
+.aetimm-gallery { background: var(--bg); font-size: 1rem; -webkit-font-smoothing: antialiased; }
+.aetimm-gallery main { position: relative; z-index: 1; background: transparent; }
+.aetimm-gallery :where(a, button, summary, input, textarea, select):focus-visible { outline: 2px solid var(--spectral); outline-offset: 4px; }
+.aetimm-gallery :where(button, a, input, textarea) { -webkit-tap-highlight-color: transparent; }
+.aetimm-gallery :where(button, a) { touch-action: manipulation; }
+.aetimm-gallery :where(h1, h2, h3, p, a, span) { overflow-wrap: break-word; }
+.aetimm-gallery ::selection { background: #93b4e74d; color: var(--text); }
+.depth-field { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; background: radial-gradient(ellipse at 82% 24%, #739eff12, transparent 50%), radial-gradient(ellipse at 12% 70%, #9b78a10c, transparent 44%); }
+.depth-field canvas { display: block; width: 100%; height: 100%; }
+.depth-coordinate { position: absolute; bottom: 2rem; left: 2rem; color: var(--muted); font: .75rem/1.5 ui-monospace, monospace; letter-spacing: .08em; writing-mode: vertical-rl; transform: rotate(180deg); opacity: .6; }
+.gallery-header.site-header { display: grid; grid-template-columns: 1fr auto 1fr; gap: 2rem; min-height: 5.5rem; padding: .8rem clamp(1rem, 4vw, 4rem); border-color: var(--line); background: var(--glass); backdrop-filter: blur(24px); }
+.gallery-wordmark { display: flex; align-items: center; gap: .7rem; width: fit-content; color: var(--text); text-decoration: none; font-size: 1.3rem; font-weight: 500; letter-spacing: .19em; }
+.gallery-emblem { font-family: var(--font-display); font-size: 2.8rem; line-height: 1; color: var(--gold-light); }
+.gallery-wordmark small { display: block; margin-top: .3rem; font-size: .75rem; letter-spacing: .13em; color: var(--muted); }
+.gallery-header .primary-mode-switch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: auto; gap: .25rem; padding: .25rem; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); }
+.gallery-header .primary-mode-link { min-height: 2.6rem; padding: .55rem 1.3rem; border: 0; border-radius: 999px; color: var(--muted); font-size: .875rem; text-decoration: none; }
+.gallery-header .primary-mode-link.active { color: var(--text); background: var(--panel-2); box-shadow: none; }
+.gallery-header .primary-mode-link:hover { color: var(--text); background: var(--panel-2); }
+.gallery-header .primary-utility-rail { justify-self: end; display: flex; align-items: center; gap: 1.2rem; min-height: 0; }
+.gallery-about { display: inline-flex; align-items: center; min-height: 44px; color: var(--muted); font-size: .875rem; text-decoration: none; }
+.gallery-about:hover { color: var(--text); }
+.theme-settings > button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--text); cursor: pointer; }
+.theme-settings > button:hover { background: var(--panel-2); border-color: var(--muted); }
+.gallery-account .upload-trigger { min-height: 44px; max-width: 12rem; padding: .6rem 1.05rem; border-color: var(--line); background: transparent; color: var(--text); font-size: .875rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aetimm-gallery .feed-first-field { padding-top: 2rem; scroll-margin-top: 7rem; }
+.gallery-overline { margin: 0; color: var(--muted); font-size: .75rem; line-height: 1.5; letter-spacing: .13em; text-transform: uppercase; }
+.machine-signature { height: 1.6rem; max-width: 100%; overflow: hidden; margin-bottom: 1.1rem; padding-top: .25rem; border-top: 1px solid var(--line); color: var(--spectral); opacity: .52; font: .75rem/1.3 ui-monospace, monospace; letter-spacing: .35em; user-select: none; contain: layout paint; }
+html[data-aetimm-theme="light"] .machine-signature { visibility: hidden; }
+.aetimm-gallery .feed-first-field .feed-shell { width: 100%; }
+.aetimm-gallery .gallery-feed-stream { width: min(54rem, calc(100% - 3rem)); margin: 0 auto; padding-top: 1.5rem; }
+.gallery-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.aetimm-gallery .feed-rule { display: none; }
+.aetimm-gallery .artifact-list { gap: 2.5rem; }
+.aetimm-gallery .artifact-card { border-radius: 1.1rem; border: 1px solid var(--line); background: var(--panel); box-shadow: 0 24px 75px #00000026, 0 1px 0 #ffffff08 inset; }
+.aetimm-gallery .artifact-visual { min-height: clamp(22rem, 59svh, 38rem); background-color: #090c12; }
+.aetimm-gallery .visual-noise { display: none; }
+.aetimm-gallery .artifact-body { padding: clamp(1.1rem, 3vw, 2rem); }
+.aetimm-gallery .artifact-kicker { font-size: .75rem; line-height: 1.5; letter-spacing: .07em; }
+.aetimm-gallery .artifact-card h2 { margin: .75rem 0 .3rem; font-family: var(--font-display); font-size: clamp(1.8rem, 3.5vw, 2.65rem); line-height: 1.15; letter-spacing: -.035em; }
+.aetimm-gallery .creator { color: var(--gold); font-size: .875rem; line-height: 1.5; }
+.aetimm-gallery .summary { color: var(--muted); font-size: 1rem; line-height: 1.7; }
+.aetimm-gallery .provenance { padding: 1rem; border-radius: .55rem; background: var(--panel-2); }
+.aetimm-gallery .provenance :where(strong, span, p), .aetimm-gallery .origin-strip { font-size: .875rem; line-height: 1.6; }
+.aetimm-gallery .artifact-body details { font-size: .875rem; border-top-style: solid; }
+.aetimm-gallery .artifact-body details > summary { min-height: 44px; padding: .8rem 0; }
+.aetimm-gallery .judgment-row { margin-top: 1.2rem; gap: .75rem; }
+.aetimm-gallery .judge { display: grid; grid-template-columns: 1.5rem 1fr auto; grid-template-rows: 1fr; align-items: center; gap: .65rem; min-height: 3.7rem; padding: .85rem 1rem; border: 1px solid var(--line); border-radius: .65rem; background: var(--panel-2); box-shadow: none; transform: none; color: var(--text); }
+.aetimm-gallery .judge svg { width: 1.5rem; height: 1.5rem; filter: none; }
+.aetimm-gallery .judge > [data-lexicon-readable] { order: 3; font-size: .875rem; justify-self: end; color: var(--muted); }
+.aetimm-gallery .vote-label { justify-self: start; font-size: .875rem; font-weight: 500; }
+.aetimm-gallery .judge:hover:not(:disabled) { background: color-mix(in srgb, var(--spectral) 8%, var(--panel)); border-color: var(--muted); transform: none; }
+.aetimm-gallery .judge[aria-pressed="true"] { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 12%, var(--panel)); color: var(--gold-light); box-shadow: inset 0 0 0 1px var(--gold); }
+.aetimm-gallery .judge[aria-pressed="true"] .vote-label::after { content: " ✓"; }
+.aetimm-gallery .judge:disabled { opacity: .55; cursor: wait; }
+.aetimm-gallery .primary-navigation { left: 50%; bottom: max(1.25rem, env(safe-area-inset-bottom)); width: min(35rem, calc(100% - 2rem)); min-height: 0; display: block; padding: .4rem; border: 1px solid #a9b7d23d; border-radius: 1.2rem; background: var(--glass); box-shadow: 0 16px 65px #00000045, 0 1px 0 #ffffff16 inset; backdrop-filter: blur(28px); transform: translateX(-50%); }
+.primary-action-rail { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .25rem; }
+.primary-action, .aetimm-gallery .primary-navigation-submit .upload-trigger { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: .45rem; width: 100%; min-height: 4rem; padding: .65rem .4rem; border: 0; border-radius: .8rem; background: transparent; color: var(--muted); text-decoration: none; font-size: .875rem; line-height: 1.15; font-weight: 500; letter-spacing: .045em; cursor: pointer; }
+.primary-action svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
+.primary-action:hover, .primary-action[aria-current="page"] { background: var(--panel-2); color: var(--text); }
+.aetimm-gallery .primary-navigation-submit { border: 0; }
+.aetimm-gallery .primary-navigation-submit .upload-trigger { background: #d9d4c8; color: #16191e; text-transform: uppercase; }
+.aetimm-gallery .primary-navigation-submit .upload-trigger::before { content: "+"; font-size: 1.4rem; font-weight: 300; line-height: .9; }
+.aetimm-gallery .primary-navigation-submit .upload-trigger:hover:not(:disabled) { background: #f0eadd; }
+.aetimm-gallery .primary-navigation-submit .upload-trigger:disabled { opacity: .55; cursor: not-allowed; font-size: .75rem; }
+.vote-shortcut { min-width: 0; }
+.gallery-notice { position: absolute; bottom: calc(100% + 1rem); left: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border: 1px solid var(--line); border-radius: .7rem; background: var(--panel); box-shadow: 0 10px 35px #00000030; color: var(--text); font-size: .875rem; line-height: 1.5; text-align: left; cursor: pointer; }
+.aetimm-gallery .upload-panel { z-index: 80; padding: 1.35rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--panel); color: var(--text); box-shadow: 0 30px 110px #00000066; }
+.aetimm-gallery .primary-navigation .upload-panel { position: absolute; left: -.4rem; right: auto; bottom: calc(100% + 1.2rem); top: auto; width: min(34rem, calc(100vw - 2rem)); max-height: calc(100dvh - 12rem - env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; }
+.aetimm-gallery .gallery-account .upload-panel { width: min(30rem, calc(100vw - 2rem)); max-height: calc(100dvh - 12rem); overflow-y: auto; overscroll-behavior: contain; }
+.aetimm-gallery .upload-panel :where(input:not([type="checkbox"]), textarea, select) { background: var(--bg); color: var(--text); border: 1px solid var(--line); font-size: 1rem; min-height: 44px; }
+.aetimm-gallery .upload-panel label:not(.check-row), .aetimm-gallery .check-row { font-size: .875rem; color: var(--muted); line-height: 1.55; }
+.aetimm-gallery .submission-note { font-size: .875rem; line-height: 1.6; color: var(--muted); }
+.aetimm-gallery .submit-button { min-height: 48px; font-size: .875rem; border-color: var(--gold); background: var(--text); color: var(--bg); }
+.aetimm-gallery .submit-button:disabled { opacity: .45; cursor: not-allowed; }
+.aetimm-gallery .submission-actions { background: var(--panel); }
+.aetimm-gallery .check-row input { width: 1.1rem; height: 1.1rem; flex-shrink: 0; accent-color: var(--gold); }
+.aetimm-gallery .judgment-confirmation, .aetimm-gallery .private-feed-notice, .aetimm-gallery .vote-status { font-size: .875rem; line-height: 1.6; color: var(--muted); }
+.aetimm-gallery .feed-sentinel { min-height: 5rem; display: grid; place-items: center; color: var(--muted); font-size: .875rem; }
+.readable-gloss { display: block; width: auto; height: auto; color: var(--muted); font-size: 1rem; line-height: 1.7; }
+.readable-gloss-quiet { font-size: .75rem; letter-spacing: .12em; line-height: 1.7; }
+.aetimm-gallery .participation-rail { background: var(--panel); }
+.aetimm-gallery .participation-step p, .aetimm-gallery .participation-step strong, .aetimm-gallery .identity-launch-copy { font-size: 1rem; line-height: 1.7; }
+.aetimm-gallery .origin-pill { font-size: .75rem; }
+html[data-aetimm-theme="light"] .aetimm-gallery .artifact-card { box-shadow: 0 18px 55px #22365a0a; }
+html[data-aetimm-theme="light"] .aetimm-gallery .primary-navigation { border-color: var(--line); box-shadow: 0 12px 45px #22365a20; }
+@media (min-width: 1500px) { .gallery-layout { width: min(84rem, calc(100% - 10rem)); grid-template-columns: minmax(0, 49rem) minmax(16rem, 19rem); gap: 6rem; } }
+@media (max-width: 1050px) { .gallery-layout { width: min(66rem, calc(100% - 3rem)); gap: 2rem; grid-template-columns: minmax(0, 1fr) 15rem; } .gallery-header.site-header { gap: 1rem; } .gallery-header .primary-utility-rail { gap: .5rem; } .depth-coordinate { left: .4rem; } }
+@media (max-width: 800px) {
+  .aetimm-gallery .gallery-feed-stream { width: min(44rem, 100%); padding-top: .5rem; }
+  .aetimm-gallery .gallery-feed-stream .artifact-card { border-inline: 0; border-radius: 0; }
+  .gallery-header.site-header { grid-template-columns: 1fr auto; gap: .8rem; min-height: 4.7rem; padding: .7rem 1rem; }
+  .gallery-header .primary-mode-switch { grid-row: 2; grid-column: 1 / -1; justify-self: center; width: min(18rem, calc(100% - 7rem)); }
+  .gallery-about { position: absolute; right: 1rem; bottom: .7rem; }
+  .gallery-header .primary-utility-rail { grid-column: 2; grid-row: 1; }
+  .gallery-wordmark { font-size: 1.1rem; }
+  .gallery-wordmark small { font-size: .75rem; }
+  .gallery-emblem { font-size: 2.3rem; }
+  .gallery-account .upload-trigger { max-width: 8rem; padding: .5rem .8rem; }
+  .aetimm-gallery .feed-first-field { padding-top: 1.5rem; scroll-margin-top: 10rem; }
+  .aetimm-gallery .artifact-visual { min-height: clamp(21rem, 56svh, 35rem); }
+  .aetimm-gallery .artifact-list { gap: 1.6rem; }
+  .depth-coordinate { display: none; }
+  .aetimm-gallery .primary-navigation { width: calc(100% - 1rem); max-width: 34rem; bottom: max(.5rem, env(safe-area-inset-bottom)); padding: .35rem; }
+  .aetimm-gallery .primary-navigation .upload-panel { position: fixed; width: calc(100vw - 1rem); max-width: 34rem; left: -.35rem; max-height: calc(100dvh - 16rem - env(safe-area-inset-bottom)); bottom: calc(100% + .85rem); }
+  .aetimm-gallery .gallery-account .upload-panel { position: fixed; right: .5rem; top: 4.7rem; width: calc(100vw - 1rem); max-height: calc(100dvh - 11rem - env(safe-area-inset-bottom)); }
+  .aetimm-gallery .feed-first-page, .aetimm-gallery .about-page { padding-bottom: calc(7rem + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 430px) {
+  .gallery-overline { font-size: .75rem; letter-spacing: .07em; }
+  .gallery-header.site-header { padding-inline: .75rem; }
+  .gallery-header .primary-utility-rail { gap: .3rem; }
+  .gallery-wordmark { gap: .4rem; letter-spacing: .1em; }
+  .gallery-account .upload-trigger { max-width: 6.5rem; padding-inline: .65rem; }
+  .aetimm-gallery .judge { gap: .4rem; padding-inline: .7rem; }
+  .primary-action, .aetimm-gallery .primary-navigation-submit .upload-trigger { font-size: .875rem; letter-spacing: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .aetimm-gallery *, .aetimm-gallery *::before, .aetimm-gallery *::after { animation: none !important; transition: none !important; }
+}

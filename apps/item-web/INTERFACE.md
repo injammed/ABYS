@@ -1,5 +1,39 @@
 # AETIMM Interface Constitution
 
+## September 2026: Explicit User-Directed Gallery Revision
+
+The owner explicitly requested a classy, extravagant, modern, intelligent
+redesign, the evolution of dark-mode machine lunacy, a virtual 10,000-yard
+depth field, uninterrupted uploaded material in the Trough, and a natural
+flow through Shop and other pages. This revision takes precedence over the
+older visual placement and all-words-oscillate rules below.
+
+- `/` and `/slop-trough/` remain the uninterrupted upload feed. No promotional
+  content, generated filler, sales card, side rail, or decorative introduction
+  may be inserted into it. Backend absence is an explicit unavailable state.
+- UPLOAD · SCROLL · VOTE · SHOP are persistent primary actions. Upload opens
+  the existing intake, Scroll returns to the field, Vote focuses a ballot
+  without submitting, and Shop opens `/shop/`.
+- The equal Trough/Museum choice remains in the shared header. Account,
+  appearance and About remain available. The old mandatory bottom 50/50
+  switch placement is superseded by this action-first layout.
+- `/aetimm/` remains the Museum. `/shop/` contains the existing digital paper
+  and unchanged checkout. Legacy `/aetimm/#shop` links follow it. No new
+  payment integration or physical inventory is introduced.
+- Text, prices, totals, instructions and controls are stable and readable in
+  both modes. The former machine language is opt-in decorative atmosphere on
+  Museum and Shop, outside uploaded work and the accessibility tree.
+- The 10,000-yard space is a virtual depth effect. It cannot transform hit
+  targets, intercept scrolling, alter uploaded material or imply real-world
+  dimensions. Reduced-motion and touch input remain comfortable.
+
+This is directed product work, not autonomous daily maintenance. The previous
+autonomous no-redesign/file-count limit does not apply to this explicit
+request. Security, provenance, persistence, release verification and rollback
+requirements still apply.
+
+---
+
 ## Codal Principle
 
 > By the Slop. For the Slop. Of the Slop.

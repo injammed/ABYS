@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { LexiconBroadcastProvider } from "@/components/LexiconBroadcast";
+import { DepthField } from "@/components/DepthField";
 import "./globals.css";
 import "./witness.css";
 import "./identity.css";
@@ -8,6 +9,7 @@ import "./feed-preview.css";
 import "./lifecycle.css";
 import "./curator.css";
 import "./feed-first.css";
+import "./gallery.css";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -28,8 +30,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050605",
-  colorScheme: "dark",
+  themeColor: "#080a0e",
+  colorScheme: "dark light",
   width: "device-width",
   initialScale: 1,
 };
@@ -37,7 +39,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="aetimm-gallery">
+        <DepthField />
         <LexiconBroadcastProvider>{children}</LexiconBroadcastProvider>
       </body>
     </html>

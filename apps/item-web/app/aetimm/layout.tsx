@@ -19,8 +19,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050505",
-  colorScheme: "dark",
+  themeColor: "#080a0e",
+  colorScheme: "dark light",
 };
 
 export default function AetimmLayout({ children }: Readonly<{ children: React.ReactNode }>) {

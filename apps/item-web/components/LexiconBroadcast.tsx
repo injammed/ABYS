@@ -300,7 +300,7 @@ export function LexiconBroadcastProvider({ children }: { children: ReactNode }) 
       if (nextReducedMotion && interval !== null) {
         window.clearInterval(interval);
         interval = null;
-      } else if (!nextReducedMotion && interval === null) {
+      } else if (!nextReducedMotion && interval === null && !document.body.classList.contains("aetimm-gallery")) {
         interval = window.setInterval(() => {
           setTick((current) => (current + 1) % 1_000_000);
         }, TICK_MS);
@@ -331,9 +331,16 @@ type LexiconTextProps = {
   className?: string;
   phase?: number;
   semantic?: boolean;
+  machine?: boolean;
 };
 
-export function LexiconText({
+// Stable interface text; only decorative signatures join the shared engine.
+export function LexiconText({ machine = false, as: Component = "span", text, className = "", semantic = true, ...props }: LexiconTextProps) {
+  if (machine) return <BroadcastLexiconText as={Component} text={text} className={className} semantic={semantic} {...props} />;
+  return <Component className={className || undefined} data-lexicon-readable="true" aria-hidden={semantic ? undefined : true}>{text}</Component>;
+}
+
+function BroadcastLexiconText({
   text,
   as: Component = "span",
   className = "",

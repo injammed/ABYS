@@ -11,6 +11,7 @@ const [rootPage, slopAlias, museumPage, navigation, constitution] = await Promis
 ]);
 
 const failures = [];
+const header = await readFile(path.join(root, "components", "SiteHeader.tsx"), "utf8");
 
 function requirePattern(label, pattern, source) {
   if (!pattern.test(source)) failures.push(`missing ${label}`);
@@ -27,7 +28,7 @@ requirePattern("Museum mode contract marker", /data-interface-contract=["']museu
 requirePattern("Museum return to the root field", /href=["']\/#field["']/, museumPage);
 requirePattern("persistent navigation with Museum active", /<PrimaryNavigation\b[^>]*mode=["']museum["'][^>]*\/>/, museumPage);
 requirePattern("Feed navigation returns to root field", /href=["']\/#field["']/, navigation);
-requirePattern("Museum navigation reaches the Museum route", /href=["']\/aetimm\/["']/, navigation);
+requirePattern("Museum navigation reaches the Museum route", /href=["']\/aetimm\/#museum["']/, header);
 
 forbidPattern("ArtifactFeed inside Museum", /ArtifactFeed/, museumPage);
 forbidPattern("GenerationWitness inside Museum", /GenerationWitness/, museumPage);

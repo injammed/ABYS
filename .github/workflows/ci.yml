@@ -17,7 +17,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       - name: Install
         run: npm install
@@ -29,7 +28,8 @@ jobs:
         run: npm test
 
       - name: Run ABYS cycle smoke test
-        run: npm run cycle -- "CI smoke test: verify ABYS can produce a plan, memory writes, and Codex packet."
+        run: >-
+          npm run cycle -- "CI smoke test: verify ABYS can produce a plan, memory writes, and Codex packet."
 
       - name: Upload ABYS cycle artifacts
         uses: actions/upload-artifact@v4
