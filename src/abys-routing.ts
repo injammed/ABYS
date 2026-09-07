@@ -35,7 +35,7 @@ export function routeTask(task: ProductTask, _signals: WorldSignal[] = []): Rout
 
   const itemScore = scoreTerms(tokens, ITEM_TERMS);
   const syntelScore = scoreTerms(tokens, SYNTEL_TERMS);
-  const abysScore = scoreTerms(tokens, ABYS_TERMS) + (task.status === "ready" ? 1 : 0);
+  const abysScore = scoreTerms(tokens, ABYS_TERMS);
   const slopFlags = detectSlop(tokens, task);
   const execution_surface = executionSurfaceFor(tokens);
   const handoff_target = handoffTargetFor(tokens, itemScore, syntelScore);
