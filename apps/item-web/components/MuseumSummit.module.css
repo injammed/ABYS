@@ -243,3 +243,20 @@
   .objectStage { min-height: 24rem; }
   .mountain { width: 150vw; height: 60%; }
 }
+
+/* The Summit shares the new gallery's material and typography system. */
+:global(.aetimm-gallery) .summit { width: min(76rem, calc(100% - 4rem)); margin-bottom: 3rem; padding-top: 2.5rem; scroll-margin-top: 10rem; }
+:global(.aetimm-gallery) .heading { border-color: var(--line); }
+:global(.aetimm-gallery) .heading p, :global(.aetimm-gallery) .heading span { font-size: .75rem; letter-spacing: .08em; line-height: 1.6; }
+:global(.aetimm-gallery) .heading h2 { font-family: var(--font-display); letter-spacing: -.035em; font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.2; }
+:global(.aetimm-gallery) .peak { min-height: 26rem; padding-bottom: 2rem; border-radius: 1rem; border-color: var(--line); background: radial-gradient(ellipse at 50% 0, color-mix(in srgb, var(--spectral) 8%, transparent), transparent 70%), color-mix(in srgb, var(--panel) 90%, transparent); box-shadow: 0 30px 100px #00000024; }
+:global(.aetimm-gallery) .mountain, :global(.aetimm-gallery) .peak::before { display: none; }
+:global(.aetimm-gallery) .vacant { margin-block: 5rem 2rem; border: 0; background: transparent; backdrop-filter: none; }
+:global(.aetimm-gallery) .vacant span { font-size: .75rem; }
+:global(.aetimm-gallery) .vacant strong { font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.2; }
+:global(.aetimm-gallery) .apex { margin-top: 3.5rem; border-radius: .8rem; border-color: var(--line); background: var(--panel); box-shadow: 0 20px 60px #00000030; }
+:global(.aetimm-gallery) .plaque { background: var(--panel); border-radius: 0 0 .8rem .8rem; }
+:global(.aetimm-gallery) .plaque h3 { font-family: var(--font-display); letter-spacing: -.03em; line-height: 1.15; }
+:global(.aetimm-gallery) .plaque p { font-size: .75rem; line-height: 1.5; }
+:global(.aetimm-gallery) .plaque span, :global(.aetimm-gallery) .plaque small { font-size: .875rem; line-height: 1.6; }
+@media (max-width: 800px) { :global(.aetimm-gallery) .summit { width: calc(100% - 2rem); } :global(.aetimm-gallery) .peak { min-height: 22rem; } }

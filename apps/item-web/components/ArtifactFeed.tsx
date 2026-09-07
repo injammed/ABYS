@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { FeedArtifact, makeFeedBatch, originClassLabels } from "@/lib/feed";
+import { FeedArtifact, originClassLabels } from "@/lib/feed";
 import {
   AUTH_REQUIRED_EVENT,
   consumeVoteIntent,
@@ -72,14 +72,11 @@ function appendUnique(current: FeedArtifact[], incoming: FeedArtifact[]): FeedAr
 }
 
 export function ArtifactFeed() {
-  const [artifacts, setArtifacts] = useState<FeedArtifact[]>(() =>
-    socialBackendEnabled ? [] : makeFeedBatch(0)
-  );
+  const [artifacts, setArtifacts] = useState<FeedArtifact[]>([]);
   const [privatePreviews, setPrivatePreviews] = useState<FeedArtifact[]>([]);
   const [judgments, setJudgments] = useState<Record<string, Judgment>>({});
   const [voteStates, setVoteStates] = useState<Record<string, VoteRequestState>>({});
   const [session, setSession] = useState<Session | null>(null);
-  const [batch, setBatch] = useState(1);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(socialBackendEnabled);
@@ -430,11 +427,7 @@ export function ArtifactFeed() {
       ([entry]) => {
         if (!entry.isIntersecting || loading) return;
 
-        if (!socialBackendEnabled) {
-          setArtifacts((current) => [...current, ...makeFeedBatch(batch)]);
-          setBatch((value) => value + 1);
-          return;
-        }
+        if (!socialBackendEnabled) return;
 
         if (!hasMore || !cursor) return;
         if (Date.now() < paginationRetryAtRef.current) return;
@@ -469,7 +462,7 @@ export function ArtifactFeed() {
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [batch, cursor, hasMore, loading, paginationRetryRevision]);
+  }, [cursor, hasMore, loading, paginationRetryRevision]);
 
   const visible = useMemo(
     () => socialBackendEnabled ? appendUnique(privatePreviews, artifacts) : artifacts,
@@ -486,11 +479,7 @@ export function ArtifactFeed() {
     }
 
     if (!socialBackendEnabled) {
-      setJudgments((current) => ({ ...current, [id]: judgment }));
-      setVoteStates((current) => ({
-        ...current,
-        [id]: { state: "saved", message: judgment === "preserve" ? "Museum." : "Slop." },
-      }));
+      setVoteMessage("Voting is unavailable while the Trough is offline.");
       return;
     }
 
@@ -572,6 +561,7 @@ export function ArtifactFeed() {
 
   return (
     <section className="feed-shell" aria-label="Infinite machine-made Artifact feed" data-lexicon-surface="true">
+      {!socialBackendEnabled && <p className="judgment-confirmation" role="status">The Trough is offline. Uploads and voting will return when it reconnects.</p>}
       <div className="feed-rule">
         <span className="signal-dot" aria-hidden="true" />
         <LexiconText text="MACHINE-MADE ONLY · SCROLL · VOTE OR IGNORE" phase={3} />
@@ -690,7 +680,7 @@ export function ArtifactFeed() {
                     >
                       <SlopGlyph />
                       <LexiconText className={styles.voteCount} text={String(artifact.slopVotes ?? 0)} phase={phase + 20} semantic={false} />
-                      <span className={styles.srOnly}>Slop</span>
+                      <span className="vote-label" aria-hidden="true">Slop</span>
                     </button>
                     <button
                       className={`${styles.voteButton} ${styles.museumVote} judge museum${judgment === "preserve" ? " selected" : ""}`}
@@ -702,7 +692,7 @@ export function ArtifactFeed() {
                     >
                       <MuseumGlyph />
                       <LexiconText className={styles.voteCount} text={String(artifact.museumVotes ?? 0)} phase={phase + 21} semantic={false} />
-                      <span className={styles.srOnly}>Museum</span>
+                      <span className="vote-label" aria-hidden="true">Museum</span>
                     </button>
                   </div>
                 )}
@@ -727,11 +717,11 @@ export function ArtifactFeed() {
         <LexiconText as="p" className="judgment-confirmation" text="The trough is empty. Disturbing." phase={71} />
       )}
 
-      <div ref={sentinel} className="feed-sentinel" aria-hidden="true">
+      <div ref={sentinel} className="feed-sentinel" role="status" aria-live="polite">
         <LexiconText
-          text={loading ? "Loading slop…" : hasMore || !socialBackendEnabled ? "More…" : "You reached the bottom. For now."}
+          text={!socialBackendEnabled ? "" : loading ? "Loading slop…" : hasMore ? "More…" : "You reached the bottom. For now."}
           phase={79}
-          semantic={false}
+          semantic={true}
         />
       </div>
     </section>

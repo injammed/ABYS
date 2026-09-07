@@ -338,3 +338,16 @@
 @media (prefers-reduced-motion: reduce) {
   .case { transform: none; }
 }
+
+:global(.aetimm-gallery) .collection { width: min(76rem, calc(100% - 4rem)); margin-bottom: 3rem; padding-top: 2rem; scroll-margin-top: 10rem; }
+:global(.aetimm-gallery) .collection::before { display: none; }
+:global(.aetimm-gallery) .roomHeader { border-color: var(--line); font-size: .75rem; line-height: 1.6; letter-spacing: .1em; }
+:global(.aetimm-gallery) .emptyChamber { min-height: 23rem; border: 1px solid var(--line); border-radius: 1rem; background: color-mix(in srgb, var(--panel) 90%, transparent); box-shadow: 0 20px 70px #00000018; }
+:global(.aetimm-gallery) .emptyChamber h2 { color: var(--text); font-family: var(--font-display); font-size: clamp(2.3rem, 5vw, 4rem); letter-spacing: -.04em; line-height: 1.2; }
+:global(.aetimm-gallery) .emptyChamber::before, :global(.aetimm-gallery) .emptyChamber::after, :global(.aetimm-gallery) .voidPedestal { display: none; }
+:global(.aetimm-gallery) .case { border-radius: .8rem; border-color: var(--line); background: var(--panel); box-shadow: 0 20px 65px #00000026; transform: none; }
+:global(.aetimm-gallery) .plaque h2 { font-family: var(--font-display); letter-spacing: -.03em; line-height: 1.15; }
+:global(.aetimm-gallery) .accession, :global(.aetimm-gallery) .date { font-size: .75rem; line-height: 1.6; }
+:global(.aetimm-gallery) .creator, :global(.aetimm-gallery) .form { font-size: .875rem; line-height: 1.6; }
+:global(.aetimm-gallery) .summary { color: var(--muted); font-size: 1rem; line-height: 1.7; }
+@media (max-width: 800px) { :global(.aetimm-gallery) .collection { width: calc(100% - 2rem); } }

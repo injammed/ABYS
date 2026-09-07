@@ -1,74 +1,21 @@
 import Link from "next/link";
-import { AccountGate } from "@/components/AccountGate";
 import { IntakeValidationBridge } from "@/components/IntakeValidationBridge";
-import { LexiconText } from "@/components/LexiconBroadcast";
-import { PrimaryNavigationMobileStyles } from "@/components/PrimaryNavigationMobileStyles";
 import { SlopDrop } from "@/components/SlopDrop";
-import { ThemeSettings } from "@/components/ThemeSettings";
+import { VoteShortcut } from "@/components/VoteShortcut";
 
-type PrimaryMode = "feed" | "museum";
-
-type PrimaryNavigationProps = {
-  mode?: PrimaryMode;
-};
-
-export function PrimaryNavigation({ mode }: PrimaryNavigationProps) {
+export function PrimaryNavigation({ mode }: { mode?: "feed" | "museum" | "shop" }) {
   return (
-    <nav
-      className="primary-navigation"
-      aria-label="Primary experience and utility navigation"
-      data-navigation-contract="primary-mode-coin-flip-v1"
-      data-arrival-contract="active-mode-is-not-a-button-v1"
-    >
-      <PrimaryNavigationMobileStyles />
+    <nav className="primary-navigation" aria-label="Upload, scroll, vote, shop" data-navigation-contract="upload-scroll-vote-shop-v2">
       <IntakeValidationBridge />
-
-      <div className="primary-mode-switch" aria-label="Choose primary experience">
-        {mode === "feed" ? (
-          <div className="primary-mode-link primary-mode-feed active" aria-current="page" aria-label="Slop Trough, infinite feed">
-            <span className="primary-navigation-mark" aria-hidden="true">≋</span>
-            <span aria-hidden="true">
-              <LexiconText as="strong" text="SLOP TROUGH" phase={5} semantic={false} />
-              <LexiconText as="small" text="Infinite feed" phase={13} semantic={false} />
-            </span>
-          </div>
-        ) : (
-          <Link className="primary-mode-link primary-mode-feed" href="/#field" aria-label="Slop Trough, infinite feed">
-            <span className="primary-navigation-mark" aria-hidden="true">≋</span>
-            <span aria-hidden="true">
-              <LexiconText as="strong" text="SLOP TROUGH" phase={5} semantic={false} />
-              <LexiconText as="small" text="Infinite feed" phase={13} semantic={false} />
-            </span>
-          </Link>
-        )}
-
-        {mode === "museum" ? (
-          <div className="primary-mode-link primary-mode-museum active" aria-current="page" aria-label="AETIMM Museum, spatial selection">
-            <span className="primary-navigation-mark" aria-hidden="true">◇</span>
-            <span aria-hidden="true">
-              <LexiconText as="strong" text="AETIMM MUSEUM" phase={17} semantic={false} />
-              <LexiconText as="small" text="Spatial selection" phase={23} semantic={false} />
-            </span>
-          </div>
-        ) : (
-          <Link className="primary-mode-link primary-mode-museum" href="/aetimm/" aria-label="AETIMM Museum, spatial selection">
-            <span className="primary-navigation-mark" aria-hidden="true">◇</span>
-            <span aria-hidden="true">
-              <LexiconText as="strong" text="AETIMM MUSEUM" phase={17} semantic={false} />
-              <LexiconText as="small" text="Spatial selection" phase={23} semantic={false} />
-            </span>
-          </Link>
-        )}
-      </div>
-
-      <div className="primary-utility-rail" aria-label="Secondary controls">
+      <div className="primary-action-rail">
         <div className="primary-navigation-action primary-navigation-submit"><SlopDrop /></div>
-        <Link className="primary-navigation-link" href="/about/" aria-label="About">
-          <span className="primary-navigation-mark" aria-hidden="true">i</span>
-          <LexiconText text="About" phase={29} semantic={false} />
+        <Link href="/#field" className="primary-action" aria-current={mode === "feed" ? "page" : undefined}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h14" /></svg><span>SCROLL</span>
         </Link>
-        <ThemeSettings />
-        <div className="primary-navigation-action primary-navigation-account"><AccountGate /></div>
+        <VoteShortcut mode={mode} />
+        <Link href="/shop/" className="primary-action" aria-current={mode === "shop" ? "page" : undefined}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l1 13H4L5 8Z" /><path d="M9 9V6a3 3 0 0 1 6 0v3" /></svg><span>SHOP</span>
+        </Link>
       </div>
     </nav>
   );

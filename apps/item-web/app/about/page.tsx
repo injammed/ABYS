@@ -3,22 +3,13 @@ import { GenerationWitness } from "@/components/GenerationWitness";
 import { LexiconText } from "@/components/LexiconBroadcast";
 import { PhaseIdentity } from "@/components/PhaseIdentity";
 import { PrimaryNavigation } from "@/components/PrimaryNavigation";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export default function AboutPage() {
   return (
     <main className="about-page" data-lexicon-contract="character-broadcast-v1">
-      <header className="site-header feed-first-header">
-        <Link className="brand-lockup feed-first-brand" href="/" aria-label="Return to the live feed">
-          <div className="brand-mark" aria-hidden="true">◇</div>
-          <div>
-            <LexiconText as="p" className="eyebrow" text="SLOP TROUGH™" phase={3} />
-            <LexiconText as="h1" text="ABOUT THE FIELD" phase={7} />
-          </div>
-        </Link>
-        <Link className="upload-trigger header-link" href="/" aria-label="Enter feed">
-          <LexiconText text="Enter feed" phase={11} semantic={false} />
-        </Link>
-      </header>
+      <SiteHeader />
+      <h1 className="gallery-sr-only">About the field</h1>
 
       <section className="participation-rail" aria-label="How to participate">
         <div className="participation-step">
