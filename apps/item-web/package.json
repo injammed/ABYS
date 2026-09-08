@@ -25,18 +25,21 @@
     "verify:runtime": "node scripts/verify-universal-runtime.mjs",
     "verify:museum-runtime": "node scripts/verify-museum-runtime.mjs",
     "verify:museum-summit": "node scripts/verify-museum-summit.mjs",
-    "verify:multi-image-dump": "node scripts/verify-multi-image-dump.mjs"
+    "verify:multi-image-dump": "node scripts/verify-multi-image-dump.mjs",
+    "verify:currency-library": "node scripts/verify-currency-library.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "latest",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@types/three": "^0.185.4",
     "typescript": "latest"
   }
 }

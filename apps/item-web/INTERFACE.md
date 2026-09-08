@@ -1,5 +1,17 @@
 # AETIMM Interface Constitution
 
+## 8 September 2026: Owner-directed currency library within SHOP
+
+The owner requests a global 3D+ currency library, searchable ITEM records, a walkable exhibition and evidence-led plus speculative 2027–2040 scenarios. The latest clarification places the library within SHOP and preserves UPLOAD · SCROLL · VOTE · SHOP and the uninterrupted Trough.
+
+- `/` and `/#field` retain the existing feed-first behavior.
+- `/shop/` opens into the ITEM library, followed by the existing digital edition and its checkout.
+- `/aetimm/` is the dedicated currency Museum view of the same library, within SHOP; it replaces the previous general exhibition.
+- No payment, authentication, upload, voting or moderation behavior changes. Accession data and backend rules remain intact.
+- National designs and adoption scenarios are speculative until independently evidenced. No visual constitutes legal tender, endorsement, manufacturing validation or a patent filing.
+- Original AI concept plates are preserved as provenance, with corrections and unknowns stated in the records.
+- This is expressly requested product work, not autonomous maintenance. The new Museum presentation supersedes historical general-exhibition rules below; the root covenant remains in force.
+
 ## September 2026: Explicit User-Directed Gallery Revision
 
 The owner explicitly requested a classy, extravagant, modern, intelligent

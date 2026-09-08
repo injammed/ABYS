@@ -98,6 +98,9 @@ jobs:
       - name: Verify composite feed cursor
         run: npm run verify:feed-cursor
 
+      - name: Verify ITEM currency library
+        run: npm run verify:currency-library
+
       - name: Typecheck
         run: npm run typecheck
 

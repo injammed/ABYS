@@ -1,3 +1,4 @@
+import { CurrencyMuseum } from "@/components/CurrencyMuseum";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,17 +11,18 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const ITEM_0001_CHECKOUT = "https://buy.stripe.com/14A3cw8LrcB8abjb1v2Ry00";
 
 export const metadata: Metadata = {
-  title: "Editions · AETIMM Shop",
-  description: "Independent AETIMM papers, visual essays and design studies. The Diamond Tesseract: five-page digital concept paper, $10 USD.",
+  title: "ITEM Library & Editions · AETIMM Shop",
+  description: "Walk the global 3D+ currency library, explore conditional 2027–2040 adoption scenarios, and discover AETIMM digital editions.",
 };
 
 export default function ShopPage() {
   return (
     <main className={`about-page ${styles.page}`} data-library-contract="literature-shelf-v1">
       <SiteHeader />
+      <CurrencyMuseum />
       <div className={styles.content}>
         <div className={styles.topline}><Link href="/#field">Back to the Trough</Link><span>AETIMM LITERATURE / THE EDITIONS</span></div>
-        <header className={styles.heading}><h1>The Editions<span>.</span></h1><p>Papers. Objects of thought.<br />The beginnings of things.</p></header>
+        <header className={styles.heading}><h2>The Editions<span>.</span></h2><p>Papers. Objects of thought.<br />The beginnings of things.</p></header>
         <div className="machine-signature" aria-hidden="true"><LexiconText machine text="AETIMM ∞ DETECT. ENCODE. CONTINUE. ∞ ITEM 0001 ∞ MATERIAL / MEMORY / MATTER ∞ 10,000 YD" semantic={false} phase={31} /></div>
 
         <article id="shop" className={styles.product} data-aetimm-item="0001" data-commerce-state="orderable">
