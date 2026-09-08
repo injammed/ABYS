@@ -1,0 +1,31 @@
+AETIMM / ITEM — INSTITUTIONAL EVALUATION BRIEF
+Version 1 · 8 September 2026
+Concept originator: Adam Bryant Summers
+
+PURPOSE
+Evaluate whether a bounded physical prototype study is warranted for a multi-piece synthetic-diamond enclosure around an inert metal core. The broader 3D+ currency family explores objects as carriers of physical identity, provenance and cultural expression.
+
+CURRENT STATUS
+Independent concept proposal. Program records identify a final Draft 3 technical concept paper and government submission companion prepared in September 2026. No validated enclosure, patent filing, government endorsement, accepted Treasury review or national adoption is confirmed in this catalog. Illustrative denominations are neither issue commitments nor sale prices.
+
+REQUESTED EVALUATION
+A written feasibility response for bonded coupons and a subscale assembly, identifying facilities, material dimensions, candidate joint processes, required measurements, estimated cost, schedule and stop conditions. No commitment to sovereign currency issuance is requested at this research stage.
+
+FIRST DELIVERABLE
+A dimensioned coupon plan and test matrix with jointly agreed thresholds for bond strength, optical transmission, fracture, thermal cycling and repeatability. Record failures. Progress to enclosure assembly only after independent measurements support it.
+
+OPEN DECISIONS
+Core composition; dimensions and mass budget; optical versus mechanically retained joints; inspection method; security threat model; cost ceiling; custody and damage handling. Multi-material designs need their own validation. No universal counterfeit-proof claim is established.
+
+ADOPTION PATH
+Named evaluation sponsor -> measured prototype -> jurisdiction-specific authority and monetary mandate -> auditable limited pilot -> explicit continuation decision. Each country requires its own decision and evidence. The 2027–2040 library illustrates conditional paths, including stalled research and no adoption.
+
+DOCUMENT CONTROL
+Before sending, attach the actual final technical paper, claims/unknowns matrix, prototype test plan and versioned figure set. Confirm intended recipient and review route. This brief is for preparation and has not been sent by this site.
+
+PRIMARY REFERENCES
+https://www.nature.com/articles/s41467-024-53150-3
+https://www.usmint.gov/news/inside-the-mint/how-coins-are-made-design-and-selection-process
+https://www.uspto.gov/patents/basics/apply/provisional-application
+
+Library: https://aetimm.com/aetimm/

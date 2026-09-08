@@ -1,0 +1,36 @@
+export const asset = (name: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/currency/${name}.jpg`;
+export type Item = { id: string; name: string; country: string; materials: string; form: string; denomination: string; tile: number; gate: string; idea: string };
+export const items: Item[] = [
+ {id:"ITEM-001",name:"X-Coin",country:"United States",materials:"Gold",form:"Union",denomination:"50 USD",tile:0,gate:"Join strength, edge safety and a costed fabrication trial.",idea:"Two familiar coins become one sculptural monetary object."},
+ {id:"ITEM-002",name:"Diamond Tesseract",country:"United States",materials:"Synthetic diamond · inert metal core",form:"Cube",denomination:"250,000 USD",tile:1,gate:"Bonded coupons, then a subscale enclosure; joint strength, optical quality and thermal mismatch must pass predefined tests.",idea:"American iconography inside a transparent, multi-piece diamond enclosure. The flagship research proposal."},
+ {id:"ITEM-003",name:"Liberty Torus",country:"United States",materials:"Platinum · sapphire · gold",form:"Torus",denomination:"10,000 USD",tile:2,gate:"Assembly tolerances, stone retention and handling durability.",idea:"A continuous ring makes monetary identity visible from every direction."},
+ {id:"ITEM-004",name:"Harmony Sphere",country:"China",materials:"Jade · gold · proposed graphene",form:"Sphere",denomination:"50,000 CNY",tile:3,gate:"Define any functional role for graphene; validate jade mounting and impact resistance.",idea:"A spherical study of balance, layers and cultural identity."},
+ {id:"ITEM-005",name:"Sora Prism",country:"Japan",materials:"Sapphire · titanium · silver",form:"Pyramid",denomination:"100,000 JPY",tile:4,gate:"Optical finishing, dissimilar-material joints and protected points.",idea:"A transparent prism carrying a miniature cultural landscape."},
+ {id:"ITEM-006",name:"Axis Cube",country:"Germany",materials:"Tungsten · gold · optical quartz",form:"Cube",denomination:"25,000 EUR",tile:5,gate:"Mass budget, quartz enclosure joining and drop testing.",idea:"A dense metal center inside a clear architectural shell."},
+ {id:"ITEM-007",name:"Alpine Core",country:"Switzerland",materials:"Rock crystal · gold · proposed alloy",form:"Rough",denomination:"50,000 CHF",tile:6,gate:"Specify alloy chemistry, inspect inclusions and characterize fracture behavior.",idea:"Irregular material becomes part of an object's recognizable identity."},
+ {id:"ITEM-008",name:"Sand Blossom",country:"United Arab Emirates",materials:"Gold · diamond · silicon carbide",form:"Stellar",denomination:"100,000 AED",tile:7,gate:"Tip protection, stone retention and repeatable assembly.",idea:"A radial desert-inspired object, conceived as a ceremonial issue."},
+ {id:"ITEM-009",name:"Infinity Lotus",country:"India",materials:"Diamond · gold · chalcedony",form:"Stellar",denomination:"100,000 INR",tile:8,gate:"Petal strength, impact survival and serviceable mounts.",idea:"Layered petals translate a familiar emblem into a physical object."},
+ {id:"ITEM-010",name:"Southern Star",country:"Australia",materials:"Opal · titanium · gold",form:"Stellar",denomination:"50,000 AUD",tile:9,gate:"Opal stability, material compatibility and protected handling.",idea:"A star-shaped study in light, national identity and mixed materials."},
+];
+export const years = [
+ [2027,"Prove the interface","Small bonded coupons and independently recorded failures.","A subscale diamond enclosure in a research collection.","Joining fails; retain solid forms or mechanically retained display prototypes."],
+ [2028,"Make one repeatable object","Repeat coupon results, then document assembly yield and actual costs.","A small family of numbered demonstrators.","Yield or cost prevents repeat manufacture."],
+ [2029,"Test identity and durability","Blind authentication trials, wear, impact and temperature testing.","Independent laboratories compare object fingerprints.","Security signals are unstable or too easy to imitate."],
+ [2030,"Invite national interpretation","Publish technical evidence and seek a named institutional evaluation route.","The ten-object world collection becomes an international exhibition.","No institutional sponsor emerges; remain a research/art collection."],
+ [2031,"Design for custody","Document inspection, custody transfer, damage and loss procedures.","Museum and vault pilots evaluate physical verification.","Handling and insurance costs outweigh practical value."],
+ [2032,"Evaluate pilot issuance","Obtain jurisdiction-specific authority and a defined issuing partner before any currency pilot.","One authorized experimental issue becomes possible.","No legal authority or issuer: no monetary issuance."],
+ [2033,"Compare verification methods","Independent round-robin measurement and reproducibility data.","Several institutions read the same physical reference records.","Readers disagree; interoperability remains unresolved."],
+ [2034,"Test circulation boundaries","Measure real demand, redemption operations and total lifecycle costs.","A limited pilot explores transfers between approved custodians.","No viable demand or redemption mechanism."],
+ [2035,"Explore a second jurisdiction","Require a separate sponsor, legal review and locally appropriate design.","Two independent national programs compare voluntary standards.","A first pilot does not translate across borders."],
+ [2036,"Establish repair and retirement","Publish damage thresholds, replacement and retirement controls.","Objects acquire documented physical histories.","Lifecycle support costs make continuation impractical."],
+ [2037,"Audit manufacturing scale","Independent yield, energy, supply and environmental accounting.","Selected forms move beyond bespoke production.","Capacity or resource constraints keep production small."],
+ [2038,"Evaluate cross-border compatibility","Test verification and custody agreements under each participant's rules.","A shared reference format links distinct national objects.","Jurisdictions choose incompatible requirements."],
+ [2039,"Review public usefulness","Publish independent findings on access, fraud, cost and use.","A wider public collection connects material culture and money.","Benefits do not justify expansion; limit or retire the pilot."],
+ [2040,"Choose the enduring forms","Continue only forms supported by repeatable evidence and willing authorized institutions.","A plural global family of 3D monetary objects, if all preceding gates succeed.","A durable museum and research archive, even without currency adoption."],
+] as const;
+export const sources = [
+ {title:"Direct-bonded diamond membranes (2024)",url:"https://www.nature.com/articles/s41467-024-53150-3",note:"Demonstrates membrane interfaces; does not validate this large diamond enclosure."},
+ {title:"U.S. Mint: design and selection",url:"https://www.usmint.gov/news/inside-the-mint/how-coins-are-made-design-and-selection-process",note:"Describes the role of legislation and review in U.S. coin programs; not an approval of ITEM."},
+ {title:"USPTO: provisional applications",url:"https://www.uspto.gov/patents/basics/apply/provisional-application",note:"Filing guidance. Concept illustrations alone establish no patent-pending status."},
+];
+export const plates = ["world","overview","exotic","evolution","rarity","family","solid","trajectory","catalog","pyramid"];

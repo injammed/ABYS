@@ -134,6 +134,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:feed-cursor
 
+      - name: Verify ITEM currency library
+        working-directory: apps/item-web
+        run: npm run verify:currency-library
+
       - name: Typecheck
         working-directory: apps/item-web
         run: npm run typecheck

@@ -42,7 +42,7 @@ for (const [label, pattern, source] of [
   ["top accession receives pedestal", /if \(index === 0\) return "pedestal"/, collection],
   ["next accessions receive wall treatment", /if \(index < 4\) return "wall"/, collection],
   ["pedestal is architectural not numeric rank", /\.pedestalCase[\s\S]*grid-column: 1 \/ -1/, collectionStyles],
-  ["Museum page mounts permanent collection", /<MuseumCollection \/>/, page],
+  ["Owner-directed Museum mounts currency library", /<CurrencyMuseum \/>/, page],
   ["ordinary curator queue is exceptional only", /Ordinary uploads do not wait here/, curator],
   ["hold queue explicitly not Museum selection", /This is not Museum selection/, curator],
   ["architecture separates Museum from private hold", /A private hold is not an aspirational state and not a Museum audition/, architecture],

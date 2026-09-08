@@ -32,8 +32,8 @@ for (const [label, pattern, source] of [
   ["offline tabs do no Museum refresh", /!navigator\.onLine/, visibleRefresh],
   ["one Museum refresh in flight", /inFlightRef\.current/, visibleRefresh],
   ["return to visible wakes Museum", /visibilitychange/, visibleRefresh],
-  ["Museum page contains Summit", /<MuseumSummit \/>/, page],
-  ["Summit precedes permanent collection", /<MuseumSummit \/>[\s\S]*<MuseumCollection \/>/, page],
+  ["Museum page contains currency library", /<CurrencyMuseum \/>/, page],
+  ["Currency forecast contract", /data-currency-contract="global-forecast-library-v1"/, page],
 ]) {
   assert.ok(pattern.test(source), `Museum Summit contract failed: missing ${label}`);
 }
