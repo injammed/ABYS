@@ -3,3 +3,4 @@
 @media(prefers-reduced-motion:reduce){.museum *{scroll-behavior:auto!important;transition:none!important}}
 
 .halls{position:absolute;top:1rem;right:1rem;display:flex;gap:.5rem}.halls button{background:#101620dd;border:1px solid #71644b;color:#f2e8d8;min-width:44px;min-height:44px;font-size:.85rem}.walk{height:clamp(500px,76vh,900px)}.toolbar{margin-top:1rem}.walkControls button{min-width:48px;font-size:1.25rem}
+.modelViewer{min-width:0;align-self:start}.modelCanvas{height:420px;background:#090e17;position:relative}.modelCanvas canvas{display:block;width:100%;height:100%;touch-action:none}.modelViewer>button{border:1px solid var(--gold-light);background:transparent;color:var(--gold-light);padding:.75rem 1rem;margin-top:.75rem;min-height:44px}.modelViewer>p{font-size:.8rem;color:var(--muted)}@media(max-width:800px){.modelCanvas{height:340px}.walkControls button{min-width:38px;padding:.45rem}}

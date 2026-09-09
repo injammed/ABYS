@@ -138,6 +138,10 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:currency-library
 
+      - name: Verify currency sculptures
+        working-directory: apps/item-web
+        run: npm run verify:currency-sculptures
+
       - name: Typecheck
         working-directory: apps/item-web
         run: npm run typecheck

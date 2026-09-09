@@ -101,6 +101,9 @@ jobs:
       - name: Verify ITEM currency library
         run: npm run verify:currency-library
 
+      - name: Verify currency sculptures
+        run: npm run verify:currency-sculptures
+
       - name: Typecheck
         run: npm run typecheck
 
