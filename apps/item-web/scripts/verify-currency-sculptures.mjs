@@ -14,7 +14,7 @@ for(const item of items){
  const box=new T.Box3().setFromObject(model);const size=box.getSize(new T.Vector3());
  assert.ok(size.x>.5&&size.y>.5&&size.z>.5,`${item.id} must have physical depth in all axes`);
  assert.ok(size.x<2.2&&size.y<2.2&&size.z<2.2,`${item.id} must fit its pedestal space`);
- let meshes=0;model.traverse(node=>{if(node.isMesh){meshes++;assert.notEqual(node.geometry.type,'PlaneGeometry');const p=node.geometry.attributes.position;for(const n of p.array)assert.ok(Number.isFinite(n));triangles+=(node.geometry.index?.count??p.count)/3;}});
+ let meshes=0;model.traverse(node=>{if(node.isMesh){meshes++;assert.notEqual(node.geometry.type,'PlaneGeometry');const p=node.geometry.attributes.position;for(const n of p.array)assert.ok(Number.isFinite(n));for(const n of node.geometry.attributes.normal.array)assert.ok(Number.isFinite(n),"Relief normals must remain finite for shading");triangles+=(node.geometry.index?.count??p.count)/3;}});
  assert.ok(meshes>0&&meshes<=4,'Merged material meshes keep the forty-object gallery bounded');
  const binary=await new GLTFExporter().parseAsync(model,{binary:true});assert.ok(binary instanceof ArrayBuffer);assert.equal(new DataView(binary).getUint32(0,true),0x46546c67);bytes+=binary.byteLength;
  signatures.add(createHash('sha256').update(Buffer.from(binary)).digest('hex'));

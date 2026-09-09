@@ -1,7 +1,31 @@
 import * as T from "three";
+import heightData from "./currency-relief-data.json" with {type:"json"};
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import {RoundedBoxGeometry} from "three/addons/geometries/RoundedBoxGeometry.js";
 import type { Item } from "./currency-library";
+
+const samples=heightData.maps.map(map=>Uint8Array.from(atob(map),c=>c.charCodeAt(0)));
+/** Raised relief geometry, sampled from an AI-authored sculptural height field.
+ * This is interpretive 2.5D relief; the model is not a scan of the original art.
+ * The silhouette has walls and a back, so exported relief is not a floating image.
+ */
+function reliefMesh(kind:0|1|2,high:boolean,width=1.15,height=1.15,depth=.10){
+  const source=samples[kind],resolution=high?144:46,stride=resolution+1;
+  const vertices:number[]=[],indices:number[]=[],values:number[]=[];
+  const read=(x:number,y:number)=>{const xx=x*(heightData.size-1)/resolution,yy=y*(heightData.size-1)/resolution;const x0=Math.floor(xx),y0=Math.floor(yy),x1=Math.min(heightData.size-1,x0+1),y1=Math.min(heightData.size-1,y0+1),a=xx-x0,b=yy-y0;return ((source[y0*heightData.size+x0]*(1-a)+source[y0*heightData.size+x1]*a)*(1-b)+(source[y1*heightData.size+x0]*(1-a)+source[y1*heightData.size+x1]*a)*b)/255;};
+  for(let y=0;y<=resolution;y++)for(let x=0;x<=resolution;x++){
+    const value=Math.max(0,(read(x,y)-.055)/.945);values.push(value);vertices.push((x/resolution-.5)*width,(.5-y/resolution)*height,.003+value*depth);
+  }
+  const edges=new Map<string,[number,number]>();
+  const triangle=(a:number,b:number,c:number)=>{if(Math.max(values[a],values[b],values[c])<.025)return;indices.push(a,b,c);for(const [u,v]of [[a,b],[b,c],[c,a]]){const key=u<v?`${u}:${v}`:`${v}:${u}`;if(edges.has(key))edges.delete(key);else edges.set(key,[u,v]);}};
+  for(let y=0;y<resolution;y++)for(let x=0;x<resolution;x++){const a=y*stride+x,b=a+1,c=a+stride,d=c+1;triangle(a,c,b);triangle(b,c,d);}
+  const frontCount=vertices.length/3;
+  for(let i=0;i<frontCount;i++)vertices.push(vertices[i*3],vertices[i*3+1],-.002);
+  const frontIndices=[...indices];for(let i=0;i<frontIndices.length;i+=3)indices.push(frontIndices[i]+frontCount,frontIndices[i+2]+frontCount,frontIndices[i+1]+frontCount);
+  // Front + back + connected silhouette walls survive actual GLB export.
+  for(const [a,b]of edges.values())indices.push(b,a,a+frontCount,b,a+frontCount,b+frontCount);
+  const g=new T.BufferGeometry();g.setAttribute("position",new T.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();return g;
+}
 
 // Reference-guided sculptural interpretations. Hidden surfaces and relief are inferred.
 // Dimensions are exhibition units, not manufacturing specifications.
@@ -11,7 +35,7 @@ export function buildCurrencySculpture(item: Item, detail: "gallery" | "hero" = 
   const root=new T.Group();root.name=`${item.id} ${item.name}`;
   root.userData={itemId:item.id,interpretation:"Reference-guided 3D study; hidden geometry inferred; not manufacturing CAD",sourceImage:item.image??"world",sourceTile:item.tile};
   const warm=index<=10 && ![6,7,10].includes(index);
-  const metal=new T.MeshStandardMaterial({color:warm?0xc4a35c:0xc8d2dc,metalness:1,roughness:.22});
+  const metal=new T.MeshPhysicalMaterial({color:warm?0xc4a35c:0xc8d2dc,metalness:1,roughness:.24,anisotropy:.28,anisotropyRotation:.4,clearcoat:.15,clearcoatRoughness:.16});
   const dark=new T.MeshStandardMaterial({color:0x19212b,metalness:.92,roughness:.3});
   const glass=new T.MeshPhysicalMaterial({color:index===5?0xcce8ff:0xffffff,metalness:0,roughness:.045,transmission:1,thickness:1.1,ior:index===5?1.77:2.417,dispersion:.045,attenuationColor:new T.Color(0xdceeff),attenuationDistance:6,clearcoat:1,clearcoatRoughness:.06});
   const jewel=new T.MeshStandardMaterial({color:index===4?0x285b49:index===9?0x709d83:index===10?0x256796:0xb29145,metalness:.86,roughness:.19});
@@ -30,31 +54,8 @@ export function buildCurrencySculpture(item: Item, detail: "gallery" | "hero" = 
     const stroke=(points:number[][],radius=.007,m:T.Material=metal)=>{const curve=new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p).applyMatrix4(face)));add(new T.TubeGeometry(curve,high?points.length*5:8,radius,high?6:4,false),m);};
     const circle=(radius:number,tube:number,z:number,m:T.Material=metal)=>{const g=new T.TorusGeometry(radius,tube,high?8:5,high?80:40);g.translate(0,0,z);local(g,m);};
     // Multiple relief levels produce real silhouette, highlights and parallax.
-    if(kind%3===0){
-      relief([[-.23,-.34],[-.07,-.22],[-.08,-.1],[-.18,.02],[-.17,.19],[-.07,.29],[.12,.29],[.18,.17],[.19,.115],[.285,.07],[.20,.035],[.207,-.01],[.15,-.05],[.11,-.17],[.27,-.34]],.042,metal,face);
-      bead(-.065,.12,.045,.125,.165,.056);bead(.067,.055,.065,.069,.102,.043);bead(.13,.125,.084,.045,.013,.014);
-      stroke([[.16,.04,.094],[.18,.03,.10],[.201,.032,.084]],.006,dark);
-      bead(.153,.124,.098,.009,.007,.006,dark);
-      stroke([[.13,-.015,.09],[.168,-.02,.094],[.19,-.016,.081]],.004,dark);
-      // Curled hair: individually modeled strands flowing into the neck.
-      for(let j=0;j<11;j++){const x=-.17+j*.022;stroke([[x,.205,.075],[x-.022,.1,.10],[x+.028,.006,.104],[x-.018,-.12,.079],[x+.016,-.21,.055]],.007);}
-      for(let j=0;j<7;j++){const a=Math.PI*.04+j*Math.PI*.145;relief([[Math.cos(a)*.16,Math.sin(a)*.16+.14],[Math.cos(a)*.43,Math.sin(a)*.40+.14],[Math.cos(a+.1)*.16,Math.sin(a+.1)*.16+.14]],.034,metal,face);}
-      stroke([[-.15,.25,.09],[-.04,.30,.10],[.10,.28,.09],[.17,.19,.082]],.016);
-      for(let j=0;j<4;j++)stroke([[-.12+j*.03,-.23,.07],[-.10+j*.045,-.27,.068],[.03+j*.05,-.32,.057]],.006);
-    }else if(kind%3===1){
-      // Layered flight feathers, breast, shield, beak and tail.
-      for(const side of [-1,1])for(let j=0;j<11;j++){
-        const x=side*(.11+j*.031),y=.15+j*.014;
-        bead(x,y,.037,.037,.14-j*.006,.018,metal,-side*(.6+j*.065));
-        stroke([[side*.08,.13,.066],[x,y+.045,.064],[x+side*.05,y-.05,.055]],.0045);
-      }
-      bead(0,.035,.049,.09,.16,.045);bead(.018,.216,.071,.055,.067,.041);
-      relief([[.045,.245],[.14,.212],[.055,.191]],.08,metal,face);bead(.047,.237,.112,.008,.007,.005,dark);
-      for(let j=0;j<5;j++)bead((j-2)*.037,-.21,.04,.018,.10,.017,metal,(j-2)*-.22);
-      relief([[-.105,.03],[.105,.03],[.09,-.12],[0,-.20],[-.09,-.12]],.093,dark,face);
-      for(let j=0;j<7;j++){const x=(j-3)*.023;stroke([[x,.006,.107],[x,-.06,.112],[x*.5,-.15,.107]],.006);}
-      stroke([[-.09,.025,.109],[0,.03,.113],[.09,.025,.109]],.012);
-      for(const side of [-1,1]){stroke([[side*.04,-.13,.07],[side*.11,-.21,.07],[side*.19,-.20,.065]],.009);}
+    if(kind%3===0||kind%3===1){
+      local(reliefMesh(kind%3 as 0|1,high,1.15,1.15,kind%3===0?.095:.08));
     }else{
       relief([[-.19,-.38],[.17,-.38],[.10,-.16],[.075,.14],[-.09,.14],[-.13,-.17]],.041,metal,face);
       bead(-.008,.22,.053,.054,.071,.039);bead(-.014,.228,.078,.039,.05,.018);
@@ -105,26 +106,9 @@ export function buildCurrencySculpture(item: Item, detail: "gallery" | "hero" = 
     add(new T.TubeGeometry(new T.CatmullRomCurve3(points),high?240:120,.003,4,true),m);
   }
   function franklin(face:T.Matrix4){
-    // Bald crown, elongated face, side hair, nose, eyelids and coat are distinct volumes.
-    faceBead(face,[0,.10,.048],[.195,.285,.064]);
-    faceBead(face,[.014,-.06,.087],[.15,.155,.045]);
-    faceBead(face,[.012,.045,.119],[.027,.085,.026]);
-    faceBead(face,[.019,-.013,.134],[.035,.024,.026]);
-    for(const side of [-1,1]){
-      faceBead(face,[side*.17,.025,.044],[.045,.066,.029]);
-      faceStroke(face,[[side*.031,.11,.108],[side*.078,.13,.112],[side*.125,.11,.093]],.01);
-      faceStroke(face,[[side*.034,.095,.112],[side*.073,.085,.123],[side*.116,.093,.105]],.005,dark);
-      faceBead(face,[side*.073,.094,.124],[.008,.009,.004],dark);
-      for(let j=0;j<10;j++)faceStroke(face,[[side*(.14+j*.006),.23-j*.009,.04],[side*(.20+j*.005),.12,.068],[side*(.19+j*.006),-.06,.071],[side*(.23+j*.004),-.20,.046]],.006);
-      faceStroke(face,[[side*.073,.20,.108],[side*.025,.213,.116],[0,.211,.117]],.0025,dark);
-    }
-    faceStroke(face,[[-.08,-.107,.111],[0,-.096,.13],[.073,-.10,.11]],.004,dark);
-    faceStroke(face,[[-.06,-.132,.107],[0,-.142,.112],[.063,-.13,.103]],.003);
-    relief([[-.31,-.43],[-.23,-.28],[-.09,-.19],[0,-.23],[.10,-.2],[.26,-.31],[.31,-.43]],.035,dark,face);
-    relief([[-.09,-.2],[0,-.25],[-.04,-.39],[-.16,-.27]],.046,metal,face);
-    relief([[.1,-.2],[.02,-.25],[.035,-.39],[.17,-.28]],.046,metal,face);
-    for(let j=0;j<13;j++){const y=-.18+j*.035;faceStroke(face,[[-.11,y,.079],[-.06,y+.004,.099],[0,y+.007,.114],[.06,y+.004,.103],[.105,y,.079]],.0015,dark);}
+    const portrait=reliefMesh(2,high,.89,1.12,.105);portrait.applyMatrix4(face);add(portrait,metal);
   }
+
   if(item.form==="Inlaid"){
     dark.color.set(0x29211f);dark.metalness=.72;dark.roughness=.39;metal.color.set(0xc6c0b2);metal.roughness=.34;jewel.color.set(0xb97750);
     add(new RoundedBoxGeometry(1.43,1.43,1.43,3,.007),dark);
@@ -196,7 +180,7 @@ export function buildCurrencySculpture(item: Item, detail: "gallery" | "hero" = 
   }else cube(1.24+(index%4)*.045,item.form==="Solid",item.form==="Chamfered"||item.name.includes("Faceted"));
   for(const [material,geometries]of buckets){const merged=mergeGeometries(geometries);geometries.forEach(g=>g.dispose());if(!merged)throw new Error(`Cannot build ${item.id}`);const mesh=new T.Mesh(merged,material);mesh.name=`${item.id} ${material===glass?"crystal":material===metal?"relief":"core"}`;mesh.userData.itemId=item.id;mesh.castShadow=material!==glass;mesh.receiveShadow=true;root.add(mesh);}
   for(const material of [metal,dark,glass,jewel])if(!buckets.has(material))material.dispose();
-  root.rotation.y=(index%5-2)*.11;root.userData.geometryEdition="signature-relief-v3";
+  root.rotation.y=(index%5-2)*.11;root.userData.geometryEdition="sculpted-height-relief-v4";
   return root;
 }
 
