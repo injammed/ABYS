@@ -98,7 +98,7 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
     }).catch(()=>{if(!disposed)setStatus("3D could not open. Explore the Catalog or Forecast instead.");});
     return()=>{disposed=true;cleanup();};
   },[]);
-  return <div className={styles.walk} data-sculpture-gallery="signature-pedestals-v3">
+  return <div className={styles.walk} data-sculpture-gallery="sculpted-relief-gallery-v4">
     <div className={styles.canvas} ref={host} style={{backgroundImage:`url("${asset("clear-relief")}")`,backgroundSize:"cover",backgroundPosition:"center"}} />
     <nav className={styles.halls} aria-label="Jump to exhibition hall">{Array.from({length:hallCount},(_,n)=>n).map(n=><button key={n} onClick={()=>action.current(`hall${n}` as Action)} aria-label={`Hall ${n+1}, objects ${n*10+1} to ${Math.min(items.length,n*10+10)}`}>{String(n+1).padStart(2,"0")}</button>)}</nav>
     <div className={styles.walkControls}>{status&&<p role="status">{status}</p>}<div className={styles.joystickRow}>
