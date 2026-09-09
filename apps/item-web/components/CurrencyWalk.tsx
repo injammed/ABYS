@@ -5,7 +5,11 @@ import {CurrencyJoystick} from "./CurrencyJoystick";
 import {smoothAxis} from "@/lib/currency-navigation";
 import styles from "./CurrencyMuseum.module.css";
 
-type Action = "forward" | "back" | "left" | "right" | "reset" | "hall0" | "hall1" | "hall2" | "hall3" | "strafeleft" | "straferight";
+type Action = "reset" | `hall${number}`;
+const hallCount=Math.ceil(items.length/10);
+const lastRow=-Math.floor((items.length-1)/2)*6;
+const corridorLength=20-lastRow;
+const corridorCenter=(lastRow-4)/2;
 export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
   const motion=useRef({x:0,y:0,lookX:0,lookY:0});
   const host = useRef<HTMLDivElement>(null);
@@ -47,9 +51,9 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
       const room=new RoomEnvironment();const environment=pmrem.fromScene(room,.04);scene.environment=environment.texture;room.dispose();pmrem.dispose();
       const key=new THREE.DirectionalLight(0xffedcb,3);key.position.set(3,8,8);scene.add(key);
       const fill=new THREE.DirectionalLight(0xaacbff,2);fill.position.set(-4,4,-10);scene.add(fill);
-      box(12,.2,132,0,-.1,-58,0x151a22);
-      box(.2,6,132,-6,3,-58,0x111723);box(.2,6,132,6,3,-58,0x111723);
-      for(let z=7;z>-124;z-=5){box(.04,.02,3,0,.02,z,0x9f8251);box(12,.05,.08,0,5,z,0xb99964);}
+      box(12,.2,corridorLength,0,-.1,corridorCenter,0x151a22);
+      box(.2,6,corridorLength,-6,3,corridorCenter,0x111723);box(.2,6,corridorLength,6,3,corridorCenter,0x111723);
+      for(let z=7;z>lastRow-8;z-=5){box(.04,.02,3,0,.02,z,0x9f8251);box(12,.05,.08,0,5,z,0xb99964);}
       items.forEach((item,i)=>{
         const x=i%2===0?-3.3:3.3;const z=-Math.floor(i/2)*6;
         box(1.9,1.05,1.9,x,.525,z,0x20252e);
@@ -62,11 +66,11 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
       const blocked=(x:number,z:number)=>obstacles.some(o=>Math.abs(x-o.x)<1.22&&Math.abs(z-o.z)<1.22);
       const move=(forward:number,side:number)=>{
         const nx=Math.max(-5.25,Math.min(5.25,camera.position.x-Math.sin(yaw)*forward+Math.cos(yaw)*side));
-        const nz=Math.max(-119,Math.min(8,camera.position.z-Math.cos(yaw)*forward-Math.sin(yaw)*side));
+        const nz=Math.max(lastRow-5,Math.min(8,camera.position.z-Math.cos(yaw)*forward-Math.sin(yaw)*side));
         if(!blocked(nx,camera.position.z))camera.position.x=nx;
         if(!blocked(camera.position.x,nz))camera.position.z=nz;
       };
-      action.current=a=>{ if(a.startsWith("hall")){camera.position.set(0,1.8,6-Number(a.slice(4))*30);yaw=0;pitch=0;motion.current={x:0,y:0,lookX:0,lookY:0};velocity={x:0,y:0};}else if(a==="reset"){camera.position.set(0,1.8,6);yaw=0;pitch=0;motion.current={x:0,y:0,lookX:0,lookY:0};velocity={x:0,y:0};}else if(a==="left")yaw+=.35;else if(a==="right")yaw-=.35;else if(a==="strafeleft"||a==="straferight")move(0,a==="strafeleft"?-.65:.65);else move(a==="forward"?.65:-.65,0); };
+      action.current=a=>{camera.position.set(0,1.8,a.startsWith("hall")?6-Number(a.slice(4))*30:6);yaw=0;pitch=0;motion.current={x:0,y:0,lookX:0,lookY:0};velocity={x:0,y:0};};
       const keydown=(e:KeyboardEvent)=>{if(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright"].includes(e.key.toLowerCase())){e.preventDefault();keys.add(e.key.toLowerCase());}};
       const keyup=(e:KeyboardEvent)=>keys.delete(e.key.toLowerCase());
       const clear=()=>keys.clear();
@@ -94,9 +98,9 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
     }).catch(()=>{if(!disposed)setStatus("3D could not open. Explore the Catalog or Forecast instead.");});
     return()=>{disposed=true;cleanup();};
   },[]);
-  return <div className={styles.walk} data-sculpture-gallery="forty-pedestals-v2">
+  return <div className={styles.walk} data-sculpture-gallery="signature-pedestals-v3">
     <div className={styles.canvas} ref={host} style={{backgroundImage:`url("${asset("clear-relief")}")`,backgroundSize:"cover",backgroundPosition:"center"}} />
-    <nav className={styles.halls} aria-label="Jump to exhibition hall">{[0,1,2,3].map(n=><button key={n} onClick={()=>action.current(`hall${n}` as Action)} aria-label={`Hall ${n+1}, objects ${n*10+1} to ${n*10+10}`}>{String(n+1).padStart(2,"0")}</button>)}</nav>
+    <nav className={styles.halls} aria-label="Jump to exhibition hall">{Array.from({length:hallCount},(_,n)=>n).map(n=><button key={n} onClick={()=>action.current(`hall${n}` as Action)} aria-label={`Hall ${n+1}, objects ${n*10+1} to ${Math.min(items.length,n*10+10)}`}>{String(n+1).padStart(2,"0")}</button>)}</nav>
     <div className={styles.walkControls}>{status&&<p role="status">{status}</p>}<div className={styles.joystickRow}>
       <CurrencyJoystick label="Move" onMove={(x,y)=>{motion.current.x=x;motion.current.y=y;}}/>
       <button aria-label="Return to entrance" onClick={()=>action.current("reset")}>⌂</button>

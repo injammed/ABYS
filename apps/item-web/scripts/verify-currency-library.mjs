@@ -10,7 +10,7 @@ for(const year of years) assert.ok(year.length===5&&year.every(x=>String(x).leng
 for(const item of items) assert.ok(item.gate&&item.materials&&item.country&&item.denomination,'Every exhibit must expose its manufacturing gate and provenance fields');
 for(const plate of plates) assert.ok((await stat(`public/currency/${plate}.jpg`)).size>0);
 assert.equal(sources.length,3);
-assert.equal(items.length,40,'Forty selected studies must remain available');
+assert.equal(items.length,43,'Original forty and three signature studies must remain available');
 for(const item of items) {
  const [x,y,w,h]=cropFor(item);
  assert.ok(x>=0&&y>=0&&w>0&&h>0&&x+w<=1&&y+h<=1,'Exhibit crops stay within the original image');

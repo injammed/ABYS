@@ -67,7 +67,7 @@ export function buildCurrencySculpture(item: Item, detail: "gallery" | "hero" = 
       for(let j=0;j<3;j++)stroke([[-.085,.08-j*.055,.075],[0,.025-j*.058,.082],[.075,.02-j*.06,.07]],.007);
     }
     // Coin-like concentric reeding, beaded rims and laurel leaves.
-    if(index%3!==1){circle(.505,.008,.016);circle(.538,.006,.011);}
+    if(index%3!==1){circle(.505,.008,.016);circle(.538,.006,.011);if(high)guilloche(face,.524,.006,72,.02);}
     for(let j=0;j<32;j++){const a=j*Math.PI/16;bead(Math.cos(a)*.55,Math.sin(a)*.55,.014,.009,.009,.009);}
     for(const side of [-1,1]){
       stroke([[side*.1,-.49,.024],[side*.33,-.38,.024],[side*.43,-.14,.024]],.006);
@@ -88,7 +88,84 @@ export function buildCurrencySculpture(item: Item, detail: "gallery" | "hero" = 
       for(const x of [-.42,.42])for(const y of [-.42,.42])for(const z of [-.42,.42])add(new T.OctahedronGeometry(.037),metal,[x,y,z]);
     }
   }
-  if(item.form==="Union"){
+  // These three source studies have dedicated construction, not generic cube presets.
+  const faceMatrices=()=>[[0,0,0],[0,Math.PI/2,0],[0,Math.PI,0],[0,-Math.PI/2,0],[-Math.PI/2,0,0],[Math.PI/2,0,0]].map(r=>new T.Matrix4().makeRotationFromEuler(new T.Euler(...r as [number,number,number])).multiply(new T.Matrix4().makeTranslation(0,0,.715)));
+  function faceRing(face:T.Matrix4,r:number,tube:number,z=0,m:T.Material=metal,sx=1,sy=1){const g=new T.TorusGeometry(r,tube,high?8:5,high?96:48);g.scale(sx,sy,1);g.translate(0,0,z);g.applyMatrix4(face);add(g,m);}
+  function faceStroke(face:T.Matrix4,points:number[][],radius=.004,m:T.Material=metal){const path=new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p).applyMatrix4(face)));add(new T.TubeGeometry(path,high?32:16,radius,high?6:4,false),m);}
+  function faceBead(face:T.Matrix4,p:number[],scale:number[],m:T.Material=metal){const g=new T.SphereGeometry(1,high?24:12,high?16:8);g.scale(...scale as [number,number,number]);g.translate(...p as [number,number,number]);g.applyMatrix4(face);add(g,m);}
+  function stars(face:T.Matrix4){
+    for(let row=0;row<4;row++)for(let col=0;col<4;col++){
+      const x=-.54+col*.35+(row%2)*.025,y=-.53+row*.35;
+      const points=Array.from({length:10},(_,i)=>{const a=Math.PI/2+i*Math.PI/5,r=i%2?.024:.058;return [x+Math.cos(a)*r,y+Math.sin(a)*r];});
+      const shape=new T.Shape();points.forEach(([x,y],i)=>i?shape.lineTo(x,y):shape.moveTo(x,y));shape.closePath();const g=new T.ExtrudeGeometry(shape,{depth:.0015,bevelEnabled:false});g.applyMatrix4(face);add(g,metal);
+    }
+  }
+  function guilloche(face:T.Matrix4,r:number,amplitude:number,frequency:number,z=0,m:T.Material=metal,sx=1,sy=1){
+    const points=Array.from({length:high?241:121},(_,i)=>{const a=i/(high?240:120)*Math.PI*2,rr=r+amplitude*Math.sin(a*frequency);return new T.Vector3(Math.cos(a)*rr*sx,Math.sin(a)*rr*sy,z).applyMatrix4(face);});
+    add(new T.TubeGeometry(new T.CatmullRomCurve3(points),high?240:120,.003,4,true),m);
+  }
+  function franklin(face:T.Matrix4){
+    // Bald crown, elongated face, side hair, nose, eyelids and coat are distinct volumes.
+    faceBead(face,[0,.10,.048],[.195,.285,.064]);
+    faceBead(face,[.014,-.06,.087],[.15,.155,.045]);
+    faceBead(face,[.012,.045,.119],[.027,.085,.026]);
+    faceBead(face,[.019,-.013,.134],[.035,.024,.026]);
+    for(const side of [-1,1]){
+      faceBead(face,[side*.17,.025,.044],[.045,.066,.029]);
+      faceStroke(face,[[side*.031,.11,.108],[side*.078,.13,.112],[side*.125,.11,.093]],.01);
+      faceStroke(face,[[side*.034,.095,.112],[side*.073,.085,.123],[side*.116,.093,.105]],.005,dark);
+      faceBead(face,[side*.073,.094,.124],[.008,.009,.004],dark);
+      for(let j=0;j<10;j++)faceStroke(face,[[side*(.14+j*.006),.23-j*.009,.04],[side*(.20+j*.005),.12,.068],[side*(.19+j*.006),-.06,.071],[side*(.23+j*.004),-.20,.046]],.006);
+      faceStroke(face,[[side*.073,.20,.108],[side*.025,.213,.116],[0,.211,.117]],.0025,dark);
+    }
+    faceStroke(face,[[-.08,-.107,.111],[0,-.096,.13],[.073,-.10,.11]],.004,dark);
+    faceStroke(face,[[-.06,-.132,.107],[0,-.142,.112],[.063,-.13,.103]],.003);
+    relief([[-.31,-.43],[-.23,-.28],[-.09,-.19],[0,-.23],[.10,-.2],[.26,-.31],[.31,-.43]],.035,dark,face);
+    relief([[-.09,-.2],[0,-.25],[-.04,-.39],[-.16,-.27]],.046,metal,face);
+    relief([[.1,-.2],[.02,-.25],[.035,-.39],[.17,-.28]],.046,metal,face);
+    for(let j=0;j<13;j++){const y=-.18+j*.035;faceStroke(face,[[-.11,y,.079],[-.06,y+.004,.099],[0,y+.007,.114],[.06,y+.004,.103],[.105,y,.079]],.0015,dark);}
+  }
+  if(item.form==="Inlaid"){
+    dark.color.set(0x29211f);dark.metalness=.72;dark.roughness=.39;metal.color.set(0xc6c0b2);metal.roughness=.34;jewel.color.set(0xb97750);
+    add(new RoundedBoxGeometry(1.43,1.43,1.43,3,.007),dark);
+    faceMatrices().forEach(stars);
+    const seal=new T.Matrix4().makeTranslation(-.48,.41,.721);
+    const disk=new T.CylinderGeometry(.051,.051,.009,high?64:32);disk.rotateX(Math.PI/2);disk.applyMatrix4(seal);add(disk,jewel);
+    faceRing(seal,.06,.008,.006,jewel);guilloche(seal,.062,.007,6,.008,jewel);
+    for(let j=0;j<5;j++)faceStroke(seal,[[-.025,-.025+j*.012,.012],[.025,-.025+j*.012,.012]],.0015,jewel);
+  }else if(item.form==="Filigree"){
+    add(new RoundedBoxGeometry(1.40,1.40,1.40,3,.09),glass);
+    const faces=faceMatrices();
+    faces.forEach((face,i)=>{
+      const shape=new T.Shape();shape.moveTo(-.61,-.68);shape.lineTo(.61,-.68);shape.lineTo(.68,-.61);shape.lineTo(.68,.61);shape.lineTo(.61,.68);shape.lineTo(-.61,.68);shape.lineTo(-.68,.61);shape.lineTo(-.68,-.61);shape.closePath();const hole=new T.Path();hole.absarc(0,0,.56,0,Math.PI*2,true);shape.holes.push(hole);
+      const plate=new T.ExtrudeGeometry(shape,{depth:.014,bevelEnabled:true,bevelSize:.007,bevelThickness:.004,bevelSegments:2,curveSegments:high?64:32});plate.applyMatrix4(face);add(plate,metal);
+      faceRing(face,.565,.012,.021);faceRing(face,.607,.009,.023);guilloche(face,.59,.01,40,.026);
+      for(let j=0;j<24;j++){const a=j*Math.PI/12;const a1=new T.Vector3(Math.cos(a)*.27,Math.sin(a)*.27,-.06).applyMatrix4(face),a2=new T.Vector3(Math.cos(a)*.55,Math.sin(a)*.55,-.06).applyMatrix4(face);rod(a1,a2,.005,jewel);}
+      for(const x of [-.5,.5])for(const y of [-.5,.5]){
+        const corner=face.clone().multiply(new T.Matrix4().makeTranslation(x,y,.03));guilloche(corner,.092,.021,5,0);faceRing(corner,.056,.004);guilloche(corner,.055,.01,7,.004,jewel);
+        const stone=new T.OctahedronGeometry(.037);stone.translate(x,y,.033);stone.applyMatrix4(face);add(stone,glass);
+      }
+      const center=face.clone().multiply(new T.Matrix4().makeScale(.88,.88,1));motif(center,i===0?0:i===4?1:i%3);
+    });
+    add(new T.IcosahedronGeometry(.22,2),jewel);for(let j=0;j<4;j++)ring(.34+j*.052,.014,[0,0,0],[j*.6,j*.8,.3],jewel);
+  }else if(item.form==="Portrait"){
+    add(new RoundedBoxGeometry(1.4,1.4,1.4,3,.012),glass);
+    const faces=faceMatrices();
+    faces.forEach((face,i)=>{
+      if(i===4||i===5)return;
+      // Pierced engraving panels keep the crystal interior visible around the relief.
+      const shape=new T.Shape();shape.moveTo(-.685,-.685);shape.lineTo(.685,-.685);shape.lineTo(.685,.685);shape.lineTo(-.685,.685);shape.closePath();const hole=new T.Path();hole.absellipse(0,0,.37,.51,0,Math.PI*2,true,0);shape.holes.push(hole);
+      const panel=new T.ExtrudeGeometry(shape,{depth:.006,bevelEnabled:false,curveSegments:high?64:32});panel.applyMatrix4(face);add(panel,dark);
+      faceRing(face,.48,.012,.018,metal,.82,1.16);guilloche(face,.515,.008,52,.015,metal,.80,1.12);
+      for(const side of [-1,1])for(let line=0;line<5;line++)faceStroke(face,Array.from({length:25},(_,j)=>[-.64+j*.053,side*(.57+line*.017)+Math.sin(j*2.3+line)*.006,.012]),.0025);
+      for(const x of [-.57,.57])for(const y of [-.45,.45]){const corner=face.clone().multiply(new T.Matrix4().makeTranslation(x,y,.01));guilloche(corner,.076,.017,9);}
+      if(i%2===0)franklin(face);else motif(face.clone().multiply(new T.Matrix4().makeScale(.83,.83,1)),1);
+    });
+    for(let j=0;j<5;j++)ring(.27+j*.054,.012,[0,.12,0],[j*.24,j*.40,0],jewel);
+    ring(.60,.013,[0,.68,0],[Math.PI/2,0,0],jewel);
+    motif(new T.Matrix4().makeRotationX(-Math.PI/2).multiply(new T.Matrix4().makeTranslation(0,0,.41)).multiply(new T.Matrix4().makeScale(.56,.56,.7)),1);
+  }else if(item.form==="Union"){
+
     for(const angle of [-.7,.7]){const disk=new T.CylinderGeometry(.66,.66,.085,48);disk.rotateX(Math.PI/2);disk.rotateY(angle);add(disk);const face=new T.Matrix4().makeRotationY(angle);face.multiply(new T.Matrix4().makeTranslation(0,0,.055));motif(face,1);
       for(let j=0;j<64;j++){const a=j*Math.PI/32;const g=new T.BoxGeometry(.007,.025,.095);g.translate(0,.642,0);g.rotateZ(a);g.rotateY(angle);add(g);}
       const rim=new T.TorusGeometry(.625,.012,6,64);rim.translate(0,0,.051);rim.rotateY(angle);add(rim);
@@ -119,7 +196,7 @@ export function buildCurrencySculpture(item: Item, detail: "gallery" | "hero" = 
   }else cube(1.24+(index%4)*.045,item.form==="Solid",item.form==="Chamfered"||item.name.includes("Faceted"));
   for(const [material,geometries]of buckets){const merged=mergeGeometries(geometries);geometries.forEach(g=>g.dispose());if(!merged)throw new Error(`Cannot build ${item.id}`);const mesh=new T.Mesh(merged,material);mesh.name=`${item.id} ${material===glass?"crystal":material===metal?"relief":"core"}`;mesh.userData.itemId=item.id;mesh.castShadow=material!==glass;mesh.receiveShadow=true;root.add(mesh);}
   for(const material of [metal,dark,glass,jewel])if(!buckets.has(material))material.dispose();
-  root.rotation.y=(index%5-2)*.11;root.userData.geometryEdition="sculpted-relief-v2";
+  root.rotation.y=(index%5-2)*.11;root.userData.geometryEdition="signature-relief-v3";
   return root;
 }
 
