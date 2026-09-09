@@ -1,10 +1,13 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { asset, items } from "@/lib/currency-library";
+import {CurrencyJoystick} from "./CurrencyJoystick";
+import {smoothAxis} from "@/lib/currency-navigation";
 import styles from "./CurrencyMuseum.module.css";
 
 type Action = "forward" | "back" | "left" | "right" | "reset" | "hall0" | "hall1" | "hall2" | "hall3" | "strafeleft" | "straferight";
 export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
+  const motion=useRef({x:0,y:0,lookX:0,lookY:0});
   const host = useRef<HTMLDivElement>(null);
   const action = useRef<(a: Action) => void>(() => {});
   const select = useRef(onSelect);
@@ -20,16 +23,16 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
       try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false }); }
       catch { setStatus("3D is unavailable on this device. Explore the complete Catalog or Forecast instead."); return; }
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
-      renderer.setClearColor(0x080b10);
+      renderer.setClearColor(0x080b10);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
       parent.appendChild(renderer.domElement);
       const canvas = renderer.domElement;
       canvas.tabIndex = 0;
       canvas.setAttribute("aria-label", "Walkable ITEM exhibition. Focus here; use W A S D to move, arrow keys to turn, or drag to look. Select an exhibit for its record.");
       const scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(0x080b10, 25, 145);
+      scene.fog = new THREE.Fog(0x080b10, 15, 42);
       const camera = new THREE.PerspectiveCamera(62, 1, .1, 180);
       camera.position.set(0, 1.8, 6);
-      let yaw = 0;
+      let yaw = 0, pitch=0;let velocity={x:0,y:0};
       const geometries: InstanceType<typeof THREE.BufferGeometry>[] = [];
       const materials: InstanceType<typeof THREE.Material>[] = [];
       const textures: InstanceType<typeof THREE.Texture>[] = [];
@@ -63,27 +66,41 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
         if(!blocked(nx,camera.position.z))camera.position.x=nx;
         if(!blocked(camera.position.x,nz))camera.position.z=nz;
       };
-      action.current=a=>{ if(a.startsWith("hall")){camera.position.set(0,1.8,6-Number(a.slice(4))*30);yaw=0;}else if(a==="reset"){camera.position.set(0,1.8,6);yaw=0;}else if(a==="left")yaw+=.35;else if(a==="right")yaw-=.35;else if(a==="strafeleft"||a==="straferight")move(0,a==="strafeleft"?-.65:.65);else move(a==="forward"?.65:-.65,0); };
+      action.current=a=>{ if(a.startsWith("hall")){camera.position.set(0,1.8,6-Number(a.slice(4))*30);yaw=0;pitch=0;motion.current={x:0,y:0,lookX:0,lookY:0};velocity={x:0,y:0};}else if(a==="reset"){camera.position.set(0,1.8,6);yaw=0;pitch=0;motion.current={x:0,y:0,lookX:0,lookY:0};velocity={x:0,y:0};}else if(a==="left")yaw+=.35;else if(a==="right")yaw-=.35;else if(a==="strafeleft"||a==="straferight")move(0,a==="strafeleft"?-.65:.65);else move(a==="forward"?.65:-.65,0); };
       const keydown=(e:KeyboardEvent)=>{if(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright"].includes(e.key.toLowerCase())){e.preventDefault();keys.add(e.key.toLowerCase());}};
       const keyup=(e:KeyboardEvent)=>keys.delete(e.key.toLowerCase());
       const clear=()=>keys.clear();
-      let dragging=false;let startX=0;let lastX=0;let distance=0;
-      const down=(e:PointerEvent)=>{canvas.focus();dragging=true;startX=e.clientX;lastX=startX;distance=0;canvas.setPointerCapture(e.pointerId);};
-      const drag=(e:PointerEvent)=>{if(dragging){yaw-=(e.clientX-lastX)*.005;distance+=Math.abs(e.clientX-lastX);lastX=e.clientX;}};
-      const up=(e:PointerEvent)=>{if(!dragging)return;dragging=false;if(distance>6)return;const rect=canvas.getBoundingClientRect();const ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1),camera);const hit=ray.intersectObjects(sculptures,true)[0];if(hit)select.current(hit.object.userData.itemId);};
-      const cancel=()=>{dragging=false;clear();};
+      let dragging=false;let startX=0;let lastX=0;let lastY=0;let distance=0;
+      const down=(e:PointerEvent)=>{canvas.focus();dragging=true;startX=e.clientX;lastX=startX;lastY=e.clientY;distance=0;canvas.setPointerCapture(e.pointerId);};
+      const drag=(e:PointerEvent)=>{if(dragging){yaw-=(e.clientX-lastX)*.005;pitch=Math.max(-.7,Math.min(.7,pitch-(e.clientY-lastY)*.003));distance+=Math.abs(e.clientX-lastX)+Math.abs(e.clientY-lastY);lastX=e.clientX;lastY=e.clientY;}};
+      const up=(e:PointerEvent)=>{if(!dragging)return;dragging=false;if(distance>6)return;const rect=canvas.getBoundingClientRect();const ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1),camera);const hit=ray.intersectObjects(sculptures.filter(s=>s.visible),true)[0];if(hit)select.current(hit.object.userData.itemId);};
+      const cancel=()=>{dragging=false;clear();motion.current={x:0,y:0,lookX:0,lookY:0};velocity={x:0,y:0};};
       canvas.addEventListener("keydown",keydown);window.addEventListener("keyup",keyup);canvas.addEventListener("blur",clear);window.addEventListener("blur",cancel);
       canvas.addEventListener("pointerdown",down);canvas.addEventListener("pointermove",drag);canvas.addEventListener("pointerup",up);canvas.addEventListener("pointercancel",cancel);
       const resize=new ResizeObserver(()=>{const {width,height}=parent.getBoundingClientRect();if(width&&height){renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix();}});resize.observe(parent);
       let frame=0;
-      const render=()=>{if(disposed)return;const dt=Math.min(clock.getDelta(),.05);if(keys.has("arrowleft"))yaw+=dt*1.3;if(keys.has("arrowright"))yaw-=dt*1.3;move((Number(keys.has("w")||keys.has("arrowup"))-Number(keys.has("s")||keys.has("arrowdown")))*dt*4,(Number(keys.has("d"))-Number(keys.has("a")))*dt*4);camera.rotation.set(0,yaw,0);if(document.visibilityState==="visible")renderer.render(scene,camera);frame=requestAnimationFrame(render);};render();setStatus("");
+      const render=()=>{
+        if(disposed)return;const dt=Math.min(clock.getDelta(),.05);
+        if(keys.has("arrowleft"))yaw+=dt*1.3;if(keys.has("arrowright"))yaw-=dt*1.3;
+        yaw-=motion.current.lookX*dt*1.55;pitch=Math.max(-.7,Math.min(.7,pitch-motion.current.lookY*dt));
+        const forward=Number(keys.has("w")||keys.has("arrowup"))-Number(keys.has("s")||keys.has("arrowdown"))-motion.current.y;
+        const side=Number(keys.has("d"))-Number(keys.has("a"))+motion.current.x;const length=Math.max(1,Math.hypot(forward,side));
+        velocity.x=smoothAxis(velocity.x,side/length,dt);velocity.y=smoothAxis(velocity.y,forward/length,dt);
+        move(velocity.y*dt*3.8,velocity.x*dt*3.8);camera.rotation.set(pitch,yaw,0,"YXZ");
+        for(const sculpture of sculptures)sculpture.visible=Math.abs(sculpture.position.z-camera.position.z)<38;
+        if(document.visibilityState==="visible")renderer.render(scene,camera);frame=requestAnimationFrame(render);
+      };render();setStatus("");
       cleanup=()=>{cancelAnimationFrame(frame);resize.disconnect();canvas.removeEventListener("keydown",keydown);window.removeEventListener("keyup",keyup);canvas.removeEventListener("blur",clear);window.removeEventListener("blur",cancel);canvas.removeEventListener("pointerdown",down);canvas.removeEventListener("pointermove",drag);canvas.removeEventListener("pointerup",up);canvas.removeEventListener("pointercancel",cancel);geometries.forEach(x=>x.dispose());materials.forEach(x=>x.dispose());textures.forEach(x=>x.dispose());sculptures.forEach(disposeCurrencySculpture);environment.dispose();renderer.dispose();canvas.remove();action.current=()=>{};};
     }).catch(()=>{if(!disposed)setStatus("3D could not open. Explore the Catalog or Forecast instead.");});
     return()=>{disposed=true;cleanup();};
   },[]);
-  return <div className={styles.walk} data-sculpture-gallery="forty-pedestals-v1">
+  return <div className={styles.walk} data-sculpture-gallery="forty-pedestals-v2">
     <div className={styles.canvas} ref={host} style={{backgroundImage:`url("${asset("clear-relief")}")`,backgroundSize:"cover",backgroundPosition:"center"}} />
     <nav className={styles.halls} aria-label="Jump to exhibition hall">{[0,1,2,3].map(n=><button key={n} onClick={()=>action.current(`hall${n}` as Action)} aria-label={`Hall ${n+1}, objects ${n*10+1} to ${n*10+10}`}>{String(n+1).padStart(2,"0")}</button>)}</nav>
-    <div className={styles.walkControls}>{status&&<p role="status">{status}</p>}<div>{([ ["left","↶"],["strafeleft","⇠"],["forward","↑"],["back","↓"],["straferight","⇢"],["right","↷"],["reset","⌂"] ] as const).map(([a,label])=><button aria-label={a==="left"?"Turn left":a==="right"?"Turn right":a==="forward"?"Walk forward":a==="back"?"Walk back":a==="strafeleft"?"Step left":a==="straferight"?"Step right":"Return to entrance"} key={a} onClick={()=>action.current(a)}>{label}</button>)}</div></div>
+    <div className={styles.walkControls}>{status&&<p role="status">{status}</p>}<div className={styles.joystickRow}>
+      <CurrencyJoystick label="Move" onMove={(x,y)=>{motion.current.x=x;motion.current.y=y;}}/>
+      <button aria-label="Return to entrance" onClick={()=>action.current("reset")}>⌂</button>
+      <CurrencyJoystick label="Look" onMove={(x,y)=>{motion.current.lookX=x;motion.current.lookY=y;}}/>
+    </div></div>
   </div>;
 }
