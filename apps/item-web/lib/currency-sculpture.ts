@@ -24,7 +24,10 @@ function reliefMesh(kind:0|1|2,high:boolean,width=1.15,height=1.15,depth=.10){
   const frontIndices=[...indices];for(let i=0;i<frontIndices.length;i+=3)indices.push(frontIndices[i]+frontCount,frontIndices[i+2]+frontCount,frontIndices[i+1]+frontCount);
   // Front + back + connected silhouette walls survive actual GLB export.
   for(const [a,b]of edges.values())indices.push(b,a,a+frontCount,b,a+frontCount,b+frontCount);
-  const g=new T.BufferGeometry();g.setAttribute("position",new T.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();return g;
+  // Keep only referenced vertices so empty atlas pixels cannot enlarge model bounds.
+  const used=new Map<number,number>(),compact:number[]=[];
+  const remapped=indices.map(index=>{let next=used.get(index);if(next===undefined){next=used.size;used.set(index,next);compact.push(vertices[index*3],vertices[index*3+1],vertices[index*3+2]);}return next;});
+  const g=new T.BufferGeometry();g.setAttribute("position",new T.Float32BufferAttribute(compact,3));g.setIndex(remapped);g.computeVertexNormals();return g;
 }
 
 // Reference-guided sculptural interpretations. Hidden surfaces and relief are inferred.
@@ -42,8 +45,10 @@ export function buildCurrencySculpture(item: Item, detail: "gallery" | "hero" = 
   const buckets=new Map<T.Material,T.BufferGeometry[]>();
   function add(g:T.BufferGeometry,m:T.Material=metal,p:[number,number,number]=[0,0,0],r:[number,number,number]=[0,0,0],scale:[number,number,number]=[1,1,1]) {
     const matrix=new T.Matrix4().compose(new T.Vector3(...p),new T.Quaternion().setFromEuler(new T.Euler(...r)),new T.Vector3(...scale));
-    g.applyMatrix4(matrix);const flat=g.index?g.toNonIndexed():g;if(flat!==g)g.dispose();flat.deleteAttribute("uv");
-    const group=buckets.get(m)??[];group.push(flat);buckets.set(m,group);
+    g.applyMatrix4(matrix);g.deleteAttribute("uv");
+    // Preserve shared vertices, normals and seams; unindexed shapes get identity indices.
+    if(!g.index)g.setIndex(Array.from({length:g.attributes.position.count},(_,i)=>i));
+    const group=buckets.get(m)??[];group.push(g);buckets.set(m,group);
   }
   function rod(a:T.Vector3,b:T.Vector3,r=.018,m:T.Material=metal){const delta=b.clone().sub(a);const g=new T.CylinderGeometry(r,r,delta.length(),8);g.applyQuaternion(new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize()));g.translate(...a.clone().add(b).multiplyScalar(.5).toArray());add(g,m);}
   function ring(radius:number,tube:number,p:[number,number,number]=[0,0,0],r:[number,number,number]=[0,0,0],m:T.Material=metal){add(new T.TorusGeometry(radius,tube,8,64),m,p,r);}
