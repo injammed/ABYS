@@ -317,3 +317,11 @@ Every interface fold must measurably strengthen at least one primary without wea
 7. Feed-state restoration across nuanced controls.
 
 Each fold must pass automated checks, production deployment, and exact-device verification before it is treated as complete.
+
+## September 2026: Argus — explicit fifth destination
+
+The owner explicitly adds ARGUS: UPLOAD · SCROLL · VOTE · SHOP · ARGUS. Preserve the existing four actions and library. Argus v1 is a local trace-inspection prototype with evidence-linked deterministic rules, not a deployed autonomous or omniscient monitor. Its permanent observation directive is a product ambition. Continuous monitoring requires a separately instrumented backend and authorized sources.
+
+## Argus priority — explicit owner revision, 12 September 2026
+
+Argus is now the business priority. AETIMM is the funnel, public field, demonstrator of witnessed material and home of all eyes for one Argus. A compact Argus introduction and Eye link precede the uninterrupted root artifact stream; this explicitly supersedes the earlier ban on any root introduction. The root route is the Slop Feed. Its role is now the public field of Argus, not a claim that each submission has been independently observed or verified. No generated filler is permitted. The header prioritizes Argus, then Field and Museum. Primary actions are UPLOAD · SCROLL · VOTE · SHOP · ARGUS. The gallery, purchase flow and account controls remain available.
