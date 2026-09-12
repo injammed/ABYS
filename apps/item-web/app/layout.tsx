@@ -14,13 +14,13 @@ import "./gallery.css";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const metadata: Metadata = {
-  title: "SLOP TROUGH™ · AI-Only Feed",
-  description: "The dedicated public habitat for safe AI-made excess, provenance labels, human judgment, and the extreme boundary between synthetic slop and AETIMM museum artifacts.",
-  applicationName: "SLOP TROUGH",
+  title: "AETIMM · Home of Argus",
+  description: "One Argus. An open field. Bring machine-made work into view, inspect activity traces, and follow the evidence. Upload · Scroll · Vote · Shop · Argus.",
+  applicationName: "AETIMM · Argus",
   manifest: `${basePath}/manifest.webmanifest`,
   appleWebApp: {
     capable: true,
-    title: "ST",
+    title: "AETIMM",
     statusBarStyle: "black-translucent",
   },
   icons: {

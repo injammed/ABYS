@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArtifactFeed } from "@/components/ArtifactFeed";
 import { BinarySwipeVoting } from "@/components/BinarySwipeVoting";
 import { PrimaryNavigation } from "@/components/PrimaryNavigation";
@@ -6,11 +7,12 @@ import { SubmissionLandingBridge } from "@/components/SubmissionLandingBridge";
 
 export default function HomePage() {
   return (
-    <main className="feed-first-page" data-interface-contract="slop-feed-root-v1" data-language-contract="legible-machine-gallery-v2">
+    <main className="feed-first-page" data-interface-contract="slop-feed-root-v1" data-language-contract="legible-machine-gallery-v2" data-business-priority="argus">
       <SubmissionLandingBridge />
       <SiteHeader mode="feed" />
-      <h1 className="gallery-sr-only">SLOP TROUGH™</h1>
-      <section id="field" className="feed-first-field gallery-feed-stream" aria-label="Live Slop Trough artifact field">
+      <header className="argus-field-entry"><div><p className="gallery-overline">AETIMM / HOME OF ALL EYES</p><h1>One Argus. An open field.</h1><p>Bring machine-made work into view. Witness it. Judge it. Follow the evidence.</p></div><Link href="/argus/">Enter the Eye <span aria-hidden="true">↗</span></Link></header>
+      <p className="argus-field-scope">THE WITNESSED FIELD / SLOP TROUGH™ · Public submissions and judgments. Submission is not verification by Argus.</p>
+      <section id="field" className="feed-first-field gallery-feed-stream" aria-label="Argus public field — Slop Trough submissions">
         <BinarySwipeVoting />
         <ArtifactFeed />
       </section>

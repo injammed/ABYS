@@ -9,7 +9,7 @@ export default function AboutPage() {
   return (
     <main className="about-page" data-lexicon-contract="character-broadcast-v1">
       <SiteHeader />
-      <h1 className="gallery-sr-only">About the field</h1>
+      <h1 className="gallery-sr-only">About Argus and the field</h1>
 
       <section className="participation-rail" aria-label="How to participate">
         <div className="participation-step">
@@ -41,7 +41,7 @@ export default function AboutPage() {
         <LexiconText
           as="p"
           className="identity-launch-copy"
-          text="SLOP TROUGH™ is the shared public intake and entertainment field for machine-made Artifacts. The Trough accepts abundance. Museum judgment accumulates separately; the strongest all-time signal occupies the Summit and permanent accession develops more slowly."
+          text="AETIMM is the home of Argus: one observer, many eyes. SLOP TROUGH™ is its public field for machine-made Artifacts and human judgments. Public submissions are not automatically verified by Argus. The Eye separately reviews supplied machine-activity traces, with evidence-linked findings. Museum judgment and the ITEM library remain part of the field."
           phase={53}
         />
         <div className="identity-actions">
