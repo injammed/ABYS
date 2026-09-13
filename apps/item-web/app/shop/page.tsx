@@ -8,7 +8,6 @@ import { SiteHeader } from "@/components/SiteHeader";
 import styles from "./Shop.module.css";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const ITEM_0001_PAPER = `${basePath}/literature/Diamond_Tesseract_Technical_Concept_Paper_FINAL_Draft_3.pdf`;
 const AETIMM_DONATION = "https://donate.stripe.com/9B600k6Djbx45V37Pj2Ry01";
 
 export const metadata: Metadata = {
@@ -36,8 +35,8 @@ export default function ShopPage() {
             <h2>The Diamond<br /><em>Tesseract.</em></h2>
             <p className={styles.subtitle}>A Three-Dimensional Synthetic-Diamond Monetary Architecture.</p>
             <p className={styles.description}>A five-page technical concept paper exploring currency as a physical, three-dimensional object. Materials, construction, American iconography, authentication, custody, and a proposed path from concept to physical specimen.</p>
-            <dl className={styles.specifications}><div><dt>Format</dt><dd>Digital paper · 5 pages</dd></div><div><dt>Edition</dt><dd>Final concept · Draft 3 of 3</dd></div><div><dt>Published</dt><dd>September 2026</dd></div></dl>
-            <div className={styles.purchase}><span className={styles.price}>FREE <small>PDF</small></span><a href={ITEM_0001_PAPER} target="_blank" rel="noreferrer">Read final draft <span aria-hidden="true">↗</span></a></div>
+            <dl className={styles.specifications}><div><dt>Format</dt><dd>Public paper · 5 pages</dd></div><div><dt>Edition</dt><dd>Final concept · Draft 3 of 3</dd></div><div><dt>Published</dt><dd>September 2026</dd></div></dl>
+            <div className={styles.purchase}><span className={styles.price}>FREE <small>READ</small></span><Link href="/literature/item-0001/">Read final draft <span aria-hidden="true">↗</span></Link></div>
             <div className={styles.purchase}><span className={styles.price}>∞ <small>USD</small></span><a href={AETIMM_DONATION} target="_blank" rel="noreferrer">Donate any amount <span aria-hidden="true">↗</span></a></div>
             <p className={styles.checkoutNote}>The paper is public. Donations support AETIMM independently and do not purchase access.</p>
             <p className={styles.boundary}>Independent concept. Not legal tender. No government endorsement.</p>
