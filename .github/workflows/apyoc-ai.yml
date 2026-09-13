@@ -1,0 +1,72 @@
+name: Apyoc supervised AI eye
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apyoc-ai.yml'
+      - 'scripts/apyoc/**'
+      - 'apps/item-web/lib/apyoc-machine.ts'
+      - 'apps/item-web/public/apyoc/machine.json'
+  schedule:
+    - cron: '19 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+concurrency:
+  group: apyoc-observation-writer
+  cancel-in-progress: false
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Load public archive
+        run: |
+          git fetch origin apyoc-observations
+          git worktree add observation-data FETCH_HEAD
+      - name: Install pinned CPU model runtime
+        run: |
+          python -m venv .apyoc-venv
+          .apyoc-venv/bin/python -m pip install -r scripts/apyoc/requirements-ai.txt
+      - name: Download and verify pinned model data
+        run: python scripts/apyoc/download-model.py .apyoc-model
+      - name: Run supervised network-isolated inference
+        run: python scripts/apyoc/supervise.py .apyoc-run .apyoc-model .apyoc-venv/bin/python
+      - name: Validate complete execution evidence
+        run: |
+          node --input-type=module -e "import {readFileSync} from 'node:fs'; import {parseAiRun} from './apps/item-web/lib/apyoc-machine.ts'; parseAiRun(JSON.parse(readFileSync('.apyoc-run/record.json','utf8')));"
+      - name: Attest workflow provenance
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: .apyoc-run/record.json
+      - name: Verify provenance before publishing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUNDLE_PATH: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          gh attestation verify .apyoc-run/record.json --bundle "$BUNDLE_PATH" --repo injammed/ABYS --signer-workflow injammed/ABYS/.github/workflows/apyoc-ai.yml --deny-self-hosted-runners
+      - name: Publish immutable run and verification bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUNDLE_PATH: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          node scripts/apyoc/publish-ai.mjs observation-data .apyoc-run/record.json "$BUNDLE_PATH"
+          git -C observation-data config user.name 'apyoc-observer[bot]'
+          git -C observation-data config user.email 'apyoc-observer@users.noreply.github.com'
+          git -C observation-data add ai
+          git -C observation-data commit -m 'Append supervised AI execution evidence'
+          git fetch observation-data HEAD
+          gh auth setup-git
+          git push origin FETCH_HEAD:refs/heads/apyoc-observations

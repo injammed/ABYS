@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "id": "apyoc-selector-001",
+  "enabled": true,
+  "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+  "modelRevision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+  "weightsSha256": "5af571cbf074e6d21a03528d2330792e532ca608f24ac70a143f6b369968ab8c",
+  "policy": "fixed-head-selection-v1",
+  "targets": ["home", "eye", "shop"],
+  "maximumRequestsPerRun": 4,
+  "scheduledIntervalMinutes": 60,
+  "scope": "Three baseline HEAD requests and at most one model-selected HEAD request to fixed AETIMM endpoints. Model inference has no network interface. No visitor data or arbitrary prompts.",
+  "limitations": "One supervised worker. Provider internals, arbitrary processes, hidden goals and other machines are outside this observation contract. Workflow provenance is not proof of global coverage or independent behavioral observation."
+}

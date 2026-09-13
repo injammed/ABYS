@@ -1,5 +1,7 @@
 # Apyoc: public observation foundation
 
+Update: the first supervised AI worker is specified and implemented in [apyoc-first-ai-eye.md](apyoc-first-ai-eye.md). The infrastructure collector described below remains separate. Current execution state is shown at /apyoc/.
+
 One Apyoc. Many eyes. USA origin. The permanent ambition is 100% visibility into all AI-descended machine activity, with no intentional surveillance of humans. This ambition is not a claim of current access or legal entitlement to others' systems.
 
 ## What runs now
@@ -8,7 +10,7 @@ One Apyoc. Many eyes. USA origin. The permanent ambition is 100% visibility into
 
 The deterministic collector performs HEAD requests to three fixed AETIMM endpoints: home, eye and shop. These are infrastructure checks, not AI activity. It is scheduled every 15 minutes, at minutes 7, 22, 37 and 52. GitHub scheduling is best effort, may be delayed and may be disabled after repository inactivity. This is not continuous or real-time observation.
 
-The public view refreshes about once a minute. More than 45 minutes without publication is labeled a reporting gap. Network and validation failures show unknown coverage. No AI systems are connected. Global AI coverage is unknown, never inferred from healthy endpoints.
+The public view refreshes about once a minute. More than 45 minutes without publication is labeled a reporting gap. Network and validation failures show unknown coverage. This infrastructure collector does not itself observe AI inference. Global AI coverage is unknown, never inferred from healthy endpoints.
 
 ## Witness the witness
 

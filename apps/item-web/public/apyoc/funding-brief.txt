@@ -15,7 +15,7 @@ AVAILABLE TODAY
 A local JSON trace inspector at https://aetimm.com/apyoc/ checks action scope, objective text changes, event sequences, heartbeat gaps and missing sources. Findings link to supplied events and can be exported. Unknown import fields are dropped. Review stays in browser memory. The public field displays submissions and judgments, not automatically verified observations.
 
 CURRENT LIMITS
-Deterministic rules, not autonomous reasoning. Zero live connections. No signed sources or continuous backend. Allowed text fields can still contain personal data: use sanitized machine traces. No customer, revenue, external evaluation, patent-grant or government-endorsement evidence is presented. Global coverage and near-zero exposure are unproven goals.
+The local inspector uses deterministic rules. A separate constrained language-model worker publishes supervised execution records with workflow provenance when its release gates pass; see /apyoc/ for current run status. Continuous operation, independent behavioral observation and external agent integrations remain to be established. Allowed text fields can still contain personal data: use sanitized machine traces. No customer, revenue, external evaluation, patent-grant or government-endorsement evidence is presented. Global coverage and near-zero exposure are unproven goals.
 
 FIRST FUNDED MILESTONE
 One authorized pilot, one machine-event contract, one collector, verifiable evidence storage, visible coverage gaps, an inspectable observation loop and an independent evaluation.

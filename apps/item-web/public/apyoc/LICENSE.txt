@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Scope: Apyoc-owned software and documentation in scripts/apyoc/,
-.github/workflows/apyoc-observe.yml, apps/item-web/lib/apyoc*.ts,
+.github/workflows/apyoc-observe.yml, .github/workflows/apyoc-ai.yml, apps/item-web/lib/apyoc*.ts,
 apps/item-web/components/Apyoc*, apps/item-web/app/apyoc/,
 apps/item-web/scripts/verify-apyoc*.mjs, docs/apyoc*.md,
 and the Apyoc funding and pilot briefs. This notice does not relicense
