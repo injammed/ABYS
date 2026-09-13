@@ -24,6 +24,6 @@ assert.throws(()=>roundtrip({...clean,systems:[{...clean.systems[0],heartbeatSec
 assert.deepEqual(inspectTrace(roundtrip({...clean,events:[clean.events[1],clean.events[0]]})),[]);
 assert.ok(inspectTrace(roundtrip({...clean,events:[clean.events[0],{...clean.events[1],sequence:1}]})).some(f=>f.title==='Sequence repeated or reversed'));
 assert.ok(!inspectTrace(roundtrip({...single,capturedAt:'2026-09-12T12:01:00Z'})).some(f=>f.title==='Coverage ends before capture'));
-const ui=await readFile('components/ArgusEye.tsx','utf8');assert.match(ui,/Demonstration · synthetic events/);assert.match(ui,/0 live connections/);assert.match(ui,/Export review/);assert.doesNotMatch(ui,/dangerouslySetInnerHTML|localStorage|fetch\(/);assert.match(ui,/Ten billion eyes\. One Argus\./);
-const page=await readFile('app/argus/page.tsx','utf8');assert.match(page,/<PrimaryNavigation mode="argus"/);
-console.log('Argus PASS: trace validation, conflicts, objective changes, sequence gaps, cadence boundaries, empty sources and explicit prototype state.');
+const ui=await readFile('components/ArgusEye.tsx','utf8');assert.match(ui,/Demonstration · synthetic events/);assert.match(ui,/0 live connections/);assert.match(ui,/Export review/);assert.doesNotMatch(ui,/dangerouslySetInnerHTML|localStorage|fetch\(/);assert.match(ui,/Ten billion eyes\. One Apyoc\./);assert.match(ui,/APYOC/);assert.doesNotMatch(ui,/\bARGUS\b|\bArgus\b/);
+const page=await readFile('app/argus/page.tsx','utf8');assert.match(page,/<PrimaryNavigation mode="argus"/);assert.match(page,/Apyoc · The Eye Remains Open/);
+console.log('Apyoc PASS: trace validation, conflicts, objective changes, sequence gaps, cadence boundaries, empty sources and explicit prototype state.');
