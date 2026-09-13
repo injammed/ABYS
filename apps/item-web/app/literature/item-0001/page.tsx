@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ITEM0001_HERO } from "@/lib/item0001-hero";
 
 export const metadata: Metadata = {
   title: "The Diamond Tesseract · Final Draft · AETIMM",
@@ -49,8 +48,8 @@ export default function Item0001() {
     <p><Link href="/shop/">← AETIMM / THE EDITIONS</Link></p>
     <p style={{letterSpacing:".12em",fontSize:12}}>ITEM 0001 · FINAL TECHNICAL CONCEPT PAPER · DRAFT 3 OF 3 · SEPTEMBER 2026</p>
     <h1 style={{fontSize:"clamp(42px,8vw,84px)",lineHeight:.95,margin:"28px 0 0"}}>THE DIAMOND TESSERACT</h1>
-    <figure style={{margin:"4px -12px 12px",display:"grid",placeItems:"center"}}>
-      <img src={ITEM0001_HERO} alt="Two symmetrical Diamond Tesseract concept studies floating side by side" style={{display:"block",width:"min(100%,980px)",height:"auto",objectFit:"contain"}} />
+    <figure style={{margin:"2px -12px 10px",display:"grid",placeItems:"center"}}>
+      <img src="/images/diamond-tesseract-pair.webp" alt="Two equal, symmetrical Diamond Tesseract concept studies floating side by side" style={{display:"block",width:"min(100%,980px)",height:"auto",objectFit:"contain"}} />
     </figure>
     <p style={{fontSize:22,marginTop:8}}>A Three-Dimensional Synthetic-Diamond Monetary Architecture</p>
     <p>Adam Bryant Summers · Independent Concept · Not Legal Tender · No Government Endorsement</p>
