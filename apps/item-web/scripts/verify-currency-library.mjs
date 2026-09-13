@@ -21,8 +21,11 @@ for(const item of items) {
 const [root,shop,museum,ui,walk,brief]=await Promise.all(['app/page.tsx','app/shop/page.tsx','app/aetimm/page.tsx','components/CurrencyMuseum.tsx','components/CurrencyWalk.tsx','public/currency/evaluation-brief.txt'].map(x=>readFile(x,'utf8')));
 assert.doesNotMatch(root,/CurrencyMuseum/,'Currency library belongs to SHOP; root remains the live Trough');
 assert.match(root,/<ArtifactFeed\s*\/>/);
+assert.match(root,/<DonationWelcome\s*\/>/,'Donation prompt may precede the Trough without replacing it');
 assert.match(shop,/<CurrencyMuseum\s*\/>/);
-assert.match(shop,/data-commerce-state="orderable"/,'Existing digital edition must remain available');
+assert.match(shop,/data-commerce-state="public"/,'ITEM 0001 must remain publicly readable');
+assert.match(shop,/Donate any amount/,'Public literature may be supported by an independent donation');
+assert.doesNotMatch(shop,/Buy digital copy|\$10 <small>USD<\/small>/,'Public scripture is not paywalled');
 assert.match(museum,/<CurrencyMuseum\s*\/>/);
 assert.doesNotMatch(museum,/<MuseumSummit|<MuseumCollection/,'Museum exhibition is exclusively currency');
 assert.match(ui,/not an issued value or selling price/);
@@ -32,4 +35,4 @@ assert.match(walk,/renderer\.dispose\(\)/);
 assert.match(walk,/cancelAnimationFrame/);
 assert.match(walk,/3D is unavailable on this device/);
 assert.match(brief,/has not been sent/);
-console.log('Currency library PASS: 14 complete scenario years, unique records, available provenance plates, research boundaries, Shop placement and preserved root/checkout.');
+console.log('Currency library PASS: 14 complete scenario years, unique records, available provenance plates, public ITEM 0001, donation-first support and preserved Trough.');
