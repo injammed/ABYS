@@ -42,4 +42,4 @@ Acceptance evidence and decision maker: ____________________
 Access-revocation drill and rollback plan: ____________________
 Continue / revise / stop decision and reasons: ____________________
 
-This is a scoping worksheet, not an executed contract. Current Apyoc is a local deterministic demonstrator with zero live connections. The pilot service, AI reasoning and privacy guarantees remain to be built and evaluated. No public investor contact or payment channel is active on this launch.
+This is a scoping worksheet, not an executed contract. Current Apyoc includes a local deterministic inspector and a bounded supervised AI experiment; current run status is published at /apyoc/. An external pilot service, broad autonomous reasoning and privacy guarantees remain to be built and evaluated. No public investor contact or payment channel is active on this launch.

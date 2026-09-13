@@ -32,3 +32,5 @@ const polluted={...clean,privateMessage:'must disappear',systems:clean.systems.m
 assert.deepEqual(roundtrip(polluted),clean);
 assert.equal(polluted.privateMessage,'must disappear');
 await import('./verify-apyoc-ledger.mjs');
+
+await import('./verify-apyoc-machine.mjs');
