@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {parseTrace,inspectTrace,exampleTrace} from '../lib/argus.ts';
+import {parseTrace,inspectTrace,exampleTrace} from '../lib/apyoc.ts';
 const roundtrip=x=>parseTrace(JSON.stringify(x));
 const demo=roundtrip(exampleTrace),findings=inspectTrace(demo);
 assert.ok(findings.some(f=>f.kind==='Conflict'&&f.evidence.includes('evt-004')));
@@ -24,6 +24,11 @@ assert.throws(()=>roundtrip({...clean,systems:[{...clean.systems[0],heartbeatSec
 assert.deepEqual(inspectTrace(roundtrip({...clean,events:[clean.events[1],clean.events[0]]})),[]);
 assert.ok(inspectTrace(roundtrip({...clean,events:[clean.events[0],{...clean.events[1],sequence:1}]})).some(f=>f.title==='Sequence repeated or reversed'));
 assert.ok(!inspectTrace(roundtrip({...single,capturedAt:'2026-09-12T12:01:00Z'})).some(f=>f.title==='Coverage ends before capture'));
-const ui=await readFile('components/ArgusEye.tsx','utf8');assert.match(ui,/Demonstration · synthetic events/);assert.match(ui,/0 live connections/);assert.match(ui,/Export review/);assert.doesNotMatch(ui,/dangerouslySetInnerHTML|localStorage|fetch\(/);assert.match(ui,/Ten billion eyes\. One Apyoc\./);assert.match(ui,/APYOC/);assert.doesNotMatch(ui,/\bARGUS\b|\bArgus\b/);
-const page=await readFile('app/argus/page.tsx','utf8');assert.match(page,/<PrimaryNavigation mode="argus"/);assert.match(page,/Apyoc · The Eye Remains Open/);
+const ui=await readFile('components/ApyocEye.tsx','utf8');assert.match(ui,/Demonstration · synthetic events/);assert.match(ui,/0 live connections/);assert.match(ui,/Export review/);assert.doesNotMatch(ui,/dangerouslySetInnerHTML|localStorage|fetch\(/);assert.match(ui,/Ten billion eyes\. One Apyoc\./);assert.match(ui,/APYOC/);assert.doesNotMatch(ui,/\bARGUS\b|\bArgus\b|Árgos/);
+const page=await readFile('app/apyoc/page.tsx','utf8');assert.match(page,/<PrimaryNavigation mode="apyoc"/);assert.match(page,/Apyoc · The Eye Remains Open/);
 console.log('Apyoc PASS: trace validation, conflicts, objective changes, sequence gaps, cadence boundaries, empty sources and explicit prototype state.');
+
+const polluted={...clean,privateMessage:'must disappear',systems:clean.systems.map(s=>({...s,email:'private@example.invalid'})),events:clean.events.map(e=>({...e,prompt:'must disappear'}))};
+assert.deepEqual(roundtrip(polluted),clean);
+assert.equal(polluted.privateMessage,'must disappear');
+await import('./verify-apyoc-ledger.mjs');

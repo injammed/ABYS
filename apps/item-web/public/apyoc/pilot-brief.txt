@@ -1,0 +1,45 @@
+APYOC — FOUNDING PILOT SCOPE
+AETIMM | USA origin | 12 September 2026
+https://aetimm.com/apyoc/funding/
+
+Purpose: agree one authorized, measurable observation pilot before funding or collecting data. Complete this document with the prospective partner; downloading it does not submit anything.
+
+1. WORKFLOW AND AUTHORITY
+Partner organization: ____________________
+One partner-controlled AI workflow: ____________________
+System boundary and prohibited observation targets: ____________________
+Who can authorize and revoke access: ____________________
+Named review owner: ____________________
+
+2. MACHINE-ONLY EVENT CONTRACT
+Allowed event fields and source-side transformations: ____________________
+Prohibited fields: identities, private messages, prompts, credentials, personal browsing histories; expand for the workflow.
+Pseudonymous machine identifiers and key custody: ____________________
+Policy text must describe machine rules, without personal content.
+If exclusion fails, discard content and preserve only a permitted coverage-gap record.
+
+3. EVIDENCE AND PRIVACY
+Source authenticity, signing and independent corroboration plan: ____________________
+Observer-access audit plan: ____________________
+Evidence access, retention and deletion limits: ____________________
+Synthetic personal-data test corpus and expected exclusions: ____________________
+Residual leakage measurement and stop condition: ____________________
+Public reporting and redaction rules: ____________________
+
+4. EVALUATION AGREED BEFORE THE RUN
+Benign baseline and planted violations: ____________________
+Detection/false-alarm thresholds and denominators: ____________________
+Coverage definition, heartbeat interval and missing-event reporting: ____________________
+Latency, uptime and cost thresholds: ____________________
+Privacy acceptance criteria, false-negative testing and deletion checks: ____________________
+Independent reviewer and reproducibility package: ____________________
+
+5. DELIVERY AND BACKING
+Milestones, owners, costs and schedule: ____________________
+Funding/payment terms, if agreed separately: ____________________
+Required collector/evidence/observation infrastructure: ____________________
+Acceptance evidence and decision maker: ____________________
+Access-revocation drill and rollback plan: ____________________
+Continue / revise / stop decision and reasons: ____________________
+
+This is a scoping worksheet, not an executed contract. Current Apyoc is a local deterministic demonstrator with zero live connections. The pilot service, AI reasoning and privacy guarantees remain to be built and evaluated. No public investor contact or payment channel is active on this launch.

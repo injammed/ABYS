@@ -1,0 +1,38 @@
+APYOC — FOUNDING FUNDING BRIEF
+AETIMM | USA-origin independent project | 12 September 2026
+https://aetimm.com/apyoc/funding/
+
+TEN BILLION EYES. ONE APYOC.
+Concept by Adam Bryant Summers, developed with ChatGPT and Grok.
+
+MISSION
+Build an AI-native, continuously operating observer of AI-descended machine activity. Universal machine visibility is the moonshot. Near-zero human surveillance is the target: no intentional monitoring of people; exclude incidental human data at the source and measure residual exposure. One Apyoc is the project identity, not a claim of legal exclusivity over observers.
+
+PROBLEM AND PROPOSED BUSINESS
+Operators of AI agents need evidence of actions, authorization and missing coverage. Start with scoped observation pilots for partner-controlled agent workflows; test a recurring observation and evidence service. Customer demand, pricing and economics remain to be validated.
+
+AVAILABLE TODAY
+A local JSON trace inspector at https://aetimm.com/apyoc/ checks action scope, objective text changes, event sequences, heartbeat gaps and missing sources. Findings link to supplied events and can be exported. Unknown import fields are dropped. Review stays in browser memory. The public field displays submissions and judgments, not automatically verified observations.
+
+CURRENT LIMITS
+Deterministic rules, not autonomous reasoning. Zero live connections. No signed sources or continuous backend. Allowed text fields can still contain personal data: use sanitized machine traces. No customer, revenue, external evaluation, patent-grant or government-endorsement evidence is presented. Global coverage and near-zero exposure are unproven goals.
+
+FIRST FUNDED MILESTONE
+One authorized pilot, one machine-event contract, one collector, verifiable evidence storage, visible coverage gaps, an inspectable observation loop and an independent evaluation.
+
+RELEASE GATES
+1. Signed pilot scope, authority, retention, privacy test corpus and baseline.
+2. Reproducible observation run, verifiable events, outage visibility and tested access revocation.
+3. Results for planted violations, false alarms, latency, coverage and synthetic personal-data exclusion against thresholds agreed before testing.
+4. Independent review, documented pilot acceptance, measured operating costs and a continuation decision.
+
+USE OF BACKING
+Collector and observation engineering; privacy and security work; reproducible evaluation; evidence infrastructure and pilot operations. Establish funding amount, schedule and commercial terms after scoping the pilot. No financing terms or returns are promised in this brief.
+
+HUMAN BOUNDARY
+Prefer pseudonymous machine IDs, action categories, authorization outcomes, software versions, timestamps and sequence continuity. Exclude identities, prompts, private messages, credentials and browsing histories. Discard unsuitable content and show the coverage gap. Restrict sensitive evidence access; make redacted findings inspectable. Measure unintended inclusion and deletion behavior. A clean finite test does not prove zero real-world exposure.
+
+NEXT STEP
+Use the companion pilot brief to agree a bounded evaluation with a design partner. This launch provides downloads only: no contact form, collection of investor details or payment acceptance.
+
+USA origin describes the founder's project origin; it does not imply incorporation, government affiliation or endorsement. ChatGPT and Grok are development tools, not represented as legal inventors or commercial partners.
