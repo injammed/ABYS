@@ -24,9 +24,11 @@ assert.match(css, /\.primary-mode-switch\s*\{[^}]*repeat\(3, minmax\(0, 1fr\)\)/
 for (const [source, mode] of [[root, "feed"], [museum, "museum"], [shop, "shop"]]) assert.ok(source.includes(`<PrimaryNavigation mode="${mode}" />`));
 assert.match(about, /<SiteHeader\s*\/>[\s\S]*<PrimaryNavigation\s*\/>/);
 assert.match(constitution, /## September 2026: Explicit User-Directed Gallery Revision/);
-console.log("Navigation PASS: five working actions, Argus/Field/Museum destinations, accounts and appearance preserved; Vote never submits a judgment.");
+console.log("Navigation PASS: five working actions, Apyoc/Field/Museum destinations, accounts and appearance preserved; Vote never submits a judgment.");
 
 assert.match(navigation, /href="\/argus\/"/);
-assert.match(navigation, /SHOP[\s\S]*ARGUS/);
+assert.match(navigation, /SHOP[\s\S]*APYOC/);
+assert.doesNotMatch(navigation, />ARGUS</);
+assert.match(header, />Apyoc</);
 
 await import('./verify-argus.mjs');
