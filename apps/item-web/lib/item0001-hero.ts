@@ -1,0 +1,1 @@
+export const ITEM0001_HERO = "data:image/webp;base64,UklGRkoBAABXRUJQVlA4ID4BAABQJQCdASqABwAAPA...";
