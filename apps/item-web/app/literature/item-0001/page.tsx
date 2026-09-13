@@ -6,7 +6,6 @@ export const metadata: Metadata = {
   description: "A Three-Dimensional Synthetic-Diamond Monetary Architecture — Final Technical Concept Paper, Draft 3 of 3, September 2026.",
 };
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const AETIMM_DONATION = "https://donate.stripe.com/9B600k6Djbx45V37Pj2Ry01";
 
 const sections = [
@@ -69,7 +68,7 @@ export default function Item0001() {
         <h1 style={{fontSize:"clamp(48px,10vw,96px)",lineHeight:.88,letterSpacing:"-.045em",textAlign:"center",margin:"0"}}>THE DIAMOND<br />TESSERACT</h1>
 
         <figure style={{margin:"6px auto 8px",display:"grid",placeItems:"center",maxWidth:960}}>
-          <img src={`${basePath}/images/diamond-tesseract-pair.webp?v=4`} alt="Two equal Diamond Tesseract concept studies, presented symmetrically" style={{display:"block",width:"100%",height:"auto",objectFit:"contain",border:0,background:"transparent"}} />
+          <img src="/images/diamond-tesseract-pair.webp?v=5" alt="Two equal Diamond Tesseract concept studies, presented symmetrically" style={{display:"block",width:"100%",height:"auto",objectFit:"contain",border:0,background:"transparent"}} />
         </figure>
 
         <p style={{fontSize:"clamp(18px,3vw,25px)",textAlign:"center",letterSpacing:".14em",lineHeight:1.45,textTransform:"uppercase",margin:"6px auto 18px",maxWidth:820}}>A Three-Dimensional Synthetic-Diamond<br />Monetary Architecture</p>
