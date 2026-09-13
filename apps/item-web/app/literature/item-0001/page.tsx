@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: "A Three-Dimensional Synthetic-Diamond Monetary Architecture — Final Technical Concept Paper, Draft 3 of 3, September 2026.",
 };
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const AETIMM_DONATION = "https://donate.stripe.com/9B600k6Djbx45V37Pj2Ry01";
+
 const sections = [
   ["Executive thesis", [
     "The Diamond Tesseract is proposed as an experimental precursor to three possible future classes of American physical value instrument: sovereign currency, reserve instrument, and high-denomination bearer asset.",
@@ -43,19 +46,48 @@ const sections = [
   ]]
 ] as const;
 
+const buttonStyle = {
+  minHeight: 84,
+  borderRadius: 8,
+  padding: "18px 20px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 20,
+  textDecoration: "none",
+  letterSpacing: ".08em",
+  fontSize: 14,
+  fontWeight: 700,
+} as const;
+
 export default function Item0001() {
-  return <main style={{maxWidth:860,margin:"0 auto",padding:"64px 24px 120px",fontFamily:"Arial, Helvetica, sans-serif",lineHeight:1.65}}>
-    <p><Link href="/shop/">← AETIMM / THE EDITIONS</Link></p>
-    <p style={{letterSpacing:".12em",fontSize:12}}>ITEM 0001 · FINAL TECHNICAL CONCEPT PAPER · DRAFT 3 OF 3 · SEPTEMBER 2026</p>
-    <h1 style={{fontSize:"clamp(42px,8vw,84px)",lineHeight:.95,margin:"28px 0 0"}}>THE DIAMOND TESSERACT</h1>
-    <figure style={{margin:"2px -12px 10px",display:"grid",placeItems:"center"}}>
-      <img src="/images/diamond-tesseract-pair.webp" alt="Two equal, symmetrical Diamond Tesseract concept studies floating side by side" style={{display:"block",width:"min(100%,980px)",height:"auto",objectFit:"contain"}} />
-    </figure>
-    <p style={{fontSize:22,marginTop:8}}>A Three-Dimensional Synthetic-Diamond Monetary Architecture</p>
-    <p>Adam Bryant Summers · Independent Concept · Not Legal Tender · No Government Endorsement</p>
-    <hr style={{margin:"48px 0"}} />
-    {sections.map(([title, paragraphs]) => <section key={title} style={{margin:"0 0 56px"}}><h2 style={{fontSize:28}}>{title}</h2>{paragraphs.map((p)=><p key={p}>{p}</p>)}</section>)}
-    <section><h2>References</h2><p>[1] United States Mint, “About,” accessed September 2026.</p><p>[2] S. Eaton-Magaña, M. F. Hardman, S. Odake, “Laboratory-Grown Diamonds: An Update on Identification and Products Evaluated at GIA,” Gems & Gemology, Summer 2024.</p><p>[3] B. Ali, I. V. Litvinyuk, M. Rybachuk, “Femtosecond laser micromachining of diamond: Current research status, applications and challenges,” Carbon 179 (2021), 209–226.</p><p>[4] X. Guo et al., “Direct-bonded diamond membranes for heterogeneous quantum and electronic technologies,” Nature Communications 15 (2024).</p></section>
-    <hr style={{margin:"48px 0"}} /><p><strong>FINAL DRAFT CONTROL.</strong> Draft 3 of 3 closes the concept-definition process. It preserves the flagship object, wider 3D-currency family, physical counterpoint to ledger-native money, American-origin thesis, and the requirement that unresolved physics become explicit experiments rather than unsupported claims.</p>
-  </main>;
+  return (
+    <main style={{background:"#070a0f",color:"#f2f2ef",minHeight:"100vh",fontFamily:"Arial, Helvetica, sans-serif",lineHeight:1.65}}>
+      <div style={{maxWidth:980,margin:"0 auto",padding:"42px clamp(20px,5vw,52px) 120px"}}>
+        <p style={{margin:"0 0 34px"}}><Link href="/shop/" style={{color:"#bca8d8",fontSize:18}}>← AETIMM / THE EDITIONS</Link></p>
+        <p style={{margin:"0 0 24px",textAlign:"center",letterSpacing:".2em",fontSize:12,color:"#d7d7d1"}}>ITEM 0001 · FINAL TECHNICAL CONCEPT PAPER<br />DRAFT 3 OF 3 · SEPTEMBER 2026</p>
+        <h1 style={{fontSize:"clamp(48px,10vw,96px)",lineHeight:.88,letterSpacing:"-.045em",textAlign:"center",margin:"0"}}>THE DIAMOND<br />TESSERACT</h1>
+
+        <figure style={{margin:"6px auto 8px",display:"grid",placeItems:"center",maxWidth:960}}>
+          <img src={`${basePath}/images/diamond-tesseract-pair.webp?v=4`} alt="Two equal Diamond Tesseract concept studies, presented symmetrically" style={{display:"block",width:"100%",height:"auto",objectFit:"contain",border:0,background:"transparent"}} />
+        </figure>
+
+        <p style={{fontSize:"clamp(18px,3vw,25px)",textAlign:"center",letterSpacing:".14em",lineHeight:1.45,textTransform:"uppercase",margin:"6px auto 18px",maxWidth:820}}>A Three-Dimensional Synthetic-Diamond<br />Monetary Architecture</p>
+        <div style={{width:64,height:1,background:"#a9a9a4",margin:"20px auto"}} />
+        <p style={{textAlign:"center",letterSpacing:".12em",fontSize:12,color:"#d6d6d0",margin:"0 auto 28px"}}>ADAM BRYANT SUMMERS<br />INDEPENDENT CONCEPT · NOT LEGAL TENDER · NO GOVERNMENT ENDORSEMENT</p>
+        <div style={{width:64,height:1,background:"#a9a9a4",margin:"0 auto 28px"}} />
+
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:14,margin:"0 0 16px"}}>
+          <a href="#executive-thesis" style={{...buttonStyle,background:"#f4f3ef",color:"#111318",border:"1px solid #f4f3ef"}}><span>READ FINAL DRAFT<br /><small style={{fontWeight:400,letterSpacing:".16em"}}>5 PAGES · FREE</small></span><span aria-hidden="true">↘</span></a>
+          <a href={AETIMM_DONATION} target="_blank" rel="noreferrer" style={{...buttonStyle,background:"transparent",color:"#f4f3ef",border:"1px solid #d9d9d4"}}><span>♡ &nbsp; DONATE ANY AMOUNT<br /><small style={{fontWeight:400,letterSpacing:".16em",color:"#9ea1a7"}}>SUPPORT AETIMM</small></span><span aria-hidden="true">∞</span></a>
+        </div>
+        <p style={{textAlign:"center",letterSpacing:".17em",fontSize:11,color:"#777d88",margin:"24px 0 52px"}}>KNOWLEDGE IS PUBLIC. DONATIONS SUPPORT DEVELOPMENT.</p>
+
+        <div style={{height:1,background:"#222833",margin:"0 0 44px"}} />
+        {sections.map(([title, paragraphs], index) => <section id={index === 0 ? "executive-thesis" : undefined} key={title} style={{margin:"0 0 62px"}}><h2 style={{fontSize:"clamp(22px,3vw,30px)",letterSpacing:".16em",textTransform:"uppercase",fontWeight:500,margin:"0 0 20px"}}>{title}</h2>{paragraphs.map((p)=><p key={p} style={{fontSize:"clamp(17px,2.2vw,21px)",color:"#c9cdd5",margin:"0 0 18px"}}>{p}</p>)}</section>)}
+        <section style={{marginTop:70}}><h2 style={{fontSize:24,letterSpacing:".12em",textTransform:"uppercase"}}>References</h2><p>[1] United States Mint, “About,” accessed September 2026.</p><p>[2] S. Eaton-Magaña, M. F. Hardman, S. Odake, “Laboratory-Grown Diamonds: An Update on Identification and Products Evaluated at GIA,” Gems & Gemology, Summer 2024.</p><p>[3] B. Ali, I. V. Litvinyuk, M. Rybachuk, “Femtosecond laser micromachining of diamond: Current research status, applications and challenges,” Carbon 179 (2021), 209–226.</p><p>[4] X. Guo et al., “Direct-bonded diamond membranes for heterogeneous quantum and electronic technologies,” Nature Communications 15 (2024).</p></section>
+        <hr style={{margin:"48px 0",border:0,borderTop:"1px solid #222833"}} /><p style={{color:"#aeb2bb"}}><strong>FINAL DRAFT CONTROL.</strong> Draft 3 of 3 closes the concept-definition process. It preserves the flagship object, wider 3D-currency family, physical counterpoint to ledger-native money, American-origin thesis, and the requirement that unresolved physics become explicit experiments rather than unsupported claims.</p>
+      </div>
+    </main>
+  );
 }
