@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArtifactFeed } from "@/components/ArtifactFeed";
 import { BinarySwipeVoting } from "@/components/BinarySwipeVoting";
+import { DonationWelcome } from "@/components/DonationWelcome";
 import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SubmissionLandingBridge } from "@/components/SubmissionLandingBridge";
@@ -8,6 +9,7 @@ import { SubmissionLandingBridge } from "@/components/SubmissionLandingBridge";
 export default function HomePage() {
   return (
     <main className="feed-first-page" data-interface-contract="slop-feed-root-v1" data-language-contract="legible-machine-gallery-v2" data-business-priority="apyoc">
+      <DonationWelcome />
       <SubmissionLandingBridge />
       <SiteHeader mode="feed" />
       <header className="apyoc-field-entry"><div><p className="gallery-overline">AETIMM / USA ORIGIN / HOME OF ALL EYES</p><h1>One Apyoc. An open field.</h1><p>Build the first verifiable eye on AI-descended machines. Near-zero human surveillance is the target.</p></div><div className="apyoc-funding-actions"><Link href="/apyoc/#witness">See what Apyoc sees ↗</Link><Link href="/apyoc/funding/">Funding &amp; activation ↗</Link></div></header>
