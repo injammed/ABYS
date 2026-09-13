@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "machine": "apyoc-selector-001",
+  "id": "34772860412-1",
+  "workflowRun": "34772860412",
+  "commit": "89d78e1c13e9bee71ca65ce5c605464548fa3e91",
+  "startedAt": "2026-09-13T17:52:31.662Z",
+  "finishedAt": "2026-09-13T17:52:37.650Z",
+  "state": "completed",
+  "modelRevision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+  "weightsSha256": "5af571cbf074e6d21a03528d2330792e532ca608f24ac70a143f6b369968ab8c",
+  "input": [
+    {
+      "target": "home",
+      "status": 200
+    },
+    {
+      "target": "eye",
+      "status": 200
+    },
+    {
+      "target": "shop",
+      "status": 200
+    }
+  ],
+  "decision": {
+    "target": "home",
+    "probabilities": [
+      0.8714859485626221,
+      0.10023928433656693,
+      0.02827475592494011
+    ],
+    "inferenceMs": 280,
+    "baseline": "home",
+    "agrees": true,
+    "networkIsolation": "linux-network-namespace"
+  },
+  "events": [
+    {
+      "sequence": 1,
+      "time": "2026-09-13T17:52:31.662Z",
+      "phase": "run-start",
+      "target": null,
+      "status": null,
+      "latencyMs": null
+    },
+    {
+      "sequence": 2,
+      "time": "2026-09-13T17:52:31.663Z",
+      "phase": "check-intent",
+      "target": "home",
+      "status": null,
+      "latencyMs": null
+    },
+    {
+      "sequence": 3,
+      "time": "2026-09-13T17:52:31.954Z",
+      "phase": "check-result",
+      "target": "home",
+      "status": 200,
+      "latencyMs": 290
+    },
+    {
+      "sequence": 4,
+      "time": "2026-09-13T17:52:31.956Z",
+      "phase": "check-intent",
+      "target": "eye",
+      "status": null,
+      "latencyMs": null
+    },
+    {
+      "sequence": 5,
+      "time": "2026-09-13T17:52:32.243Z",
+      "phase": "check-result",
+      "target": "eye",
+      "status": 200,
+      "latencyMs": 287
+    },
+    {
+      "sequence": 6,
+      "time": "2026-09-13T17:52:32.244Z",
+      "phase": "check-intent",
+      "target": "shop",
+      "status": null,
+      "latencyMs": null
+    },
+    {
+      "sequence": 7,
+      "time": "2026-09-13T17:52:32.379Z",
+      "phase": "check-result",
+      "target": "shop",
+      "status": 200,
+      "latencyMs": 134
+    },
+    {
+      "sequence": 8,
+      "time": "2026-09-13T17:52:32.380Z",
+      "phase": "inference-start",
+      "target": null,
+      "status": null,
+      "latencyMs": null
+    },
+    {
+      "sequence": 9,
+      "time": "2026-09-13T17:52:37.360Z",
+      "phase": "inference-result",
+      "target": "home",
+      "status": null,
+      "latencyMs": null
+    },
+    {
+      "sequence": 10,
+      "time": "2026-09-13T17:52:37.363Z",
+      "phase": "check-intent",
+      "target": "home",
+      "status": null,
+      "latencyMs": null
+    },
+    {
+      "sequence": 11,
+      "time": "2026-09-13T17:52:37.649Z",
+      "phase": "check-result",
+      "target": "home",
+      "status": 200,
+      "latencyMs": 286
+    },
+    {
+      "sequence": 12,
+      "time": "2026-09-13T17:52:37.650Z",
+      "phase": "run-stop",
+      "target": null,
+      "status": null,
+      "latencyMs": null
+    }
+  ]
+}
