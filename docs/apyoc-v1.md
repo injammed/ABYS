@@ -7,7 +7,7 @@ Owner-requested product expansion: UPLOAD · SCROLL · VOTE · SHOP · APYOC. Ap
 ## AETIMM change gate
 
 Problem: Apyoc has no destination or observation functionality on aetimm.com. The owner explicitly requests both as a potential business direction.
-Smallest viable capability: a distinct `/argus/` compatibility route presenting the Apyoc experience, primary navigation entry and functional local trace review. User-supplied Eye artwork remains at `public/argus/eye.jpeg`. Existing feed, upload, vote, accounts, checkout and 43-object library stay intact.
+Smallest viable capability: a distinct `/apyoc/` compatibility route presenting the Apyoc experience, primary navigation entry and functional local trace review. User-supplied Eye artwork remains at `public/apyoc/eye.jpeg`. Existing feed, upload, vote, accounts, checkout and 43-object library stay intact.
 This is explicit feature expansion, outside autonomous-maintenance-only daily limits. It does not replace the site's hosting or introduce a backend migration.
 
 ## What works
@@ -31,4 +31,4 @@ Apyoc becomes the site business priority and organizing identity. Shared header,
 
 ## Naming revision — 12 September 2026
 
-The public product name is **Apyoc**. Earlier public uses of “Argus” or “Árgos” are superseded. Legacy route, component, stylesheet and data-attribute identifiers may remain as implementation compatibility details, but they must not render the old names to visitors or appear in exported Apyoc review branding.
+The public product name is **Apyoc**. Earlier public uses of “Apyoc” or “Apyoc” are superseded. Legacy route, component, stylesheet and data-attribute identifiers may remain as implementation compatibility details, but they must not render the old names to visitors or appear in exported Apyoc review branding.

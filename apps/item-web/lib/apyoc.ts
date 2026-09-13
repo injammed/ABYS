@@ -13,7 +13,9 @@ export function parseTrace(text:string):Trace {
  const ids=new Set<string>(),eventIds=new Set<string>();
  for(const s of data.systems){if(!record(s)||!short(s.id,100)||!short(s.objective)||!Array.isArray(s.allowedActions)||s.allowedActions.length>100||!s.allowedActions.every(a=>short(a,100))||typeof s.heartbeatSeconds!=="number"||!Number.isFinite(s.heartbeatSeconds)||s.heartbeatSeconds<1||s.heartbeatSeconds>86400)throw Error("Each system needs an id, objective, allowedActions and heartbeatSeconds (1–86400).");if(ids.has(s.id))throw Error("System IDs must be unique.");ids.add(s.id);}
  for(const e of data.events){if(!record(e)||!short(e.id,100)||!short(e.system,100)||!ids.has(e.system)||!date(e.time)||Date.parse(e.time)>Date.parse(data.capturedAt)||!Number.isSafeInteger(e.sequence)||Number(e.sequence)<0||!short(e.action,100)||!short(e.source,100)||(e.objective!==undefined&&!short(e.objective)))throw Error("Each event needs a unique id, known system, time at or before capturedAt, nonnegative integer sequence, action and source.");if(eventIds.has(e.id))throw Error("Event IDs must be unique.");eventIds.add(e.id);}
- return data as Trace;
+ const trace=data as Trace;
+ // Retain only the observation contract; discard extra payloads before review/export.
+ return {version:1,capturedAt:trace.capturedAt,systems:trace.systems.map(s=>({id:s.id,objective:s.objective,allowedActions:[...s.allowedActions],heartbeatSeconds:s.heartbeatSeconds})),events:trace.events.map(e=>({id:e.id,system:e.system,time:e.time,sequence:e.sequence,action:e.action,source:e.source,...(e.objective===undefined?{}:{objective:e.objective})}))};
 }
 export function inspectTrace(trace:Trace):Finding[]{
  const findings:Finding[]=[];

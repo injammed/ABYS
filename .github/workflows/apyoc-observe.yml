@@ -1,0 +1,44 @@
+name: Apyoc public observation record
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apyoc-observe.yml'
+      - 'scripts/apyoc/**'
+      - 'apps/item-web/lib/apyoc-ledger.ts'
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: apyoc-observation-writer
+  cancel-in-progress: false
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Load existing public record
+        run: |
+          if git ls-remote --exit-code --heads origin apyoc-observations; then
+            git fetch origin apyoc-observations
+            git worktree add observation-data FETCH_HEAD
+          else
+            mkdir observation-data
+            git -C observation-data init -b apyoc-observations
+          fi
+      - name: Observe only fixed machine endpoints
+        run: node scripts/apyoc/collect.mjs observation-data
+      - name: Append public record
+        run: |
+          git -C observation-data config user.name 'apyoc-observer[bot]'
+          git -C observation-data config user.email 'apyoc-observer@users.noreply.github.com'
+          git -C observation-data add index.json days
+          git -C observation-data commit -m 'Append machine infrastructure observations'
+          git fetch observation-data HEAD
+          git push origin FETCH_HEAD:refs/heads/apyoc-observations

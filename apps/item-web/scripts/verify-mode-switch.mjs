@@ -6,7 +6,7 @@ const [navigation, header, vote, root, museum, shop, about, css, constitution] =
   "app/page.tsx", "app/aetimm/page.tsx", "app/shop/page.tsx", "app/about/page.tsx", "app/gallery.css", "INTERFACE.md",
 ].map(file => readFile(file, "utf8")));
 
-assert.match(navigation, /data-navigation-contract="upload-scroll-vote-shop-argus-v3"/);
+assert.match(navigation, /data-navigation-contract="upload-scroll-vote-shop-apyoc-v3"/);
 assert.match(navigation, /<SlopDrop\s*\/>[\s\S]*SCROLL[\s\S]*<VoteShortcut[\s\S]*SHOP/);
 assert.match(navigation, /href="\/#field"/);
 assert.match(navigation, /href="\/shop\/"/);
@@ -26,9 +26,9 @@ assert.match(about, /<SiteHeader\s*\/>[\s\S]*<PrimaryNavigation\s*\/>/);
 assert.match(constitution, /## September 2026: Explicit User-Directed Gallery Revision/);
 console.log("Navigation PASS: five working actions, Apyoc/Field/Museum destinations, accounts and appearance preserved; Vote never submits a judgment.");
 
-assert.match(navigation, /href="\/argus\/"/);
+assert.match(navigation, /href="\/apyoc\/"/);
 assert.match(navigation, /SHOP[\s\S]*APYOC/);
 assert.doesNotMatch(navigation, />ARGUS</);
 assert.match(header, />Apyoc</);
 
-await import('./verify-argus.mjs');
+await import('./verify-apyoc.mjs');
