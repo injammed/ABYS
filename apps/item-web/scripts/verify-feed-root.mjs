@@ -55,7 +55,7 @@ if (failures.length > 0) {
 
 console.log("Feed-root contract PASS: aetimm.com opens into the Slop Feed; nuanced controls remain secondary.");
 
-requirePattern("Argus business priority", /data-business-priority="argus"/);
+requirePattern("Apyoc business priority", /data-business-priority="argus"/);
 requirePattern("Eye destination", /href="\/argus\/"/);
-requirePattern("submitted material is not verified evidence", /Submission is not verification by Argus/);
+requirePattern("submitted material is not verified evidence", /Submission is not verification by Apyoc/);
 if (failures.length) { console.error(failures.join("\n")); process.exit(1); }
