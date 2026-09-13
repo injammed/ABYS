@@ -68,7 +68,7 @@ export default function Item0001() {
         <h1 style={{fontSize:"clamp(48px,10vw,96px)",lineHeight:.88,letterSpacing:"-.045em",textAlign:"center",margin:"0"}}>THE DIAMOND<br />TESSERACT</h1>
 
         <figure style={{margin:"6px auto 8px",display:"grid",placeItems:"center",maxWidth:960}}>
-          <img src="/images/diamond-tesseract-pair.webp?v=5" alt="Two equal Diamond Tesseract concept studies, presented symmetrically" style={{display:"block",width:"100%",height:"auto",objectFit:"contain",border:0,background:"transparent"}} />
+          <img src="/images/diamond-tesseract-pair.jpeg" alt="Two Diamond Tesseract concept cubes with silver Liberty and Franklin portraits, eagle reliefs, and gold interiors" width={1536} height={768} style={{display:"block",width:"100%",height:"auto",objectFit:"contain",border:0,background:"transparent"}} />
         </figure>
 
         <p style={{fontSize:"clamp(18px,3vw,25px)",textAlign:"center",letterSpacing:".14em",lineHeight:1.45,textTransform:"uppercase",margin:"6px auto 18px",maxWidth:820}}>A Three-Dimensional Synthetic-Diamond<br />Monetary Architecture</p>
