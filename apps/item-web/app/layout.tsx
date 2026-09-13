@@ -14,9 +14,9 @@ import "./gallery.css";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const metadata: Metadata = {
-  title: "AETIMM · Home of Argus",
-  description: "One Argus. An open field. Bring machine-made work into view, inspect activity traces, and follow the evidence. Upload · Scroll · Vote · Shop · Argus.",
-  applicationName: "AETIMM · Argus",
+  title: "AETIMM · Home of Árgos",
+  description: "One Árgos. An open field. Bring machine-made work into view, inspect activity traces, and follow the evidence. Upload · Scroll · Vote · Shop · Árgos.",
+  applicationName: "AETIMM · Árgos",
   manifest: `${basePath}/manifest.webmanifest`,
   appleWebApp: {
     capable: true,
