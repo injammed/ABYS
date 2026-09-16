@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "id": "35160844851-1",
+  "checkedAt": "2026-09-16T23:07:07.475Z",
+  "sourceCommit": "ead51ee673d274cc3c18099cbd4defb7cd17af8b",
+  "state": "completed",
+  "queries": [
+    {
+      "query": "topic:ai-generated stars:>=3 archived:false fork:false",
+      "state": "completed",
+      "returned": 10
+    },
+    {
+      "query": "topic:generative-art stars:>=3 archived:false fork:false",
+      "state": "completed",
+      "returned": 10
+    }
+  ],
+  "candidates": [
+    {
+      "id": 554771302,
+      "repository": "steven2358/awesome-generative-ai",
+      "stars": 12645,
+      "license": "CC0-1.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1265180649,
+      "repository": "pulkitxm/claude-directory",
+      "stars": 548,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1304174300,
+      "repository": "corosolto/client",
+      "stars": 244,
+      "license": "AGPL-3.0",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1116451552,
+      "repository": "oocx/tfplan2md",
+      "stars": 173,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 374744219,
+      "repository": "repath-studio/repath-studio",
+      "stars": 170,
+      "license": "AGPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1295972337,
+      "repository": "sxp-studio/subjective-zero",
+      "stars": 73,
+      "license": "AGPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 308233855,
+      "repository": "dgtized/shimmers",
+      "stars": 24,
+      "license": "AGPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1099222481,
+      "repository": "MarkusNeusinger/anyplot",
+      "stars": 17,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1276131924,
+      "repository": "lolly-tools/lolly",
+      "stars": 11,
+      "license": "MPL-2.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 990303192,
+      "repository": "rrainey/obliq-2",
+      "stars": 10,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1185183114,
+      "repository": "imweb-project/ImWeb",
+      "stars": 10,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1208109413,
+      "repository": "jorgeadev/the-architects-blueprint",
+      "stars": 8,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1211288343,
+      "repository": "ViewCompose/ViewCompose",
+      "stars": 7,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1106063925,
+      "repository": "Het161/Het161",
+      "stars": 6,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 804579039,
+      "repository": "xispado/illumination_pipeline",
+      "stars": 4,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1109222527,
+      "repository": "filthyrake/vlog",
+      "stars": 4,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1245060445,
+      "repository": "eaviles/Ollin",
+      "stars": 4,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1125583044,
+      "repository": "segin/substrate",
+      "stars": 3,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1144076205,
+      "repository": "ariaxhan/substrate",
+      "stars": 3,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1177292696,
+      "repository": "voxpelli/claude-beads",
+      "stars": 3,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    }
+  ],
+  "seenIds": [
+    308233855,
+    374744219,
+    554771302,
+    804579039,
+    990303192,
+    1099222481,
+    1106063925,
+    1109222527,
+    1116451552,
+    1125583044,
+    1144076205,
+    1177292696,
+    1185183114,
+    1208109413,
+    1211288343,
+    1245060445,
+    1265180649,
+    1276131924,
+    1295972337,
+    1304174300
+  ]
+}
