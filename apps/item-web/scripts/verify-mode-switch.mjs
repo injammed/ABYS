@@ -3,18 +3,18 @@ import { readFile } from "node:fs/promises";
 
 const [navigation, header, vote, root, museum, shop, about, css, constitution] = await Promise.all([
   "components/PrimaryNavigation.tsx", "components/SiteHeader.tsx", "components/VoteShortcut.tsx",
-  "app/page.tsx", "app/aetimm/page.tsx", "app/shop/page.tsx", "app/about/page.tsx", "app/gallery.css", "INTERFACE.md",
+  "app/slop-trough/page.tsx", "app/aetimm/page.tsx", "app/shop/page.tsx", "app/about/page.tsx", "app/gallery.css", "INTERFACE.md",
 ].map(file => readFile(file, "utf8")));
 
 assert.match(navigation, /data-navigation-contract="upload-scroll-vote-shop-apyoc-v3"/);
 assert.match(navigation, /<SlopDrop\s*\/>[\s\S]*SCROLL[\s\S]*<VoteShortcut[\s\S]*SHOP/);
-assert.match(navigation, /href="\/#field"/);
+assert.match(navigation, /href="\/slop-trough\/#field"/);
 assert.match(navigation, /href="\/shop\/"/);
-assert.match(vote, /href="\/#vote"/);
+assert.match(vote, /href="\/slop-trough\/#vote"/);
 assert.match(vote, /\.focus\(\{ preventScroll: true \}\)/);
 assert.doesNotMatch(vote, /saveVote|\.click\(/, "The shortcut focuses a ballot; it must never cast a vote.");
 assert.match(header, /className="primary-mode-switch"/);
-assert.match(header, /href="\/#field"/);
+assert.match(header, /href="\/slop-trough\/#field"/);
 assert.match(header, /href="\/aetimm\/#museum"/);
 assert.match(header, /<AccountGate\s*\/>/);
 assert.match(header, /<ThemeSettings\s*\/>/);
@@ -29,6 +29,6 @@ console.log("Navigation PASS: five working actions, Apyoc/Field/Museum destinati
 assert.match(navigation, /href="\/apyoc\/"/);
 assert.match(navigation, /SHOP[\s\S]*APYOC/);
 assert.doesNotMatch(navigation, />ARGUS</);
-assert.match(header, />Apyoc</);
+assert.match(header, />Library</);
 
 await import('./verify-apyoc.mjs');

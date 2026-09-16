@@ -1,62 +1,27 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-
-const root = process.cwd();
-const pagePath = path.join(root, "app", "page.tsx");
-const constitutionPath = path.join(root, "INTERFACE.md");
-
-const [page, constitution] = await Promise.all([
-  readFile(pagePath, "utf8"),
-  readFile(constitutionPath, "utf8"),
-]);
-
-const failures = [];
-
-function requirePattern(label, pattern, source = page) {
-  if (!pattern.test(source)) failures.push(`missing ${label}`);
+import assert from 'node:assert/strict';
+import { readFile, access } from 'node:fs/promises';
+const [home, feed, constitution, arrival, layout, submission] = await Promise.all([
+  'app/page.tsx', 'app/slop-trough/page.tsx', 'INTERFACE.md', 'components/LibraryArrival.tsx', 'app/layout.tsx', 'components/SubmissionLandingBridge.tsx',
+].map(p => readFile(p, 'utf8')));
+assert.match(home, /data-interface-contract="aetimm-library-root-v1"/);
+assert.match(home, /<SiteHeader mode="library"/);
+assert.match(home, /<PrimaryNavigation\s*\/>/);
+assert.doesNotMatch(home, /<ArtifactFeed|<DonationWelcome/);
+assert.match(home, /<LibraryArrival\s*\/>/);
+assert.match(home, /CONCEPT ARTWORK/);
+assert.match(constitution, /16 September 2026: Owner-directed Library of Things revision/);
+for (const route of ['/shop/', '/slop-trough/', '/aetimm/', '/apyoc/', '/literature/item-0001/']) {
+  assert.ok(home.includes(route), `Library must retain ${route}`);
+  await access(`app${route}page.tsx`);
 }
-
-function forbidPattern(label, pattern, source = page) {
-  if (pattern.test(source)) failures.push(`forbidden ${label}`);
-}
-
-requirePattern("ArtifactFeed import", /import\s+\{\s*ArtifactFeed\s*\}\s+from\s+["']@\/components\/ArtifactFeed["']/);
-requirePattern("PrimaryNavigation import", /import\s+\{\s*PrimaryNavigation\s*\}\s+from\s+["']@\/components\/PrimaryNavigation["']/);
-requirePattern("feed-first root class", /<main[^>]*className=["']feed-first-page["']/);
-requirePattern("permanent interface contract marker", /data-interface-contract=["']slop-feed-root-v1["']/);
-requirePattern("live field anchor", /<section[^>]*id=["']field["'][^>]*>/);
-requirePattern("artifact feed render", /<ArtifactFeed\s*\/>/);
-requirePattern("persistent primary navigation with Feed active", /<PrimaryNavigation\b[^>]*mode=["']feed["'][^>]*\/>/);
-
-forbidPattern("marketing hero on the root route", /className=["'][^"']*\bhero\b[^"']*["']/);
-forbidPattern("generation witness on the root route", /<GenerationWitness\b/);
-forbidPattern("phase identity landing wall on the root route", /<PhaseIdentity\b/);
-forbidPattern("terminal homepage footer", /<footer\b/);
-
-const feedIndex = page.indexOf("<ArtifactFeed />");
-const controlsIndex = page.search(/<PrimaryNavigation\b/);
-if (feedIndex < 0 || controlsIndex < 0 || feedIndex > controlsIndex) {
-  failures.push("ArtifactFeed must render before PrimaryNavigation");
-}
-
-requirePattern("Permanent Root Covenant", /## Permanent Root Covenant/, constitution);
-requirePattern("root route is the Slop Feed law", /The root route is the Slop Feed\./, constitution);
-requirePattern("explicit constitutional revision rule", /requires an explicit constitutional revision/, constitution);
-requirePattern("Infinite Field Principle", /## The Infinite Field Principle/, constitution);
-requirePattern("vertical-infinity Slop law", /SLOP = vertical infinity/, constitution);
-requirePattern("spatial-choice Museum law", /MUSEUM = spatial choice/, constitution);
-requirePattern("no terminal homepage footer law", /There is no terminal homepage footer in the primary field\./, constitution);
-
-if (failures.length > 0) {
-  console.error("Feed-root contract failed:");
-  for (const failure of failures) console.error(`- ${failure}`);
-  process.exit(1);
-}
-
-console.log("Feed-root contract PASS: aetimm.com opens into the Slop Feed; nuanced controls remain secondary.");
-
-requirePattern("Apyoc business priority", /data-business-priority="apyoc"/);
-requirePattern("Eye destination", /href="\/apyoc\/#witness"/);
-requirePattern("Funding destination", /href="\/apyoc\/funding\/"/);
-requirePattern("submitted material is not verified evidence", /Submission is not verification by Apyoc/);
-if (failures.length) { console.error(failures.join("\n")); process.exit(1); }
+assert.match(feed, /<section id="field"[\s\S]*<BinarySwipeVoting\s*\/>[\s\S]*<ArtifactFeed\s*\/>/);
+assert.match(feed, /<PrimaryNavigation mode="feed"/);
+assert.doesNotMatch(feed, /<DonationWelcome|<footer|<aside/);
+assert.match(arrival, /"#field", "#vote"/);
+assert.match(arrival, /target.search = old.search/);
+assert.match(arrival, /target.hash = old.hash/);
+assert.match(layout, /<SubmissionLandingBridge\s*\/>/);
+assert.match(submission, /\/slop-trough\//);
+assert.match(submission, /target.searchParams.set\("published", artifactId\)/);
+assert.match(submission, /target.hash = "field"/);
+console.log('Library root PASS: real destinations, dedicated uninterrupted Trough, legacy bookmarks and publication routing preserved.');

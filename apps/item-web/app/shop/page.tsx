@@ -21,7 +21,7 @@ export default function ShopPage() {
       <SiteHeader />
       <CurrencyMuseum />
       <div className={styles.content}>
-        <div className={styles.topline}><Link href="/#field">Back to the Trough</Link><span>AETIMM LITERATURE / THE EDITIONS</span></div>
+        <div className={styles.topline}><Link href="/slop-trough/#field">Back to the Trough</Link><span>AETIMM LITERATURE / THE EDITIONS</span></div>
         <header className={styles.heading}><h2>The Editions<span>.</span></h2><p>Papers. Objects of thought.<br />The beginnings of things.</p></header>
         <div className="machine-signature" aria-hidden="true"><LexiconText machine text="AETIMM ∞ DETECT. ENCODE. CONTINUE. ∞ ITEM 0001 ∞ MATERIAL / MEMORY / MATTER ∞ 10,000 YD" semantic={false} phase={31} /></div>
 
@@ -47,7 +47,7 @@ export default function ShopPage() {
           <div><p className="gallery-overline">ON THE HORIZON / CONCEPT</p><h2 id="horizon-title">From an idea<br />to <em>one of one.</em></h2></div>
           <div><h3>A machine-made hybrid hydrogen–electric sports car.</h3><p>Literature is first. Physical objects follow. The ambition is a unique machine-made car, purchasable here once it can actually be engineered and built.</p><span className={styles.conceptState}>In concept · Not available to order</span></div>
         </section>
-        <nav className={styles.nextSteps} aria-label="Continue exploring"><Link href="/#field">Return to the Trough <span aria-hidden="true">↗</span></Link><Link href="/aetimm/#museum">Explore the Museum <span aria-hidden="true">◇</span></Link></nav>
+        <nav className={styles.nextSteps} aria-label="Continue exploring"><Link href="/slop-trough/#field">Return to the Trough <span aria-hidden="true">↗</span></Link><Link href="/aetimm/#museum">Explore the Museum <span aria-hidden="true">◇</span></Link></nav>
       </div>
       <PrimaryNavigation mode="shop" />
     </main>

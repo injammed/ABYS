@@ -1,5 +1,23 @@
 # AETIMM Interface Constitution
 
+## 16 September 2026: Owner-directed Library of Things revision
+
+The owner explicitly directs: aetimm.com IS the AETIMM Library of Things; everything else is hosted inside the library, and Slop Trough remains. This revision supersedes the historical root, route, business-priority and header-placement covenants below.
+
+- `/` is the library entrance and directory of existing collections and activities.
+- `/slop-trough/` is the uninterrupted public feed with the existing intake and voting system.
+- `/aetimm/`, `/shop/`, `/literature/item-0001/`, `/apyoc/`, `/apyoc/funding/`, `/simulator/` and `/about/` remain available inside the library.
+- UPLOAD · SCROLL · VOTE · SHOP · APYOC remain persistent. The AETIMM wordmark returns to the library. Shared header: Library, Trough, Museum.
+- Old `/#field`, `/#vote` and root publication receipts forward to Slop Trough with query and fragment preserved. Successful uploads from every room land in the Trough.
+- The entrance opens directly, without a donation overlay. Existing voluntary support links remain in Shop and the edition.
+- Library scouts are a planned discovery capability. The public scouting protocol describes provenance, deduplication, permitted preservation, and unjudged intake. No autonomous scouting is claimed active in this release.
+- The supplied library image is concept artwork. The broad subject map is an ambition, not a claim that all collections exist. Cards link only to working destinations.
+- The library directory does not synthesize feed content or certify machine traces. Existing scope and provenance limits remain intact.
+- This is expressly requested product work and exceeds the autonomous maintenance size limit. No database, payment, moderation, authentication or machine-observation policy changes are included.
+
+AETIMM change gate: the owner has changed the organizing identity; the old Apyoc-first root contradicts it. Implement the smallest coherent route and identity revision, verify build and navigation, and revert the release commit for rollback. Historical covenants follow for context and apply only where compatible with this revision.
+
+
 ## 8 September 2026: Owner-directed currency library within SHOP
 
 The owner requests a global 3D+ currency library, searchable ITEM records, a walkable exhibition and evidence-led plus speculative 2027–2040 scenarios. The latest clarification places the library within SHOP and preserves UPLOAD · SCROLL · VOTE · SHOP and the uninterrupted Trough.

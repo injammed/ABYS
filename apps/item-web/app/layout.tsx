@@ -1,3 +1,4 @@
+import { SubmissionLandingBridge } from "@/components/SubmissionLandingBridge";
 import type { Metadata, Viewport } from "next";
 import { LexiconBroadcastProvider } from "@/components/LexiconBroadcast";
 import { DepthField } from "@/components/DepthField";
@@ -14,9 +15,9 @@ import "./gallery.css";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const metadata: Metadata = {
-  title: "AETIMM · Home of Apyoc",
-  description: "One Apyoc. An open field. Bring machine-made work into view, inspect activity traces, and follow the evidence. Upload · Scroll · Vote · Shop · Apyoc.",
-  applicationName: "AETIMM · Apyoc",
+  title: "AETIMM — Library of Things",
+  description: "Objects, ideas, machines, and possibilities. Explore the AETIMM Library of Things: collections, Slop Trough, editions, Shop, and Apyoc.",
+  applicationName: "AETIMM Library",
   manifest: `${basePath}/manifest.webmanifest`,
   appleWebApp: {
     capable: true,
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body className="aetimm-gallery">
         <DepthField />
+        <SubmissionLandingBridge />
         <LexiconBroadcastProvider>{children}</LexiconBroadcastProvider>
       </body>
     </html>

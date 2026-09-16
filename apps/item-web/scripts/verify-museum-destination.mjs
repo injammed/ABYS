@@ -25,10 +25,10 @@ assert.doesNotMatch(shop, /Buy digital copy|\$10 <small>USD<\/small>|14A3cw8LrcB
 assert.match(shop, /Independent concept\. Not legal tender\. No government endorsement\./);
 assert.match(shop, /AI CONCEPT ARTWORK · FINAL PAPER PUBLISHED BELOW/);
 assert.match(shop, /data-north-star-product="one-of-one-hydrogen-electric-sports-car-v1"[\s\S]*data-commerce-state="concept"[\s\S]*Not available to order/);
-assert.match(home, /<DonationWelcome \/>/);
+assert.doesNotMatch(home, /<DonationWelcome \/>/);
 assert.match(donation, /DONATE ANY AMOUNT/);
 assert.match(donation, /Enter AETIMM without donating/);
 assert.match(compatibility, /window\.location\.hash === "#shop"\) router\.replace\("\/shop\/"\)/);
 assert.doesNotMatch(page, /router\.(push|replace)\(|redirect\(/);
 assert.doesNotMatch(collection, /if\s*\(loading\)\s*\{?\s*return|if\s*\(accessions\.length\s*===\s*0\)\s*\{?\s*return/);
-console.log("Destination PASS: Museum remains intact; ITEM 0001 is public; donation is independent of access and appears first on root arrival.");
+console.log("Destination PASS: Museum remains intact; ITEM 0001 is public; donation is independent of access without blocking library arrival.");

@@ -10,7 +10,7 @@ const bridgePath = path.join(root, "components", "SubmissionLandingBridge.tsx");
 const slopDropPath = path.join(root, "components", "SlopDrop.tsx");
 const receiptPath = path.join(root, "lib", "publication-receipt.ts");
 const supabaseBrowserPath = path.join(root, "lib", "supabase-browser.ts");
-const pagePath = path.join(root, "app", "page.tsx");
+const pagePath = path.join(root, "app", "layout.tsx");
 const socialFeedPath = path.join(root, "lib", "social-feed.ts");
 
 const [publication, voteAggregate, voteLockdown, binaryJudgment, bridge, slopDrop, receipt, supabaseBrowser, page, socialFeed] = await Promise.all([

@@ -9,7 +9,7 @@ export function PrimaryNavigation({ mode }: { mode?: "feed" | "museum" | "shop" 
       <IntakeValidationBridge />
       <div className="primary-action-rail">
         <div className="primary-navigation-action primary-navigation-submit"><SlopDrop /></div>
-        <Link href="/#field" className="primary-action" aria-current={mode === "feed" ? "page" : undefined}>
+        <Link href="/slop-trough/#field" className="primary-action" aria-current={mode === "feed" ? "page" : undefined}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h14" /></svg><span>SCROLL</span>
         </Link>
         <VoteShortcut mode={mode === "apyoc" ? undefined : mode} />

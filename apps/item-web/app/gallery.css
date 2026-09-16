@@ -105,7 +105,7 @@ html[data-aetimm-theme="light"] .aetimm-gallery .primary-navigation { border-col
   .aetimm-gallery .gallery-feed-stream { width: min(44rem, 100%); padding-top: .5rem; }
   .aetimm-gallery .gallery-feed-stream .artifact-card { border-inline: 0; border-radius: 0; }
   .gallery-header.site-header { grid-template-columns: 1fr auto; gap: .8rem; min-height: 4.7rem; padding: .7rem 1rem; }
-  .gallery-header .primary-mode-switch { grid-row: 2; grid-column: 1 / -1; justify-self: center; width: min(18rem, calc(100% - 7rem)); }
+  .gallery-header .primary-mode-switch { grid-row: 2; grid-column: 1 / -1; justify-self: center; width: min(24rem, 100%); }
   .gallery-about { position: absolute; right: 1rem; bottom: .7rem; }
   .gallery-header .primary-utility-rail { grid-column: 2; grid-row: 1; }
   .gallery-wordmark { font-size: 1.1rem; }
