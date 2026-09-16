@@ -32,3 +32,5 @@ assert.doesNotMatch(navigation, />ARGUS</);
 assert.match(header, />Library</);
 
 await import('./verify-apyoc.mjs');
+
+await import('../../../scripts/scouts/test.mjs');
