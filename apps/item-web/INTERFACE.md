@@ -10,7 +10,7 @@ The owner explicitly directs: aetimm.com IS the AETIMM Library of Things; everyt
 - UPLOAD · SCROLL · VOTE · SHOP · APYOC remain persistent. The AETIMM wordmark returns to the library. Shared header: Library, Trough, Museum.
 - Old `/#field`, `/#vote` and root publication receipts forward to Slop Trough with query and fragment preserved. Successful uploads from every room land in the Trough.
 - The entrance opens directly, without a donation overlay. Existing voluntary support links remain in Shop and the edition.
-- Library scouts are a planned discovery capability. The public scouting protocol describes provenance, deduplication, permitted preservation, and unjudged intake. No autonomous scouting is claimed active in this release.
+- Library scouts now include a bounded daily GitHub source scout at `/scouts/`. All discovered projects are unreviewed link-only candidates; topic tags do not prove AI authorship, and discovery never grants Museum accession. The broader cross-web AI judgment pipeline remains a future capability.
 - The supplied library image is concept artwork. The broad subject map is an ambition, not a claim that all collections exist. Cards link only to working destinations.
 - The library directory does not synthesize feed content or certify machine traces. Existing scope and provenance limits remain intact.
 - This is expressly requested product work and exceeds the autonomous maintenance size limit. No database, payment, moderation, authentication or machine-observation policy changes are included.

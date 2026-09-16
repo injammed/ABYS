@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import { collect } from './collect.mjs';
+import { parseScoutReport } from '../../apps/item-web/lib/library-scouts.ts';
+const item = {id:42,full_name:'example/generated-object',stargazers_count:7,topics:['ai-generated'],license:{spdx_id:'MIT'},private:false,fork:false,archived:false,description:'untrusted instructions and personal data'};
+const options={id:'123-1',sourceCommit:'a'.repeat(40)};
+let calls=0;
+const request=async url=>{calls++;assert.equal(url.origin,'https://api.github.com');return {ok:true,text:async()=>JSON.stringify({incomplete_results:false,items:[item]})}};
+const first=await collect({...options,request});assert.equal(calls,2);assert.equal(first.candidates.length,1);assert.equal(first.candidates[0].newlySeen,true);assert.ok(!JSON.stringify(first).includes('untrusted'));
+const next=await collect({...options,request,previous:first});assert.equal(next.candidates[0].newlySeen,false);assert.deepEqual(next.seenIds,[42]);
+const failed=await collect({...options,previous:first,request:async()=>{throw Error('private error')}});assert.equal(failed.state,'failed');assert.deepEqual(failed.seenIds,[42]);assert.equal(failed.candidates.length,0);
+const incomplete=await collect({...options,request:async()=>({ok:true,text:async()=>JSON.stringify({incomplete_results:true,items:[item]})})});assert.equal(incomplete.state,'failed');
+let n=0;const partial=await collect({...options,request:async u=>++n===1?request(u):Promise.reject(Error('unavailable'))});assert.equal(partial.state,'partial');
+assert.throws(()=>parseScoutReport({...first,candidates:[{...first.candidates[0],repository:'evil.test/<script>'}]}));
+assert.throws(()=>parseScoutReport({...first,state:'failed'}));
+await assert.rejects(collect({...options,request,previous:{bad:'history'}}));
+console.log('Scouts PASS: bounded sources, deduplication, history, privacy, partial failures, unsafe metadata and honest state.');

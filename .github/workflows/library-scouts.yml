@@ -1,0 +1,103 @@
+name: AETIMM Library Scout
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/library-scouts.yml'
+      - 'scripts/scouts/**'
+      - 'apps/item-web/lib/library-scouts.ts'
+  schedule:
+    - cron: '31 6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: aetimm-library-scout
+  cancel-in-progress: false
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify scout boundaries
+        run: node scripts/scouts/test.mjs
+      - name: Read prior discovery history
+        id: history
+        run: |
+          set +e
+          git ls-remote --exit-code --heads origin library-discoveries > /dev/null
+          scout_ref_status=$?
+          set -e
+          if [ "$scout_ref_status" -eq 0 ]; then
+            git fetch origin library-discoveries
+            git worktree add scout-history FETCH_HEAD
+            echo 'path=scout-history' >> "$GITHUB_OUTPUT"
+          elif [ "$scout_ref_status" -eq 2 ]; then
+            echo 'path=-' >> "$GITHUB_OUTPUT"
+          else
+            exit "$scout_ref_status"
+          fi
+      - name: Discover public candidates
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SCOUT_HISTORY: ${{ steps.history.outputs.path }}
+        run: node scripts/scouts/collect.mjs "$SCOUT_HISTORY" scout-output
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scout-report
+          path: scout-output/report.json
+          retention-days: 7
+  publish:
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: scout-report
+          path: scout-output
+      - name: Append discovery report
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          git ls-remote --exit-code --heads origin library-discoveries > /dev/null
+          scout_ref_status=$?
+          set -e
+          if [ "$scout_ref_status" -eq 0 ]; then
+            git fetch origin library-discoveries
+            git worktree add scout-data FETCH_HEAD
+          elif [ "$scout_ref_status" -eq 2 ]; then
+            mkdir scout-data
+            git -C scout-data init -b library-discoveries
+          else
+            exit "$scout_ref_status"
+          fi
+          python - <<'PY'
+          import json, os, pathlib
+          source=pathlib.Path('scout-output/report.json').read_bytes()
+          report=json.loads(source)
+          assert report['id']==os.environ['GITHUB_RUN_ID']+'-'+os.environ['GITHUB_RUN_ATTEMPT']
+          root=pathlib.Path('scout-data')
+          (root/'runs').mkdir(exist_ok=True)
+          with (root/'runs'/f"{report['id']}.json").open('xb') as f: f.write(source)
+          (root/'latest.json').write_bytes(source)
+          PY
+          git -C scout-data config user.name 'aetimm-library-scout[bot]'
+          git -C scout-data config user.email 'aetimm-library-scout@users.noreply.github.com'
+          git -C scout-data add latest.json runs
+          git -C scout-data commit -m 'Append bounded public discovery report'
+          git fetch scout-data HEAD
+          gh auth setup-git
+          git push origin FETCH_HEAD:refs/heads/library-discoveries
