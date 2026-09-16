@@ -9,7 +9,7 @@ export function SubmissionLandingBridge() {
         ? String(event.detail?.artifactId ?? "").trim()
         : "";
 
-      const target = new URL("/", window.location.origin);
+      const target = new URL(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/slop-trough/`, window.location.origin);
       if (artifactId) target.searchParams.set("published", artifactId);
       target.hash = "field";
 

@@ -37,7 +37,7 @@ export function VoteShortcut({ mode }: { mode?: "feed" | "museum" | "shop" }) {
 
   return (
     <div className="vote-shortcut">
-      {mode === "feed" ? <button className="primary-action" type="button" onClick={() => setMessage(focusBallot() ? "" : "No public work is ready to vote on yet.")}>{contents}</button> : <Link href="/#vote" className="primary-action">{contents}</Link>}
+      {mode === "feed" ? <button className="primary-action" type="button" onClick={() => setMessage(focusBallot() ? "" : "No public work is ready to vote on yet.")}>{contents}</button> : <Link href="/slop-trough/#vote" className="primary-action">{contents}</Link>}
       {message && <button type="button" className="gallery-notice" onClick={() => setMessage("")} aria-label={`${message} Dismiss`}><span role="status">{message}</span><span aria-hidden="true">×</span></button>}
     </div>
   );

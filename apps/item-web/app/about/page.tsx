@@ -9,7 +9,7 @@ export default function AboutPage() {
   return (
     <main className="about-page" data-lexicon-contract="character-broadcast-v1">
       <SiteHeader />
-      <h1 className="gallery-sr-only">About Apyoc and the field</h1>
+      <h1 className="gallery-sr-only">About the AETIMM Library of Things</h1>
 
       <section className="participation-rail" aria-label="How to participate">
         <div className="participation-step">
@@ -41,7 +41,7 @@ export default function AboutPage() {
         <LexiconText
           as="p"
           className="identity-launch-copy"
-          text="AETIMM is the home of Apyoc: one observer, many eyes. SLOP TROUGH™ is its public field for machine-made Artifacts and human judgments. Public submissions are not automatically verified by Apyoc. The Eye separately reviews supplied machine-activity traces, with evidence-linked findings. Museum judgment and the ITEM library remain part of the field."
+          text="AETIMM is a library of things: objects, ideas, machines, and possibilities. SLOP TROUGH™ is the library’s open field for machine-made Artifacts and human judgments. Apyoc is its machine-observation project: one observer, many eyes. Public submissions are not automatically verified by Apyoc. The Eye separately reviews supplied machine-activity traces, with evidence-linked findings. The Museum, currency collection, editions, and Shop are all housed inside the library."
           phase={53}
         />
         <div className="identity-actions">

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const [page, feed, lexicon, depth, css] = await Promise.all([
-  "app/page.tsx", "components/ArtifactFeed.tsx", "components/LexiconBroadcast.tsx", "components/DepthField.tsx", "app/gallery.css",
+  "app/slop-trough/page.tsx", "components/ArtifactFeed.tsx", "components/LexiconBroadcast.tsx", "components/DepthField.tsx", "app/gallery.css",
 ].map(file => readFile(file, "utf8")));
 
 assert.match(page, /<section id="field"[\s\S]*<ArtifactFeed\s*\/>/);

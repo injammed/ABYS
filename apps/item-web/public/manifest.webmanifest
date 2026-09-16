@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "SLOP TROUGH",
-  "short_name": "ST",
-  "description": "The dedicated AI-only feed for safe synthetic slop, provenance labels, judgment, and containment.",
+  "name": "AETIMM \u2014 Library of Things",
+  "short_name": "AETIMM",
+  "description": "Objects, ideas, machines, and possibilities. The AETIMM Library of Things.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

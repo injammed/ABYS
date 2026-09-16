@@ -18,10 +18,10 @@ for(const item of items) {
  assert.ok((await stat(`public/currency/${imageFor(item)}.jpg`)).size>0);
 }
 
-const [root,shop,museum,ui,walk,brief]=await Promise.all(['app/page.tsx','app/shop/page.tsx','app/aetimm/page.tsx','components/CurrencyMuseum.tsx','components/CurrencyWalk.tsx','public/currency/evaluation-brief.txt'].map(x=>readFile(x,'utf8')));
-assert.doesNotMatch(root,/CurrencyMuseum/,'Currency library belongs to SHOP; root remains the live Trough');
+const [root,shop,museum,ui,walk,brief]=await Promise.all(['app/slop-trough/page.tsx','app/shop/page.tsx','app/aetimm/page.tsx','components/CurrencyMuseum.tsx','components/CurrencyWalk.tsx','public/currency/evaluation-brief.txt'].map(x=>readFile(x,'utf8')));
+assert.doesNotMatch(root,/CurrencyMuseum/,'Currency library belongs to SHOP; the dedicated Trough remains a live feed');
 assert.match(root,/<ArtifactFeed\s*\/>/);
-assert.match(root,/<DonationWelcome\s*\/>/,'Donation prompt may precede the Trough without replacing it');
+assert.doesNotMatch(root,/<DonationWelcome\s*\/>/,'The Trough remains uninterrupted inside the library');
 assert.match(shop,/<CurrencyMuseum\s*\/>/);
 assert.match(shop,/data-commerce-state="public"/,'ITEM 0001 must remain publicly readable');
 assert.match(shop,/Donate any amount/,'Public literature may be supported by an independent donation');

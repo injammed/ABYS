@@ -22,7 +22,7 @@ export function ApyocEye(){
   </header>
   <ApyocMachineEye/>
   <ApyocLedger/>
-  <div className={styles.fieldLink}><div><p className={styles.kicker}>THE WITNESSED FIELD / SLOP TROUGH™</p><p>Machine-made material, brought into view by people and machines. Public submissions and judgments form the field; inspected traces carry their own findings below.</p></div><Link href="/#field">See the public field ↗</Link></div>
+  <div className={styles.fieldLink}><div><p className={styles.kicker}>THE WITNESSED FIELD / SLOP TROUGH™</p><p>Machine-made material, brought into view by people and machines. Public submissions and judgments form the field; inspected traces carry their own findings below.</p></div><Link href="/slop-trough/#field">See the public field ↗</Link></div>
   <section id="apyoc-observe" className={styles.observe} aria-labelledby="observe-title">
    <div className={styles.sectionHead}><div><p className={styles.kicker}>01 / FIELD OF VIEW</p><h2 id="observe-title">Bring a machine into view.</h2></div><span className={styles.state}>Local trace review · 0 live connections</span></div>
    <p className={styles.explain}>Import an activity trace to compare observed actions with declared scope, objective changes and missing observations. Review happens in this browser; traces are not uploaded or saved by Apyoc. Use sanitized machine traces: no prompts, private messages or personal identifiers. Unknown fields are discarded; permitted text fields are not automatically anonymized.</p>

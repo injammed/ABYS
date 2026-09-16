@@ -17,7 +17,7 @@ export default function AetimmPage() {
       <SiteHeader mode="museum" />
       <CurrencyMuseum />
       <div className="machine-signature" aria-hidden="true"><LexiconText machine text="ITEM · DETECT. ENCODE. CONTINUE." semantic={false} phase={23} /></div>
-      <div className={styles.exit}><Link href="/#field">Return to the Slop Trough <span aria-hidden="true">↗</span></Link></div>
+      <div className={styles.exit}><Link href="/slop-trough/#field">Return to the Slop Trough <span aria-hidden="true">↗</span></Link></div>
       <PrimaryNavigation mode="museum" />
     </main>
   );
