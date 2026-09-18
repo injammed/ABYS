@@ -1,0 +1,23 @@
+[Unit]
+Description=AETIMM standalone source scout
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=aetimm-scout
+Group=aetimm-scout
+WorkingDirectory=/opt/aetimm-scout
+EnvironmentFile=/etc/aetimm-scout.env
+ExecStart=/usr/bin/python3 /opt/aetimm-scout/scripts/scouts/runtime.py run --db /var/lib/aetimm-scout/scout.db --source-commit ${SCOUT_SOURCE_COMMIT}
+StateDirectory=aetimm-scout
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+TimeoutStartSec=180
+MemoryMax=512M
+CPUQuota=50%

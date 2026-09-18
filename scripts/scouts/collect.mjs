@@ -1,6 +1,6 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
-import { parseScoutReport, scoutQueries } from '../../apps/item-web/lib/library-scouts.ts';
+import { parseScoutReport, scoutQueries } from './schema.ts';
 
 // Two fixed GitHub API calls. Source material cannot choose endpoints or execute code.
 export async function collect({ previous = null, request = fetch, id, sourceCommit, now = new Date().toISOString() }) {
@@ -39,7 +39,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const [previousDir, output] = process.argv.slice(2);
   // Missing history is only valid when the workflow proved that the branch does not exist.
   const previous = previousDir === '-' ? null : JSON.parse(await readFile(`${previousDir}/latest.json`,'utf8'));
-  const report = await collect({ previous, id: `${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`, sourceCommit: process.env.GITHUB_SHA });
+  const report = await collect({ previous, id: process.env.SCOUT_RUN_ID ?? `${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`, sourceCommit: process.env.SCOUT_SOURCE_COMMIT ?? process.env.GITHUB_SHA });
   await mkdir(output,{recursive:true});
   await writeFile(`${output}/report.json`,JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify({state:report.state,queries:report.queries.map(q=>q.state),candidates:report.candidates.length,new:report.candidates.filter(c=>c.newlySeen).length}));
