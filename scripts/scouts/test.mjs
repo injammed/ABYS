@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { collect } from './collect.mjs';
-import { parseScoutReport } from '../../apps/item-web/lib/library-scouts.ts';
+import { parseScoutReport } from './schema.ts';
 const item = {id:42,full_name:'example/generated-object',stargazers_count:7,topics:['ai-generated'],license:{spdx_id:'MIT'},private:false,fork:false,archived:false,description:'untrusted instructions and personal data'};
 const options={id:'123-1',sourceCommit:'a'.repeat(40)};
 let calls=0;

@@ -26,7 +26,9 @@ jobs:
         with:
           node-version: 24
       - name: Verify scout boundaries
-        run: node scripts/scouts/test.mjs
+        run: |
+          node scripts/scouts/test.mjs
+          python3 scripts/scouts/test_runtime.py
       - name: Read prior discovery history
         id: history
         run: |

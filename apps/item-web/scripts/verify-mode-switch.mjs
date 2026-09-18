@@ -34,3 +34,8 @@ assert.match(header, />Library</);
 await import('./verify-apyoc.mjs');
 
 await import('../../../scripts/scouts/test.mjs');
+
+const { execFileSync: runScoutCheck } = await import('node:child_process');
+runScoutCheck('python3', ['../../scripts/scouts/test_runtime.py'], { stdio: 'inherit' });
+
+assert.equal(await readFile('lib/library-scouts.ts','utf8'), await readFile('../../scripts/scouts/schema.ts','utf8'), 'Portable and browser report contracts must match');
