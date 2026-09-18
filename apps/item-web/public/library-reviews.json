@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "reviewer": "Codex — source inspection; no independent reproduction",
+  "reviews": [
+    {
+      "repository": "MarkusNeusinger/anyplot",
+      "title": "anyplot",
+      "kind": "Generated code collection",
+      "reviewedAt": "2026-09-18",
+      "sourceCommit": "7e64b16cd5a5c7b02c8c793c76cb8835cf5602b4",
+      "readmeBlob": "ea857479ff201bdcc10490681de3cd31c4e2b7a4",
+      "summary": "A collection of plotting examples organized around shared specifications and implementations across visualization libraries.",
+      "originEvidence": "The creator states that implementations are generated and maintained by AI, and describes specification-driven generation and automated review. This is a documented creator claim, not independently verified authorship.",
+      "licenseEvidence": "The README declares MIT licensing for the project but separately identifies Highcharts licensing restrictions. A repository-wide MIT signal does not establish permission for every dependency or generated artifact.",
+      "whyInspect": "A concrete collection of reusable outputs with specifications and per-implementation metadata offers more to inspect than a promotional AI label.",
+      "nextCheck": "Select one plot, inspect its generation record and dependencies, reproduce it in an isolated environment, and compare the result with its specification.",
+      "decision": "Candidate for artifact-level evaluation; not accessioned"
+    },
+    {
+      "repository": "oocx/tfplan2md",
+      "title": "tfplan2md",
+      "kind": "AI-assisted software",
+      "reviewedAt": "2026-09-18",
+      "sourceCommit": "e422e9f9c013fb891912a1986c376bd1718d0312",
+      "readmeBlob": "2bfc8cdfd1491d27b404c73605e19871ebcba894",
+      "summary": "Software for converting Terraform plan JSON into readable Markdown reports.",
+      "originEvidence": "The README explicitly attributes the project's code and specifications to development with GitHub Copilot. This establishes a creator disclosure of AI assistance, not autonomous machine authorship.",
+      "licenseEvidence": "The README presents the project as MIT licensed. Artifact-level preservation still requires checking the actual license, notices and dependencies.",
+      "whyInspect": "It has a bounded input/output task that can be tested against a known fixture; usefulness can be evaluated separately from how it was authored.",
+      "nextCheck": "Use a synthetic Terraform plan with known changes, reproduce the report in isolation, and test that the output preserves those changes without disclosing marked-sensitive values.",
+      "decision": "Candidate for functional evaluation; not accessioned"
+    },
+    {
+      "repository": "jorgeadev/the-architects-blueprint",
+      "title": "The Architect’s Blueprint",
+      "kind": "Generated writing pipeline",
+      "reviewedAt": "2026-09-18",
+      "sourceCommit": "705a7c759e0a3d2d3b3af33fc33b1c725ffd3196",
+      "readmeBlob": "bb7f13965fe35a0ec9bb219f626c61245b57c5c5",
+      "summary": "A pipeline described as producing and archiving AI-generated technical articles.",
+      "originEvidence": "The README names Gemini in the writing workflow. It also describes a local mode that produces mock output, so the pipeline's existence alone cannot establish the origin of an individual article.",
+      "licenseEvidence": "The README distinguishes MIT software from generated articles under CC BY 4.0 in web/src/content/blog/. The scout's repository license field missed that content-specific distinction.",
+      "whyInspect": "It is a useful test of article provenance and content-specific licensing, rather than evidence that generated writing is accurate or valuable.",
+      "nextCheck": "Choose one article, trace its production run, check its factual claims against primary sources, and confirm attribution requirements before preservation.",
+      "decision": "Requires article-level provenance and fact-checking; not accessioned"
+    }
+  ]
+}
