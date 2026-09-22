@@ -28,5 +28,35 @@
     "outcome": "reachable",
     "status": 200,
     "latencyMs": 192
+  },
+  {
+    "sequence": 178,
+    "time": "2026-09-22T07:37:20.544Z",
+    "source": "aetimm-probe",
+    "kind": "infrastructure",
+    "target": "home",
+    "outcome": "reachable",
+    "status": 200,
+    "latencyMs": 380
+  },
+  {
+    "sequence": 179,
+    "time": "2026-09-22T07:37:20.544Z",
+    "source": "aetimm-probe",
+    "kind": "infrastructure",
+    "target": "eye",
+    "outcome": "reachable",
+    "status": 200,
+    "latencyMs": 213
+  },
+  {
+    "sequence": 180,
+    "time": "2026-09-22T07:37:20.544Z",
+    "source": "aetimm-probe",
+    "kind": "infrastructure",
+    "target": "shop",
+    "outcome": "reachable",
+    "status": 200,
+    "latencyMs": 98
   }
 ]
