@@ -7,11 +7,13 @@
 
 .canvas canvas{touch-action:none}.walkControls .joystickRow{justify-content:space-between;align-items:end;flex-wrap:nowrap;padding:0 .5rem}.joystick{width:112px;height:112px;flex:0 0 112px;border-radius:50%;border:1px solid #d4bb8170;background:radial-gradient(circle,#303843cc,#0c111be8 70%);box-shadow:inset 0 0 25px #0009,0 8px 25px #0005;position:relative;pointer-events:auto;touch-action:none;user-select:none;cursor:grab;outline-offset:5px}.joystick:active{cursor:grabbing}.joystick:focus-visible{outline:2px solid #e5c38a}.joystickRing{position:absolute;inset:19px;border:1px solid #cbbb8d40;border-radius:50%}.joystickThumb{position:absolute;left:36px;top:36px;width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#d0c2a3,#766b53 60%,#292721);border:1px solid #e3d7b4;box-shadow:0 4px 12px #000b;will-change:transform;pointer-events:none}.joystickLabel{position:absolute;bottom:5px;left:0;right:0;color:#e8dfcb;font-size:12px;letter-spacing:.08em;pointer-events:none}.walkControls .joystickRow>button{align-self:end;margin-bottom:10px;border-radius:50%;width:44px;height:44px;padding:0;background:#0d131dcc}.walkControls{bottom:1.1rem}.modelCanvas{height:480px;background:radial-gradient(ellipse,#202c3c,#080c13)}@media(max-width:800px){.modelCanvas{height:390px}.walkControls{left:.55rem;right:.55rem}.walkControls .joystickRow{padding:0}}
 
-.quest{position:absolute;top:1rem;left:1rem;max-width:calc(100% - 19rem);padding:.75rem 1rem;background:#171b20d9;border-left:2px solid #e3c085;pointer-events:none;text-shadow:0 1px 3px #000}
-.quest strong,.quest span,.quest small{display:block}.quest strong{font-size:.75rem;letter-spacing:.2em;color:#ebcb91}.quest span{font-size:.8rem;margin:.35rem 0}.quest small{font-size:.7rem;color:#ddd4c1}
 .centerControls{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:.5rem}.walkControls .centerControls button{font-size:.85rem;border-radius:3px;min-width:44px;min-height:44px}
-@media(max-width:650px){.quest{top:4.4rem;left:.6rem;max-width:calc(100% - 1.2rem);padding:.5rem .7rem}.quest small{display:none}.halls{top:.6rem;right:.6rem;left:.6rem;justify-content:center}.quest span{font-size:.7rem}}
+
 
 /* Keep the game controls above the persistent site navigation on arrival. */
 .walk{height:calc(100svh - 18rem);min-height:360px;max-height:900px}
 @media(max-width:380px){.joystick{width:86px;height:86px;flex-basis:86px}.joystickThumb{left:26px;top:26px;width:32px;height:32px}.joystickRing{inset:15px}.joystickLabel{font-size:11px}}
+
+.hallPicker{position:absolute;top:.75rem;left:.75rem}.hallPicker select,.quietToggle{color:#f5f0e8;background:#151b26dc;border:1px solid #b6a37866;border-radius:4px;min-height:44px;padding:.5rem .75rem;font-size:.8rem}
+.quietToggle{position:absolute;right:.75rem;top:.75rem;cursor:pointer}.sceneStatus{position:absolute;left:1rem;right:1rem;top:4rem;text-align:center;background:#10151ee8;padding:.7rem;font-size:.8rem}
+@media(max-width:380px){.hallPicker{left:.5rem}.quietToggle{right:.5rem}.hallPicker select,.quietToggle{font-size:.7rem;padding:.45rem}}

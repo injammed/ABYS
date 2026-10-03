@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
-export const FRESCO_PATH = "/images/cathedral-fresco.jpeg";
+import CEILINGS from "./cathedral-art.json" with {type:"json"};
+
 export const LOOK_LIMIT = Math.PI / 2 - .06;
 
 export function ceilingAim(x: number, z: number, hallCount: number) {
@@ -11,7 +12,7 @@ export function ceilingAim(x: number, z: number, hallCount: number) {
 }
 
 // Inward-facing barrel vault. Physical arc width / panel length matches the
-// supplied 4:3 painting so its figures retain their proportions on the vault.
+// individual painting so its figures retain their proportions on the vault.
 export function vaultGeometry(z: number, length: number, radius = 5.94) {
   const positions: number[] = [], uv: number[] = [], indices: number[] = [];
   const segments = 48;
@@ -31,13 +32,14 @@ export function vaultGeometry(z: number, length: number, radius = 5.94) {
   return geometry;
 }
 
-export function buildCathedral(lastRow: number, fresco: THREE.Texture) {
+export function buildCathedral(lastRow: number, frescoes: THREE.Texture[]) {
   const root = new THREE.Group(); root.name = "AETIMM cathedral";
   const stone = new THREE.MeshStandardMaterial({ color: 0xe7d9bb, roughness: .82 });
   const dark = new THREE.MeshStandardMaterial({ color: 0x303b3d, roughness: .36, metalness: .16 });
   const gold = new THREE.MeshStandardMaterial({ color: 0xb98a3e, roughness: .3, metalness: .72 });
   const light = new THREE.MeshBasicMaterial({ color: 0xffe8b3 });
-  const painting = new THREE.MeshBasicMaterial({ map: fresco, side: THREE.DoubleSide, toneMapped: false });
+  if(frescoes.length!==CEILINGS.length)throw new Error("Each hall requires its own ceiling texture");
+  const paintings = frescoes.map(map=>new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, toneMapped: false }));
   const glass = new THREE.MeshBasicMaterial({ color: 0x88bbcc });
   const geometries = new Set<THREE.BufferGeometry>();
   function mesh(g: THREE.BufferGeometry, m: THREE.Material, x=0, y=0, z=0) {
@@ -59,8 +61,9 @@ export function buildCathedral(lastRow: number, fresco: THREE.Texture) {
   // all collection exhibits remain the existing volumetric sculptures.
   for(let hall=0;hall<Math.ceil((-lastRow/6*2+1)/10);hall++) {
     const z=-hall*30;
-    const panelLength=5.94*Math.PI/(1448/1086);
-    mesh(vaultGeometry(z,panelLength),painting);
+    const art=CEILINGS[hall];
+    const panelLength=5.94*Math.PI/(art.width/art.height);
+    mesh(vaultGeometry(z,panelLength),paintings[hall]);
     arch(z-panelLength/2); arch(z+panelLength/2);
   }
   const shaft = new THREE.CylinderGeometry(.27,.36,8.15,12);
@@ -90,7 +93,7 @@ export function buildCathedral(lastRow: number, fresco: THREE.Texture) {
   for(let i=0;i<12;i++) {
     const spoke=box(.07,5.25,.08,0,8,lastRow-8.65,gold);spoke.rotation.z=i*Math.PI/12;
   }
-  // Batch the static architecture by material: seven draw calls, not hundreds.
+  // Batch the static architecture by material: ten draw calls, not hundreds.
   const batches = new Map<THREE.Material, THREE.BufferGeometry[]>();
   root.updateMatrixWorld(true);
   for (const child of root.children) {
@@ -103,5 +106,5 @@ export function buildCathedral(lastRow: number, fresco: THREE.Texture) {
     const merged=mergeGeometries(batch);batch.forEach(g=>g.dispose());
     if(merged)mesh(merged,material);
   }
-  return {root,dispose(){geometries.forEach(g=>g.dispose());[stone,dark,gold,light,painting,glass].forEach(m=>m.dispose());}};
+  return {root,dispose(){geometries.forEach(g=>g.dispose());[stone,dark,gold,light,...paintings,glass].forEach(m=>m.dispose());}};
 }

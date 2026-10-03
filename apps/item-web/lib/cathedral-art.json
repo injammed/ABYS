@@ -1,0 +1,37 @@
+[
+  {
+    "path": "/images/cathedral-fresco.jpeg",
+    "name": "Elk",
+    "width": 1448,
+    "height": 1086,
+    "sha256": "8ff02d289af32c285e33dca0b77e455f13301b1723a20a83a8c31a30b6127ea5"
+  },
+  {
+    "path": "/images/cathedral-flame.jpeg",
+    "name": "Flame",
+    "width": 1029,
+    "height": 1536,
+    "sha256": "45f2bd4f4f1653d0657f68dc3db4da57cd72e695acd4a96a9c379a17a401e593"
+  },
+  {
+    "path": "/images/cathedral-nightmare.jpeg",
+    "name": "Nightmare",
+    "width": 1025,
+    "height": 1536,
+    "sha256": "a68364a12736ab2a67de7723df04c94d5381781daa74c57b67ccc438da61e748"
+  },
+  {
+    "path": "/images/cathedral-sky-battle.jpeg",
+    "name": "Sky battle",
+    "width": 1024,
+    "height": 1536,
+    "sha256": "cab79352cbf97bb410bee89bd2369902547de16e670e7ce8d0cdd23562c76ba7"
+  },
+  {
+    "path": "/images/cathedral-seraphim.jpeg",
+    "name": "Seraphim",
+    "width": 1024,
+    "height": 1536,
+    "sha256": "bb49c607c7875d5ed0a814d3e6294ca09baa2561e649816cc27bbf0e517155c3"
+  }
+]

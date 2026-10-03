@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { items } from "@/lib/currency-library";
 import {CurrencyJoystick} from "./CurrencyJoystick";
 import {smoothAxis} from "@/lib/currency-navigation";
+import CEILINGS from "@/lib/cathedral-art.json";
 import styles from "./CurrencyMuseum.module.css";
 
-type Action = "look" | "reset" | `hall${number}`;
+type Action = "level" | "look" | "reset" | `hall${number}`;
 const hallCount=Math.ceil(items.length/10);
 const lastRow=-Math.floor((items.length-1)/2)*6;
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -15,12 +16,14 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
   const action = useRef<(a: Action) => void>(() => {});
   const select = useRef(onSelect);
   select.current = onSelect;
-  const [progress,setProgress]=useState({halls:1,ceiling:false});
+  const [hall,setHall]=useState(0);
+  const [lookingUp,setLookingUp]=useState(false);
+  const [quiet,setQuiet]=useState(false);
   const [status, setStatus] = useState("Opening the exhibition…");
   useEffect(() => {
     let disposed = false;
     let cleanup = () => {};
-    Promise.all([import("three"),import("@/lib/currency-sculpture"),import("three/addons/environments/RoomEnvironment.js"),import("@/lib/cathedral")]).then(([THREE,{buildCurrencySculpture,disposeCurrencySculpture},{RoomEnvironment},{buildCathedral,FRESCO_PATH,LOOK_LIMIT,ceilingAim}]) => {
+    Promise.all([import("three"),import("@/lib/currency-sculpture"),import("three/addons/environments/RoomEnvironment.js"),import("@/lib/cathedral")]).then(([THREE,{buildCurrencySculpture,disposeCurrencySculpture},{RoomEnvironment},{buildCathedral,LOOK_LIMIT,ceilingAim}]) => {
       if (disposed || !host.current) return;
       const parent = host.current;
       let renderer: InstanceType<typeof THREE.WebGLRenderer>;
@@ -40,14 +43,15 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
       const geometries: InstanceType<typeof THREE.BufferGeometry>[] = [];
       const materials: InstanceType<typeof THREE.Material>[] = [];
       const textures: InstanceType<typeof THREE.Texture>[] = [];
-      let frescoFailed=false,frescoReady=false;
-      const fresco=new THREE.TextureLoader().load(`${basePath}${FRESCO_PATH}`,()=>{frescoReady=true;if(disposed)fresco.dispose();},undefined,()=>{frescoFailed=true;if(!disposed)setStatus("Ceiling painting could not load. The cathedral and exhibits are still open.");});
-      fresco.colorSpace=THREE.SRGBColorSpace;
-      fresco.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());textures.push(fresco);
-      const cathedral=buildCathedral(lastRow,fresco);scene.add(cathedral.root);
-      const visited=new Set([0]);let ceilingSeen=false;
-      const ceilingRay=new THREE.Raycaster();const gaze=new THREE.Vector3();
-      const paintedVault=cathedral.root.children.find(child=>((child as InstanceType<typeof THREE.Mesh>).material as InstanceType<typeof THREE.MeshBasicMaterial>).map===fresco);
+      let frescoFailed=false;
+      const loader=new THREE.TextureLoader();
+      const frescoes=CEILINGS.map(art=>{
+        const texture=loader.load(`${basePath}${art.path}`,()=>{if(disposed)texture.dispose();},undefined,()=>{frescoFailed=true;if(!disposed)setStatus("A ceiling painting could not load. Refresh to try again.");});
+        texture.colorSpace=THREE.SRGBColorSpace;
+        texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());textures.push(texture);return texture;
+      });
+      const cathedral=buildCathedral(lastRow,frescoes);scene.add(cathedral.root);
+      let currentHall=0,currentLookingUp=false;
       const sculptures: InstanceType<typeof THREE.Group>[] = [];
       const obstacles: {x:number;z:number}[] = [];
       const box = (w:number,h:number,d:number,x:number,y:number,z:number,color:number) => {
@@ -75,7 +79,7 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
         if(!blocked(nx,camera.position.z))camera.position.x=nx;
         if(!blocked(camera.position.x,nz))camera.position.z=nz;
       };
-      action.current=a=>{if(a==="look"){({yaw,pitch}=ceilingAim(camera.position.x,camera.position.z,hallCount));canvas.focus({preventScroll:true});return;}camera.position.set(0,1.8,a.startsWith("hall")?6-Number(a.slice(4))*30:6);yaw=0;pitch=0;motion.current={x:0,y:0,lookX:0,lookY:0};velocity={x:0,y:0};};
+      action.current=a=>{if(a==="level"){pitch=0;canvas.focus({preventScroll:true});return;}if(a==="look"){({yaw,pitch}=ceilingAim(camera.position.x,camera.position.z,hallCount));canvas.focus({preventScroll:true});return;}camera.position.set(0,1.8,a.startsWith("hall")?6-Number(a.slice(4))*30:6);yaw=0;pitch=0;motion.current={x:0,y:0,lookX:0,lookY:0};velocity={x:0,y:0};};
       const keydown=(e:KeyboardEvent)=>{if(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright","pageup","pagedown","shift"].includes(e.key.toLowerCase())){e.preventDefault();keys.add(e.key.toLowerCase());}};
       const keyup=(e:KeyboardEvent)=>keys.delete(e.key.toLowerCase());
       const clear=()=>keys.clear();
@@ -98,15 +102,10 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
         const side=Number(keys.has("d"))-Number(keys.has("a"))+motion.current.x;const length=Math.max(1,Math.hypot(forward,side));
         velocity.x=smoothAxis(velocity.x,side/length,dt);velocity.y=smoothAxis(velocity.y,forward/length,dt);
         const speed=keys.has("shift")?6:3.8;move(velocity.y*dt*speed,velocity.x*dt*speed);camera.rotation.set(pitch,yaw,0,"YXZ");
-        const hall=Math.max(0,Math.min(hallCount-1,Math.floor((6-camera.position.z)/30)));
-        let sawFresco=false;
-        if(!ceilingSeen&&frescoReady&&pitch>.5&&paintedVault){
-          scene.updateMatrixWorld(true);camera.getWorldDirection(gaze);ceilingRay.set(camera.position,gaze);
-          sawFresco=ceilingRay.intersectObject(paintedVault).length>0;
-        }
-        const changed=!visited.has(hall)||sawFresco;
-        visited.add(hall);ceilingSeen=ceilingSeen||sawFresco;
-        if(changed)setProgress({halls:visited.size,ceiling:ceilingSeen});
+        const nextHall=Math.max(0,Math.min(hallCount-1,Math.round(-camera.position.z/30)));
+        if(nextHall!==currentHall){currentHall=nextHall;setHall(nextHall);}
+        const nextLookingUp=pitch>.5;
+        if(nextLookingUp!==currentLookingUp){currentLookingUp=nextLookingUp;setLookingUp(nextLookingUp);}
         for(const sculpture of sculptures)sculpture.visible=Math.abs(sculpture.position.z-camera.position.z)<38;
         if(document.visibilityState==="visible")renderer.render(scene,camera);frame=requestAnimationFrame(render);
       };render();if(!frescoFailed)setStatus("");
@@ -116,12 +115,13 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
   },[]);
   return <div className={styles.walk} data-sculpture-gallery="sculpted-relief-gallery-v4">
     <div className={styles.canvas} ref={host}  />
-    <div className={styles.quest}><strong>THE CATHEDRAL</strong><span>{progress.halls}/{hallCount} halls discovered · {progress.ceiling?"Fresco discovered":"Look up to discover the fresco"}</span><small>WASD to walk · drag to look · tap an object</small></div>
-    <nav className={styles.halls} aria-label="Jump to exhibition hall">{Array.from({length:hallCount},(_,n)=>n).map(n=><button key={n} onClick={()=>action.current(`hall${n}` as Action)} aria-label={`Hall ${n+1}, objects ${n*10+1} to ${Math.min(items.length,n*10+10)}`}>{String(n+1).padStart(2,"0")}</button>)}</nav>
-    <div className={styles.walkControls}>{status&&<p role="status">{status}</p>}<div className={styles.joystickRow}>
+    {!quiet&&<label className={styles.hallPicker}><span className="gallery-sr-only">Choose ceiling hall</span><select aria-label="Choose ceiling hall" value={hall} onChange={e=>action.current(`hall${e.target.value}` as Action)}>{CEILINGS.map((art,n)=><option key={art.path} value={n}>Hall {String(n+1).padStart(2,"0")} · {art.name}</option>)}</select></label>}
+    <button className={styles.quietToggle} aria-pressed={quiet} onClick={()=>{motion.current={x:0,y:0,lookX:0,lookY:0};setQuiet(!quiet);}}>{quiet?"Show controls":"Quiet view"}</button>
+    {status&&<p className={styles.sceneStatus} role="status">{status}</p>}
+    {!quiet&&<div className={styles.walkControls}><div className={styles.joystickRow}>
       <CurrencyJoystick label="Move" onMove={(x,y)=>{motion.current.x=x;motion.current.y=y;}}/>
-      <div className={styles.centerControls}><button onClick={()=>action.current("look")}>Look up ↑</button><button aria-label="Return to entrance" onClick={()=>action.current("reset")}>⌂</button></div>
+      <div className={styles.centerControls}><button onClick={()=>action.current(lookingUp?"level":"look")}>{lookingUp?"Look ahead":"Look up ↑"}</button></div>
       <CurrencyJoystick label="Look" onMove={(x,y)=>{motion.current.lookX=x;motion.current.lookY=y;}}/>
-    </div></div>
+    </div></div>}
   </div>;
 }
