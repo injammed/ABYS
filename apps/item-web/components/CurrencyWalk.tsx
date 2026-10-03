@@ -20,7 +20,7 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
   useEffect(() => {
     let disposed = false;
     let cleanup = () => {};
-    Promise.all([import("three"),import("@/lib/currency-sculpture"),import("three/addons/environments/RoomEnvironment.js"),import("@/lib/cathedral")]).then(([THREE,{buildCurrencySculpture,disposeCurrencySculpture},{RoomEnvironment},{buildCathedral,FRESCO_PATH,LOOK_LIMIT}]) => {
+    Promise.all([import("three"),import("@/lib/currency-sculpture"),import("three/addons/environments/RoomEnvironment.js"),import("@/lib/cathedral")]).then(([THREE,{buildCurrencySculpture,disposeCurrencySculpture},{RoomEnvironment},{buildCathedral,FRESCO_PATH,LOOK_LIMIT,ceilingAim}]) => {
       if (disposed || !host.current) return;
       const parent = host.current;
       let renderer: InstanceType<typeof THREE.WebGLRenderer>;
@@ -75,7 +75,7 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
         if(!blocked(nx,camera.position.z))camera.position.x=nx;
         if(!blocked(camera.position.x,nz))camera.position.z=nz;
       };
-      action.current=a=>{if(a==="look"){pitch=1.48;canvas.focus({preventScroll:true});return;}camera.position.set(0,1.8,a.startsWith("hall")?6-Number(a.slice(4))*30:6);yaw=0;pitch=0;motion.current={x:0,y:0,lookX:0,lookY:0};velocity={x:0,y:0};};
+      action.current=a=>{if(a==="look"){({yaw,pitch}=ceilingAim(camera.position.x,camera.position.z,hallCount));canvas.focus({preventScroll:true});return;}camera.position.set(0,1.8,a.startsWith("hall")?6-Number(a.slice(4))*30:6);yaw=0;pitch=0;motion.current={x:0,y:0,lookX:0,lookY:0};velocity={x:0,y:0};};
       const keydown=(e:KeyboardEvent)=>{if(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright","pageup","pagedown","shift"].includes(e.key.toLowerCase())){e.preventDefault();keys.add(e.key.toLowerCase());}};
       const keyup=(e:KeyboardEvent)=>keys.delete(e.key.toLowerCase());
       const clear=()=>keys.clear();
@@ -100,7 +100,7 @@ export function CurrencyWalk({ onSelect }: { onSelect: (id: string) => void }) {
         const speed=keys.has("shift")?6:3.8;move(velocity.y*dt*speed,velocity.x*dt*speed);camera.rotation.set(pitch,yaw,0,"YXZ");
         const hall=Math.max(0,Math.min(hallCount-1,Math.floor((6-camera.position.z)/30)));
         let sawFresco=false;
-        if(!ceilingSeen&&frescoReady&&pitch>1.15&&paintedVault){
+        if(!ceilingSeen&&frescoReady&&pitch>.5&&paintedVault){
           scene.updateMatrixWorld(true);camera.getWorldDirection(gaze);ceilingRay.set(camera.position,gaze);
           sawFresco=ceilingRay.intersectObject(paintedVault).length>0;
         }

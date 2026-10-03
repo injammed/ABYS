@@ -4,6 +4,12 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 export const FRESCO_PATH = "/images/cathedral-fresco.jpeg";
 export const LOOK_LIMIT = Math.PI / 2 - .06;
 
+export function ceilingAim(x: number, z: number, hallCount: number) {
+  const hall = Math.max(0, Math.min(hallCount - 1, Math.round(-z / 30)));
+  const dz = z + hall * 30;
+  return { yaw: Math.atan2(x, dz), pitch: Math.min(LOOK_LIMIT, Math.atan2(14.94 - 1.8, Math.hypot(x, dz))) };
+}
+
 // Inward-facing barrel vault. Physical arc width / panel length matches the
 // supplied 4:3 painting so its figures retain their proportions on the vault.
 export function vaultGeometry(z: number, length: number, radius = 5.94) {

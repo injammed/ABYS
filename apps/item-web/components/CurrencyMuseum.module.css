@@ -11,3 +11,7 @@
 .quest strong,.quest span,.quest small{display:block}.quest strong{font-size:.75rem;letter-spacing:.2em;color:#ebcb91}.quest span{font-size:.8rem;margin:.35rem 0}.quest small{font-size:.7rem;color:#ddd4c1}
 .centerControls{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:.5rem}.walkControls .centerControls button{font-size:.85rem;border-radius:3px;min-width:44px;min-height:44px}
 @media(max-width:650px){.quest{top:4.4rem;left:.6rem;max-width:calc(100% - 1.2rem);padding:.5rem .7rem}.quest small{display:none}.halls{top:.6rem;right:.6rem;left:.6rem;justify-content:center}.quest span{font-size:.7rem}}
+
+/* Keep the game controls above the persistent site navigation on arrival. */
+.walk{height:calc(100svh - 18rem);min-height:360px;max-height:900px}
+@media(max-width:380px){.joystick{width:86px;height:86px;flex-basis:86px}.joystickThumb{left:26px;top:26px;width:32px;height:32px}.joystickRing{inset:15px}.joystickLabel{font-size:11px}}

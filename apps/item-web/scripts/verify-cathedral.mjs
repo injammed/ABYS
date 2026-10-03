@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import * as T from 'three';
-import { buildCathedral, vaultGeometry, LOOK_LIMIT } from '../lib/cathedral.ts';
+import { buildCathedral, vaultGeometry, LOOK_LIMIT, ceilingAim } from '../lib/cathedral.ts';
 const texture=new T.Texture();
 const cathedral=buildCathedral(-126,texture);
 cathedral.root.updateMatrixWorld(true);
@@ -22,6 +22,11 @@ for(const z of [0,-30,-60,-90,-120]){
  const hits=ray.intersectObject(painted);assert.ok(hits.length,'Every hall has a ceiling painting');
  assert.ok(hits[0].point.y>14,'Fresco is above the player, not an exhibit panel');
  assert.ok(Math.abs(hits[0].uv.x-.5)<.01&&Math.abs(hits[0].uv.y-.5)<.01,'Painting centered over each hall');
+}
+for(const x of [-5,0,5]) for(const z of [8,0,-14,-30,-74,-120,-131]) {
+ const aim=ceilingAim(x,z,5);const camera=new T.PerspectiveCamera();camera.position.set(x,1.8,z);camera.rotation.set(aim.pitch,aim.yaw,0,'YXZ');
+ const ray=new T.Raycaster(camera.position,camera.getWorldDirection(new T.Vector3()));
+ assert.ok(ray.intersectObject(painted).length,'Look up must aim at painted vault from every hall and aisle');
 }
 assert.ok(LOOK_LIMIT>1.48&&LOOK_LIMIT<Math.PI/2,'Camera can look overhead without inversion');
 const geometry=vaultGeometry(0,14);
