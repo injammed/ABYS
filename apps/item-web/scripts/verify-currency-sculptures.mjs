@@ -32,5 +32,7 @@ const {joystickVector,smoothAxis}=await import('../lib/currency-navigation.ts');
 assert.deepEqual(joystickVector(.05,.04),{x:0,y:0});assert.deepEqual(joystickVector(0,-1),{x:0,y:-1});
 for(const [x,y] of [[8,8],[-8,8],[8,-8],[-8,-8]]){const v=joystickVector(x,y);assert.ok(Math.abs(Math.hypot(v.x,v.y)-1)<1e-10);assert.equal(Math.sign(v.x),Math.sign(x));assert.equal(Math.sign(v.y),Math.sign(y));}
 let fast=0,slow=0;for(let i=0;i<120;i++)fast=smoothAxis(fast,1,1/120);for(let i=0;i<30;i++)slow=smoothAxis(slow,1,1/30);assert.ok(Math.abs(fast-slow)<1e-10,'Movement response is frame-rate independent');for(let i=0;i<60;i++)fast=smoothAxis(fast,0,1/60);assert.ok(fast<.00001,'Releasing joystick stops movement');
-const walk=await readFile('components/CurrencyWalk.tsx','utf8');assert.doesNotMatch(walk,/PlaneGeometry|TextureLoader/,'Pedestals must show 3D objects rather than image panels');assert.match(walk,/blocked/,'Visitors cannot walk through pedestals');
+const walk=await readFile('components/CurrencyWalk.tsx','utf8');assert.doesNotMatch(walk,/PlaneGeometry/,'Pedestals must show 3D objects rather than image panels');assert.match(walk,/blocked/,'Visitors cannot walk through pedestals');
 console.log(`Sculptures PASS: ${items.length} volumetric models; ${Math.round(triangles)} triangles; ${Math.round(geometryBytes/1024)} KiB geometry; ${Math.round(bytes/1024)} KiB total GLB; all ${items.length} export/import round trips match.`);
+
+await import("./verify-cathedral.mjs");

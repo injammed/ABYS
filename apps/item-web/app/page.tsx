@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CurrencyMuseum } from "@/components/CurrencyMuseum";
 import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { LibraryArrival } from "@/components/LibraryArrival";
@@ -20,14 +21,18 @@ export default function HomePage() {
     <main className={styles.page} data-interface-contract="aetimm-library-root-v1">
       <LibraryArrival />
       <SiteHeader mode="library" />
+      <section className={styles.play} id="play" aria-labelledby="play-title">
+        <header className={styles.playHeading}><div><p className={styles.eyebrow}>FREE TO PLAY / NO SIGN-UP</p><h1 id="play-title">AETIMM. Walk into the strange.</h1></div><a href="#collections">Explore the library ↓</a></header>
+        <CurrencyMuseum />
+      </section>
       <div className={styles.content}>
         <header className={styles.entrance}>
           <div className={styles.introduction}>
             <p className={styles.eyebrow}>AETIMM / OPEN TO HUMANITY</p>
-            <h1>The library<br />of <em>things.</em></h1>
+            <h2>The library<br />of <em>things.</em></h2>
             <p className={styles.lead}>Objects. Ideas. Machines.<br />Everything worth carrying forward.</p>
-            <p className={styles.description}>A growing physical–digital library. Explore what exists, what has been imagined, and what could be made.</p>
-            <div className={styles.actions}><Link href="#collections">Browse the library <span aria-hidden="true">↓</span></Link><Link href="/shop/#museum">Walk the collection <span aria-hidden="true">↗</span></Link></div>
+            <p className={styles.description}>A playable library of things. Wander the cathedral, find strange objects, and follow them into the wider collection.</p>
+            <div className={styles.actions}><Link href="#collections">Browse the library <span aria-hidden="true">↓</span></Link><Link href="#play">Back to the cathedral <span aria-hidden="true">↗</span></Link></div>
             <p className={styles.motto}>DETECT. ENCODE. CONTINUE.</p>
           </div>
           <figure className={styles.vision}>
