@@ -1,5 +1,10 @@
 # AETIMM Interface Constitution
 
+## 2 October 2026: Owner-directed playable cathedral
+
+The owner explicitly requests that AETIMM become an instantly playable free exploration game, with the walkable exhibit hall rebuilt as a cathedral and the supplied painting on its ceiling. This supersedes the directory-first placement above the fold. The library remains the organizing collection, with its directory below the playable scene. The existing 43 sculpture records, downloads, routes, Trough and navigation remain available. Exploration progress is session-local and carries no monetary rewards. The cathedral is a procedural interpretation, not an exact architectural reconstruction. This directed feature exceeds autonomous maintenance limits. Verify geometry, controls, existing sculptures, typecheck and static build; revert this release to roll back.
+
+
 ## 16 September 2026: Owner-directed Library of Things revision
 
 The owner explicitly directs: aetimm.com IS the AETIMM Library of Things; everything else is hosted inside the library, and Slop Trough remains. This revision supersedes the historical root, route, business-priority and header-placement covenants below.
