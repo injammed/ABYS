@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { BUILDINGS, SUPPLIES } from './survival';
-import {HOSTILES,F49_SPAWN} from './hostiles';
+import {HOSTILES,OUTBREAK_SLOTS,F49_SPAWN} from './hostiles';
 import {robotModel,alienModel,gunshipModel,type Skins} from './hostile-models';
 
 export function person(color:number,robot=false){
@@ -22,7 +22,7 @@ export function rifle(){
  return {group,flash};
 }
 export function buildDistrict(skins:Skins){
- const root=new T.Group();root.name='District Zero';const collisions:T.Object3D[]=[];
+ const root=new T.Group();root.name='Capital Refuge / cathedral camp';const collisions:T.Object3D[]=[];
  const materials=new Map<number,T.MeshStandardMaterial>();
  const mat=(color:number)=>{let m=materials.get(color);if(!m){m=new T.MeshStandardMaterial({color,roughness:.85,metalness:.15});materials.set(color,m);}return m;};
  const box=(w:number,h:number,d:number,x:number,y:number,z:number,color:number)=>{const mesh=new T.Mesh(new T.BoxGeometry(w,h,d),mat(color));mesh.position.set(x,y,z);root.add(mesh);return mesh;};
@@ -39,8 +39,7 @@ export function buildDistrict(skins:Skins){
   box(b.w+.4,.4,b.d+.4,b.x,height,b.z,0x151d1c);
  });
  // Perimeter is a visibly sealed district, not a promise of an infinite map.
- for(const side of [-1,1])box(1,6,140,side*71,3,78,0x1a2825);
- box(142,6,1,0,3,148,0x1a2825);
+ // Open streets lead into the geographic capital map.
  for(let z=19;z<140;z+=24)for(const side of [-1,1]){
   box(.12,5,.12,side*11.8,2.5,z,0x35443f);
   const lamp=new T.Mesh(new T.BoxGeometry(.6,.15,.6),new T.MeshBasicMaterial({color:0x83ffc0}));lamp.position.set(side*11.8,5,z);root.add(lamp);
@@ -59,11 +58,11 @@ export function buildDistrict(skins:Skins){
   const sprite=new T.Sprite(new T.SpriteMaterial({map:texture,depthTest:true}));sprite.position.set(x,y,z);sprite.scale.set(1.65,.4125,1);root.add(sprite);return sprite;
  };
  label('LIBRARY TERMINAL',2.6,2.35,6);label('MARA / KEEPER',-2.5,2.6,6);label('IRI / SURVIVOR',-8,2.6,57);
- label('DISTRICT ZERO',0,4.2,12);label('CATHEDRAL / SAFE',0,5.7,9.9);
+ label('CAPITAL REFUGE',0,4.2,12);label('CATHEDRAL / SAFE',0,5.7,9.9);
  const keeper=person(0x998b6e);keeper.position.set(-2.5,0,6);root.add(keeper);
  const visitor=person(0x6b94a0);visitor.scale.set(.8,1.15,.8);visitor.position.set(-8,0,57);root.add(visitor);
  const supplies=SUPPLIES.map(s=>{const mesh=box(.7,.6,.7,s.x,.3,s.z,s.kind==='water'?0x57acc1:s.kind==='medicine'?0xcda789:0x679a55);return {id:s.id,mesh};});
- const enemies=HOSTILES.map(({kind,x,z})=>{const robot=kind==='robot',alien=kind==='alien';const mesh=robot?robotModel(skins.robot):alien?alienModel(skins.alien):person(0x596449);mesh.position.set(x,0,z);root.add(mesh);const laser=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]),new T.LineBasicMaterial({color:0xff382b,transparent:true,opacity:.8}));laser.visible=false;root.add(laser);return {mesh,robot,alien,kind,x,z,cooldown:0,windup:0,beamTime:0,aim:new T.Vector3(),laser};});
+ const enemies=[...HOSTILES,...OUTBREAK_SLOTS].map(({kind,x,z})=>{const robot=kind==='robot',alien=kind==='alien';const mesh=robot?robotModel(skins.robot):alien?alienModel(skins.alien):person(0x596449);mesh.position.set(x,0,z);root.add(mesh);const laser=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]),new T.LineBasicMaterial({color:0xff382b,transparent:true,opacity:.8}));laser.visible=false;root.add(laser);return {mesh,robot,alien,kind,x,z,dead:false,active:false,respawn:0,cooldown:0,windup:0,beamTime:0,aim:new T.Vector3(),laser};});
  const gunship=gunshipModel(skins.aircraft);gunship.position.set(F49_SPAWN.x,F49_SPAWN.y,F49_SPAWN.z);gunship.rotation.y=Math.PI;root.add(gunship);
  label('F-49 / E TO BOARD',8,3.5,19);
  // Visible landing pad beside the cathedral exit.

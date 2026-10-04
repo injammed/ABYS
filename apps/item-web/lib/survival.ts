@@ -1,3 +1,4 @@
+import {safe,capitalBounds,roofAt} from './capital-map.ts';
 export type Player = {x:number;z:number;health:number;water:number;food:number;stamina:number;bottles:number;rations:number;elapsed:number;looted:string[];helped:boolean;gift:boolean;armed:boolean;ammo:number;reserve:number;defeated:number[]};
 export type Obstacle = {x:number;z:number;w:number;d:number};
 export const freshPlayer = ():Player=>({x:0,z:3,health:100,water:100,food:100,stamina:100,bottles:2,rations:2,elapsed:0,looted:[],helped:false,gift:false,armed:false,ammo:0,reserve:0,defeated:[]});
@@ -10,16 +11,17 @@ export const BUILDINGS:Obstacle[]=[];
 for(let row=0;row<5;row++)for(const side of [-1,1])for(let col=0;col<2;col++)BUILDINGS.push({x:side*(25+col*24),z:28+row*25,w:17,d:17});
 export const PEDESTALS:Obstacle[]=Array.from({length:43},(_,i)=>({x:i%2?3.3:-3.3,z:-Math.floor(i/2)*6,w:2.05,d:2.05}));
 export function canStand(x:number,z:number){
- if(!Number.isFinite(x)||!Number.isFinite(z)||x< -70||x>70||z< -131||z>146)return false;
- if(z<10.65){if(Math.abs(x)>5.2)return false;if(z>9.35&&Math.abs(x)>1.5)return false;}
- if(z>=10.65&&z<11.1&&Math.abs(x)>1.5)return false;
- const obstacles=z<10?[...PEDESTALS,{x:2.6,z:6,w:1,d:.7}]:[...BUILDINGS,{x:-12,z:65,w:10,d:10}];
+ if(!Number.isFinite(x)||!Number.isFinite(z)||!capitalBounds(x,z))return false;
+ if(z<10.65&&Math.abs(x)<6.5&&z>=-132){if(Math.abs(x)>5.2)return false;if(z>9.35&&Math.abs(x)>1.5)return false;}
+ if(z>=10.65&&z<11.1&&Math.abs(x)>1.5&&Math.abs(x)<6.5)return false;
+ if(roofAt(x,z)>0)return false;
+ const obstacles=safe(x,z)?[...PEDESTALS,{x:2.6,z:6,w:1,d:.7}]:[...BUILDINGS,{x:-12,z:65,w:10,d:10}];
  return !obstacles.some(o=>Math.abs(x-o.x)<o.w/2+.35&&Math.abs(z-o.z)<o.d/2+.35);
 }
 export function advance(p:Player,dt:number,running:boolean){
  dt=Math.max(0,Math.min(.1,dt));if(p.health<=0)return;
  p.elapsed+=dt;p.stamina=Math.max(0,Math.min(100,p.stamina+dt*(running?-20:12)));
- if(p.z>11){p.water=Math.max(0,p.water-dt*(running?.22:.1));p.food=Math.max(0,p.food-dt*.055);if(!p.water||!p.food)p.health=Math.max(0,p.health-dt*2);}
+ if(!safe(p.x,p.z)){p.water=Math.max(0,p.water-dt*(running?.22:.1));p.food=Math.max(0,p.food-dt*.055);if(!p.water||!p.food)p.health=Math.max(0,p.health-dt*2);}
 }
 export function consume(p:Player,kind:'water'|'food'){
  if(kind==='water'&&p.bottles>0&&p.water<100){p.bottles--;p.water=Math.min(100,p.water+40);return 'Water restored.';}
@@ -33,11 +35,12 @@ export function collect(p:Player,id:string){
 export function armPlayer(p:Player){
  if(p.armed)return false;p.armed=true;p.ammo=30;p.reserve=90;return true;
 }
-export function spendRound(p:Player){if(!p.armed||p.ammo<=0||p.health<=0||p.z<=11)return false;p.ammo--;return true;}
+export function spendRound(p:Player){if(!p.armed||p.ammo<=0||p.health<=0||safe(p.x,p.z))return false;p.ammo--;return true;}
 export function reloadWeapon(p:Player){const rounds=Math.min(30-p.ammo,p.reserve);if(!p.armed||rounds<=0)return false;p.ammo+=rounds;p.reserve-=rounds;return true;}
 export function talk(p:Player,npc:'keeper'|'visitor',raw:string){
  const text=raw.toLowerCase().slice(0,300);
  if(npc==='keeper'){
+  if(/quest|mission|refugee|outbreak|evac|quarantine|nuclear/.test(text))return 'Five million refugees came to the capital. One infection can become thousands. Open the field map with M. Restore the hospital, quarantine relay and evacuation route. Aegis offers a fictional strike, but civilian losses are permanent. Containment is another path.';
   if(/ak.?47|weapon|rifle|gun|ammo|shoot/.test(text)){if(armPlayer(p))return 'Take this AK-47 and 120 rounds. Click or F fires; T reloads. The cathedral is a safe zone.';return 'You have my AK-47. Click or F fires; T reloads. I have no more ammunition to spare.';}
   if(/help|suppl|food|water|hungr|thirst/.test(text)){if(!p.gift){p.gift=true;p.bottles++;p.rations++;return 'Take a bottle and a ration. This is all I can spare. Outside, look for the green supply crates. Q drinks; R eats.';}return 'I already gave you my spare supplies. Search the crates along the central avenue. This cathedral is safe.';}
   if(/terminal|library|shop|upload|apyoc|trough/.test(text))return 'The green terminal beside me holds the entire library. Walk to it and press E. You can return to your body when you close it.';
@@ -68,5 +71,6 @@ export function restorePlayer(raw:string|null):Player{
 }
 
 // This first district supports bounded VTOL flight along its open corridors.
-export function canHover(x:number,z:number){return z>=17&&z<=142&&[-2,2].every(dx=>[-2,2].every(dz=>canStand(x+dx,z+dz)));}
+export function flightFloor(x:number,z:number){let height=0;for(const dx of [-2,2])for(const dz of [-2,2]){height=Math.max(height,roofAt(x+dx,z+dz));BUILDINGS.forEach((b,i)=>{if(Math.abs(x+dx-b.x)<b.w/2&&Math.abs(z+dz-b.z)<b.d/2)height=Math.max(height,10+(i*17)%31);});}return height?height+3:1.4;}
+export function canHover(x:number,z:number,altitude=1.4){return capitalBounds(x,z)&&!safe(x,z)&&altitude>=flightFloor(x,z)&&[-2,2].every(dx=>[-2,2].every(dz=>altitude>flightFloor(x+dx,z+dz)+2||canStand(x+dx,z+dz)));}
 export function landingSpot(x:number,z:number){for(const [dx,dz] of [[-4,0],[4,0],[0,-5],[0,5]])if(canStand(x+dx,z+dz))return {x:x+dx,z:z+dz};return null;}

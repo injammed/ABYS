@@ -142,6 +142,12 @@ jobs:
         working-directory: apps/item-web
         run: npm run verify:currency-sculptures
 
+      - name: Verify survival and capital campaign
+        working-directory: apps/item-web
+        run: |
+          node scripts/verify-survival.mjs
+          node scripts/verify-capital.mjs
+
       - name: Typecheck
         working-directory: apps/item-web
         run: npm run typecheck

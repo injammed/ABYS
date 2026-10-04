@@ -1,0 +1,22 @@
+{
+  "bbox": [
+    -77.08,
+    38.835,
+    -76.945,
+    38.925
+  ],
+  "origin": [
+    -77.04,
+    38.904
+  ],
+  "coordinates": "Local metres: east x, south z; north up. Equirectangular approximation.",
+  "imagery": "https://imagery.nationalmap.gov/arcgis/rest/services/USGSNAIPImagery/ImageServer",
+  "imageryLicense": "USGS/USDA NAIP public-domain aerial photography",
+  "imagerySHA256": "707fe2f8dc013c01f6bc2c484758a6bc9fd5118f989bdb8b962b8ffaaa30c4f3",
+  "footprints": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Facility_and_Structure/MapServer/1",
+  "footprintLicense": "DC Open Data public domain",
+  "buildings": 23680,
+  "height": "Estimated game heights; not surveyed building heights",
+  "fetched": "2026-10-04",
+  "limitations": "Flat ground and simplified footprint extrusions; not photogrammetric facades or interiors."
+}

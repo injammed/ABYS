@@ -6,3 +6,6 @@ export const HOSTILES:{kind:EnemyKind;x:number;z:number}[]=[
 ];
 export const ENEMY_STATS={infected:{hits:2,speed:1.5,range:16,damage:7},robot:{hits:5,speed:2,range:30,damage:12},alien:{hits:4,speed:3.1,range:22,damage:14}};
 export const F49_SPAWN={x:8,z:19,y:1.4};
+
+// Reusable local representatives of the regional outbreak. Slots are activated from the finite population ledger.
+export const OUTBREAK_SLOTS=Array.from({length:48},(_,i)=>({kind:'infected' as const,x:(i%2?1:-1)*(6+(i%4)),z:32+(i%12)*7}));
