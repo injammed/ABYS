@@ -15,8 +15,8 @@ import "./gallery.css";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const metadata: Metadata = {
-  title: "AETIMM — Library of Things",
-  description: "Objects, ideas, machines, and possibilities. Explore the AETIMM Library of Things: collections, Slop Trough, editions, Shop, and Apyoc.",
+  title: "AETIMM — Survive",
+  description: "Spawn in the cathedral. Explore District Zero. Survive. A free browser game with the AETIMM Library of Things inside its terminals.",
   applicationName: "AETIMM Library",
   manifest: `${basePath}/manifest.webmanifest`,
   appleWebApp: {

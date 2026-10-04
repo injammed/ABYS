@@ -1,5 +1,10 @@
 # AETIMM Interface Constitution
 
+## 3 October 2026: Owner-directed survival world
+
+The owner commits the entire entrance to an instantly playable first/third-person game. The cathedral is spawn and the safe zone; a terminal there hosts every existing site section. The root now opens the game without site navigation or a directory overlay. The previous directory moves to `/library/`; all existing direct routes remain for terminal use, bookmarks and accessible fallback. This explicitly supersedes older root/header constraints and maintenance limits. District Zero is a bounded single-player first release, with local saves and rules-based typed NPC dialogue; Earth-scale simulation, open-ended AI dialogue and paid downloads are future work. Existing publication, voting, payments and Apyoc policies do not change. Validate movement, pause, perspective, survival, dialogue and terminal access; revert the release to roll back.
+
+
 ## 2 October 2026: Owner-directed playable cathedral
 
 The owner explicitly requests that AETIMM become an instantly playable free exploration game, with the walkable exhibit hall rebuilt as a cathedral and the supplied painting on its ceiling. This supersedes the directory-first placement above the fold. The library remains the organizing collection, with its directory below the playable scene. The existing 43 sculpture records, downloads, routes, Trough and navigation remain available. Exploration progress is session-local and carries no monetary rewards. The cathedral is a procedural interpretation, not an exact architectural reconstruction. This directed feature exceeds autonomous maintenance limits. Verify geometry, controls, existing sculptures, typecheck and static build; revert this release to roll back.

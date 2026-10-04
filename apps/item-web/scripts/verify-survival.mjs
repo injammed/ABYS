@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {freshPlayer,canStand,advance,consume,collect,talk,restorePlayer} from '../lib/survival.ts';
+for(let z=3;z<22;z+=.1)assert.ok(canStand(0,z),'Walk out of cathedral through doorway');
+assert.equal(canStand(3,10),false);assert.equal(canStand(7,0),false);assert.equal(canStand(25,28),false);assert.equal(canStand(0,149),false);
+const p=freshPlayer();assert.ok(canStand(p.x,p.z));advance(p,1,false);assert.equal(p.water,100,'Safe zone does not drain water');
+p.z=20;for(let n=0;n<100;n++)advance(p,.05,true);assert.ok(p.water<100&&p.stamina<100);
+p.water=50;const bottles=p.bottles;consume(p,'water');assert.equal(p.bottles,bottles-1);assert.equal(p.water,90);
+p.x=-8;p.z=23;assert.ok(collect(p,'water-1'));const got=p.bottles;assert.equal(collect(p,'water-1'),false);assert.equal(p.bottles,got,'No duplicate loot');assert.equal(collect(p,'med-2'),false,'Cannot collect remotely');
+const q=freshPlayer();talk(q,'keeper','Please help me find food');assert.equal(q.bottles,3);talk(q,'keeper','help');assert.equal(q.bottles,3,'Keeper gift is once only');
+talk(q,'visitor','I want to give water');assert.equal(q.bottles,2);assert.equal(q.rations,5);talk(q,'visitor','give water');assert.equal(q.bottles,2,'Trade is once only');
+assert.match(talk(q,'keeper','invent a helicopter'),/do not know/);
+assert.deepEqual(restorePlayer(JSON.stringify({version:1,player:q})),q);
+for(const bad of [null,'{',JSON.stringify({version:2,player:q}),JSON.stringify({version:1,player:{...q,x:900}}),JSON.stringify({version:1,player:{...q,health:0}}),JSON.stringify({version:1,player:{...q,bottles:-1}})])assert.deepEqual(restorePlayer(bad),freshPlayer());
+console.log('Survival PASS: doorway/collisions, resource drain, bounded loot, dialogue mutations and validated save recovery.');
