@@ -5,3 +5,4 @@
 .top>div:first-child,.objective{background:#07120bd9;padding:.4rem .65rem;border-radius:3px}
 
 .weapon{margin-top:.5rem;letter-spacing:0;line-height:1.8}.weapon button{font-size:10px;padding:.2rem .4rem;min-height:34px}
+@media(max-width:650px){.notice{top:210px}}

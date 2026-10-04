@@ -17,5 +17,13 @@ const armed=freshPlayer();assert.ok(armPlayer(armed));assert.equal(armed.ammo,30
 assert.equal(spendRound(armed),false,'Cathedral blocks firing');armed.z=34;assert.ok(spendRound(armed));assert.equal(armed.ammo,29);assert.ok(reloadWeapon(armed));assert.equal(armed.ammo,30);assert.equal(armed.reserve,89);assert.equal(reloadWeapon(armed),false);
 armed.ammo=0;assert.equal(spendRound(armed),false);armed.defeated=[0,2];assert.deepEqual(restorePlayer(JSON.stringify({version:1,player:armed})),armed);
 const legacy=freshPlayer();delete legacy.armed;delete legacy.ammo;delete legacy.reserve;delete legacy.defeated;assert.deepEqual(restorePlayer(JSON.stringify({version:1,player:legacy})),freshPlayer());
-for(const patch of [{ammo:31},{reserve:-1},{defeated:[0,0]},{defeated:[8]},{armed:false,ammo:30}])assert.deepEqual(restorePlayer(JSON.stringify({version:1,player:{...armed,...patch}})),freshPlayer());
+for(const patch of [{ammo:31},{reserve:-1},{defeated:[0,0]},{defeated:[10]},{armed:false,ammo:30}])assert.deepEqual(restorePlayer(JSON.stringify({version:1,player:{...armed,...patch}})),freshPlayer());
 console.log('Combat PASS: one-time rifle gift, ammunition, safe zone, reload, defeated IDs and legacy saves.');
+
+const {HOSTILES,ENEMY_STATS,F49_SPAWN}=await import('../lib/hostiles.ts');
+const {canHover,landingSpot}=await import('../lib/survival.ts');
+assert.equal(HOSTILES.length,10);assert.equal(HOSTILES.filter(e=>e.kind==='alien').length,3);
+assert.ok(canHover(F49_SPAWN.x,F49_SPAWN.z));assert.equal(canHover(0,10),false);assert.equal(canHover(25,28),false);assert.ok(landingSpot(8,19));
+const expanded=freshPlayer();expanded.defeated=[7,8,9];assert.deepEqual(restorePlayer(JSON.stringify({version:1,player:expanded})),expanded);
+assert.ok(ENEMY_STATS.robot.range>ENEMY_STATS.infected.range);assert.ok(ENEMY_STATS.alien.speed>ENEMY_STATS.infected.speed);
+console.log('Hostiles PASS: stable IDs, added aliens, legacy save continuity and bounded flight/landing.');
