@@ -32,7 +32,7 @@ export function vaultGeometry(z: number, length: number, radius = 5.94) {
   return geometry;
 }
 
-export function buildCathedral(lastRow: number, frescoes: THREE.Texture[]) {
+export function buildCathedral(lastRow: number, frescoes: THREE.Texture[], openEntrance = false) {
   const root = new THREE.Group(); root.name = "AETIMM cathedral";
   const stone = new THREE.MeshStandardMaterial({ color: 0xe7d9bb, roughness: .82 });
   const dark = new THREE.MeshStandardMaterial({ color: 0x303b3d, roughness: .36, metalness: .16 });
@@ -55,7 +55,9 @@ export function buildCathedral(lastRow: number, frescoes: THREE.Texture[]) {
   const length = 20-lastRow, center = (lastRow-4)/2;
   box(12,.25,length,0,-.125,center,stone);
   box(.35,9,length,-6.15,4.5,center,stone); box(.35,9,length,6.15,4.5,center,stone);
-  box(12,15,.3,0,7.5,lastRow-9,stone); box(12,15,.3,0,7.5,10,stone);
+  box(12,15,.3,0,7.5,lastRow-9,stone); if(openEntrance){
+    box(4,15,.3,-4,7.5,10,stone);box(4,15,.3,4,7.5,10,stone);box(4,10,.3,0,10,10,stone);
+  }else box(12,15,.3,0,7.5,10,stone);
   mesh(vaultGeometry(center,length,6),stone).material.side=THREE.DoubleSide;
   // Five paintings, one overhead in each hall. These are architectural surfaces;
   // all collection exhibits remain the existing volumetric sculptures.

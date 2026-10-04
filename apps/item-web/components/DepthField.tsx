@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 // A virtual camera volume in metres. Projection changes only the ambient
 // scene; document flow, pointer targets and scrolling stay in screen space.
 const FAR_METRES = 10000 * 0.9144;
 
 export function DepthField() {
+  const pathname=usePathname();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if(pathname==="/")return;
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
@@ -93,7 +96,8 @@ export function DepthField() {
       document.removeEventListener("visibilitychange", schedule);
       motion.removeEventListener("change", schedule);
     };
-  }, []);
+  }, [pathname]);
 
+  if(pathname==="/")return null;
   return <div className="depth-field" aria-hidden="true" data-virtual-depth-yards="10000"><canvas ref={canvasRef} /><span className="depth-coordinate">AETIMM / VIRTUAL DEPTH · 10,000 YD</span></div>;
 }

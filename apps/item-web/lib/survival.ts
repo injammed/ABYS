@@ -1,0 +1,60 @@
+export type Player = {x:number;z:number;health:number;water:number;food:number;stamina:number;bottles:number;rations:number;elapsed:number;looted:string[];helped:boolean;gift:boolean};
+export type Obstacle = {x:number;z:number;w:number;d:number};
+export const freshPlayer = ():Player=>({x:0,z:3,health:100,water:100,food:100,stamina:100,bottles:2,rations:2,elapsed:0,looted:[],helped:false,gift:false});
+export const SUPPLIES = [
+ {id:'water-1',x:-8,z:23,kind:'water'},{id:'food-1',x:9,z:31,kind:'food'},
+ {id:'med-1',x:-16,z:49,kind:'medicine'},{id:'water-2',x:22,z:68,kind:'water'},
+ {id:'food-2',x:-9,z:89,kind:'food'},{id:'med-2',x:12,z:118,kind:'medicine'},
+] as const;
+export const BUILDINGS:Obstacle[]=[];
+for(let row=0;row<5;row++)for(const side of [-1,1])for(let col=0;col<2;col++)BUILDINGS.push({x:side*(25+col*24),z:28+row*25,w:17,d:17});
+export const PEDESTALS:Obstacle[]=Array.from({length:43},(_,i)=>({x:i%2?3.3:-3.3,z:-Math.floor(i/2)*6,w:2.05,d:2.05}));
+export function canStand(x:number,z:number){
+ if(!Number.isFinite(x)||!Number.isFinite(z)||x< -70||x>70||z< -131||z>146)return false;
+ if(z<10.65){if(Math.abs(x)>5.2)return false;if(z>9.35&&Math.abs(x)>1.5)return false;}
+ if(z>=10.65&&z<11.1&&Math.abs(x)>1.5)return false;
+ const obstacles=z<10?[...PEDESTALS,{x:2.6,z:6,w:1,d:.7}]:[...BUILDINGS,{x:-12,z:65,w:10,d:10}];
+ return !obstacles.some(o=>Math.abs(x-o.x)<o.w/2+.35&&Math.abs(z-o.z)<o.d/2+.35);
+}
+export function advance(p:Player,dt:number,running:boolean){
+ dt=Math.max(0,Math.min(.1,dt));if(p.health<=0)return;
+ p.elapsed+=dt;p.stamina=Math.max(0,Math.min(100,p.stamina+dt*(running?-20:12)));
+ if(p.z>11){p.water=Math.max(0,p.water-dt*(running?.22:.1));p.food=Math.max(0,p.food-dt*.055);if(!p.water||!p.food)p.health=Math.max(0,p.health-dt*2);}
+}
+export function consume(p:Player,kind:'water'|'food'){
+ if(kind==='water'&&p.bottles>0&&p.water<100){p.bottles--;p.water=Math.min(100,p.water+40);return 'Water restored.';}
+ if(kind==='food'&&p.rations>0&&p.food<100){p.rations--;p.food=Math.min(100,p.food+35);return 'Hunger eased.';}
+ return kind==='water'?'No water needed, or no bottles left.':'No food needed, or no rations left.';
+}
+export function collect(p:Player,id:string){
+ const supply=SUPPLIES.find(s=>s.id===id);if(!supply||p.looted.includes(id)||Math.hypot(p.x-supply.x,p.z-supply.z)>3)return false;
+ p.looted.push(id);if(supply.kind==='water')p.bottles+=2;else if(supply.kind==='food')p.rations+=2;else p.health=Math.min(100,p.health+40);return true;
+}
+export function talk(p:Player,npc:'keeper'|'visitor',raw:string){
+ const text=raw.toLowerCase().slice(0,300);
+ if(npc==='keeper'){
+  if(/help|suppl|food|water|hungr|thirst/.test(text)){if(!p.gift){p.gift=true;p.bottles++;p.rations++;return 'Take a bottle and a ration. This is all I can spare. Outside, look for the green supply crates. Q drinks; R eats.';}return 'I already gave you my spare supplies. Search the crates along the central avenue. This cathedral is safe.';}
+  if(/terminal|library|shop|upload|apyoc|trough/.test(text))return 'The green terminal beside me holds the entire library. Walk to it and press E. You can return to your body when you close it.';
+  if(/outside|city|danger|war|robot|zombie|surviv/.test(text))return 'The city broadcasts conflicting war warnings. The infected follow movement; drones patrol the avenue. Run in bursts and come back here if you are hurt.';
+  if(/who|name|hello|hi\b/.test(text))return 'I am Mara, the keeper. I keep the doors open. Ask me for help, about the terminal, or about the city.';
+ }else{
+  if(/give|share|offer|trade/.test(text)&&/water|bottle|drink/.test(text)){
+   if(p.helped)return 'You already shared water with me. I will remember it. I have nothing else to trade.';
+   if(p.bottles<1)return 'You have no water to spare. Find a sealed bottle first.';
+   p.bottles--;p.rations+=2;p.helped=true;return 'Water. Thank you. Take two of our sealed rations. Your atmosphere burns; our ship will not leave again.';
+  }
+  if(/ship|crash|who|name|alien|hello/.test(text))return 'I am Iri. Our landing failed. I need water. If you can spare a bottle, say “give water.” I have food to exchange.';
+  if(/food|water|help|thirst/.test(text))return 'One bottle of water for two rations. Say “give water” if you want to trade. I cannot promise more.';
+ }
+ return npc==='keeper'?'I do not know how to help with that yet. Ask about supplies, the terminal, or dangers outside.':'I do not understand. Ask about the ship, or offer water.';
+}
+export function restorePlayer(raw:string|null):Player{
+ const fallback=freshPlayer();if(!raw||raw.length>5000)return fallback;
+ try{const data=JSON.parse(raw);const p=data.player;if(data.version!==1||!p||!canStand(p.x,p.z))return fallback;
+ for(const k of ['health','water','food','stamina'] as const)if(!Number.isFinite(p[k])||p[k]<0||p[k]>100)return fallback;
+ if(p.health===0)return fallback;
+ for(const k of ['bottles','rations','elapsed'] as const)if(!Number.isFinite(p[k])||p[k]<0||p[k]>1e7)return fallback;
+ if(!Number.isInteger(p.bottles)||!Number.isInteger(p.rations)||typeof p.gift!=='boolean'||typeof p.helped!=='boolean'||!Array.isArray(p.looted)||p.looted.length>6||new Set(p.looted).size!==p.looted.length||p.looted.some((id:string)=>!SUPPLIES.some(s=>s.id===id)))return fallback;
+ return {...fallback,...p};
+ }catch{return fallback;}
+}
