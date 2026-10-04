@@ -104,6 +104,11 @@ jobs:
       - name: Verify currency sculptures
         run: npm run verify:currency-sculptures
 
+      - name: Verify survival and capital campaign
+        run: |
+          node scripts/verify-survival.mjs
+          node scripts/verify-capital.mjs
+
       - name: Typecheck
         run: npm run typecheck
 
