@@ -10,6 +10,15 @@ export function person(color:number,robot=false){
  const eyes=new T.Mesh(new T.BoxGeometry(.3,.05,.04),new T.MeshBasicMaterial({color:robot?0xff5340:0xb8ffe0}));eyes.position.set(0,1.72,-.2);root.add(eyes);
  root.userData.legs=legs;return root;
 }
+export function rifle(){
+ const group=new T.Group();group.name='AK-47';
+ const metal=new T.MeshStandardMaterial({color:0x252a29,metalness:.8,roughness:.35}),wood=new T.MeshStandardMaterial({color:0x75432b,roughness:.7});
+ const part=(w:number,h:number,d:number,x:number,y:number,z:number,m:T.Material)=>{const mesh=new T.Mesh(new T.BoxGeometry(w,h,d),m);mesh.position.set(x,y,z);group.add(mesh);return mesh;};
+ part(.09,.12,.34,0,0,0,metal);part(.075,.1,.23,0,-.015,.27,wood);part(.1,.09,.22,0,0,-.28,wood);part(.035,.035,.35,0,.02,-.54,metal);part(.06,.17,.09,0,-.12,.08,wood).rotation.x=-.25;
+ part(.055,.23,.12,0,-.16,-.1,metal).rotation.x=.25;part(.025,.075,.025,0,.06,-.63,metal);
+ const flash=new T.Mesh(new T.OctahedronGeometry(.065),new T.MeshBasicMaterial({color:0xffcb60}));flash.position.z=-.74;flash.visible=false;group.add(flash);
+ return {group,flash};
+}
 export function buildDistrict(){
  const root=new T.Group();root.name='District Zero';const collisions:T.Object3D[]=[];
  const materials=new Map<number,T.MeshStandardMaterial>();
@@ -53,8 +62,9 @@ export function buildDistrict(){
  const visitor=person(0x6b94a0);visitor.scale.set(.8,1.15,.8);visitor.position.set(-8,0,57);root.add(visitor);
  const supplies=SUPPLIES.map(s=>{const mesh=box(.7,.6,.7,s.x,.3,s.z,s.kind==='water'?0x57acc1:s.kind==='medicine'?0xcda789:0x679a55);return {id:s.id,mesh};});
  const enemies=Array.from({length:7},(_,i)=>{const robot=i>4;const mesh=person(robot?0x444f51:0x596449,robot);const x=(i%2?1:-1)*(5+i%3*2),z=38+i*14;mesh.position.set(x,0,z);root.add(mesh);return {mesh,robot,x,z,cooldown:0};});
+ const weapon=rifle();root.add(weapon.group);
  const player=person(0x252d2c);root.add(player);
- return {root,player,enemies,supplies,collisions,dispose(){
+ return {root,player,weapon,protectedActors:[keeper,visitor],enemies,supplies,collisions,dispose(){
   const geometries=new Set<T.BufferGeometry>(),mats=new Set<T.Material>(),textures=new Set<T.Texture>();root.traverse(n=>{
    const m=n as T.Mesh;if(m.geometry)geometries.add(m.geometry);if(m.material)for(const a of Array.isArray(m.material)?m.material:[m.material]){mats.add(a);const map=(a as T.MeshBasicMaterial).map;if(map)textures.add(map);}
   });geometries.forEach(g=>g.dispose());mats.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());

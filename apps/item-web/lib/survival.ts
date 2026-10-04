@@ -1,6 +1,6 @@
-export type Player = {x:number;z:number;health:number;water:number;food:number;stamina:number;bottles:number;rations:number;elapsed:number;looted:string[];helped:boolean;gift:boolean};
+export type Player = {x:number;z:number;health:number;water:number;food:number;stamina:number;bottles:number;rations:number;elapsed:number;looted:string[];helped:boolean;gift:boolean;armed:boolean;ammo:number;reserve:number;defeated:number[]};
 export type Obstacle = {x:number;z:number;w:number;d:number};
-export const freshPlayer = ():Player=>({x:0,z:3,health:100,water:100,food:100,stamina:100,bottles:2,rations:2,elapsed:0,looted:[],helped:false,gift:false});
+export const freshPlayer = ():Player=>({x:0,z:3,health:100,water:100,food:100,stamina:100,bottles:2,rations:2,elapsed:0,looted:[],helped:false,gift:false,armed:false,ammo:0,reserve:0,defeated:[]});
 export const SUPPLIES = [
  {id:'water-1',x:-8,z:23,kind:'water'},{id:'food-1',x:9,z:31,kind:'food'},
  {id:'med-1',x:-16,z:49,kind:'medicine'},{id:'water-2',x:22,z:68,kind:'water'},
@@ -30,9 +30,15 @@ export function collect(p:Player,id:string){
  const supply=SUPPLIES.find(s=>s.id===id);if(!supply||p.looted.includes(id)||Math.hypot(p.x-supply.x,p.z-supply.z)>3)return false;
  p.looted.push(id);if(supply.kind==='water')p.bottles+=2;else if(supply.kind==='food')p.rations+=2;else p.health=Math.min(100,p.health+40);return true;
 }
+export function armPlayer(p:Player){
+ if(p.armed)return false;p.armed=true;p.ammo=30;p.reserve=90;return true;
+}
+export function spendRound(p:Player){if(!p.armed||p.ammo<=0||p.health<=0||p.z<=11)return false;p.ammo--;return true;}
+export function reloadWeapon(p:Player){const rounds=Math.min(30-p.ammo,p.reserve);if(!p.armed||rounds<=0)return false;p.ammo+=rounds;p.reserve-=rounds;return true;}
 export function talk(p:Player,npc:'keeper'|'visitor',raw:string){
  const text=raw.toLowerCase().slice(0,300);
  if(npc==='keeper'){
+  if(/ak.?47|weapon|rifle|gun|ammo|shoot/.test(text)){if(armPlayer(p))return 'Take this AK-47 and 120 rounds. Click or F fires; T reloads. The cathedral is a safe zone.';return 'You have my AK-47. Click or F fires; T reloads. I have no more ammunition to spare.';}
   if(/help|suppl|food|water|hungr|thirst/.test(text)){if(!p.gift){p.gift=true;p.bottles++;p.rations++;return 'Take a bottle and a ration. This is all I can spare. Outside, look for the green supply crates. Q drinks; R eats.';}return 'I already gave you my spare supplies. Search the crates along the central avenue. This cathedral is safe.';}
   if(/terminal|library|shop|upload|apyoc|trough/.test(text))return 'The green terminal beside me holds the entire library. Walk to it and press E. You can return to your body when you close it.';
   if(/outside|city|danger|war|robot|zombie|surviv/.test(text))return 'The city broadcasts conflicting war warnings. The infected follow movement; drones patrol the avenue. Run in bursts and come back here if you are hurt.';
@@ -55,6 +61,8 @@ export function restorePlayer(raw:string|null):Player{
  if(p.health===0)return fallback;
  for(const k of ['bottles','rations','elapsed'] as const)if(!Number.isFinite(p[k])||p[k]<0||p[k]>1e7)return fallback;
  if(!Number.isInteger(p.bottles)||!Number.isInteger(p.rations)||typeof p.gift!=='boolean'||typeof p.helped!=='boolean'||!Array.isArray(p.looted)||p.looted.length>6||new Set(p.looted).size!==p.looted.length||p.looted.some((id:string)=>!SUPPLIES.some(s=>s.id===id)))return fallback;
- return {...fallback,...p};
+ const armed=p.armed??false,ammo=p.ammo??0,reserve=p.reserve??0,defeated=p.defeated??[];
+ if(typeof armed!=='boolean'||!Number.isInteger(ammo)||ammo<0||ammo>30||!Number.isInteger(reserve)||reserve<0||reserve>90||(!armed&&(ammo||reserve))||!Array.isArray(defeated)||defeated.length>7||new Set(defeated).size!==defeated.length||defeated.some((id:number)=>!Number.isInteger(id)||id<0||id>6))return fallback;
+ return {...fallback,...p,armed,ammo,reserve,defeated};
  }catch{return fallback;}
 }

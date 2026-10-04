@@ -3,3 +3,5 @@
 @media(max-width:650px){.top{left:14px;right:14px;top:max(12px,env(safe-area-inset-top))}.top strong{font-size:14px}.top span{font-size:9px}.topActions{gap:.3rem}.topActions button{padding:.4rem .6rem;font-size:10px}.top kbd{display:none}.objective{left:14px;top:80px}.hint{display:none}.bottom{left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));gap:.4rem;align-items:stretch}.vitals{gap:.7rem;padding:.5rem}.vitals span{font-size:8px}.vitals b{font-size:15px}.inventory{flex-direction:column;gap:2px}.inventory button{font-size:10px;min-height:32px;padding:.2rem .5rem}.modal{padding:1rem;width:96vw;max-height:96dvh}.modal h2{font-size:18px}.modalHeader{align-items:start}.modalHeader button{font-size:11px}.apps button{font-size:11px}.keys{grid-template-columns:120px 1fr}.touch{left:12px;right:12px}.notice{top:110px;font-size:11px}}
 
 .top>div:first-child,.objective{background:#07120bd9;padding:.4rem .65rem;border-radius:3px}
+
+.weapon{margin-top:.5rem;letter-spacing:0;line-height:1.8}.weapon button{font-size:10px;padding:.2rem .4rem;min-height:34px}
