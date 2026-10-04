@@ -45,11 +45,11 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
   if(k==='escape'){paused=true;clear();document.exitPointerLock?.();cb.pause();}
  };
  const keyup=(e:KeyboardEvent)=>keys.delete(e.key.toLowerCase());
- let dragging=false,lastX=0,lastY=0;
- const down=(e:PointerEvent)=>{if(paused)return;if(e.button===0&&document.pointerLockElement===canvas)firing=true;canvas.focus({preventScroll:true});if(e.pointerType==='mouse'&&!document.pointerLockElement){try{const request=canvas.requestPointerLock?.();request?.catch(()=>cb.notice('Mouse capture unavailable. Drag to look.'));}catch{cb.notice('Drag to look.');}}dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);};
- const look=(e:PointerEvent)=>{if(paused)return;const locked=document.pointerLockElement===canvas;if(!locked&&!dragging)return;const dx=locked?e.movementX:e.clientX-lastX,dy=locked?e.movementY:e.clientY-lastY;yaw-=dx*.0025;pitch=T.MathUtils.clamp(pitch-dy*.0025,-1.48,1.48);lastX=e.clientX;lastY=e.clientY;};
+ let dragging=false,lastX=0,lastY=0,skipLockDelta=false;
+ const down=(e:PointerEvent)=>{if(paused)return;if(e.button===0&&document.pointerLockElement===canvas)firing=true;canvas.focus({preventScroll:true});if(e.pointerType==='mouse'&&!document.pointerLockElement){try{const request=canvas.requestPointerLock?.();request?.catch(()=>cb.notice('Mouse capture unavailable. Drag to look.'));}catch{cb.notice('Drag to look.');}}dragging=true;lastX=e.clientX;lastY=e.clientY;if(e.pointerType!=='mouse'){try{canvas.setPointerCapture(e.pointerId);}catch{/* Pointer may already be released. */}}};
+ const look=(e:PointerEvent)=>{if(paused)return;const locked=document.pointerLockElement===canvas;if(locked&&skipLockDelta){skipLockDelta=false;return;}if(!locked&&!dragging)return;const dx=locked?e.movementX:e.clientX-lastX,dy=locked?e.movementY:e.clientY-lastY;yaw-=dx*.0025;pitch=T.MathUtils.clamp(pitch-dy*.0025,-1.48,1.48);lastX=e.clientX;lastY=e.clientY;};
  const up=()=>{dragging=false;firing=false;};
- const lock=()=>{if(!document.pointerLockElement&&!paused){paused=true;clear();cb.pause();}};
+ const lock=()=>{if(document.pointerLockElement===canvas)skipLockDelta=true;if(!document.pointerLockElement&&!paused){paused=true;clear();cb.pause();}};
  const blur=()=>{clear();if(!paused){paused=true;cb.pause();}save();};
  const hidden=()=>{if(document.hidden)blur();};
  window.addEventListener('keydown',keydown);window.addEventListener('keyup',keyup);window.addEventListener('blur',blur);document.addEventListener('visibilitychange',hidden);document.addEventListener('pointerlockchange',lock);canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',look);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
