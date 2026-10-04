@@ -1,5 +1,7 @@
 import * as T from 'three';
 import { BUILDINGS, SUPPLIES } from './survival';
+import {HOSTILES,F49_SPAWN} from './hostiles';
+import {robotModel,alienModel,gunshipModel,type Skins} from './hostile-models';
 
 export function person(color:number,robot=false){
  const root=new T.Group();const material=new T.MeshStandardMaterial({color,roughness:.7,metalness:robot?.75:.1});
@@ -19,7 +21,7 @@ export function rifle(){
  const flash=new T.Mesh(new T.OctahedronGeometry(.065),new T.MeshBasicMaterial({color:0xffcb60}));flash.position.z=-.74;flash.visible=false;group.add(flash);
  return {group,flash};
 }
-export function buildDistrict(){
+export function buildDistrict(skins:Skins){
  const root=new T.Group();root.name='District Zero';const collisions:T.Object3D[]=[];
  const materials=new Map<number,T.MeshStandardMaterial>();
  const mat=(color:number)=>{let m=materials.get(color);if(!m){m=new T.MeshStandardMaterial({color,roughness:.85,metalness:.15});materials.set(color,m);}return m;};
@@ -61,10 +63,15 @@ export function buildDistrict(){
  const keeper=person(0x998b6e);keeper.position.set(-2.5,0,6);root.add(keeper);
  const visitor=person(0x6b94a0);visitor.scale.set(.8,1.15,.8);visitor.position.set(-8,0,57);root.add(visitor);
  const supplies=SUPPLIES.map(s=>{const mesh=box(.7,.6,.7,s.x,.3,s.z,s.kind==='water'?0x57acc1:s.kind==='medicine'?0xcda789:0x679a55);return {id:s.id,mesh};});
- const enemies=Array.from({length:7},(_,i)=>{const robot=i>4;const mesh=person(robot?0x444f51:0x596449,robot);const x=(i%2?1:-1)*(5+i%3*2),z=38+i*14;mesh.position.set(x,0,z);root.add(mesh);return {mesh,robot,x,z,cooldown:0};});
+ const enemies=HOSTILES.map(({kind,x,z})=>{const robot=kind==='robot',alien=kind==='alien';const mesh=robot?robotModel(skins.robot):alien?alienModel(skins.alien):person(0x596449);mesh.position.set(x,0,z);root.add(mesh);const laser=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]),new T.LineBasicMaterial({color:0xff382b,transparent:true,opacity:.8}));laser.visible=false;root.add(laser);return {mesh,robot,alien,kind,x,z,cooldown:0,windup:0,beamTime:0,aim:new T.Vector3(),laser};});
+ const gunship=gunshipModel(skins.aircraft);gunship.position.set(F49_SPAWN.x,F49_SPAWN.y,F49_SPAWN.z);gunship.rotation.y=Math.PI;root.add(gunship);
+ label('F-49 / E TO BOARD',8,3.5,19);
+ // Visible landing pad beside the cathedral exit.
+ box(9,.04,12,8,-.03,19,0x2b413a);
+
  const weapon=rifle();root.add(weapon.group);
  const player=person(0x252d2c);root.add(player);
- return {root,player,weapon,protectedActors:[keeper,visitor],enemies,supplies,collisions,dispose(){
+ return {root,player,weapon,gunship,protectedActors:[keeper,visitor],enemies,supplies,collisions,dispose(){
   const geometries=new Set<T.BufferGeometry>(),mats=new Set<T.Material>(),textures=new Set<T.Texture>();root.traverse(n=>{
    const m=n as T.Mesh;if(m.geometry)geometries.add(m.geometry);if(m.material)for(const a of Array.isArray(m.material)?m.material:[m.material]){mats.add(a);const map=(a as T.MeshBasicMaterial).map;if(map)textures.add(map);}
   });geometries.forEach(g=>g.dispose());mats.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());

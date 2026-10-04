@@ -1,0 +1,20 @@
+[
+  {
+    "kind": "robot",
+    "path": "/images/hostiles/robot-reference.jpeg",
+    "source": "IMG_5769(2).jpeg",
+    "sha256": "6688d0f0dcddc7eb0ed6e2531b72a1ea9817f7a66389298a94150ec9565ee5fc"
+  },
+  {
+    "kind": "alien",
+    "path": "/images/hostiles/alien-reference.jpeg",
+    "source": "31D1466D-25D9-44C0-B5DA-D095436716E0(1).jpeg",
+    "sha256": "a784d66e6693ce68c5082c114545e790fca073b60988230d3b01574a5d7392a9"
+  },
+  {
+    "kind": "F-49",
+    "path": "/images/hostiles/f49-reference.jpeg",
+    "source": "IMG_5856.jpeg",
+    "sha256": "e8c972eb16000592ebd2c88ab353056d91bbb49b34314fa8b1bf21d20cee5de8"
+  }
+]

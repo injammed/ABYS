@@ -41,7 +41,7 @@ export function talk(p:Player,npc:'keeper'|'visitor',raw:string){
   if(/ak.?47|weapon|rifle|gun|ammo|shoot/.test(text)){if(armPlayer(p))return 'Take this AK-47 and 120 rounds. Click or F fires; T reloads. The cathedral is a safe zone.';return 'You have my AK-47. Click or F fires; T reloads. I have no more ammunition to spare.';}
   if(/help|suppl|food|water|hungr|thirst/.test(text)){if(!p.gift){p.gift=true;p.bottles++;p.rations++;return 'Take a bottle and a ration. This is all I can spare. Outside, look for the green supply crates. Q drinks; R eats.';}return 'I already gave you my spare supplies. Search the crates along the central avenue. This cathedral is safe.';}
   if(/terminal|library|shop|upload|apyoc|trough/.test(text))return 'The green terminal beside me holds the entire library. Walk to it and press E. You can return to your body when you close it.';
-  if(/outside|city|danger|war|robot|zombie|surviv/.test(text))return 'The city broadcasts conflicting war warnings. The infected follow movement; drones patrol the avenue. Run in bursts and come back here if you are hurt.';
+  if(/outside|city|danger|war|robot|zombie|surviv|alien|f.?49|vtol|gunship/.test(text))return 'Infected roam the avenue. Spined aliens rush you; rifle robots fire lasers. The F-49 is on the pad outside: E boards, Space rises, C descends, click or F fires. Land before exiting.';
   if(/who|name|hello|hi\b/.test(text))return 'I am Mara, the keeper. I keep the doors open. Ask me for help, about the terminal, or about the city.';
  }else{
   if(/give|share|offer|trade/.test(text)&&/water|bottle|drink/.test(text)){
@@ -62,7 +62,11 @@ export function restorePlayer(raw:string|null):Player{
  for(const k of ['bottles','rations','elapsed'] as const)if(!Number.isFinite(p[k])||p[k]<0||p[k]>1e7)return fallback;
  if(!Number.isInteger(p.bottles)||!Number.isInteger(p.rations)||typeof p.gift!=='boolean'||typeof p.helped!=='boolean'||!Array.isArray(p.looted)||p.looted.length>6||new Set(p.looted).size!==p.looted.length||p.looted.some((id:string)=>!SUPPLIES.some(s=>s.id===id)))return fallback;
  const armed=p.armed??false,ammo=p.ammo??0,reserve=p.reserve??0,defeated=p.defeated??[];
- if(typeof armed!=='boolean'||!Number.isInteger(ammo)||ammo<0||ammo>30||!Number.isInteger(reserve)||reserve<0||reserve>90||(!armed&&(ammo||reserve))||!Array.isArray(defeated)||defeated.length>7||new Set(defeated).size!==defeated.length||defeated.some((id:number)=>!Number.isInteger(id)||id<0||id>6))return fallback;
+ if(typeof armed!=='boolean'||!Number.isInteger(ammo)||ammo<0||ammo>30||!Number.isInteger(reserve)||reserve<0||reserve>90||(!armed&&(ammo||reserve))||!Array.isArray(defeated)||defeated.length>10||new Set(defeated).size!==defeated.length||defeated.some((id:number)=>!Number.isInteger(id)||id<0||id>9))return fallback;
  return {...fallback,...p,armed,ammo,reserve,defeated};
  }catch{return fallback;}
 }
+
+// This first district supports bounded VTOL flight along its open corridors.
+export function canHover(x:number,z:number){return z>=17&&z<=142&&[-2,2].every(dx=>[-2,2].every(dz=>canStand(x+dx,z+dz)));}
+export function landingSpot(x:number,z:number){for(const [dx,dz] of [[-4,0],[4,0],[0,-5],[0,5]])if(canStand(x+dx,z+dz))return {x:x+dx,z:z+dz};return null;}

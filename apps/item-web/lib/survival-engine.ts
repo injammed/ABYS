@@ -2,11 +2,12 @@ import * as T from 'three';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {buildCathedral} from './cathedral';
 import {buildDistrict} from './survival-world';
+import {ENEMY_STATS,F49_SPAWN} from './hostiles';
 import {buildCurrencySculpture,disposeCurrencySculpture} from './currency-sculpture';
 import {items} from './currency-library';
 import CEILINGS from './cathedral-art.json';
-import {armPlayer,spendRound,reloadWeapon,advance,canStand,collect,consume,freshPlayer,restorePlayer,SUPPLIES,type Player} from './survival';
-export type Hud={armed:boolean;ammo:number;reserve:number;health:number;water:number;food:number;stamina:number;bottles:number;rations:number;zone:string;prompt:string;third:boolean;dead:boolean;minutes:number;locked:boolean};
+import {canHover,landingSpot,armPlayer,spendRound,reloadWeapon,advance,canStand,collect,consume,freshPlayer,restorePlayer,SUPPLIES,type Player} from './survival';
+export type Hud={piloting:boolean;altitude:number;hull:number;armed:boolean;ammo:number;reserve:number;health:number;water:number;food:number;stamina:number;bottles:number;rations:number;zone:string;prompt:string;third:boolean;dead:boolean;minutes:number;locked:boolean};
 export type Callbacks={hud:(h:Hud)=>void;interact:(target:string)=>void;pause:()=>void;notice:(text:string)=>void};
 const KEY='aetimm-survival-v1';
 export function createSurvival(host:HTMLDivElement,cb:Callbacks){
@@ -15,17 +16,21 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
  renderer.setClearColor(0x0b1714);host.appendChild(renderer.domElement);const canvas=renderer.domElement;canvas.tabIndex=0;canvas.setAttribute('aria-label','AETIMM survival world. WASD moves. Mouse looks. E interacts. V changes camera. Escape pauses.');
  const scene=new T.Scene();scene.fog=new T.FogExp2(0x17251f,.011);
  const camera=new T.PerspectiveCamera(68,1,.08,240);let needsRender=true;let yaw=Math.PI,pitch=.03,third=false,paused=false,disposed=false,jump=0,vertical=0;
- const motion={x:0,y:0,lookX:0,lookY:0};const keys=new Set<string>();
+ let piloting=false,altitude=F49_SPAWN.y,hull=100;
+ const motion={x:0,y:0,lookX:0,lookY:0,lift:0};const keys=new Set<string>();
  scene.add(new T.HemisphereLight(0xc6dacb,0x2a2920,1.5));const sun=new T.DirectionalLight(0xffd8a2,1.8);sun.position.set(-10,40,10);scene.add(sun);
  const pmrem=new T.PMREMGenerator(renderer),room=new RoomEnvironment(),environment=pmrem.fromScene(room,.04);scene.environment=environment.texture;room.dispose();pmrem.dispose();
  const textures:T.Texture[]=[];const loader=new T.TextureLoader();const base=process.env.NEXT_PUBLIC_BASE_PATH??'';
  const frescoes=CEILINGS.map(art=>{const texture=loader.load(`${base}${art.path}`,()=>{if(disposed)texture.dispose();},undefined,()=>cb.notice('A ceiling image could not load.'));texture.colorSpace=T.SRGBColorSpace;texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());textures.push(texture);return texture;});
  const cathedral=buildCathedral(-126,frescoes,true);scene.add(cathedral.root);
- const district=buildDistrict();scene.add(district.root);
+ const skin=(name:string)=>{const t=loader.load(`${base}/images/hostiles/${name}-reference.jpeg`,()=>{needsRender=true;},undefined,()=>cb.notice('An enemy skin could not load.'));t.colorSpace=T.SRGBColorSpace;textures.push(t);return t;};
+ const district=buildDistrict({robot:skin('robot'),alien:skin('alien'),aircraft:skin('f49')});scene.add(district.root);
  const sculptures:T.Group[]=[];const pedestals:T.Mesh[]=[];
  const pedestalMaterial=new T.MeshStandardMaterial({color:0xc5b896,roughness:.8});const pedestalGeometry=new T.BoxGeometry(1.95,1.1,1.95);
  items.forEach((item,i)=>{const x=i%2?3.3:-3.3,z=-Math.floor(i/2)*6;const base=new T.Mesh(pedestalGeometry,pedestalMaterial);base.position.set(x,.55,z);scene.add(base);pedestals.push(base);const model=buildCurrencySculpture(item);const box=new T.Box3().setFromObject(model);model.position.set(x,1.12-box.min.y,z);scene.add(model);sculptures.push(model);});
  const target=()=>{
+  if(piloting)return 'exit-gunship';
+  if(Math.hypot(p.x-district.gunship.position.x,p.z-district.gunship.position.z)<5)return 'gunship';
   if(Math.hypot(p.x-2.6,p.z-6)<3.2)return 'terminal';
   if(Math.hypot(p.x+2.5,p.z-6)<3)return 'keeper';
   if(Math.hypot(p.x+8,p.z-57)<3)return 'visitor';
@@ -34,14 +39,14 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
  };
  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({version:1,player:p}));}catch{/* Storage denial must never stop play. */}};
  let firing=false,shotCooldown=0,flashTime=0,reloading=0;
- const clear=()=>{firing=false;keys.clear();motion.x=motion.y=motion.lookX=motion.lookY=0;};
- const interact=()=>{if(paused||p.health<=0)return;const t=target();if(t.startsWith('supply:')){if(collect(p,t.slice(7))){cb.notice('Supplies collected.');save();}}else if(t){clear();paused=true;document.exitPointerLock?.();if(t==='keeper'&&armPlayer(p)){save();cb.notice("Mara gave you an AK-47 · 30 loaded / 90 spare · Click or F fires · T reloads");}cb.interact(t);}};
+ const clear=()=>{firing=false;keys.clear();motion.x=motion.y=motion.lookX=motion.lookY=motion.lift=0;};
+ const interact=()=>{if(paused||p.health<=0)return;const t=target();if(t==='gunship'){piloting=true;pitch=-.08;p.x=district.gunship.position.x;p.z=district.gunship.position.z;altitude=district.gunship.position.y;clear();reloading=0;cb.notice('F-49 online · WASD flies · Space rises · C descends · F fires · E exits after landing');return;}if(t==='exit-gunship'){if(altitude>1.7){cb.notice('Descend with C before exiting');return;}const spot=landingSpot(p.x,p.z);if(!spot){cb.notice('No clear ground to exit here');return;}piloting=false;p.x=spot.x;p.z=spot.z;clear();jump=vertical=0;save();return;}if(t.startsWith('supply:')){if(collect(p,t.slice(7))){cb.notice('Supplies collected.');save();}}else if(t){clear();paused=true;document.exitPointerLock?.();if(t==='keeper'&&armPlayer(p)){save();cb.notice("Mara gave you an AK-47 · 30 loaded / 90 spare · Click or F fires · T reloads");}cb.interact(t);}};
  const keydown=(e:KeyboardEvent)=>{
   if(paused||e.target instanceof HTMLInputElement||e.target instanceof HTMLTextAreaElement)return;
-  const k=e.key.toLowerCase();if(['w','a','s','d','shift',' ','e','v','q','r','f','t','escape','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
+  const k=e.key.toLowerCase();if(['w','a','s','d','shift',' ','e','v','q','r','f','t','c','escape','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
   keys.add(k);if(e.repeat)return;
   if(k==='t')reload();if(k==='e')interact();if(k==='v')third=!third;if(k==='q')cb.notice(consume(p,'water'));if(k==='r')cb.notice(consume(p,'food'));
-  if(k===' '&&jump===0&&p.health>0){vertical=5;}
+  if(k===' '&&!piloting&&jump===0&&p.health>0){vertical=5;}
   if(k==='escape'){paused=true;clear();document.exitPointerLock?.();cb.pause();}
  };
  const keyup=(e:KeyboardEvent)=>keys.delete(e.key.toLowerCase());
@@ -54,23 +59,23 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
  const hidden=()=>{if(document.hidden)blur();};
  window.addEventListener('keydown',keydown);window.addEventListener('keyup',keyup);window.addEventListener('blur',blur);document.addEventListener('visibilitychange',hidden);document.addEventListener('pointerlockchange',lock);canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',look);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
  const resize=new ResizeObserver(()=>{const {width,height}=host.getBoundingClientRect();if(width&&height){renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix();needsRender=true;}});resize.observe(host);
- const reload=()=>{if(paused||p.health<=0||!p.armed||reloading||p.ammo===30||p.reserve===0)return;reloading=1.6;cb.notice('Reloading…');};
+ const reload=()=>{if(paused||p.health<=0||piloting||!p.armed||reloading||p.ammo===30||p.reserve===0)return;reloading=1.6;cb.notice('Reloading…');};
  const shotRay=new T.Raycaster();
  const fire=()=>{
-  if(paused||reloading||shotCooldown||!p.armed||p.health<=0)return;
+  if(paused||reloading||shotCooldown||(!piloting&&!p.armed)||p.health<=0)return;
   if(p.z<=11){cb.notice('Cathedral safe zone · weapon lowered');return;}
-  if(!spendRound(p)){cb.notice(p.reserve?'Empty · press T to reload':'Out of ammunition');return;}
-  shotCooldown=.14;flashTime=.065;scene.updateMatrixWorld(true);
+  if(!piloting&&!spendRound(p)){cb.notice(p.reserve?'Empty · press T to reload':'Out of ammunition');return;}
+  shotCooldown=piloting?.2:.14;flashTime=.065;scene.updateMatrixWorld(true);
   const live=district.enemies.filter((_,i)=>!p.defeated.includes(i));
   const blockers=[cathedral.root,...district.collisions,...pedestals,...district.protectedActors];
   shotRay.setFromCamera(new T.Vector2(0,0),camera);shotRay.far=90;
   const aim=shotRay.intersectObjects([...blockers,...live.map(e=>e.mesh)],true)[0];
   const point=aim?aim.point:shotRay.ray.at(90,new T.Vector3());
-  const origin=new T.Vector3(p.x,1.5+jump,p.z),direction=point.clone().sub(origin);shotRay.set(origin,direction.normalize());shotRay.far=90;
+  const origin=new T.Vector3(p.x,piloting?altitude+.4:1.5+jump,p.z),direction=point.clone().sub(origin);shotRay.set(origin,direction.normalize());shotRay.far=90;
   const hit=shotRay.intersectObjects([...blockers,...live.map(e=>e.mesh)],true)[0];
   if(hit){const index=district.enemies.findIndex(e=>{let o:T.Object3D|null=hit.object;while(o){if(o===e.mesh)return true;o=o.parent;}return false;});
-   if(index>=0){const enemy=district.enemies[index];enemy.mesh.userData.damage=(enemy.mesh.userData.damage??0)+1;
-    if(enemy.mesh.userData.damage>=(enemy.robot?5:2)){p.defeated.push(index);enemy.mesh.visible=false;cb.notice(enemy.robot?'Patrol disabled':'Infected stopped');}else cb.notice('Hit');
+   if(index>=0){const enemy=district.enemies[index];enemy.mesh.userData.damage=(enemy.mesh.userData.damage??0)+(piloting?2:1);
+    if(enemy.mesh.userData.damage>=(ENEMY_STATS[enemy.kind].hits)){p.defeated.push(index);enemy.mesh.visible=false;cb.notice(enemy.robot?'Patrol disabled':enemy.alien?'Alien stopped':'Infected stopped');}else cb.notice('Hit');
    }
   }save();
  };
@@ -82,35 +87,53 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
    yaw-=motion.lookX*dt*1.8;pitch=T.MathUtils.clamp(pitch-motion.lookY*dt*1.4,-1.48,1.48);
    if(keys.has('arrowleft'))yaw+=dt*1.5;if(keys.has('arrowright'))yaw-=dt*1.5;
    const forward=Number(keys.has('w')||keys.has('arrowup'))-Number(keys.has('s')||keys.has('arrowdown'))-motion.y,side=Number(keys.has('d'))-Number(keys.has('a'))+motion.x;
-   const len=Math.max(1,Math.hypot(forward,side));const running=keys.has('shift')&&p.stamina>1&&Math.hypot(forward,side)>.1;const speed=running?6:3.4;
+   const len=Math.max(1,Math.hypot(forward,side));const running=keys.has('shift')&&p.stamina>1&&Math.hypot(forward,side)>.1;const speed=piloting?11:running?6:3.4;
    const nx=p.x+(-Math.sin(yaw)*forward+Math.cos(yaw)*side)/len*speed*dt,nz=p.z+(-Math.cos(yaw)*forward-Math.sin(yaw)*side)/len*speed*dt;
-   if(canStand(nx,p.z))p.x=nx;if(canStand(p.x,nz))p.z=nz;
+   const valid=piloting?canHover:canStand;if(valid(nx,p.z))p.x=nx;if(valid(p.x,nz))p.z=nz;
+   if(piloting){altitude=T.MathUtils.clamp(altitude+(Number(keys.has(' '))-Number(keys.has('c'))+motion.lift)*dt*4,1.4,16);district.gunship.position.set(p.x,altitude,p.z);district.gunship.rotation.y=yaw;}
    vertical-=dt*12;jump=Math.max(0,jump+vertical*dt);if(!jump)vertical=0;
-   advance(p,dt,running);
+   advance(p,dt,running&&!piloting);
    district.enemies.forEach((e,i)=>{
-    e.mesh.visible=!p.defeated.includes(i);if(!e.mesh.visible)return;
-    const distance=Math.hypot(p.x-e.mesh.position.x,p.z-e.mesh.position.z);const chase=p.z>13&&distance<(e.robot?23:16);
+    e.mesh.visible=!p.defeated.includes(i);e.laser.visible=false;if(!e.mesh.visible)return;
+    const stats=ENEMY_STATS[e.kind],distance=Math.hypot(p.x-e.mesh.position.x,p.z-e.mesh.position.z),chase=p.z>13&&distance<stats.range;
     const tx=chase?p.x:e.x+Math.sin(p.elapsed*.18+i)*5,tz=chase?p.z:e.z+Math.cos(p.elapsed*.18+i)*5;
-    const direction=new T.Vector2(tx-e.mesh.position.x,tz-e.mesh.position.z);if(direction.length()>.3){direction.normalize();const speed=chase?(e.robot?2.6:1.5):.55;const x=e.mesh.position.x+direction.x*dt*speed,z=Math.max(14,e.mesh.position.z+direction.y*dt*speed);if(canStand(x,e.mesh.position.z))e.mesh.position.x=x;if(canStand(e.mesh.position.x,z))e.mesh.position.z=z;e.mesh.rotation.y=Math.atan2(-direction.x,-direction.y);}
-    const legs=e.mesh.userData.legs as T.Mesh[];legs.forEach((leg,n)=>leg.rotation.x=Math.sin(p.elapsed*5+n*Math.PI)*.35);
-    e.cooldown=Math.max(0,e.cooldown-dt);if(chase&&distance<1.3&&!e.cooldown){p.health=Math.max(0,p.health-(e.robot?12:7));e.cooldown=1;cb.notice(e.robot?'A patrol struck you. Get clear.':'An infected survivor struck you.');}
+    const direction=new T.Vector2(tx-e.mesh.position.x,tz-e.mesh.position.z),moving=direction.length()>.3&&!(e.robot&&chase&&distance<20);
+    if(moving){direction.normalize();const speed=chase?stats.speed:.55,x=e.mesh.position.x+direction.x*dt*speed,z=Math.max(14,e.mesh.position.z+direction.y*dt*speed);if(canStand(x,e.mesh.position.z))e.mesh.position.x=x;if(canStand(e.mesh.position.x,z))e.mesh.position.z=z;}
+    if(chase||moving)e.mesh.rotation.y=Math.atan2(-(tx-e.mesh.position.x),-(tz-e.mesh.position.z));
+    (e.mesh.userData.legs as T.Object3D[]).forEach((leg,n)=>leg.rotation.x=moving?Math.sin(p.elapsed*(e.alien?9:5)+n*Math.PI)*.3:0);
+    e.cooldown=Math.max(0,e.cooldown-dt);e.beamTime=Math.max(0,e.beamTime-dt);
+    if(e.robot){
+     const muzzle=(e.mesh.userData.muzzle as T.Vector3).clone();e.mesh.localToWorld(muzzle);
+     const playerAim=new T.Vector3(p.x,piloting?altitude+.4:1.4+jump,p.z),aim=(e.windup||e.beamTime)?e.aim.clone():playerAim.clone(),delta=aim.clone().sub(muzzle);shotRay.set(muzzle,delta.clone().normalize());shotRay.far=delta.length();
+     const blocked=shotRay.intersectObjects([cathedral.root,...district.collisions,...pedestals,...district.protectedActors],true).some(h=>h.distance<delta.length()-.2);
+     if(chase&&!blocked&&!e.cooldown&&!e.windup){e.windup=.8;e.aim.copy(playerAim);cb.notice('Laser lock · move or find cover');}
+     if(e.windup){e.windup=Math.max(0,e.windup-dt);e.laser.visible=true;(e.laser.material as T.LineBasicMaterial).opacity=.25;
+      if(!e.windup){e.cooldown=2.4;e.beamTime=.18;if(chase&&!blocked&&playerAim.distanceTo(e.aim)<(piloting?2:.9)){if(piloting)hull=Math.max(0,hull-stats.damage);else p.health=Math.max(0,p.health-stats.damage);cb.notice(piloting?'F-49 hull hit':'Laser hit · find cover');}}
+     }
+     if(e.beamTime){e.laser.visible=true;(e.laser.material as T.LineBasicMaterial).opacity=1;}
+     if(e.laser.visible){const attr=e.laser.geometry.getAttribute('position') as T.BufferAttribute;attr.setXYZ(0,muzzle.x,muzzle.y,muzzle.z);attr.setXYZ(1,aim.x,aim.y,aim.z);attr.needsUpdate=true;e.laser.geometry.computeBoundingSphere();}
+    }else if(chase&&distance<(e.alien?2.1:1.3)&&!e.cooldown&&(!piloting||altitude<2.8)){
+     if(piloting)hull=Math.max(0,hull-stats.damage);else p.health=Math.max(0,p.health-stats.damage);e.cooldown=1;cb.notice(e.alien?'Alien claws struck you':'An infected survivor struck you');
+    }
    });
+   if(piloting&&hull<=0)p.health=0;
    if(p.health<=0){save();clear();paused=true;document.exitPointerLock?.();}
   }
   district.supplies.forEach(s=>s.mesh.visible=!p.looted.includes(s.id));
-  district.player.visible=third;district.player.position.set(p.x,jump,p.z);district.player.rotation.y=yaw;
+  district.player.visible=third&&!piloting;district.player.position.set(p.x,jump,p.z);district.player.rotation.y=yaw;
   const moving=keys.has('w')||keys.has('s')||Math.abs(motion.y)>.1;(district.player.userData.legs as T.Mesh[]).forEach((leg,n)=>leg.rotation.x=moving&&!paused?Math.sin(p.elapsed*7+n*Math.PI)*.4:0);
-  camera.position.set(p.x,1.7+jump,p.z);camera.rotation.set(pitch,yaw,0,'YXZ');
-  if(third){const origin=camera.position.clone();const offset=new T.Vector3(Math.sin(yaw)*3.6,1.1,Math.cos(yaw)*3.6);ray.set(origin,offset.clone().normalize());scene.updateMatrixWorld(true);const hits=ray.intersectObjects([cathedral.root,...district.collisions,...pedestals],true);const distance=Math.min(offset.length(),hits[0]?Math.max(.3,hits[0].distance-.25):offset.length());camera.position.add(offset.normalize().multiplyScalar(distance));camera.lookAt(origin.add(new T.Vector3(-Math.sin(yaw)*4,Math.sin(pitch)*5,-Math.cos(yaw)*4)));}
+  camera.position.set(p.x,piloting?altitude+1.25:1.7+jump,p.z);camera.rotation.set(pitch,yaw,0,'YXZ');
+  if(third){const origin=camera.position.clone();const offset=new T.Vector3(Math.sin(yaw)*(piloting?9:3.6),piloting?4:1.1,Math.cos(yaw)*(piloting?9:3.6));ray.set(origin,offset.clone().normalize());scene.updateMatrixWorld(true);const hits=ray.intersectObjects([cathedral.root,...district.collisions,...pedestals],true);const distance=Math.min(offset.length(),hits[0]?Math.max(.3,hits[0].distance-.25):offset.length());camera.position.add(offset.normalize().multiplyScalar(distance));camera.lookAt(origin.add(new T.Vector3(-Math.sin(yaw)*4,Math.sin(pitch)*5,-Math.cos(yaw)*4)));}
   if(!paused&&(firing||keys.has('f')))fire();
-  district.weapon.group.visible=p.armed&&!paused&&p.health>0;
+  (district.gunship.userData.flash as T.Mesh).visible=piloting&&flashTime>0&&!paused;
+  district.weapon.group.visible=!piloting&&p.armed&&!paused&&p.health>0;
   district.weapon.flash.visible=flashTime>0&&!paused;
   if(third){district.weapon.group.position.set(p.x,1.15+jump,p.z);district.weapon.group.quaternion.setFromEuler(new T.Euler(pitch,yaw,0,'YXZ'));district.weapon.group.translateX(.32);district.weapon.group.translateZ(-.35);}
   else{district.weapon.group.position.copy(camera.position);district.weapon.group.quaternion.copy(camera.quaternion);district.weapon.group.translateX(.25);district.weapon.group.translateY(reloading?-.5:-.25);district.weapon.group.translateZ(-.5+flashTime*.35);}
   sculptures.forEach(s=>s.visible=Math.abs(s.position.z-p.z)<36);
-  uiTime+=dt;saveTime+=dt;if(uiTime>.15){uiTime=0;const t=target();const prompt=t==='terminal'?'E · Open library terminal':t==='keeper'?'E · Talk to Mara':t==='visitor'?'E · Talk to Iri':t.startsWith('supply:')?'E · Collect supplies':t?'E · Inspect object':'';cb.hud({armed:p.armed,ammo:p.ammo,reserve:p.reserve,health:Math.ceil(p.health),water:Math.ceil(p.water),food:Math.ceil(p.food),stamina:Math.ceil(p.stamina),bottles:p.bottles,rations:p.rations,zone:p.z<11?'Cathedral · safe zone':'District Zero · hostile',prompt,third,dead:p.health<=0,minutes:Math.floor(p.elapsed/60),locked:document.pointerLockElement===canvas});}
+  uiTime+=dt;saveTime+=dt;if(uiTime>.15){uiTime=0;const t=target();const prompt=t==='gunship'?'E · Board F-49':t==='exit-gunship'?(altitude>1.7?'E · Land before exiting':'E · Exit F-49'):t==='terminal'?'E · Open library terminal':t==='keeper'?'E · Talk to Mara':t==='visitor'?'E · Talk to Iri':t.startsWith('supply:')?'E · Collect supplies':t?'E · Inspect object':'';cb.hud({piloting,altitude:Math.round(altitude*10)/10,hull:Math.ceil(hull),armed:p.armed,ammo:p.ammo,reserve:p.reserve,health:Math.ceil(p.health),water:Math.ceil(p.water),food:Math.ceil(p.food),stamina:Math.ceil(p.stamina),bottles:p.bottles,rations:p.rations,zone:p.z<11?'Cathedral · safe zone':'District Zero · hostile',prompt,third,dead:p.health<=0,minutes:Math.floor(p.elapsed/60),locked:document.pointerLockElement===canvas});}
   if(saveTime>10){saveTime=0;save();}if(!document.hidden&&(!paused||needsRender)){renderer.render(scene,camera);needsRender=false;}frame=requestAnimationFrame(render);
  }
  render();
- return {fire,reload,player:()=>p,motion,interact,setPaused(value:boolean){paused=value;clear();save();if(value)document.exitPointerLock?.();else canvas.focus({preventScroll:true});},toggleCamera(){third=!third;needsRender=true;},consume(kind:'water'|'food'){cb.notice(consume(p,kind));},restart(){p=freshPlayer();reloading=shotCooldown=flashTime=0;firing=false;yaw=Math.PI;pitch=.03;jump=vertical=0;paused=false;district.enemies.forEach(e=>{e.mesh.position.set(e.x,0,e.z);e.cooldown=0;e.mesh.userData.damage=0;e.mesh.visible=true;});save();},dispose(){disposed=true;save();cancelAnimationFrame(frame);resize.disconnect();if(document.pointerLockElement===canvas)document.exitPointerLock();window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);document.removeEventListener('visibilitychange',hidden);document.removeEventListener('pointerlockchange',lock);canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',look);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',up);cathedral.dispose();district.dispose();textures.forEach(t=>t.dispose());sculptures.forEach(disposeCurrencySculpture);pedestalGeometry.dispose();pedestalMaterial.dispose();environment.dispose();renderer.dispose();canvas.remove();}};
+ return {fire,reload,player:()=>p,motion,interact,setPaused(value:boolean){paused=value;clear();save();if(value)document.exitPointerLock?.();else canvas.focus({preventScroll:true});},toggleCamera(){third=!third;needsRender=true;},consume(kind:'water'|'food'){cb.notice(consume(p,kind));},restart(){p=freshPlayer();piloting=false;hull=100;altitude=F49_SPAWN.y;district.gunship.position.set(F49_SPAWN.x,F49_SPAWN.y,F49_SPAWN.z);district.gunship.rotation.y=Math.PI;reloading=shotCooldown=flashTime=0;firing=false;yaw=Math.PI;pitch=.03;jump=vertical=0;paused=false;district.enemies.forEach(e=>{e.mesh.position.set(e.x,0,e.z);e.cooldown=e.windup=e.beamTime=0;e.laser.visible=false;e.mesh.userData.damage=0;e.mesh.visible=true;});save();},dispose(){disposed=true;save();cancelAnimationFrame(frame);resize.disconnect();if(document.pointerLockElement===canvas)document.exitPointerLock();window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);document.removeEventListener('visibilitychange',hidden);document.removeEventListener('pointerlockchange',lock);canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',look);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',up);cathedral.dispose();district.dispose();textures.forEach(t=>t.dispose());sculptures.forEach(disposeCurrencySculpture);pedestalGeometry.dispose();pedestalMaterial.dispose();environment.dispose();renderer.dispose();canvas.remove();}};
 }
