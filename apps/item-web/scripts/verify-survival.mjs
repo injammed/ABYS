@@ -27,3 +27,20 @@ assert.ok(canHover(F49_SPAWN.x,F49_SPAWN.z));assert.equal(canHover(0,10),false);
 const expanded=freshPlayer();expanded.defeated=[7,8,9];assert.deepEqual(restorePlayer(JSON.stringify({version:1,player:expanded})),expanded);
 assert.ok(ENEMY_STATS.robot.range>ENEMY_STATS.infected.range);assert.ok(ENEMY_STATS.alien.speed>ENEMY_STATS.infected.speed);
 console.log('Hostiles PASS: stable IDs, added aliens, legacy save continuity and bounded flight/landing.');
+
+const {STAR_STAFF,validStarTarget,inStarImpact}=await import('../lib/star-staff.ts');
+assert.equal(validStarTarget({x:0,y:1.5,z:35},{x:0,y:0,z:60}),true);
+assert.equal(validStarTarget({x:0,y:1.5,z:35},{x:0,y:0,z:20}),false,'Blast must not overlap refuge');
+assert.equal(validStarTarget({x:0,y:1.5,z:35},{x:0,y:0,z:300}),false,'Range bounded');
+assert.equal(validStarTarget({x:0,y:1.5,z:35},{x:0,y:0,z:60},[{x:1,y:0,z:61}]),false,'Nearby survivors protected');
+assert.equal(validStarTarget({x:0,y:1.5,z:35},{x:NaN,y:0,z:60}),false);
+assert.equal(inStarImpact({x:0,y:0,z:60},{x:0,y:1,z:61}),true);
+assert.equal(inStarImpact({x:0,y:0,z:60},{x:0,y:30,z:60}),false,'Rooftop impact does not reach distant ground');
+assert.equal(STAR_STAFF.damage>=5,true);console.log('Starfall PASS: bounded targeting, refuge/survivor exclusion and 3D impact radius.');
+
+const {buildStarStaff}=await import('../lib/star-staff-world.ts');
+const {Vector3}=await import('three');const visual=buildStarStaff();const impactPoint=new Vector3(0,0,60);
+visual.update(0,impactPoint);assert.equal(visual.strike.visible,true);assert.equal(visual.strike.position.y,90);assert.equal(visual.impact.visible,false);
+visual.update(1.5,impactPoint);assert.equal(visual.strike.visible,false);assert.equal(visual.impact.visible,true);assert.ok(visual.impact.position.distanceTo(impactPoint)<.2);
+visual.update(2.2,impactPoint);assert.equal(visual.impact.visible,false);visual.reset();assert.equal(visual.strike.visible,false);visual.dispose();
+console.log('Starfall visual PASS: falling star, timed impact ring and reset.');
