@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {freshCampaign,advanceCampaign,missionAction,eliminate,restoreCampaign,POPULATION,MISSIONS} from '../lib/capital-campaign.ts';
+import {freshCampaign,advanceCampaign,missionAction,eliminate,restoreCampaign,POPULATION,MISSIONS,civilianLossFor} from '../lib/capital-campaign.ts';
 import {installFootprints,roofAt,geo,capitalBounds,safe} from '../lib/capital-map.ts';
 import {canStand,canHover} from '../lib/survival.ts';
 const conserved=c=>assert.equal(c.humans+c.zombies+c.saved+c.dead+c.eliminated,POPULATION);
@@ -13,8 +13,17 @@ missionAction(c,'hospital',0);assert.equal(c.saved,5000);const once=c.saved;miss
 missionAction(c,'relay',0);const infected=c.zombies;for(let i=0;i<35;i++)advanceCampaign(c,1);assert.equal(c.zombies,infected,'Quarantine stops conversions');
 assert.match(missionAction(c,'command',1),/both/);missionAction(c,'command',2);missionAction(c,'evac',2);assert.equal(c.saved,10000);
 const nuclear={...c};const civilianLoss=Math.ceil(nuclear.humans*.25);missionAction(nuclear,'aegis',2,true);assert.ok(nuclear.launched&&nuclear.won);assert.equal(nuclear.dead,civilianLoss);assert.equal(nuclear.saved,10000);conserved(nuclear);const dead=nuclear.dead;missionAction(nuclear,'aegis',2,true);assert.equal(nuclear.dead,dead);
+for(const strategy of ['hypersonic','swarm']){
+ const branch={...c};const expected=civilianLossFor(branch,strategy);missionAction(branch,'aegis',2,strategy);
+ assert.equal(branch.strategy,strategy);assert.equal(branch.dead,expected);assert.equal(branch.saved,10000);conserved(branch);
+ const committed={...branch};assert.match(missionAction(branch,'aegis',2,'nuclear'),/already committed/);assert.deepEqual(branch,committed);
+ for(let i=0;i<2000;i++){advanceCampaign(branch,1);conserved(branch);}assert.ok(branch.won);assert.deepEqual(restoreCampaign(branch),branch);
+}
+const legacy={...nuclear};delete legacy.strategy;assert.deepEqual(restoreCampaign(legacy),nuclear);
+const invalid={...c};assert.match(missionAction(invalid,'aegis',2,'invalid'),/Unknown/);assert.deepEqual(invalid,c);
+assert.deepEqual(restoreCampaign({...c,strategy:'invalid'}),freshCampaign());
 missionAction(c,'aegis',2);for(let i=0;i<2000;i++){advanceCampaign(c,1);conserved(c);}assert.ok(c.won);assert.equal(c.dead,0);assert.equal(c.zombies,0);assert.ok(c.eliminated>=initial);
 assert.deepEqual(restoreCampaign(c),c);for(const patch of [{humans:-1},{saved:NaN},{quest:7},{dead:1},{won:false},{clock:Infinity},{converted:0},{carry:-1},{lastEvac:c.clock+1}])assert.deepEqual(restoreCampaign({...c,...patch}),freshCampaign());
 const rows=JSON.parse(readFileSync(new URL('../public/maps/washington/buildings.json',import.meta.url)));assert.ok(rows.length>20000);installFootprints(rows);for(const m of MISSIONS)assert.ok(canStand(m.x,m.z),'Every mission is reachable on foot');assert.ok(capitalBounds(...Object.values(geo(-77.01,38.88))));assert.ok(safe(0,3));assert.equal(safe(100,0),false);
 installFootprints([[20,[[200,200],[220,200],[220,220],[200,220]]]]);assert.equal(roofAt(210,210),20);assert.equal(canStand(210,210),false);assert.equal(canHover(210,210,40),true);assert.equal(canHover(210,210,2),false);installFootprints([]);
-console.log('Capital PASS: outbreak growth, conservation, early eradication, quarantine, rescue cooldown, gated quests, both endings, recovery and geographic collision.');
+console.log('Capital PASS: outbreak growth, conservation, early eradication, quarantine, rescue cooldown, gated quests, all four endings, legacy migration and committed decisions, recovery and geographic collision.');
