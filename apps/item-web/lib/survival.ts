@@ -40,6 +40,7 @@ export function reloadWeapon(p:Player){const rounds=Math.min(30-p.ammo,p.reserve
 export function talk(p:Player,npc:'keeper'|'visitor',raw:string){
  const text=raw.toLowerCase().slice(0,300);
  if(npc==='keeper'){
+  if(/demon|possess|trinity|goblin|witch|warlock|titan|rift|breach/.test(text))return 'Rescue 25,000 before considering Trinity. It releases HSGV salvos, nuclear reentry warheads and MADS together. The crust opens and demons emerge. Possessed infected explode: keep your distance. Defeat 8 goblins, 1 titan and 3 warlocks, then restore the seal. The Starfall staff is yours; press 2.';
   if(/quest|mission|refugee|outbreak|evac|quarantine|nuclear/.test(text))return 'Five million refugees came to the capital. One infection can become thousands. Open the field map with M. Restore the hospital, quarantine relay and evacuation route. Aegis offers a fictional strike, but civilian losses are permanent. Containment is another path.';
   if(/ak.?47|weapon|rifle|gun|ammo|shoot/.test(text)){if(armPlayer(p))return 'Take this AK-47 and 120 rounds. Click or F fires; T reloads. The cathedral is a safe zone.';return 'You have my AK-47. Click or F fires; T reloads. I have no more ammunition to spare.';}
   if(/help|suppl|food|water|hungr|thirst/.test(text)){if(!p.gift){p.gift=true;p.bottles++;p.rations++;return 'Take a bottle and a ration. This is all I can spare. Outside, look for the green supply crates. Q drinks; R eats.';}return 'I already gave you my spare supplies. Search the crates along the central avenue. This cathedral is safe.';}
