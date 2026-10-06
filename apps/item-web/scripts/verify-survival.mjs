@@ -44,3 +44,10 @@ visual.update(0,impactPoint);assert.equal(visual.strike.visible,true);assert.equ
 visual.update(1.5,impactPoint);assert.equal(visual.strike.visible,false);assert.equal(visual.impact.visible,true);assert.ok(visual.impact.position.distanceTo(impactPoint)<.2);
 visual.update(2.2,impactPoint);assert.equal(visual.impact.visible,false);visual.reset();assert.equal(visual.strike.visible,false);visual.dispose();
 console.log('Starfall visual PASS: falling star, timed impact ring and reset.');
+
+const {demonModel,DEMON_STATS}=await import('../lib/demon-models.ts');const {Box3}=await import('three');
+for(const kind of ['goblin','titan','warlock']){const model=demonModel(kind);const size=new Box3().setFromObject(model).getSize(new Vector3());assert.ok(Math.abs(size.y-DEMON_STATS[kind].height)<.001);assert.equal(model.userData.legs.length,2);let count=0;model.traverse(o=>{if(o.isMesh)count++;});assert.ok(count<15,'Rigid parts batch into bounded draw calls');}
+const {characterModel}=await import('../lib/character-models.ts');for(const role of ['player','mara','iri','refugee','infected']){const model=characterModel(0x555555,role);assert.equal(model.userData.legs.length,2);assert.ok(new Box3().setFromObject(model).getSize(new Vector3()).y>1.5);}
+const {canIgnite,demonContact}=await import('../lib/demon-rules.ts');assert.equal(canIgnite(0,6),false);assert.equal(canIgnite(0,40),true);assert.equal(canIgnite(0,40,[{x:0,z:42}]),false);assert.equal(demonContact('titan',10,20),true);assert.equal(demonContact('goblin',1,10),false);
+const {buildRift}=await import('../lib/rift-world.ts');const rift=buildRift();assert.equal(rift.enemies.length,23);assert.equal(rift.fires.length,24);rift.update(.1,9,true);assert.equal(rift.root.visible,true);for(let i=0;i<100;i++)rift.ignite(new Vector3(0,0,40));assert.equal(rift.fires.length,24);rift.reset();assert.ok(rift.fires.every(f=>!f.group.visible));rift.dispose();
+console.log('Rift models PASS: 3ft/200ft/hover silhouettes, batched geometry, protected fire exclusions and fixed effect pools.');

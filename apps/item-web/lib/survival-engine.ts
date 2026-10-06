@@ -1,4 +1,7 @@
 import * as T from 'three';
+import {buildRift} from './rift-world';
+import {DEMON_STATS} from './demon-models';
+import {canIgnite,demonContact} from './demon-rules';
 import {STAR_STAFF,validStarTarget,inStarImpact,type StarTarget} from './star-staff';
 import {buildStarStaff} from './star-staff-world';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
@@ -6,7 +9,7 @@ import {buildCathedral} from './cathedral';
 import {buildDistrict} from './survival-world';
 import {buildCapital} from './capital-world';
 import {safe} from './capital-map';
-import {freshCampaign,restoreCampaign,advanceCampaign,eliminate,missionAction,MISSIONS,type Campaign,type EradicationOption} from './capital-campaign';
+import {freshCampaign,restoreCampaign,advanceCampaign,eliminate,eliminateDemon,missionAction,MISSIONS,type Campaign,type EradicationOption} from './capital-campaign';
 import {ENEMY_STATS,F49_SPAWN} from './hostiles';
 import {buildCurrencySculpture,disposeCurrencySculpture} from './currency-sculpture';
 import {items} from './currency-library';
@@ -31,6 +34,7 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
  const skin=(name:string)=>{const t=loader.load(`${base}/images/hostiles/${name}-reference.jpeg`,()=>{needsRender=true;},undefined,()=>cb.notice('An enemy skin could not load.'));t.colorSpace=T.SRGBColorSpace;textures.push(t);return t;};
  const capital=buildCapital(loader,base,()=>{needsRender=true;},()=>cb.notice('A map layer could not load. Refresh to retry.'));scene.add(capital.root);
  capital.ready.then(()=>{if(!piloting&&!canStand(p.x,p.z)){p.x=0;p.z=3;cb.notice('Returned to the cathedral: saved ground position was obstructed.');}});
+ const rift=buildRift();scene.add(rift.root);
  const district=buildDistrict({robot:skin('robot'),alien:skin('alien'),aircraft:skin('f49')});scene.add(district.root);
  const staff=buildStarStaff();scene.add(staff.root);let selectedWeapon:'ak'|'staff'='staff',staffCooldown=0,starAge=0,starTarget:T.Vector3|null=null,starResolved=false;
  const selectWeapon=(weapon:'ak'|'staff')=>{if(paused||piloting||p.health<=0)return;if(weapon==='ak'&&!p.armed){cb.notice('Talk to Mara for the AK-47');return;}selectedWeapon=weapon;reloading=0;firing=false;needsRender=true;cb.notice(weapon==='staff'?'Starfall bowstaff · aim at terrain outside the refuge · Click / F summons':'AK-47 selected');};
@@ -47,6 +51,10 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
   const supply=SUPPLIES.find(s=>!p.looted.includes(s.id)&&Math.hypot(p.x-s.x,p.z-s.z)<2.8);if(supply)return 'supply:'+supply.id;
   const index=sculptures.findIndex(s=>Math.hypot(p.x-s.position.x,p.z-s.position.z)<2.4);return index>=0?'exhibit:'+items[index].id:'';
  };
+ const protectedPoints=()=>[...district.protectedActors,...capital.protectedActors].map(o=>o.getWorldPosition(new T.Vector3()));
+ const ignite=(point:T.Vector3,explosion=false)=>{if(!canIgnite(point.x,point.z,protectedPoints()))return;rift.ignite(point);if(explosion&&!safe(p.x,p.z)&&Math.hypot(p.x-point.x,(piloting?altitude:1.5)-point.y,p.z-point.z)<7){if(piloting)hull=Math.max(0,hull-18);else p.health=Math.max(0,p.health-18);}};
+ const killEnemy=(enemy:typeof district.enemies[number],index:number)=>{if(!enemy.active||enemy.dead)return;enemy.dead=true;enemy.active=false;enemy.mesh.visible=false;enemy.laser.visible=false;if(enemy.kind==='infected'){eliminate(c);enemy.respawn=2;if(c.rift&&c.riftClock>=8)ignite(enemy.mesh.position.clone(),true);}else if(!p.defeated.includes(index))p.defeated.push(index);};
+ const hitDemon=(enemy:typeof rift.enemies[number],damage:number)=>{if(!enemy.active||enemy.dead)return;enemy.damage+=damage;if(enemy.damage>=DEMON_STATS[enemy.kind].hits&&eliminateDemon(c,enemy.kind)){enemy.active=false;enemy.dead=true;enemy.respawn=4;enemy.mesh.visible=false;cb.notice(enemy.kind==='titan'?'Crust titan banished':enemy.kind==='warlock'?'Warlock banished':'Goblin banished');}};
  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({version:2,player:piloting?{...p,x:0,z:3}:p,campaign:c}));}catch{/* Storage denial must never stop play. */}};
  let firing=false,shotCooldown=0,flashTime=0,reloading=0;
  const clear=()=>{firing=false;keys.clear();motion.x=motion.y=motion.lookX=motion.lookY=motion.lift=0;};
@@ -75,7 +83,7 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
  const summonStar=()=>{
   if(staffCooldown||starTarget)return;
   scene.updateMatrixWorld(true);shotRay.setFromCamera(new T.Vector2(0,0),camera);shotRay.far=STAR_STAFF.range;
-  const hit=shotRay.intersectObjects([cathedral.root,...district.collisions,...capital.collisions,...pedestals,...district.protectedActors,...capital.protectedActors,...district.enemies.filter(e=>e.active&&!e.dead).map(e=>e.mesh)],true)[0];
+  const hit=shotRay.intersectObjects([cathedral.root,...district.collisions,...capital.collisions,...pedestals,...district.protectedActors,...capital.protectedActors,...district.enemies.filter(e=>e.active&&!e.dead).map(e=>e.mesh),...rift.enemies.filter(e=>e.active&&!e.dead).map(e=>e.mesh)],true)[0];
   const ground=shotRay.ray.intersectPlane(new T.Plane(new T.Vector3(0,1,0),0),new T.Vector3());
   const target=hit?.point??ground,origin=new T.Vector3(p.x,1.5+jump,p.z);
   const protectedPoints=[...district.protectedActors,...capital.protectedActors].map(o=>o.getWorldPosition(new T.Vector3()));
@@ -88,17 +96,18 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
   if(!piloting&&selectedWeapon==='staff'){summonStar();return;}
   if(!piloting&&!spendRound(p)){cb.notice(p.reserve?'Empty · press T to reload':'Out of ammunition');return;}
   shotCooldown=piloting?.2:.14;flashTime=.065;scene.updateMatrixWorld(true);
-  const live=district.enemies.filter(e=>e.active&&!e.dead);
+  const live=district.enemies.filter(e=>e.active&&!e.dead),demons=rift.enemies.filter(e=>e.active&&!e.dead);
+  const isChild=(object:T.Object3D,root:T.Object3D)=>{let o:T.Object3D|null=object;while(o){if(o===root)return true;o=o.parent;}return false;};
   const blockers=[cathedral.root,...district.collisions,...capital.collisions,...pedestals,...district.protectedActors,...capital.protectedActors];
   shotRay.setFromCamera(new T.Vector2(0,0),camera);shotRay.far=90;
-  const aim=shotRay.intersectObjects([...blockers,...live.map(e=>e.mesh)],true)[0];
+  const aim=shotRay.intersectObjects([...blockers,...live.map(e=>e.mesh),...demons.map(e=>e.mesh)],true)[0];
   const point=aim?aim.point:shotRay.ray.at(90,new T.Vector3());
   const origin=new T.Vector3(p.x,piloting?altitude+.4:1.5+jump,p.z),direction=point.clone().sub(origin);shotRay.set(origin,direction.normalize());shotRay.far=90;
-  const hit=shotRay.intersectObjects([...blockers,...live.map(e=>e.mesh)],true)[0];
+  const hit=shotRay.intersectObjects([...blockers,...live.map(e=>e.mesh),...demons.map(e=>e.mesh)],true)[0];
   if(hit){const index=district.enemies.findIndex(e=>{let o:T.Object3D|null=hit.object;while(o){if(o===e.mesh)return true;o=o.parent;}return false;});
    if(index>=0){const enemy=district.enemies[index];enemy.mesh.userData.damage=(enemy.mesh.userData.damage??0)+(piloting?2:1);
-    if(enemy.mesh.userData.damage>=(ENEMY_STATS[enemy.kind].hits)){if(enemy.kind==='infected'){eliminate(c);enemy.dead=true;enemy.active=false;enemy.respawn=2;}else p.defeated.push(index);enemy.mesh.visible=false;cb.notice(enemy.robot?'Patrol disabled':enemy.alien?'Alien stopped':'Infected stopped');}else cb.notice('Hit');
-   }
+    if(enemy.mesh.userData.damage>=ENEMY_STATS[enemy.kind].hits+(c.rift&&c.riftClock>=8&&enemy.kind==='infected'?2:0)){killEnemy(enemy,index);cb.notice(enemy.robot?'Patrol disabled':enemy.alien?'Alien stopped':c.rift?'Possessed infected exploded':'Infected stopped');}else cb.notice('Hit');
+   }else{const demon=demons.find(e=>isChild(hit.object,e.mesh));if(demon)hitDemon(demon,piloting?2:1);}
   }save();
  };
  const clock=new T.Clock();let frame=0,uiTime=0,saveTime=0;const ray=new T.Raycaster();
@@ -108,9 +117,8 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
    staffCooldown=Math.max(0,staffCooldown-dt);
    if(starTarget){starAge+=dt;staff.update(starAge,starTarget);if(starAge>=STAR_STAFF.fallTime&&!starResolved){starResolved=true;let hits=0;
     district.enemies.forEach((enemy,index)=>{if(!enemy.active||enemy.dead||!inStarImpact(starTarget as StarTarget,{x:enemy.mesh.position.x,y:enemy.mesh.position.y+1,z:enemy.mesh.position.z}))return;
-     hits++;enemy.mesh.userData.damage=STAR_STAFF.damage;enemy.dead=true;enemy.active=false;enemy.mesh.visible=false;enemy.laser.visible=false;
-     if(enemy.kind==='infected'){eliminate(c);enemy.respawn=2;}else if(!p.defeated.includes(index))p.defeated.push(index);
-    });save();cb.notice(`Starfall impact · ${hits} hostiles stopped`);
+     hits++;killEnemy(enemy,index);
+    });rift.enemies.forEach(e=>{if(e.active&&!e.dead&&inStarImpact(starTarget as StarTarget,{x:e.mesh.position.x,y:e.mesh.position.y+(e.kind==='titan'?8:1),z:e.mesh.position.z})){hitDemon(e,STAR_STAFF.damage);hits++;}});save();cb.notice(`Starfall impact · ${hits} hostiles hit`);
    }if(starAge>=2.2){starTarget=null;staff.reset();}}
    shotCooldown=Math.max(0,shotCooldown-dt);flashTime=Math.max(0,flashTime-dt);if(reloading){reloading=Math.max(0,reloading-dt);if(!reloading){reloadWeapon(p);save();cb.notice('Reloaded');}}
    yaw-=motion.lookX*dt*1.8;pitch=T.MathUtils.clamp(pitch-motion.lookY*dt*1.4,-1.48,1.48);
@@ -121,7 +129,8 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
    const valid=piloting?(x:number,z:number)=>canHover(x,z,altitude):canStand;if(valid(nx,p.z))p.x=nx;if(valid(p.x,nz))p.z=nz;
    if(piloting){altitude=T.MathUtils.clamp(altitude+(Number(keys.has(' '))-Number(keys.has('c'))+motion.lift)*dt*32,flightFloor(p.x,p.z),450);district.gunship.position.set(p.x,altitude,p.z);district.gunship.rotation.y=yaw;}
    vertical-=dt*12;jump=Math.max(0,jump+vertical*dt);if(!jump)vertical=0;
-   advance(p,dt,running&&!piloting);advanceCampaign(c,dt);if(c.launched){blastAge+=dt;capital.updateStrike(blastAge);}else capital.blast.visible=false;capital.markers.forEach(m=>{m.beam.visible=m.index===Math.min(c.quest,4)&&!c.won;m.ring.visible=m.index<=c.quest;});
+   advance(p,dt,running&&!piloting);advanceCampaign(c,dt);if(c.launched){blastAge+=dt;capital.updateStrike(blastAge);}else capital.blast.visible=false;if(c.rift){rift.update(dt,c.riftClock,c.demons>0);scene.fog!.color.setHex(0x493b40);renderer.setClearColor(0x493b40);}else rift.root.visible=false;
+   capital.markers.forEach(m=>{m.beam.visible=m.index===(c.strategy==='trinity'?Math.min(c.quest,MISSIONS.length-1):Math.min(c.quest,4))&&!c.won;m.ring.visible=m.index<=c.quest;});
    let represented=0;
    district.enemies.forEach((e,i)=>{
     e.laser.visible=false;e.respawn=Math.max(0,e.respawn-dt);
@@ -135,7 +144,8 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
      }
      e.active=wanted;if(wanted)represented++;
     }else{e.active=!p.defeated.includes(i);e.dead=!e.active;}
-    e.mesh.visible=e.active;if(!e.active)return;
+    e.mesh.visible=e.active;if(e.kind==='infected'){(e.mesh.userData.possession as T.Group).visible=c.rift&&c.riftClock>=8;}if(!e.active)return;
+    if(e.kind==='infected'&&c.rift&&c.riftClock>=8&&Math.sin(p.elapsed*.6+i)>.995)ignite(e.mesh.position.clone());
     const stats=ENEMY_STATS[e.kind],distance=Math.hypot(p.x-e.mesh.position.x,p.z-e.mesh.position.z),chase=!safe(p.x,p.z)&&distance<stats.range;
     const tx=chase?p.x:e.x+Math.sin(p.elapsed*.18+i)*5,tz=chase?p.z:e.z+Math.cos(p.elapsed*.18+i)*5;
     const direction=new T.Vector2(tx-e.mesh.position.x,tz-e.mesh.position.z),moving=direction.length()>.3&&!(e.robot&&chase&&distance<20);
@@ -157,6 +167,23 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
      if(piloting)hull=Math.max(0,hull-stats.damage);else p.health=Math.max(0,p.health-stats.damage);e.cooldown=1;cb.notice(e.alien?'Alien claws struck you':'An infected survivor struck you');
     }
    });
+   if(c.rift&&c.riftClock>=8){
+    let represented=0;
+    rift.enemies.forEach((e,i)=>{
+     e.respawn=Math.max(0,e.respawn-dt);e.cooldown=Math.max(0,e.cooldown-dt);
+     if(Math.hypot(p.x-e.mesh.position.x,p.z-e.mesh.position.z)>(e.kind==='titan'?500:180))e.active=false;
+     const wanted=represented<c.demons&&!e.respawn&&!c.won;
+     if(wanted&&!e.active){let placed=false;for(let n=0;n<24;n++){const a=i*2.4+n*.5,r=e.kind==='titan'?100:e.kind==='warlock'?45:28,x=p.x+Math.sin(a)*r,z=p.z+Math.cos(a)*r;if(canStand(x,z)&&canIgnite(x,z,protectedPoints())){e.mesh.position.set(x,e.kind==='warlock'?3:0,z);placed=true;break;}}if(!placed){e.mesh.visible=false;return;}e.damage=0;e.dead=false;e.active=true;}
+     e.active=wanted;e.mesh.visible=wanted;if(!wanted)return;represented++;
+     const distance=Math.hypot(p.x-e.mesh.position.x,p.z-e.mesh.position.z),stats=DEMON_STATS[e.kind],chase=!safe(p.x,p.z)&&distance<stats.range;
+     if(chase&&distance>(e.kind==='titan'?14:2)){const dx=(p.x-e.mesh.position.x)/distance*stats.speed*dt,dz=(p.z-e.mesh.position.z)/distance*stats.speed*dt;if(canStand(e.mesh.position.x+dx,e.mesh.position.z))e.mesh.position.x+=dx;if(canStand(e.mesh.position.x,e.mesh.position.z+dz))e.mesh.position.z+=dz;}
+     e.mesh.rotation.y=Math.atan2(-(p.x-e.mesh.position.x),-(p.z-e.mesh.position.z));
+     (e.mesh.userData.legs as T.Group[]).forEach((leg,n)=>leg.rotation.x=chase?Math.sin(p.elapsed*(e.kind==='titan'?2:7)+n*Math.PI)*.25:0);
+     if(e.kind==='warlock'){e.mesh.position.y=3+Math.sin(p.elapsed*1.5+i)*.6;if(chase&&!e.cooldown&&!e.cast){e.cast=1.2;e.aim.set(p.x,0,p.z);cb.notice('Warlock fire curse · move away');}if(e.cast){e.cast=Math.max(0,e.cast-dt);if(!e.cast){ignite(e.aim);e.cooldown=4;}}}
+     else if(chase&&!e.cooldown&&demonContact(e.kind,distance,piloting?altitude:1.5+jump)){if(piloting)hull=Math.max(0,hull-stats.damage);else p.health=Math.max(0,p.health-stats.damage);e.cooldown=e.kind==='titan'?2:1;cb.notice(e.kind==='titan'?'Titan shockwave':'Goblin claws');}
+    });
+    if(!c.won&&!safe(p.x,p.z)&&rift.fires.some(f=>f.age<8&&Math.hypot(p.x-f.group.position.x,(piloting?altitude:1.5+jump)-f.group.position.y,p.z-f.group.position.z)<3.5)){if(piloting)hull=Math.max(0,hull-dt*8);else p.health=Math.max(0,p.health-dt*8);}
+   }else rift.enemies.forEach(e=>{e.active=false;e.mesh.visible=false;});
    if(piloting&&hull<=0)p.health=0;
    if(p.health<=0){save();clear();paused=true;document.exitPointerLock?.();}
   }
@@ -178,5 +205,5 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
   if(saveTime>10){saveTime=0;save();}if(!document.hidden&&(!paused||needsRender)){renderer.render(scene,camera);needsRender=false;}frame=requestAnimationFrame(render);
  }
  render();
- return {fire,reload,selectWeapon,campaign:()=>({...c}),mission(id:string,choice:EradicationOption='containment'){if(!MISSIONS.some(m=>m.id===id&&Math.hypot(p.x-m.x,p.z-m.z)<7)||piloting||p.health<=0)return 'Reach this station on foot first.';const result=missionAction(c,id,p.defeated.filter(i=>i===5||i===6).length,choice);save();cb.notice(result);return result;},player:()=>p,motion,interact,setPaused(value:boolean){paused=value;clear();save();if(value)document.exitPointerLock?.();else canvas.focus({preventScroll:true});},toggleCamera(){third=!third;needsRender=true;},consume(kind:'water'|'food'){cb.notice(consume(p,kind));},restart(){selectedWeapon='staff';staffCooldown=0;starTarget=null;starResolved=false;staff.reset();p=freshPlayer();c=freshCampaign();blastAge=0;piloting=false;hull=100;altitude=F49_SPAWN.y;district.gunship.position.set(F49_SPAWN.x,F49_SPAWN.y,F49_SPAWN.z);district.gunship.rotation.y=Math.PI;reloading=shotCooldown=flashTime=0;firing=false;yaw=Math.PI;pitch=.03;jump=vertical=0;paused=false;district.enemies.forEach(e=>{e.mesh.position.set(e.x,0,e.z);e.dead=e.active=false;e.respawn=0;e.cooldown=e.windup=e.beamTime=0;e.laser.visible=false;e.mesh.userData.damage=0;e.mesh.visible=true;});save();},dispose(){disposed=true;save();cancelAnimationFrame(frame);resize.disconnect();if(document.pointerLockElement===canvas)document.exitPointerLock();window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);document.removeEventListener('visibilitychange',hidden);document.removeEventListener('pointerlockchange',lock);canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',look);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',up);staff.dispose();cathedral.dispose();district.dispose();capital.dispose();textures.forEach(t=>t.dispose());sculptures.forEach(disposeCurrencySculpture);pedestalGeometry.dispose();pedestalMaterial.dispose();environment.dispose();renderer.dispose();canvas.remove();}};
+ return {fire,reload,selectWeapon,campaign:()=>({...c}),mission(id:string,choice:EradicationOption='containment'){if(!MISSIONS.some(m=>m.id===id&&Math.hypot(p.x-m.x,p.z-m.z)<7)||piloting||p.health<=0)return 'Reach this station on foot first.';const result=missionAction(c,id,p.defeated.filter(i=>i===5||i===6).length,choice);save();cb.notice(result);return result;},player:()=>p,motion,interact,setPaused(value:boolean){paused=value;clear();save();if(value)document.exitPointerLock?.();else canvas.focus({preventScroll:true});},toggleCamera(){third=!third;needsRender=true;},consume(kind:'water'|'food'){cb.notice(consume(p,kind));},restart(){rift.reset();scene.fog!.color.setHex(0x899a9e);renderer.setClearColor(0x899a9e);selectedWeapon='staff';staffCooldown=0;starTarget=null;starResolved=false;staff.reset();p=freshPlayer();c=freshCampaign();blastAge=0;piloting=false;hull=100;altitude=F49_SPAWN.y;district.gunship.position.set(F49_SPAWN.x,F49_SPAWN.y,F49_SPAWN.z);district.gunship.rotation.y=Math.PI;reloading=shotCooldown=flashTime=0;firing=false;yaw=Math.PI;pitch=.03;jump=vertical=0;paused=false;district.enemies.forEach(e=>{e.mesh.position.set(e.x,0,e.z);e.dead=e.active=false;e.respawn=0;e.cooldown=e.windup=e.beamTime=0;e.laser.visible=false;e.mesh.userData.damage=0;e.mesh.visible=true;});save();},dispose(){disposed=true;save();cancelAnimationFrame(frame);resize.disconnect();if(document.pointerLockElement===canvas)document.exitPointerLock();window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);document.removeEventListener('visibilitychange',hidden);document.removeEventListener('pointerlockchange',lock);canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',look);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',up);rift.dispose();staff.dispose();cathedral.dispose();district.dispose();capital.dispose();textures.forEach(t=>t.dispose());sculptures.forEach(disposeCurrencySculpture);pedestalGeometry.dispose();pedestalMaterial.dispose();environment.dispose();renderer.dispose();canvas.remove();}};
 }

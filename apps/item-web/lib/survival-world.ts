@@ -3,15 +3,8 @@ import { BUILDINGS, SUPPLIES } from './survival';
 import {HOSTILES,OUTBREAK_SLOTS,F49_SPAWN} from './hostiles';
 import {robotModel,alienModel,gunshipModel,type Skins} from './hostile-models';
 
-export function person(color:number,robot=false){
- const root=new T.Group();const material=new T.MeshStandardMaterial({color,roughness:.7,metalness:robot?.75:.1});
- const limb=(w:number,h:number,d:number,x:number,y:number,z:number)=>{const mesh=new T.Mesh(new T.BoxGeometry(w,h,d),material);mesh.position.set(x,y,z);root.add(mesh);return mesh;};
- limb(.55,.75,.3,0,1.05,0);const head=new T.Mesh(new T.SphereGeometry(.22,10,8),material);head.position.y=1.68;root.add(head);
- const legs=[limb(.19,.65,.21,-.17,.35,0),limb(.19,.65,.21,.17,.35,0)];
- limb(.16,.7,.18,-.38,1,0);limb(.16,.7,.18,.38,1,0);
- const eyes=new T.Mesh(new T.BoxGeometry(.3,.05,.04),new T.MeshBasicMaterial({color:robot?0xff5340:0xb8ffe0}));eyes.position.set(0,1.72,-.2);root.add(eyes);
- root.userData.legs=legs;return root;
-}
+export {characterModel as person} from './character-models';
+import {characterModel as person} from './character-models';
 export function rifle(){
  const group=new T.Group();group.name='AK-47';
  const metal=new T.MeshStandardMaterial({color:0x252a29,metalness:.8,roughness:.35}),wood=new T.MeshStandardMaterial({color:0x75432b,roughness:.7});
@@ -59,17 +52,17 @@ export function buildDistrict(skins:Skins){
  };
  label('LIBRARY TERMINAL',2.6,2.35,6);label('MARA / KEEPER',-2.5,2.6,6);label('IRI / SURVIVOR',-8,2.6,57);
  label('CAPITAL REFUGE',0,4.2,12);label('CATHEDRAL / SAFE',0,5.7,9.9);
- const keeper=person(0x998b6e);keeper.position.set(-2.5,0,6);root.add(keeper);
- const visitor=person(0x6b94a0);visitor.scale.set(.8,1.15,.8);visitor.position.set(-8,0,57);root.add(visitor);
+ const keeper=person(0x998b6e,'mara');keeper.position.set(-2.5,0,6);root.add(keeper);
+ const visitor=person(0x6b94a0,'iri');visitor.scale.set(.8,1.15,.8);visitor.position.set(-8,0,57);root.add(visitor);
  const supplies=SUPPLIES.map(s=>{const mesh=box(.7,.6,.7,s.x,.3,s.z,s.kind==='water'?0x57acc1:s.kind==='medicine'?0xcda789:0x679a55);return {id:s.id,mesh};});
- const enemies=[...HOSTILES,...OUTBREAK_SLOTS].map(({kind,x,z})=>{const robot=kind==='robot',alien=kind==='alien';const mesh=robot?robotModel(skins.robot):alien?alienModel(skins.alien):person(0x596449);mesh.position.set(x,0,z);root.add(mesh);const laser=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]),new T.LineBasicMaterial({color:0xff382b,transparent:true,opacity:.8}));laser.visible=false;root.add(laser);return {mesh,robot,alien,kind,x,z,dead:false,active:false,respawn:0,cooldown:0,windup:0,beamTime:0,aim:new T.Vector3(),laser};});
+ const enemies=[...HOSTILES,...OUTBREAK_SLOTS].map(({kind,x,z})=>{const robot=kind==='robot',alien=kind==='alien';const mesh=robot?robotModel(skins.robot):alien?alienModel(skins.alien):person(0x596449,'infected');mesh.position.set(x,0,z);root.add(mesh);const laser=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]),new T.LineBasicMaterial({color:0xff382b,transparent:true,opacity:.8}));laser.visible=false;root.add(laser);return {mesh,robot,alien,kind,x,z,dead:false,active:false,respawn:0,cooldown:0,windup:0,beamTime:0,aim:new T.Vector3(),laser};});
  const gunship=gunshipModel(skins.aircraft);gunship.position.set(F49_SPAWN.x,F49_SPAWN.y,F49_SPAWN.z);gunship.rotation.y=Math.PI;root.add(gunship);
  label('F-49 / E TO BOARD',8,3.5,19);
  // Visible landing pad beside the cathedral exit.
  box(9,.04,12,8,-.03,19,0x2b413a);
 
  const weapon=rifle();root.add(weapon.group);
- const player=person(0x252d2c);root.add(player);
+ const player=person(0x252d2c,'player');root.add(player);
  return {root,player,weapon,gunship,protectedActors:[keeper,visitor],enemies,supplies,collisions,dispose(){
   const geometries=new Set<T.BufferGeometry>(),mats=new Set<T.Material>(),textures=new Set<T.Texture>();root.traverse(n=>{
    const m=n as T.Mesh;if(m.geometry)geometries.add(m.geometry);if(m.material)for(const a of Array.isArray(m.material)?m.material:[m.material]){mats.add(a);const map=(a as T.MeshBasicMaterial).map;if(map)textures.add(map);}
