@@ -40,3 +40,4 @@ export function bunkerWalkable(x:number,z:number,unlocked:boolean){
 }
 
 export const bunkerRoofAt=(x:number,z:number)=>Math.abs(x-BUNKER.x)<=14&&Math.abs(z-BUNKER.z)<=19?15:0;
+export const bunkerGroundSaveValid=(x:number,z:number,h:HorizonQuest)=>(h.stage>=3||bunkerRoofAt(x,z)===0)&&bunkerWalkable(x,z,h.stage>=3);

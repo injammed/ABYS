@@ -1,5 +1,5 @@
 import {buildHorizon} from './horizon-world';
-import {freshHorizon,restoreHorizon,horizonAction,hitWizard,bunkerWalkable,bunkerRoofAt,HORIZON_MISSIONS,type HorizonQuest} from './horizon-quest';
+import {freshHorizon,restoreHorizon,horizonAction,hitWizard,bunkerWalkable,bunkerRoofAt,bunkerGroundSaveValid,HORIZON_MISSIONS,type HorizonQuest} from './horizon-quest';
 import * as T from 'three';
 import {buildRift} from './rift-world';
 import {DEMON_STATS} from './demon-models';
@@ -35,7 +35,7 @@ export function createSurvival(host:HTMLDivElement,cb:Callbacks){
  const cathedral=buildCathedral(-126,frescoes,true);scene.add(cathedral.root);
  const skin=(name:string)=>{const t=loader.load(`${base}/images/hostiles/${name}-reference.jpeg`,()=>{needsRender=true;},undefined,()=>cb.notice('An enemy skin could not load.'));t.colorSpace=T.SRGBColorSpace;textures.push(t);return t;};
  const capital=buildCapital(loader,base,()=>{needsRender=true;},()=>cb.notice('A map layer could not load. Refresh to retry.'));scene.add(capital.root);
- capital.ready.then(()=>{if(!piloting&&!walkable(p.x,p.z)){p.x=0;p.z=3;cb.notice('Returned to the cathedral: saved ground position was obstructed.');}});
+ capital.ready.then(()=>{if(!piloting&&(!canStand(p.x,p.z)||!bunkerGroundSaveValid(p.x,p.z,h))){p.x=0;p.z=3;cb.notice('Returned to the cathedral: saved ground position was obstructed.');}});
  const rift=buildRift();scene.add(rift.root);
  const reference=loader.load(`${base}/images/horizon-lens-reference.webp`,()=>{needsRender=true;});reference.colorSpace=T.SRGBColorSpace;textures.push(reference);
  const horizon=buildHorizon(reference);scene.add(horizon.root);horizon.update(h,p.elapsed);let curseAge=0,curseCooldown=0;
