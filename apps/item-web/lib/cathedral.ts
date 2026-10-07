@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import {surfaceMaterial,disposeSurface} from "./world-materials";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
 import CEILINGS from "./cathedral-art.json" with {type:"json"};
@@ -34,8 +35,8 @@ export function vaultGeometry(z: number, length: number, radius = 5.94) {
 
 export function buildCathedral(lastRow: number, frescoes: THREE.Texture[], openEntrance = false) {
   const root = new THREE.Group(); root.name = "AETIMM cathedral";
-  const stone = new THREE.MeshStandardMaterial({ color: 0xe7d9bb, roughness: .82 });
-  const dark = new THREE.MeshStandardMaterial({ color: 0x303b3d, roughness: .36, metalness: .16 });
+  const stone = surfaceMaterial("stone",0xe7d9bb,3);
+  const dark = surfaceMaterial("marble",0x303b3d,2);
   const gold = new THREE.MeshStandardMaterial({ color: 0xb98a3e, roughness: .3, metalness: .72 });
   const light = new THREE.MeshBasicMaterial({ color: 0xffe8b3 });
   if(frescoes.length!==CEILINGS.length)throw new Error("Each hall requires its own ceiling texture");
@@ -106,7 +107,9 @@ export function buildCathedral(lastRow: number, frescoes: THREE.Texture[], openE
   root.clear();geometries.forEach(g=>g.dispose());geometries.clear();
   for(const [material,batch] of batches) {
     const merged=mergeGeometries(batch);batch.forEach(g=>g.dispose());
-    if(merged)mesh(merged,material);
+    if(merged){
+      if(material===stone){const position=merged.getAttribute('position'),normal=merged.getAttribute('normal'),uv:number[]=[];for(let i=0;i<position.count;i++){const nx=Math.abs(normal.getX(i)),ny=Math.abs(normal.getY(i)),nz=Math.abs(normal.getZ(i));uv.push((nx>ny&&nx>nz?position.getZ(i):position.getX(i))*.2,(ny>nx&&ny>nz?position.getZ(i):position.getY(i))*.2);}merged.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));}
+      const part=mesh(merged,material);part.castShadow=material===stone||material===gold;part.receiveShadow=true;}
   }
-  return {root,dispose(){geometries.forEach(g=>g.dispose());[stone,dark,gold,light,...paintings,glass].forEach(m=>m.dispose());}};
+  return {root,dispose(){geometries.forEach(g=>g.dispose());[stone,dark,gold,light,...paintings,glass].forEach(disposeSurface);}};
 }

@@ -26,7 +26,7 @@ export function robotModel(skin:T.Texture){
  for(let i=0;i<4;i++)b.mesh(new T.BoxGeometry(.6-i*.05,.04,.03),red,0,1.35+i*.12,-.36);
  const gun=new T.Group();gun.position.set(.43,1.32,-.7);root.add(gun);const g=builder(gun);g.mesh(new T.BoxGeometry(.2,.22,.7),steel,0,0,0);g.mesh(new T.BoxGeometry(.09,.09,.6),joints,0,.025,-.55);g.mesh(new T.BoxGeometry(.12,.05,.6),red,0,.14,-.15);
  for(const side of [-1,1])for(let i=0;i<5;i++){b.sphere(.025,side*.46,1.4+i*.09,-.35,1,1,1,steel);b.mesh(new T.BoxGeometry(.18,.025,.07),joints,side*.5,1.76-i*.06,.28);}
- root.userData.legs=legs;root.userData.muzzle=new T.Vector3(.43,1.35,-1.55);return batchModel(root);
+ root.userData.legs=legs;root.userData.muzzle=new T.Vector3(.43,1.35,-1.55);batchModel(root);root.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;}});return root;
 }
 export function alienModel(skin:T.Texture){
  const root=new T.Group();root.name='Spined alien hunter';const b=builder(root);
@@ -47,7 +47,7 @@ export function alienModel(skin:T.Texture){
  // Long drooping jaw tendrils follow the supplied sketch.
  for(const side of [-1,1])b.bar(new T.Vector3(side*.27,1.1,-1.4),new T.Vector3(side*.31,.45,-1.5),.025,dark);
  for(let i=0;i<16;i++){const a=i*2.399;b.sphere(.05+(.02*(i%3)),Math.sin(a)*.65,1.3+(i%4)*.12,.7-(i%6)*.22,1,.6,.5,i%3===0?bone:flesh);}
- root.userData.legs=legs;return batchModel(root);
+ root.userData.legs=legs;batchModel(root);root.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;}});return root;
 }
 export function gunshipModel(skin:T.Texture){
  const root=new T.Group();root.name='F-49 VTOL gunship';const b=builder(root);
@@ -71,5 +71,5 @@ export function gunshipModel(skin:T.Texture){
  b.bar(new T.Vector3(0,.92,-1.7),new T.Vector3(0,.92,-.2),.045,dark);
  b.bar(new T.Vector3(0,-.3,-2),new T.Vector3(0,-1,-2),.055,dark);b.mesh(new T.BoxGeometry(.25,.13,.6),dark,0,-1,-2);
  const flash=b.mesh(new T.OctahedronGeometry(.2),new T.MeshBasicMaterial({color:0x94f4ff}),0,-.25,-3);flash.visible=false;
- root.userData.flash=flash;return batchModel(root);
+ root.userData.flash=flash;batchModel(root);root.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;}});return root;
 }

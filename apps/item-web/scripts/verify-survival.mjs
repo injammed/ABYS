@@ -59,3 +59,5 @@ const bossRay=new Raycaster(new Vector3(BUNKER.x-6,2.5,BUNKER.z-10),new Vector3(
 console.log('Horizon world PASS: locked/open bunker ray collisions, targetable wizard, lens/boss visibility and model disposal.');
 
 await import("./verify-economy.mjs");
+
+await import("./verify-world-art.mjs");
