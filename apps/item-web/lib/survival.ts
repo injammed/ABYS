@@ -40,6 +40,7 @@ export function reloadWeapon(p:Player){const rounds=Math.min(30-p.ammo,p.reserve
 export function talk(p:Player,npc:'keeper'|'visitor',raw:string){
  const text=raw.toLowerCase().slice(0,300);
  if(npc==='keeper'){
+  if(/apy0c|apyoc|wizard|horizon|virus|infection origin|transcend|machine mind/.test(text))return 'The alien virus, possession and robotic takeover are linked. A dark wizard corrupted APY0C and turned the Eye of Horizons against galactic life. Recover the infection archive, disconnect its command relay, enter the nuclear bunker and defeat the wizard. Sever the Eye; reclaim agency. Human rescue and outbreak containment remain separate duties. Follow the violet markers on your field map.';
   if(/demon|possess|trinity|goblin|witch|warlock|titan|rift|breach/.test(text))return 'Rescue 25,000 before considering Trinity. It releases HSGV salvos, nuclear reentry warheads and MADS together. The crust opens and demons emerge. Possessed infected explode: keep your distance. Defeat 8 goblins, 1 titan and 3 warlocks, then restore the seal. The Starfall staff is yours; press 2.';
   if(/quest|mission|refugee|outbreak|evac|quarantine|nuclear/.test(text))return 'Five million refugees came to the capital. One infection can become thousands. Open the field map with M. Restore the hospital, quarantine relay and evacuation route. Aegis offers a fictional strike, but civilian losses are permanent. Containment is another path.';
   if(/ak.?47|weapon|rifle|gun|ammo|shoot/.test(text)){if(armPlayer(p))return 'Take this AK-47 and 120 rounds. Click or F fires; T reloads. The cathedral is a safe zone.';return 'You have my AK-47. Click or F fires; T reloads. I have no more ammunition to spare.';}
@@ -48,6 +49,7 @@ export function talk(p:Player,npc:'keeper'|'visitor',raw:string){
   if(/outside|city|danger|war|robot|zombie|surviv|alien|f.?49|vtol|gunship/.test(text))return 'Infected roam the avenue. Spined aliens rush you; rifle robots fire lasers. The F-49 is on the pad outside: E boards, Space rises, C descends, click or F fires. Land before exiting.';
   if(/who|name|hello|hi\b/.test(text))return 'I am Mara, the keeper. I keep the doors open. Ask me for help, about the terminal, or about the city.';
  }else{
+  if(/apy0c|apyoc|wizard|horizon|virus|transcend/.test(text))return 'Our people are victims too. The wizard corrupted APY0C and pointed the Eye of Horizons at every living world. The virus is engineered, but it does not speak for all aliens. Break the Eye, rescue those who can be saved, and let us choose our own future.';
   if(/give|share|offer|trade/.test(text)&&/water|bottle|drink/.test(text)){
    if(p.helped)return 'You already shared water with me. I will remember it. I have nothing else to trade.';
    if(p.bottles<1)return 'You have no water to spare. Find a sealed bottle first.';

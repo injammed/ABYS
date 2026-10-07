@@ -23,7 +23,7 @@ export const MISSIONS=[
  {id:'riftseal',name:'Crust breach · seal terminal',x:80,z:1350,task:'After Trinity: defeat 8 goblins, 1 titan and 3 floating warlocks. Restore the seal to banish the demon horde and cleanse remaining possessed zombies.'},
 ] as const;
 export function advanceCampaign(c:Campaign,dt:number){
- if(c.won)return;dt=Math.max(0,Math.min(1,dt));c.clock+=dt;if(c.rift)c.riftClock+=dt;
+ dt=Math.max(0,Math.min(1,dt));c.clock+=dt;if(c.won)return;if(c.rift)c.riftClock+=dt;
  if(!c.contained&&c.zombies&&c.humans){
   c.carry+=c.zombies*Math.expm1(Math.LN2*dt/18)*(c.humans/POPULATION);
   const n=Math.min(c.humans,Math.floor(c.carry));c.carry-=n;c.humans-=n;c.zombies+=n;c.converted+=n;
@@ -47,7 +47,7 @@ export function missionAction(c:Campaign,id:string,robots:number,choice:Eradicat
  if(!ERADICATION_OPTIONS.some(o=>o.id===strategy))return 'Unknown eradication option.';
  const index=MISSIONS.findIndex(m=>m.id===id);if(index<0)return 'Unknown station.';
  if(id==='aegis'&&c.quest>=5)return 'Your eradication decision is already committed.';
- if(c.won)return 'The outbreak has been eradicated. Your survivors remain protected.';
+ if(c.won){if(id==='hospital'&&c.quest===0){const n=evacuate(c);c.quest=1;return `${n.toLocaleString()} refugees evacuated. Keep saving survivors.`;}if(index<c.quest&&(id==='hospital'||id==='evac')){if(c.clock-c.lastEvac<30)return 'Next convoy in '+Math.ceil(30-(c.clock-c.lastEvac))+' seconds of play.';return `${evacuate(c).toLocaleString()} refugees evacuated. Keep saving survivors.`;}return 'The outbreak has been eradicated. Your survivors remain protected.';}
  if(index>c.quest)return `First: ${MISSIONS[Math.min(c.quest,MISSIONS.length-1)].task}`;
  if(index<c.quest){if((id==='hospital'||id==='evac')&&c.clock-c.lastEvac>=30){return `${evacuate(c).toLocaleString()} refugees evacuated.`;}return 'Station secured. Evacuation convoys can depart every 30 seconds of play.';}
  if(id==='hospital'){const n=evacuate(c);c.quest=1;return `Hospital restored. ${n.toLocaleString()} refugees protected. Find the quarantine relay.`;}
