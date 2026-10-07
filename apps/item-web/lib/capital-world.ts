@@ -1,3 +1,4 @@
+import {groundWithTunnel} from './tunnel-ground';
 import * as T from 'three';
 import {WEST,EAST,NORTH,SOUTH,REGION,installFootprints,type Footprint} from './capital-map';
 import {MISSIONS} from './capital-campaign';
@@ -8,7 +9,7 @@ export function buildCapital(loader:T.TextureLoader,base:string,onReady:()=>void
  let disposed=false;const abort=new AbortController();
  const aerial=loader.load(`${base}/maps/washington/aerial.jpg`,onReady,undefined,onError);aerial.colorSpace=T.SRGBColorSpace;aerial.anisotropy=4;
  const roof=new T.MeshStandardMaterial({map:aerial,roughness:1,side:T.DoubleSide}),wall=new T.MeshStandardMaterial({color:0x9c9b90,roughness:.9,side:T.DoubleSide});
- const floor=new T.Mesh(new T.PlaneGeometry(EAST-WEST,SOUTH-NORTH),roof);floor.rotation.x=-Math.PI/2;floor.position.set((EAST+WEST)/2,-.25,(SOUTH+NORTH)/2);root.add(floor);
+ const floor=new T.Mesh(groundWithTunnel(WEST,EAST,NORTH,SOUTH),roof);root.add(floor);
  const boundary=new T.LineLoop(new T.BufferGeometry().setFromPoints(REGION.map(([x,z])=>new T.Vector3(x,1,z))),new T.LineBasicMaterial({color:0xd86a47}));root.add(boundary);
  const protectedActors:T.Object3D[]=[];
  const markers=MISSIONS.map((m,i)=>{
