@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import {surfaceMaterial,disposeSurface} from "./world-materials";
+import {surfaceMaterial,disposeSurface} from "./world-materials.ts";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
 import CEILINGS from "./cathedral-art.json" with {type:"json"};

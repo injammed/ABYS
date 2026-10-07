@@ -1,5 +1,5 @@
-import {buildRefugeArt,refugeWalkable} from './refuge-art';
-import {CAPITAL_LOOK} from './world-materials';
+import {buildRefugeArt,refugeWalkable} from './refuge-art.ts';
+import {CAPITAL_LOOK} from './world-materials.ts';
 import {buildEconomyWorld} from './economy-world';
 import {freshEconomy,restoreEconomy,rewardKill,syncRegionalDeaths,rewardRescue,skullQuestAction,absorbSoul,sellSouls,buy,damagePlayer,tickUpgrades,tunnelGround,economyWalkable,VENDING,SOUL_TRADER,type Economy,type GearId} from './game-economy';
 import {buildHorizon} from './horizon-world';

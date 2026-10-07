@@ -1,6 +1,6 @@
 import {groundWithTunnel} from './tunnel-ground';
 import * as T from 'three';
-import {surfaceMaterial,disposeSurface} from './world-materials';
+import {surfaceMaterial,disposeSurface} from './world-materials.ts';
 import {WEST,EAST,NORTH,SOUTH,REGION,installFootprints,type Footprint} from './capital-map';
 import {MISSIONS} from './capital-campaign';
 import {person} from './survival-world';

@@ -1,5 +1,5 @@
 import * as T from 'three';
-import {surfaceMaterial} from './world-materials';
+import {surfaceMaterial} from './world-materials.ts';
 import { BUILDINGS, SUPPLIES } from './survival';
 import {HOSTILES,OUTBREAK_SLOTS,F49_SPAWN} from './hostiles';
 import {robotModel,alienModel,gunshipModel,type Skins} from './hostile-models';
