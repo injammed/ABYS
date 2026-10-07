@@ -40,6 +40,7 @@ export function reloadWeapon(p:Player){const rounds=Math.min(30-p.ammo,p.reserve
 export function talk(p:Player,npc:'keeper'|'visitor',raw:string){
  const text=raw.toLowerCase().slice(0,300);
  if(npc==='keeper'){
+  if(/skull|soul|uk.onu|cash|vending|armor|jetpack|exo|nanite/.test(text))return 'Ask me for the Skull of Uk’onu’okele quest: rescue 5,000 refugees and defeat three enemies, then return here. Press 3 to reveal souls and hold Click / F nearby to absorb. Nera buys them for $50 each below the tunnel marked T on the map. Green supply machines sell ammo, armor, helmets, exo suits, jetpacks and nanites for in-game USD.';
   if(/apy0c|apyoc|wizard|horizon|virus|infection origin|transcend|machine mind/.test(text))return 'The alien virus, possession and robotic takeover are linked. A dark wizard corrupted APY0C and turned the Eye of Horizons against galactic life. Recover the infection archive, disconnect its command relay, enter the nuclear bunker and defeat the wizard. Sever the Eye; reclaim agency. Human rescue and outbreak containment remain separate duties. Follow the violet markers on your field map.';
   if(/demon|possess|trinity|goblin|witch|warlock|titan|rift|breach/.test(text))return 'Rescue 25,000 before considering Trinity. It releases HSGV salvos, nuclear reentry warheads and MADS together. The crust opens and demons emerge. Possessed infected explode: keep your distance. Defeat 8 goblins, 1 titan and 3 warlocks, then restore the seal. The Starfall staff is yours; press 2.';
   if(/quest|mission|refugee|outbreak|evac|quarantine|nuclear/.test(text))return 'Five million refugees came to the capital. One infection can become thousands. Open the field map with M. Restore the hospital, quarantine relay and evacuation route. Aegis offers a fictional strike, but civilian losses are permanent. Containment is another path.';
@@ -68,7 +69,7 @@ export function restorePlayer(raw:string|null):Player{
  for(const k of ['bottles','rations','elapsed'] as const)if(!Number.isFinite(p[k])||p[k]<0||p[k]>1e7)return fallback;
  if(!Number.isInteger(p.bottles)||!Number.isInteger(p.rations)||typeof p.gift!=='boolean'||typeof p.helped!=='boolean'||!Array.isArray(p.looted)||p.looted.length>6||new Set(p.looted).size!==p.looted.length||p.looted.some((id:string)=>!SUPPLIES.some(s=>s.id===id)))return fallback;
  const armed=p.armed??false,ammo=p.ammo??0,reserve=p.reserve??0,defeated=p.defeated??[];
- if(typeof armed!=='boolean'||!Number.isInteger(ammo)||ammo<0||ammo>30||!Number.isInteger(reserve)||reserve<0||reserve>90||(!armed&&(ammo||reserve))||!Array.isArray(defeated)||defeated.length>10||new Set(defeated).size!==defeated.length||defeated.some((id:number)=>!Number.isInteger(id)||id<0||id>9))return fallback;
+ if(typeof armed!=='boolean'||!Number.isInteger(ammo)||ammo<0||ammo>30||!Number.isInteger(reserve)||reserve<0||reserve>999||(!armed&&(ammo||reserve))||!Array.isArray(defeated)||defeated.length>10||new Set(defeated).size!==defeated.length||defeated.some((id:number)=>!Number.isInteger(id)||id<0||id>9))return fallback;
  return {...fallback,...p,armed,ammo,reserve,defeated};
  }catch{return fallback;}
 }

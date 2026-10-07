@@ -10,3 +10,5 @@
 @media(max-width:650px){.topActions button{font-size:11px}.mapLayout{grid-template-columns:1fr}.objective{max-width:calc(100vw - 28px);font-size:10px}.campaignStats{gap:.8rem;font-size:11px}.campaignStats b{font-size:12px}.notice{top:280px}.mapImage{max-height:46dvh}.mapImage img{max-height:46dvh;object-fit:contain}.population{font-size:14px}}
 
 .mapBoundary{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+.economyStats{display:flex;flex-wrap:wrap;gap:.3rem .8rem;letter-spacing:0;font-size:12px;color:#ffdca0;margin:.4rem 0}.shopGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}.shopGrid section{padding:1rem;border:1px solid #52765d}.shopGrid h3{margin:0}.shopGrid p{font-size:13px}.vendorMarker{color:#ffdf9f;border-color:#d1a862;min-width:17px;height:17px;font-size:10px;background:#302514}.campaignStats{flex-wrap:wrap}.game .questHint{display:block;margin:.2rem 0}

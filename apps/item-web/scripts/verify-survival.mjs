@@ -57,3 +57,5 @@ for(const id of ['horizon-evidence','horizon-relay','horizon-bunker'])horizonAct
 lensWorld.root.updateMatrixWorld(true);const bunkerRay=new Raycaster(new Vector3(BUNKER.x,2,BUNKER.z-30),new Vector3(0,0,1));bunkerRay.far=25;assert.ok(bunkerRay.intersectObjects(lensWorld.collisions,true).length,'Closed door stops shots');assert.equal(bunkerRay.intersectObjects(lensWorld.collisions.filter(o=>o!==lensWorld.door),true).length,0,'Open doorway clears first/third-person aim');
 const bossRay=new Raycaster(new Vector3(BUNKER.x-6,2.5,BUNKER.z-10),new Vector3(0,0,1));bossRay.far=30;assert.ok(bossRay.intersectObject(lensWorld.boss,true).length,'Wizard model is raycast targetable');hitWizard(story,100);horizonAction(story,'horizon-lens');lensWorld.update(story,20);assert.equal(lensWorld.boss.visible,false);assert.equal(lensWorld.lens.visible,false);assert.equal(lensWorld.door.visible,false);lensWorld.dispose();
 console.log('Horizon world PASS: locked/open bunker ray collisions, targetable wizard, lens/boss visibility and model disposal.');
+
+await import("./verify-economy.mjs");
