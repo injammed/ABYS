@@ -1,4 +1,5 @@
 import * as T from 'three';
+import {surfaceMaterial} from './world-materials.ts';
 import { BUILDINGS, SUPPLIES } from './survival';
 import {HOSTILES,OUTBREAK_SLOTS,F49_SPAWN} from './hostiles';
 import {robotModel,alienModel,gunshipModel,type Skins} from './hostile-models';
@@ -17,8 +18,8 @@ export function rifle(){
 export function buildDistrict(skins:Skins){
  const root=new T.Group();root.name='Capital Refuge / cathedral camp';const collisions:T.Object3D[]=[];
  const materials=new Map<number,T.MeshStandardMaterial>();
- const mat=(color:number)=>{let m=materials.get(color);if(!m){m=new T.MeshStandardMaterial({color,roughness:.85,metalness:.15});materials.set(color,m);}return m;};
- const box=(w:number,h:number,d:number,x:number,y:number,z:number,color:number)=>{const mesh=new T.Mesh(new T.BoxGeometry(w,h,d),mat(color));mesh.position.set(x,y,z);root.add(mesh);return mesh;};
+ const mat=(color:number)=>{let m=materials.get(color);if(!m){m=surfaceMaterial(color===0x222b29||color===0x111b1b?'asphalt':'stone',color,3);materials.set(color,m);}return m;};
+ const box=(w:number,h:number,d:number,x:number,y:number,z:number,color:number)=>{const mesh=new T.Mesh(new T.BoxGeometry(w,h,d),mat(color));mesh.position.set(x,y,z);mesh.receiveShadow=true;mesh.castShadow=h>.3;root.add(mesh);return mesh;};
  box(145,.2,140,0,-.2,78,0x111b1b);
  box(24,.04,136,0,-.07,78,0x222b29);
  for(const side of [-1,1])box(2,.12,135,side*13,.02,78,0x3e4943);
@@ -65,7 +66,7 @@ export function buildDistrict(skins:Skins){
  const player=person(0x252d2c,'player');root.add(player);
  return {root,player,weapon,gunship,protectedActors:[keeper,visitor],enemies,supplies,collisions,dispose(){
   const geometries=new Set<T.BufferGeometry>(),mats=new Set<T.Material>(),textures=new Set<T.Texture>();root.traverse(n=>{
-   const m=n as T.Mesh;if(m.geometry)geometries.add(m.geometry);if(m.material)for(const a of Array.isArray(m.material)?m.material:[m.material]){mats.add(a);const map=(a as T.MeshBasicMaterial).map;if(map)textures.add(map);}
+   const m=n as T.Mesh;if(m.geometry)geometries.add(m.geometry);if(m.material)for(const a of Array.isArray(m.material)?m.material:[m.material]){mats.add(a);const map=(a as T.MeshStandardMaterial).map,bump=(a as T.MeshStandardMaterial).bumpMap;if(map)textures.add(map);if(bump)textures.add(bump);}
   });geometries.forEach(g=>g.dispose());mats.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());
  }};
 }

@@ -1,9 +1,10 @@
 import * as T from 'three';
+import {surfaceMaterial} from './world-materials.ts';
 import {batchModel} from './model-utils.ts';
 export type CharacterRole='refugee'|'player'|'mara'|'iri'|'infected';
 export function characterModel(color:number,role:CharacterRole='refugee'){
  const root=new T.Group();root.name=role==='mara'?'Mara · cathedral keeper':role==='iri'?'Iri · stranded visitor':role==='player'?'Player · refuge ranger':role==='infected'?'Infected survivor':'Refugee';
- const cloth=new T.MeshStandardMaterial({color,roughness:.9}),skin=new T.MeshStandardMaterial({color:role==='iri'?0x8bafb2:role==='infected'?0x85927e:0xbc997e,roughness:.85});
+ const cloth=surfaceMaterial('cloth',color,3),skin=new T.MeshStandardMaterial({color:role==='iri'?0x8bafb2:role==='infected'?0x85927e:0xbc997e,roughness:.85});
  const dark=new T.MeshStandardMaterial({color:0x252a2b,roughness:.65}),leather=new T.MeshStandardMaterial({color:0x594536,roughness:.8});
  const detail=new T.MeshStandardMaterial({color:role==='player'?0x667a70:0xbbaa80,metalness:.35,roughness:.5});
  const mesh=(g:T.BufferGeometry,m:T.Material,x:number,y:number,z:number,parent:T.Group=root)=>{const o=new T.Mesh(g,m);o.position.set(x,y,z);parent.add(o);return o;};
@@ -21,7 +22,12 @@ export function characterModel(color:number,role:CharacterRole='refugee'){
  if(role==='player'){mesh(new T.BoxGeometry(.43,.4,.11),detail,0,1.2,-.18);for(let i=0;i<3;i++)mesh(new T.BoxGeometry(.085,.16,.08),leather,(i-1)*.12,1.1,-.27);mesh(new T.BoxGeometry(.34,.43,.16),dark,0,1.18,.23);}
  if(role==='mara'){mesh(new T.CylinderGeometry(.28,.43,.65,12),cloth,0,.78,0);mesh(new T.TorusGeometry(.18,.065,6,16),detail,0,1.43,0).rotation.x=Math.PI/2;mesh(new T.BoxGeometry(.12,.5,.04),detail,.12,1.14,-.21);}
  if(role==='iri'){for(const side of [-1,1])ell(side*.21,1.79,.02,.04,.17,.05,skin);root.scale.set(.86,1.08,.86);}
+ // Clothing construction and equipment establish role before effects or labels.
+ for(const side of [-1,1]){mesh(new T.BoxGeometry(.035,.36,.025),leather,side*.18,1.18,-.18).rotation.z=side*.17;mesh(new T.BoxGeometry(.13,.035,.06),dark,side*.14,.78,-.17);ell(side*.065,1.76,-.147,.035,.012,.015,skin);}
+ if(role==='mara'){const hood=ell(0,1.75,.045,.235,.27,.19,cloth);hood.position.z=.075;mesh(new T.BoxGeometry(.18,.12,.06),leather,-.15,.85,-.25);ell(0,1.38,-.2,.035,.035,.018,detail);}
+ if(role==='player'){for(const side of [-1,1]){ell(side*.32,1.4,0,.13,.09,.16,detail);mesh(new T.BoxGeometry(.08,.05,.06),detail,side*.38,.8,-.09);}mesh(new T.BoxGeometry(.22,.12,.07),leather,0,1.42,-.2);}
+ if(role==='infected'){for(let i=0;i<5;i++){mesh(new T.BoxGeometry(.09,.17,.02),dark,(i%2?1:-1)*.16,1.3-i*.09,-.175).rotation.z=i*.6;}mesh(new T.BoxGeometry(.12,.08,.02),skin,0,1.06,-.19);}
  const possession=new T.Group();possession.visible=false;root.add(possession);
  if(role==='infected'){const flame=new T.MeshBasicMaterial({color:0xff6e18});for(let i=0;i<6;i++){const o=mesh(new T.ConeGeometry(.07,.25,5),flame,(i%2?1:-1)*.16,.9+i*.14,-.2,possession);o.rotation.z=(i%2?1:-1)*.4;}ell(0,1.75,-.16,.15,.045,.03,new T.MeshBasicMaterial({color:0xffe174}),possession);for(let i=0;i<5;i++)ell((i%2?1:-1)*.19,1+i*.13,-.18,.045,.08,.02,leather);root.rotation.z=.04;}
- root.userData.legs=legs;root.userData.possession=possession;return batchModel(root);
+ root.userData.legs=legs;root.userData.possession=possession;batchModel(root);root.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;}});return root;
 }
