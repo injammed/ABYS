@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "id": "38053267353-1",
-  "checkedAt": "2026-10-10T12:47:45.632Z",
-  "sourceCommit": "17703701a5f866db980adcd1c2ebdfac3d262b15",
+  "id": "38142148315-1",
+  "checkedAt": "2026-10-11T13:10:59.028Z",
+  "sourceCommit": "05122739321db57024ba30aff54e31192b16b15b",
   "state": "completed",
   "queries": [
     {
@@ -18,10 +18,20 @@
   ],
   "candidates": [
     {
-      "id": 1099326996,
-      "repository": "marcuswendt/cascade",
-      "stars": 7,
-      "license": "MIT",
+      "id": 371476326,
+      "repository": "golanlevin/DrawingWithMachines",
+      "stars": 156,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1414149806,
+      "repository": "gillverd/accelerando-8192",
+      "stars": 18,
+      "license": null,
       "signals": [
         "generative-art"
       ],
@@ -30,7 +40,7 @@
     {
       "id": 525592995,
       "repository": "invoke-ai/InvokeAI",
-      "stars": 28520,
+      "stars": 28559,
       "license": "Apache-2.0",
       "signals": [
         "generative-art"
@@ -38,10 +48,20 @@
       "newlySeen": false
     },
     {
-      "id": 81895167,
-      "repository": "css-doodle/css-doodle",
-      "stars": 6056,
+      "id": 584639396,
+      "repository": "ai-collection/ai-collection",
+      "stars": 9196,
       "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 116062718,
+      "repository": "villares/sketch-a-day",
+      "stars": 259,
+      "license": null,
       "signals": [
         "generative-art"
       ],
@@ -58,30 +78,10 @@
       "newlySeen": false
     },
     {
-      "id": 355805398,
-      "repository": "koenderks/aRtsy",
-      "stars": 195,
-      "license": "GPL-3.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1116451552,
       "repository": "oocx/tfplan2md",
       "stars": 174,
       "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1105562494,
-      "repository": "levz0r/awesome-vibecoded-apps",
-      "stars": 41,
-      "license": "CC0-1.0",
       "signals": [
         "ai-generated"
       ],
@@ -128,12 +128,12 @@
       "newlySeen": false
     },
     {
-      "id": 1393034919,
-      "repository": "howardc38/motion-fx-lab",
-      "stars": 10,
-      "license": "0BSD",
+      "id": 1159071863,
+      "repository": "Nerahikada/chromecast-sink",
+      "stars": 9,
+      "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -229,6 +229,7 @@
     308233855,
     313701704,
     355805398,
+    371476326,
     373191504,
     374744219,
     451809672,
@@ -324,6 +325,7 @@
     1404086905,
     1407583549,
     1408412506,
-    1411230193
+    1411230193,
+    1414149806
   ]
 }
