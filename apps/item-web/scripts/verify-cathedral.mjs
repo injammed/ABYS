@@ -51,6 +51,7 @@ let hybridTriangles=0;const hybridResources=new Set();hybrid.root.traverse(n=>{i
 assert.ok(hybridTriangles<85000,'Detailed sanctuary stays below the fixed triangle budget');
 for(let hall=0;hall<5;hall++){const ray=new T.Raycaster(new T.Vector3(0,1.8,-hall*30),new T.Vector3(0,1,0));const hit=ray.intersectObjects(hybrid.root.children)[0];assert.equal(hit.object.material.map,hybridTextures[hall],'Real roof ray reaches assigned painting before structural ribs');}
 const {cathedralWalkable,cathedralSafe,cathedralRoofAt}=await import('../lib/cathedral-plan.ts');
+const {canIgnite}=await import('../lib/demon-rules.ts');for(const [x,z] of [[13,-50],[23,-42],[31,-42]])assert.equal(canIgnite(x,z),false,'Demonic fire stays outside the wider sanctuary and court');assert.ok(canIgnite(40,-42),'Hostile land fire remains enabled');
 const {canStand,flightFloor}=await import('../lib/survival.ts');const {validStarTarget}=await import('../lib/star-staff.ts');
 for(let z=3;z<22;z+=.1){assert.ok(canStand(0,z));const ray=new T.Raycaster(new T.Vector3(0,1.8,z),new T.Vector3(0,0,1),0,.1);assert.equal(ray.intersectObjects(hybrid.root.children).length,0,'Doorway path is visually unobstructed at eye height');}
 for(const x of [-13,-8,8,13])for(let z=-12;z>=-126;z-=6)assert.ok(canStand(x,z),'All four side aisles are usable');
