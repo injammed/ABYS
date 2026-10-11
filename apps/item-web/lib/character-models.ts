@@ -1,10 +1,12 @@
 import * as T from 'three';
-import {surfaceMaterial} from './world-materials.ts';
+import type {CharacterProfile} from './character-profile.ts';
+import {disposeSurface,surfaceMaterial} from './world-materials.ts';
 import {batchModel} from './model-utils.ts';
 export type CharacterRole='refugee'|'player'|'mara'|'iri'|'infected';
-export function characterModel(color:number,role:CharacterRole='refugee'){
+export function characterModel(color:number,role:CharacterRole='refugee',profile?:CharacterProfile){
  const root=new T.Group();root.name=role==='mara'?'Mara · cathedral keeper':role==='iri'?'Iri · stranded visitor':role==='player'?'Player · refuge ranger':role==='infected'?'Infected survivor':'Refugee';
- const cloth=surfaceMaterial('cloth',color,3),skin=new T.MeshStandardMaterial({color:role==='iri'?0x8bafb2:role==='infected'?0x85927e:0xbc997e,roughness:.85});
+ if(profile){root.name=profile.name;color=profile.color;}
+ const cloth=surfaceMaterial('cloth',color,3),skin=new T.MeshStandardMaterial({color:profile?profile.skin:role==='iri'?0x8bafb2:role==='infected'?0x85927e:0xbc997e,roughness:.85});
  const dark=new T.MeshStandardMaterial({color:0x252a2b,roughness:.65}),leather=new T.MeshStandardMaterial({color:0x594536,roughness:.8});
  const detail=new T.MeshStandardMaterial({color:role==='player'?0x667a70:0xbbaa80,metalness:.35,roughness:.5});
  const mesh=(g:T.BufferGeometry,m:T.Material,x:number,y:number,z:number,parent:T.Group=root)=>{const o=new T.Mesh(g,m);o.position.set(x,y,z);parent.add(o);return o;};
@@ -27,7 +29,22 @@ export function characterModel(color:number,role:CharacterRole='refugee'){
  if(role==='mara'){const hood=ell(0,1.75,.045,.235,.27,.19,cloth);hood.position.z=.075;mesh(new T.BoxGeometry(.18,.12,.06),leather,-.15,.85,-.25);ell(0,1.38,-.2,.035,.035,.018,detail);}
  if(role==='player'){for(const side of [-1,1]){ell(side*.32,1.4,0,.13,.09,.16,detail);mesh(new T.BoxGeometry(.08,.05,.06),detail,side*.38,.8,-.09);}mesh(new T.BoxGeometry(.22,.12,.07),leather,0,1.42,-.2);}
  if(role==='infected'){for(let i=0;i<5;i++){mesh(new T.BoxGeometry(.09,.17,.02),dark,(i%2?1:-1)*.16,1.3-i*.09,-.175).rotation.z=i*.6;}mesh(new T.BoxGeometry(.12,.08,.02),skin,0,1.06,-.19);}
+ if(profile){
+  const v=profile.variant;
+  if(profile.classId==='witch'){mesh(new T.CylinderGeometry(.25,.42,.7,12),cloth,0,.65,0);mesh(new T.ConeGeometry(.24,.43+v*.06,10),cloth,0,2.07,0);mesh(new T.CylinderGeometry(.32,.32,.035,12),dark,0,1.88,0);}
+  if(profile.classId==='knight'){for(const side of [-1,1])ell(side*.34,1.4,0,.18,.15,.19,detail);mesh(new T.BoxGeometry(.39,.45,.12),detail,0,1.2,-.24);root.scale.set(1.08,1+v*.025,1.08);}
+  if(profile.classId==='cyborg'){const glow=new T.MeshBasicMaterial({color:0x75e7df});for(let i=0;i<3+v;i++)mesh(new T.BoxGeometry(.025,.12,.03),glow,(i-1-v/2)*.06,1.28,-.255);for(const side of [-1,1])mesh(new T.BoxGeometry(.07,.34,.09),detail,side*.22,1.86,.05);}
+  if(profile.classId==='alien'){for(let i=0;i<3+v;i++)mesh(new T.ConeGeometry(.055,.22+i*.025,6),skin,(i-1-v/2)*.07,1.97,.055);root.scale.set(.9,1.08+v*.03,.9);}
+ }
  const possession=new T.Group();possession.visible=false;root.add(possession);
  if(role==='infected'){const flame=new T.MeshBasicMaterial({color:0xff6e18});for(let i=0;i<6;i++){const o=mesh(new T.ConeGeometry(.07,.25,5),flame,(i%2?1:-1)*.16,.9+i*.14,-.2,possession);o.rotation.z=(i%2?1:-1)*.4;}ell(0,1.75,-.16,.15,.045,.03,new T.MeshBasicMaterial({color:0xffe174}),possession);for(let i=0;i<5;i++)ell((i%2?1:-1)*.19,1+i*.13,-.18,.045,.08,.02,leather);root.rotation.z=.04;}
  root.userData.legs=legs;root.userData.possession=possession;batchModel(root);root.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;}});return root;
+}
+
+// Keep the avatar root and its purchased gear stable when a new preset is chosen.
+export function applyPresetCharacter(root:T.Group,profile:CharacterProfile,gear:T.Group){
+ root.remove(gear);const materials=new Set<T.Material>();
+ root.traverse(o=>{if(o instanceof T.Mesh){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>materials.add(m));}});
+ materials.forEach(disposeSurface);root.clear();
+ const model=characterModel(profile.color,'player',profile);root.scale.copy(model.scale);root.name=profile.name;root.userData=model.userData;root.add(...model.children.slice(),gear);
 }
