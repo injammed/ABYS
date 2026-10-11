@@ -70,7 +70,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="writer-v$(node -p "require('./apps/aetimm-writer/package.json').version")"
-          find installers -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > installers/SHA256SUMS.txt
+          (cd installers && sha256sum AETIMM-Writer-*) > installers/SHA256SUMS.txt
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "This version already exists. Increment the app version before publishing." >&2
             exit 1

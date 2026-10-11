@@ -110,6 +110,7 @@ jobs:
           node scripts/verify-capital.mjs
 
       - name: Verify writing app
+        working-directory: apps/item-web
         run: |
           npm run check --prefix ../aetimm-writer
           node ../aetimm-writer/verify.cjs
