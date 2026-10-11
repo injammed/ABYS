@@ -20,7 +20,7 @@ function Modal({children,onClose,label}:{children:ReactNode;onClose:()=>void;lab
 }
 export function SurvivalGame(){
  const host=useRef<HTMLDivElement>(null),engine=useRef<Engine|null>(null);const [status,setStatus]=useState('Entering the cathedral…');
- const [hud,setHud]=useState<Hud>({character:freshProfile(),economy:freshEconomy(),flying:false,horizon:freshHorizon(),campaign:freshCampaign(),x:0,z:3,piloting:false,altitude:0,hull:100,armed:false,ammo:0,reserve:0,health:100,water:100,food:100,stamina:100,bottles:2,rations:2,zone:'Cathedral · safe zone',prompt:'',third:false,dead:false,minutes:0,locked:false,weapon:'staff',staffCooldown:0});
+ const [hud,setHud]=useState<Hud>({character:freshProfile(),economy:freshEconomy(),flying:false,horizon:freshHorizon(),campaign:freshCampaign(),x:0,z:3,piloting:false,altitude:0,hull:100,armed:false,ammo:0,reserve:0,health:100,water:100,food:100,stamina:100,bottles:2,rations:2,zone:'Cologne × Seville · sanctuary',prompt:'',third:false,dead:false,minutes:0,locked:false,weapon:'staff',staffCooldown:0});
  const [modal,setModal]=useState<string|null>(null),[app,setApp]=useState<string|null>(null),[notice,setNotice]=useState(''),[message,setMessage]=useState(''),[missionReply,setMissionReply]=useState(''),[confirmStrike,setConfirmStrike]=useState<EradicationOption|null>(null);
  const [saveReply,setSaveReply]=useState('');
  const [dialogue,setDialogue]=useState<{speaker:string;text:string}[]>([]);

@@ -1,3 +1,4 @@
+import {cathedralWalkable,cathedralRoofAt} from './cathedral-plan.ts';
 import {safe,capitalBounds,roofAt} from './capital-map.ts';
 export type Player = {x:number;z:number;health:number;water:number;food:number;stamina:number;bottles:number;rations:number;elapsed:number;looted:string[];helped:boolean;gift:boolean;armed:boolean;ammo:number;reserve:number;defeated:number[]};
 export type Obstacle = {x:number;z:number;w:number;d:number};
@@ -12,8 +13,7 @@ for(let row=0;row<5;row++)for(const side of [-1,1])for(let col=0;col<2;col++)BUI
 export const PEDESTALS:Obstacle[]=Array.from({length:43},(_,i)=>({x:i%2?3.3:-3.3,z:-Math.floor(i/2)*6,w:2.05,d:2.05}));
 export function canStand(x:number,z:number){
  if(!Number.isFinite(x)||!Number.isFinite(z)||!capitalBounds(x,z))return false;
- if(z<10.65&&Math.abs(x)<6.5&&z>=-132){if(Math.abs(x)>5.2)return false;if(z>9.35&&Math.abs(x)>1.5)return false;}
- if(z>=10.65&&z<11.1&&Math.abs(x)>1.5&&Math.abs(x)<6.5)return false;
+ if(!cathedralWalkable(x,z))return false;
  if(roofAt(x,z)>0)return false;
  const obstacles=safe(x,z)?[...PEDESTALS,{x:2.6,z:6,w:1,d:.7}]:[...BUILDINGS,{x:-12,z:65,w:10,d:10}];
  return !obstacles.some(o=>Math.abs(x-o.x)<o.w/2+.35&&Math.abs(z-o.z)<o.d/2+.35);
@@ -75,6 +75,6 @@ export function restorePlayer(raw:string|null):Player{
 }
 
 // This first district supports bounded VTOL flight along its open corridors.
-export function flightFloor(x:number,z:number){let height=0;for(const dx of [-2,2])for(const dz of [-2,2]){height=Math.max(height,roofAt(x+dx,z+dz));BUILDINGS.forEach((b,i)=>{if(Math.abs(x+dx-b.x)<b.w/2&&Math.abs(z+dz-b.z)<b.d/2)height=Math.max(height,10+(i*17)%31);});}return height?height+3:1.4;}
+export function flightFloor(x:number,z:number){let height=0;for(const dx of [-2,2])for(const dz of [-2,2]){height=Math.max(height,roofAt(x+dx,z+dz),cathedralRoofAt(x+dx,z+dz));BUILDINGS.forEach((b,i)=>{if(Math.abs(x+dx-b.x)<b.w/2&&Math.abs(z+dz-b.z)<b.d/2)height=Math.max(height,10+(i*17)%31);});}return height?height+3:1.4;}
 export function canHover(x:number,z:number,altitude=1.4){return capitalBounds(x,z)&&!safe(x,z)&&altitude>=flightFloor(x,z)&&[-2,2].every(dx=>[-2,2].every(dz=>altitude>flightFloor(x+dx,z+dz)+2||canStand(x+dx,z+dz)));}
 export function landingSpot(x:number,z:number){for(const [dx,dz] of [[-4,0],[4,0],[0,-5],[0,5]])if(canStand(x+dx,z+dz))return {x:x+dx,z:z+dz};return null;}

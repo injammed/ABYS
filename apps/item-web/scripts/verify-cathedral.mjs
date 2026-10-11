@@ -42,3 +42,24 @@ for(const art of ceilings){
  assert.equal(createHash('sha256').update(image).digest('hex'),art.sha256,'Original image bytes preserved');
 }
 console.log(`Cathedral PASS: five distinct correctly assigned frescoes; ${triangles} triangles; resources released; originals preserved.`);
+
+const hybridTextures=ceilings.map(()=>new T.Texture()),hybrid=buildCathedral(-126,hybridTextures,true);hybrid.root.updateMatrixWorld(true);
+assert.equal(hybrid.root.userData.architecture.style,'Cologne × Seville');assert.equal(hybrid.root.userData.architecture.aisles,5);assert.equal(hybrid.root.userData.architecture.orangeTrees,4);
+assert.ok(hybrid.root.children.length<=14,'Hybrid keeps architecture batched');
+const bounds=new T.Box3().setFromObject(hybrid.root);assert.ok(bounds.max.y>=56&&bounds.max.x>=30,'Twin spires and the eastern patio shape the skyline');
+let hybridTriangles=0;const hybridResources=new Set();hybrid.root.traverse(n=>{if(n.isMesh){hybridTriangles+=(n.geometry.index?.count??n.geometry.attributes.position.count)/3;hybridResources.add(n.geometry);hybridResources.add(n.material);for(const a of Object.values(n.geometry.attributes))for(const value of a.array)assert.ok(Number.isFinite(value));}});
+assert.ok(hybridTriangles<85000,'Detailed sanctuary stays below the fixed triangle budget');
+for(let hall=0;hall<5;hall++){const ray=new T.Raycaster(new T.Vector3(0,1.8,-hall*30),new T.Vector3(0,1,0));const hit=ray.intersectObjects(hybrid.root.children)[0];assert.equal(hit.object.material.map,hybridTextures[hall],'Real roof ray reaches assigned painting before structural ribs');}
+const {cathedralWalkable,cathedralSafe,cathedralRoofAt}=await import('../lib/cathedral-plan.ts');
+const {canIgnite}=await import('../lib/demon-rules.ts');for(const [x,z] of [[13,-50],[23,-42],[31,-42]])assert.equal(canIgnite(x,z),false,'Demonic fire stays outside the wider sanctuary and court');assert.ok(canIgnite(40,-42),'Hostile land fire remains enabled');
+const {canStand,flightFloor}=await import('../lib/survival.ts');const {validStarTarget}=await import('../lib/star-staff.ts');
+for(let z=3;z<22;z+=.1){assert.ok(canStand(0,z));const ray=new T.Raycaster(new T.Vector3(0,1.8,z),new T.Vector3(0,0,1),0,.1);assert.equal(ray.intersectObjects(hybrid.root.children).length,0,'Doorway path is visually unobstructed at eye height');}
+for(const x of [-13,-8,8,13])for(let z=-12;z>=-126;z-=6)assert.ok(canStand(x,z),'All four side aisles are usable');
+for(let x=12;x<=23;x+=.1)assert.ok(canStand(x,-42),'East portal joins nave and orange-tree court');
+for(const [x,z] of [[16,-10],[0,-135],[3,10],[11,5],[23,-17],[30,-42],[20,-53],[5.65,-4]])assert.equal(cathedralWalkable(x,z),false,'Wall, tower, tree or column cannot be walked through');
+for(const [x,z] of [[13,-50],[23,-42]]){assert.ok(cathedralSafe(x,z));assert.equal(validStarTarget({x:0,y:1.8,z:3},{x,y:0,z}),false,'New aisle/court remains protected from Starfall');}
+assert.equal(cathedralRoofAt(-11,5),57);assert.ok(flightFloor(23,-17)>=46,'VTOL collision includes new belfry');
+const outsideDoor=new T.Raycaster(new T.Vector3(0,1.8,12),new T.Vector3(0,0,-1),0,5);assert.equal(outsideDoor.intersectObjects(hybrid.root.children).length,0,'Exit works in both directions');
+const roseRay=new T.Raycaster(new T.Vector3(0,11.1,8),new T.Vector3(0,0,1),0,3);const roseHit=roseRay.intersectObjects(hybrid.root.children)[0];assert.equal(roseHit.object.material.color.getHex(),0x88bbcc,'Spawn-facing rose window sits in a real facade opening');
+let hybridDisposed=0;hybridResources.forEach(r=>r.addEventListener('dispose',()=>hybridDisposed++));hybrid.dispose();assert.equal(hybridDisposed,hybridResources.size);
+console.log(`Hybrid cathedral PASS: ${hybridTriangles} triangles, ${hybrid.root.children.length} batches, five retained paintings, five walkable aisles, doors, court, safety, flight and disposal.`);
