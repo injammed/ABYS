@@ -69,6 +69,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          VERSION="$(node -p "require('./apps/aetimm-writer/package.json').version")"
+          for FILE in "Windows-x64.exe" "macOS-arm64.dmg" "macOS-x64.dmg" "Linux-x86_64.AppImage"; do
+            test -s "installers/AETIMM-Writer-$VERSION-$FILE"
+          done
           TAG="writer-v$(node -p "require('./apps/aetimm-writer/package.json').version")"
           (cd installers && sha256sum AETIMM-Writer-*) > installers/SHA256SUMS.txt
           if gh release view "$TAG" >/dev/null 2>&1; then
