@@ -148,6 +148,11 @@ jobs:
           node scripts/verify-survival.mjs
           node scripts/verify-capital.mjs
 
+      - name: Verify writing app
+        run: |
+          npm run check --prefix ../aetimm-writer
+          node ../aetimm-writer/verify.cjs
+
       - name: Typecheck
         working-directory: apps/item-web
         run: npm run typecheck

@@ -1,0 +1,4 @@
+const {contextBridge,ipcRenderer}=require('electron');
+contextBridge.exposeInMainWorld('writerDesktop',{
+ loadDraft:()=>ipcRenderer.invoke('writer-load-draft'),saveDraft:content=>ipcRenderer.invoke('writer-save-draft',content),backup:content=>ipcRenderer.invoke('writer-backup',content),previousDraft:()=>ipcRenderer.invoke('writer-previous'),resetPath:()=>ipcRenderer.invoke('writer-reset-path'),openFile:()=>ipcRenderer.invoke('writer-open'),acceptOpen:()=>ipcRenderer.invoke('writer-accept-open'),saveFile:data=>ipcRenderer.invoke('writer-save',data),readClipboard:()=>ipcRenderer.invoke('writer-read-clipboard'),writeClipboard:data=>ipcRenderer.invoke('writer-write-clipboard',data),print:()=>ipcRenderer.invoke('writer-print'),finishClose:()=>ipcRenderer.invoke('writer-finish-close'),onAction:callback=>{ipcRenderer.on('writer-action',(_event,action)=>callback(action));}
+});

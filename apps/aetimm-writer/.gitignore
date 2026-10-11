@@ -1,0 +1,4 @@
+node_modules/
+dist/
+editor/
+smoke-output.docx
