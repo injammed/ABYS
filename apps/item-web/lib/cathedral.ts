@@ -2,6 +2,7 @@ import * as THREE from "three";
 import {surfaceMaterial,disposeSurface} from "./world-materials.ts";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
+import {buildHybridArchitecture} from "./cathedral-hybrid.ts";
 import CEILINGS from "./cathedral-art.json" with {type:"json"};
 
 export const LOOK_LIMIT = Math.PI / 2 - .06;
@@ -34,14 +35,16 @@ export function vaultGeometry(z: number, length: number, radius = 5.94) {
 }
 
 export function buildCathedral(lastRow: number, frescoes: THREE.Texture[], openEntrance = false) {
-  const root = new THREE.Group(); root.name = "AETIMM cathedral";
+  const root = new THREE.Group(); root.name = openEntrance?"AETIMM / Cologne × Seville cathedral":"AETIMM cathedral";
   const stone = surfaceMaterial("stone",0xe7d9bb,3);
   const dark = surfaceMaterial("marble",0x303b3d,2);
   const gold = new THREE.MeshStandardMaterial({ color: 0xb98a3e, roughness: .3, metalness: .72 });
   const light = new THREE.MeshBasicMaterial({ color: 0xffe8b3 });
   if(frescoes.length!==CEILINGS.length)throw new Error("Each hall requires its own ceiling texture");
-  const paintings = frescoes.map(map=>new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, toneMapped: false }));
-  const glass = new THREE.MeshBasicMaterial({ color: 0x88bbcc });
+  const paintings = frescoes.map(map=>new THREE.MeshBasicMaterial({ map, side: THREE.BackSide, toneMapped: false }));
+  const glass = new THREE.MeshBasicMaterial({ color: 0x88bbcc, side:THREE.DoubleSide });
+  const leaf=new THREE.MeshStandardMaterial({color:0x496d34,roughness:.92});
+  const fruit=new THREE.MeshStandardMaterial({color:0xd88a29,roughness:.75});
   const geometries = new Set<THREE.BufferGeometry>();
   function mesh(g: THREE.BufferGeometry, m: THREE.Material, x=0, y=0, z=0) {
     geometries.add(g); const object = new THREE.Mesh(g,m); object.position.set(x,y,z); root.add(object); return object;
@@ -53,12 +56,23 @@ export function buildCathedral(lastRow: number, frescoes: THREE.Texture[], openE
     const points = Array.from({length:49},(_,i)=>{const a=i/48*Math.PI;return new THREE.Vector3(-radius*Math.cos(a),9+radius*Math.sin(a),z);});
     mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),48,.075,6,false),gold);
   }
-  const length = 20-lastRow, center = (lastRow-4)/2;
-  box(12,.25,length,0,-.125,center,stone);
-  box(.35,9,length,-6.15,4.5,center,stone); box(.35,9,length,6.15,4.5,center,stone);
-  box(12,15,.3,0,7.5,lastRow-9,stone); if(openEntrance){
-    box(4,15,.3,-4,7.5,10,stone);box(4,15,.3,4,7.5,10,stone);box(4,10,.3,0,10,10,stone);
-  }else box(12,15,.3,0,7.5,10,stone);
+  const length = 19-lastRow, center = (lastRow+1)/2;
+  box(openEntrance?32:12,.25,length,0,-.125,center,stone);
+  if(openEntrance){
+    box(.35,9,length,-16,4.5,center,stone);
+    // East wall opens into the orange-tree court at z=-42.
+    box(.35,9,91,16,4.5,-89.5,stone);box(.35,9,50,16,4.5,-15,stone);box(.35,4.5,4,16,6.75,-42,stone);
+    box(32,9,.3,0,4.5,lastRow-9,stone);box(12,6,.3,0,12,lastRow-9,stone);
+    // The portal's pointed opening is part of the wall geometry, not painted on.
+    const facade=new THREE.Shape();facade.moveTo(-6,0);facade.lineTo(-2.15,0);facade.lineTo(-2.15,3.6);
+    for(let i=0;i<=24;i++){const u=i/12-1;facade.lineTo(u*2.15,3.6+3.7*(1-Math.abs(u))**.7);}facade.lineTo(2.15,0);facade.lineTo(6,0);facade.lineTo(6,15);facade.lineTo(-6,15);facade.closePath();const roseOpening=new THREE.Path();roseOpening.absarc(0,11.1,2.1,0,Math.PI*2,true);facade.holes.push(roseOpening);
+    mesh(new THREE.ExtrudeGeometry(facade,{depth:.3,bevelEnabled:false}),stone,0,0,10);
+    for(const side of [-1,1])box(10,9,.3,side*11,4.5,10,stone);
+    root.userData.architecture=buildHybridArchitecture(mesh,stone,gold,dark,glass,leaf,fruit,vaultGeometry);
+  }else{
+    box(.35,9,length,-6.15,4.5,center,stone);box(.35,9,length,6.15,4.5,center,stone);
+    box(12,15,.3,0,7.5,lastRow-9,stone);box(12,15,.3,0,7.5,10,stone);
+  }
   mesh(vaultGeometry(center,length,6),stone).material.side=THREE.DoubleSide;
   // Five paintings, one overhead in each hall. These are architectural surfaces;
   // all collection exhibits remain the existing volumetric sculptures.
@@ -78,9 +92,9 @@ export function buildCathedral(lastRow: number, frescoes: THREE.Texture[], openE
       box(.98,.34,.98,side*5.65,.17,z,stone);
       box(1.08,.4,1.08,side*5.65,8.86,z,stone);
       // Luminous clerestory windows and gold mullions.
-      box(.03,3.4,1.85,side*5.96,6.2,z-2.8,glass);
-      box(.09,3.55,.08,side*5.91,6.2,z-2.8,gold);
-      box(.09,.08,1.95,side*5.91,6.6,z-2.8,gold);
+      box(.03,openEntrance?1.8:3.4,1.85,side*5.96,openEntrance?9.8:6.2,z-2.8,glass);
+      box(.09,openEntrance?1.9:3.55,.08,side*5.91,openEntrance?9.8:6.2,z-2.8,gold);
+      box(.09,.08,1.95,side*5.91,openEntrance?10:6.6,z-2.8,gold);
 
       box(.07,.09,1.8,side*5.86,4.4,z-2.8,light);
     }
@@ -101,7 +115,7 @@ export function buildCathedral(lastRow: number, frescoes: THREE.Texture[], openE
   root.updateMatrixWorld(true);
   for (const child of root.children) {
     const object = child as THREE.Mesh<THREE.BufferGeometry,THREE.Material>;
-    const geometry=object.geometry.clone().applyMatrix4(object.matrixWorld);
+    const geometry=(object.geometry.index?object.geometry.toNonIndexed():object.geometry.clone()).applyMatrix4(object.matrixWorld);
     const batch=batches.get(object.material)??[];batch.push(geometry);batches.set(object.material,batch);
   }
   root.clear();geometries.forEach(g=>g.dispose());geometries.clear();
@@ -111,5 +125,5 @@ export function buildCathedral(lastRow: number, frescoes: THREE.Texture[], openE
       if(material===stone){const position=merged.getAttribute('position'),normal=merged.getAttribute('normal'),uv:number[]=[];for(let i=0;i<position.count;i++){const nx=Math.abs(normal.getX(i)),ny=Math.abs(normal.getY(i)),nz=Math.abs(normal.getZ(i));uv.push((nx>ny&&nx>nz?position.getZ(i):position.getX(i))*.2,(ny>nx&&ny>nz?position.getZ(i):position.getY(i))*.2);}merged.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));}
       const part=mesh(merged,material);part.castShadow=material===stone||material===gold;part.receiveShadow=true;}
   }
-  return {root,dispose(){geometries.forEach(g=>g.dispose());[stone,dark,gold,light,...paintings,glass].forEach(disposeSurface);}};
+  return {root,dispose(){geometries.forEach(g=>g.dispose());[stone,dark,gold,light,...paintings,glass,leaf,fruit].forEach(disposeSurface);}};
 }

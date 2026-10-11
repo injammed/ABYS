@@ -17,9 +17,8 @@ export function buildRefugeArt(){
  const sign=(text:string,x:number,y:number,z:number,width=4,color='#dfd2ad')=>{
   const canvas=document.createElement('canvas');canvas.width=512;canvas.height=128;const ctx=canvas.getContext('2d')!;ctx.fillStyle='#142222';ctx.fillRect(0,0,512,128);ctx.strokeStyle=color;ctx.lineWidth=6;ctx.strokeRect(8,8,496,112);ctx.fillStyle=color;ctx.font='bold 30px monospace';ctx.textAlign='center';ctx.fillText(text,256,76);const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;const m=new T.MeshBasicMaterial({map:texture});materials.push(m);const o=new T.Mesh(new T.PlaneGeometry(width,width/4),m);o.position.set(x,y,z);deco.add(o);
  };
- // Heavy portal surrounds the existing playable entrance; clear 4m opening.
- for(const side of [-1,1]){box(deco,1.1,6.5,1,side*3,3.25,10.6,stone);box(deco,1.5,.35,1.4,side*3,6.4,10.6,gold);for(let i=0;i<6;i++)box(deco,1.12,.09,1.06,side*3,.5+i,10.6,gold);}
- box(deco,7.2,.65,1.2,0,6.9,10.6,stone);sign('AETIMM / SANCTUARY',0,6.88,11.25,5);
+ // The hybrid cathedral owns the pointed portal; keep its doorway clear.
+ sign('AETIMM / SANCTUARY',0,8.1,11.1,4);
  // Small candles at the walls, clear of the exhibit aisle.
  for(const z of [-8,-38,-68,-98])for(const side of [-1,1]){
   box(deco,.55,.9,.55,side*5.15,.45,z,stone);for(let n=0;n<3;n++){box(deco,.06,.24+n*.08,.06,side*5.15+(n-1)*.13,1.03+n*.04,z,white);const flame=new T.Mesh(new T.SphereGeometry(.035,6,4),amber);flame.position.set(side*5.15+(n-1)*.13,1.19+n*.08,z);deco.add(flame);}
