@@ -1,0 +1,45 @@
+(function(root){
+ 'use strict';
+ const FONTS=['Georgia','Garamond','Times New Roman','Palatino','Arial','Helvetica','Verdana','Trebuchet MS','Courier New','Consolas'];
+ const escape=s=>String(s).replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g,'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const fresh=()=>({version:1,title:'Untitled novel',active:'chapter-1',chapters:[{id:'chapter-1',title:'Chapter 1',html:'<p><br></p>'}],updated:new Date().toISOString()});
+ function sanitize(html,doc){const source=doc.createElement('template');source.innerHTML=String(html);const out=doc.createElement('div');const tags=new Set(['P','DIV','BR','SPAN','B','STRONG','I','EM','U','S','STRIKE','H1','H2','H3','BLOCKQUOTE','UL','OL','LI','FONT']);
+  function visit(node,parent){if(node.nodeType===3){parent.appendChild(doc.createTextNode(node.data));return;}if(node.nodeType!==1)return;if(['SCRIPT','STYLE','IFRAME','OBJECT','EMBED','SVG','MATH','FORM','INPUT','BUTTON','IMG','VIDEO','AUDIO','LINK','META'].includes(node.tagName))return;
+   if(!tags.has(node.tagName)){for(const child of node.childNodes)visit(child,parent);return;}
+   const e=doc.createElement(node.tagName==='FONT'?'span':node.tagName.toLowerCase());const st=node.style;
+   const font=(node.getAttribute('face')||st.fontFamily||'').replace(/["']/g,'').split(',')[0].trim();if(FONTS.includes(font))e.style.fontFamily=font;
+   const size=st.fontSize;if(/^(?:[8-9]|[1-6]\d|7[0-2])(?:\.\d+)?pt$/.test(size))e.style.fontSize=size;else if(/^(?:[1-9]\d|[1-2]\d\d)px$/.test(size))e.style.fontSize=size;
+   if(node.tagName==='FONT'&&node.hasAttribute('size')){const n=Number(node.getAttribute('size'));if(n>=1&&n<=7)e.style.fontSize=[8,10,12,14,18,24,36][n-1]+'pt';}
+   if(['left','center','right','justify'].includes(st.textAlign))e.style.textAlign=st.textAlign;
+   if(['bold','normal','400','700'].includes(st.fontWeight))e.style.fontWeight=st.fontWeight;
+   if(['italic','normal'].includes(st.fontStyle))e.style.fontStyle=st.fontStyle;
+   if(['underline','line-through','none'].includes(st.textDecorationLine))e.style.textDecorationLine=st.textDecorationLine;
+   for(const prop of ['color','backgroundColor'])if(/^(#[a-f\d]{3,8}|rgba?\([\d.,%\s]+\)|[a-z]+)$/i.test(st[prop]))e.style[prop]=st[prop];
+   if(['1','1.2','1.5','1.7','2'].includes(st.lineHeight))e.style.lineHeight=st.lineHeight;
+   for(const child of node.childNodes)visit(child,e);parent.appendChild(e);
+  }for(const child of source.content.childNodes)visit(child,out);return out.innerHTML||'<p><br></p>';
+ }
+ function restore(raw,doc){const r=typeof raw==='string'?JSON.parse(raw):raw;if(typeof raw==='string'&&raw.length>25e6)throw Error('Manuscript exceeds 25 MB.');if(!r||r.version!==1||!Array.isArray(r.chapters)||!r.chapters.length||r.chapters.length>500)throw Error('Not a supported AETIMM manuscript.');
+  const ids=new Set();const chapters=r.chapters.map((c,i)=>{if(!c||typeof c.html!=='string'||c.html.length>5e6)throw Error('Chapter is invalid or too large.');const id=typeof c.id==='string'&&/^[\w-]{1,80}$/.test(c.id)&&!ids.has(c.id)?c.id:'chapter-'+i;ids.add(id);return {id,title:String(c.title||'Chapter '+(i+1)).slice(0,150),html:sanitize(c.html,doc)};});
+  return {version:1,title:String(r.title||'Untitled novel').slice(0,150),active:chapters.some(c=>c.id===r.active)?r.active:chapters[0].id,chapters,updated:new Date().toISOString()};
+ }
+ function text(html,doc){const e=doc.createElement('div');e.innerHTML=sanitize(html,doc);for(const b of e.querySelectorAll('br'))b.replaceWith(doc.createTextNode('\n'));for(const b of e.querySelectorAll('p,div,h1,h2,h3,li,blockquote'))b.appendChild(doc.createTextNode('\n'));return (e.textContent||'').replace(/\n{3,}/g,'\n\n').trim();}
+ const words=s=>(String(s).match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu)||[]).length;
+ const filename=(s,ext)=>String(s).replace(/[<>:"/\\|?*\x00-\x1f]/g,'').trim().slice(0,100).replace(/^[.\s]+/,'').replace(/\.+$/,'')||'Manuscript';
+ function bookHTML(book,doc){return '<!doctype html><html><head><meta charset="utf-8"><title>'+escape(book.title)+'</title><style>body{max-width:760px;margin:50px auto;font:12pt Georgia,serif;line-height:1.7;padding:20px}section{break-before:page}h1,h2{font-family:Georgia,serif}</style></head><body><h1>'+escape(book.title)+'</h1>'+book.chapters.map(c=>'<section><h2>'+escape(c.title)+'</h2>'+sanitize(c.html,doc)+'</section>').join('')+'</body></html>';}
+ function zip(files){const enc=new TextEncoder(),parts=[],central=[];let offset=0;const u16=(b,o,n)=>new DataView(b.buffer).setUint16(o,n,true),u32=(b,o,n)=>new DataView(b.buffer).setUint32(o,n>>>0,true);const crc=bytes=>{let c=0xffffffff;for(const b of bytes){c^=b;for(let j=0;j<8;j++)c=c&1?(c>>>1)^0xedb88320:c>>>1;}return (c^0xffffffff)>>>0;};
+  for(const [name,value] of Object.entries(files)){const n=enc.encode(name),data=enc.encode(value),sum=crc(data),h=new Uint8Array(30+n.length);u32(h,0,0x04034b50);u16(h,4,20);u16(h,6,0x800);u32(h,14,sum);u32(h,18,data.length);u32(h,22,data.length);u16(h,26,n.length);h.set(n,30);parts.push(h,data);const c=new Uint8Array(46+n.length);u32(c,0,0x02014b50);u16(c,4,20);u16(c,6,20);u16(c,8,0x800);u32(c,16,sum);u32(c,20,data.length);u32(c,24,data.length);u16(c,28,n.length);u32(c,42,offset);c.set(n,46);central.push(c);offset+=h.length+data.length;}
+  const size=central.reduce((n,p)=>n+p.length,0),end=new Uint8Array(22);u32(end,0,0x06054b50);u16(end,8,central.length);u16(end,10,central.length);u32(end,12,size);u32(end,16,offset);const all=[...parts,...central,end],bytes=new Uint8Array(offset+size+22);let at=0;for(const p of all){bytes.set(p,at);at+=p.length;}return bytes;
+ }
+ function docx(book,doc){let paragraphs=[];const paragraph=(runs,align='left',heading=false)=>'<w:p><w:pPr><w:jc w:val="'+(align==='justify'?'both':align)+'"/><w:spacing w:after="160" w:line="360" w:lineRule="auto"/>'+(heading?'<w:keepNext/>':'')+'</w:pPr>'+runs+'</w:p>';
+  function run(s,style={}){return '<w:r><w:rPr><w:rFonts w:ascii="'+escape(style.font||'Georgia')+'" w:hAnsi="'+escape(style.font||'Georgia')+'"/><w:sz w:val="'+Math.round((style.size||12)*2)+'"/>'+(style.bold?'<w:b/>':'')+(style.italic?'<w:i/>':'')+(style.underline?'<w:u w:val="single"/>':'')+(style.strike?'<w:strike/>':'')+'</w:rPr><w:t xml:space="preserve">'+escape(s)+'</w:t></w:r>';}
+  paragraphs.push(paragraph(run(book.title,{size:24,bold:true}),'left',true));
+  for(const chapter of book.chapters){paragraphs.push(paragraph(run(chapter.title,{size:18,bold:true}),'left',true));const host=doc.createElement('div');host.innerHTML=sanitize(chapter.html,doc);let buffer='',align='left';
+   const flush=()=>{if(buffer){paragraphs.push(paragraph(buffer,align));buffer='';}};
+   function walk(n,style){if(n.nodeType===3){buffer+=run(n.data,style);return;}if(n.nodeType!==1)return;const block=['P','DIV','H1','H2','H3','LI','BLOCKQUOTE'].includes(n.tagName);if(block)flush();const st={...style};if(n.style.fontFamily)st.font=n.style.fontFamily.replace(/["']/g,'');if(n.style.fontSize)st.size=parseFloat(n.style.fontSize)*(n.style.fontSize.endsWith('px')?.75:1);if(['B','STRONG'].includes(n.tagName)||n.style.fontWeight==='bold'||n.style.fontWeight==='700')st.bold=true;if(['I','EM'].includes(n.tagName)||n.style.fontStyle==='italic')st.italic=true;if(n.tagName==='U'||n.style.textDecorationLine==='underline')st.underline=true;if(['S','STRIKE'].includes(n.tagName))st.strike=true;if(n.tagName==='BR'){buffer+='<w:r><w:br/></w:r>';return;}if(block)align=n.style.textAlign||'left';if(n.tagName==='LI')buffer+=run('• ',st);for(const child of n.childNodes)walk(child,st);if(block)flush();}
+   for(const child of host.childNodes)walk(child,{});flush();
+  }
+  return zip({'[Content_Types].xml':'<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>','_rels/.rels':'<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>','word/document.xml':'<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+paragraphs.join('')+'<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>'});
+ }
+ const api={FONTS,escape,fresh,sanitize,restore,text,words,filename,bookHTML,docx,zip};if(typeof module!=='undefined')module.exports=api;else root.WriterCore=api;
+})(typeof window!=='undefined'?window:globalThis);

@@ -1,0 +1,1 @@
+const {cpSync,mkdirSync}=require('node:fs');const path=require('node:path');mkdirSync(path.join(__dirname,'editor'),{recursive:true});for(const name of ['index.html','writer.css','writer.js','core.js','icon.svg'])cpSync(path.join(__dirname,'../item-web/public/writer',name),path.join(__dirname,'editor',name));console.log('Bundled local writing editor.');

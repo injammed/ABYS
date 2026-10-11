@@ -1,0 +1,62 @@
+{
+  "name": "aetimm-writer",
+  "version": "0.1.0",
+  "description": "AETIMM Writer \u2014 an offline novel-writing desktop app",
+  "productName": "AETIMM Writer",
+  "author": "AETIMM",
+  "license": "MIT",
+  "main": "main.cjs",
+  "scripts": {
+    "prepare-editor": "node prepare.cjs",
+    "start": "npm run prepare-editor && electron .",
+    "check": "node --check main.cjs && node --check preload.cjs && node --check ../item-web/public/writer/core.js && node --check ../item-web/public/writer/writer.js",
+    "test": "node verify.cjs",
+    "smoke": "electron smoke.cjs",
+    "dist": "npm run prepare-editor && electron-builder --publish never"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.aetimm.writer",
+    "productName": "AETIMM Writer",
+    "asar": true,
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "editor/**/*",
+      "resources/icon.png"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "resources"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "resources/icon.ico",
+      "artifactName": "AETIMM-Writer-${version}-Windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": false
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.productivity",
+      "icon": "resources/icon.icns",
+      "identity": "-",
+      "artifactName": "AETIMM-Writer-${version}-macOS-${arch}.${ext}"
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "Office",
+      "icon": "resources/icon.png",
+      "artifactName": "AETIMM-Writer-${version}-Linux-${arch}.${ext}"
+    }
+  }
+}
