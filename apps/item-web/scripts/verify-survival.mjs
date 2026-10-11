@@ -61,3 +61,5 @@ console.log('Horizon world PASS: locked/open bunker ray collisions, targetable w
 await import("./verify-economy.mjs");
 
 await import("./verify-world-art.mjs");
+
+await import("./verify-characters.mjs");
