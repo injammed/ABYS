@@ -1,8 +1,8 @@
 {
   "name": "aetimm-writer",
-  "version": "0.1.1",
-  "description": "AETIMM Writer \u2014 an offline novel-writing desktop app",
-  "productName": "AETIMM Writer",
+  "version": "0.1.2",
+  "description": "vnnova \u2014 an offline writing studio by AETIMM",
+  "productName": "vnnova",
   "author": "AETIMM",
   "license": "MIT",
   "main": "main.cjs",
@@ -20,13 +20,14 @@
   },
   "build": {
     "appId": "com.aetimm.writer",
-    "productName": "AETIMM Writer",
+    "productName": "vnnova",
     "asar": true,
     "files": [
       "main.cjs",
       "preload.cjs",
       "editor/**/*",
-      "resources/icon.png"
+      "resources/icon.png",
+      "profile-path.cjs"
     ],
     "directories": {
       "output": "dist",
@@ -35,7 +36,7 @@
     "win": {
       "target": "nsis",
       "icon": "resources/icon.ico",
-      "artifactName": "AETIMM-Writer-${version}-Windows-${arch}.${ext}"
+      "artifactName": "vnnova-${version}-Windows-${arch}.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -50,13 +51,13 @@
       "category": "public.app-category.productivity",
       "icon": "resources/icon.icns",
       "identity": "-",
-      "artifactName": "AETIMM-Writer-${version}-macOS-${arch}.${ext}"
+      "artifactName": "vnnova-${version}-macOS-${arch}.${ext}"
     },
     "linux": {
       "target": "AppImage",
       "category": "Office",
       "icon": "resources/icon.png",
-      "artifactName": "AETIMM-Writer-${version}-Linux-${arch}.${ext}"
+      "artifactName": "vnnova-${version}-Linux-${arch}.${ext}"
     }
   }
 }
