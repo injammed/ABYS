@@ -1,0 +1,4 @@
+const path=require('node:path');
+function routeFile(root,pathname){let name;try{name=decodeURIComponent(pathname);}catch{return null;}if(name.includes('\\')||name.includes('\0')||name.split('/').includes('..'))return null;name=name.replace(/^\/+/, '');if(!name||name.endsWith('/'))name+='index.html';else if(!path.extname(name))name+='/index.html';const file=path.resolve(root,name),relative=path.relative(root,file);return relative&&!relative.startsWith('..')&&!path.isAbsolute(relative)?file:null;}
+const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.txt':'text/plain; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.woff2':'font/woff2','.ico':'image/x-icon','.glb':'model/gltf-binary'};
+module.exports={routeFile,MIME};

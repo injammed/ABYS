@@ -1,0 +1,137 @@
+name: AETIMM desktop playtest channel
+on:
+  push:
+    branches: [main]
+    paths: ['apps/item-web/**','apps/aetimm-desktop/**','.github/workflows/desktop-game.yml']
+  pull_request:
+    paths: ['apps/item-web/**','apps/aetimm-desktop/**','.github/workflows/desktop-game.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: aetimm-desktop-game-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  content:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build local game
+        working-directory: apps/item-web
+        run: |
+          npm install
+          npm run typecheck
+          node --experimental-strip-types scripts/verify-arcade.mjs
+          npm run build
+        env:
+          NEXT_PUBLIC_BASE_PATH: ''
+          NEXT_TELEMETRY_DISABLED: '1'
+      - name: Install native test runtime
+        working-directory: apps/aetimm-desktop
+        run: npm ci
+      - name: Verify updater and pack the game
+        working-directory: apps/aetimm-desktop
+        run: |
+          npm run check
+          npm test
+          npm run prepare-game
+          python release-pack.py
+      - name: Actual offline native game test
+        working-directory: apps/aetimm-desktop
+        run: xvfb-run -a npm run smoke -- --no-sandbox --use-angle=swiftshader
+      - uses: actions/upload-artifact@v4
+        with:
+          name: game-content
+          path: |
+            apps/aetimm-desktop/dist/aetimm-game-content.tar.gz
+            apps/aetimm-desktop/dist/game-content.json
+          if-no-files-found: error
+  mac:
+    if: github.event_name != 'pull_request'
+    needs: content
+    runs-on: macos-latest
+    outputs:
+      new: ${{ steps.version.outputs.new }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check launcher version
+        id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="$(node -p "require('./apps/aetimm-desktop/package.json').version")"
+          if gh release view "desktop-v$VERSION" >/dev/null 2>&1; then
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@v4
+        if: steps.version.outputs.new == 'true'
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        if: steps.version.outputs.new == 'true'
+        with:
+          name: game-content
+          path: content
+      - name: Assemble bundled game
+        if: steps.version.outputs.new == 'true'
+        run: |
+          mkdir -p apps/aetimm-desktop/bundle
+          tar -xzf content/aetimm-game-content.tar.gz -C apps/aetimm-desktop/bundle
+      - name: Build both Mac installers
+        if: steps.version.outputs.new == 'true'
+        working-directory: apps/aetimm-desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+        run: |
+          npm ci
+          npm run check
+          npm test
+          npm run dist -- --mac --arm64 --x64
+      - uses: actions/upload-artifact@v4
+        if: steps.version.outputs.new == 'true'
+        with:
+          name: game-Mac-installers
+          path: apps/aetimm-desktop/dist/*.dmg
+          if-no-files-found: error
+  release:
+    if: github.event_name != 'pull_request'
+    needs: [content,mac]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: game-content
+          path: content
+      - uses: actions/download-artifact@v4
+        if: needs.mac.outputs.new == 'true'
+        with:
+          name: game-Mac-installers
+          path: installers
+      - name: Publish verified game channel
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="game-content-$GITHUB_SHA"
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" content/* --target "$GITHUB_SHA" --title "AETIMM playtest ${GITHUB_SHA:0:12}" --notes "Verified local game content. In AETIMM Game, check for updates, download, then apply between sessions. Saves remain on the stable local game origin." --latest=false
+          fi
+      - name: Publish Mac downloads
+        if: needs.mac.outputs.new == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="$(node -p "require('./apps/aetimm-desktop/package.json').version")"
+          test -s "installers/AETIMM-Game-$VERSION-macOS-arm64.dmg"
+          test -s "installers/AETIMM-Game-$VERSION-macOS-x64.dmg"
+          (cd installers && sha256sum *.dmg) > installers/SHA256SUMS.txt
+          if ! gh release view "desktop-v$VERSION" >/dev/null 2>&1; then
+            gh release create "desktop-v$VERSION" installers/* --target "$GITHUB_SHA" --title "AETIMM Game $VERSION / Mac playtest" --notes-file apps/aetimm-desktop/RELEASE.md --latest=false
+          fi

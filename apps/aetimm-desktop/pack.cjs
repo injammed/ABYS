@@ -1,0 +1,10 @@
+const fs=require('node:fs/promises'),path=require('node:path'),zlib=require('node:zlib');
+const MAX=512*1024*1024;
+function safeName(name){if(typeof name!=='string'||!name||name.includes('\\')||name.includes('\0')||name.startsWith('/')||/^[A-Za-z]:/.test(name)||name.split('/').some(s=>s==='..'||s==='.'||s===''))throw Error('Unsafe content path');return name;}
+function readTar(gzip){const data=zlib.gunzipSync(gzip,{maxOutputLength:MAX}),files=[],seen=new Set();let offset=0,total=0;const string=b=>b.subarray(0,b.indexOf(0)<0?b.length:b.indexOf(0)).toString('utf8'),octal=b=>{const s=string(b).trim();if(!/^[0-7]*$/.test(s))throw Error('Invalid archive size');return parseInt(s||'0',8);};
+ while(offset+512<=data.length){const h=data.subarray(offset,offset+512);if(h.every(v=>v===0))break;const expected=octal(h.subarray(148,156));let sum=0;for(let i=0;i<512;i++)sum+=i>=148&&i<156?32:h[i];if(sum!==expected)throw Error('Archive header checksum failed');const prefix=string(h.subarray(345,500)),name=safeName((prefix?prefix+'/':'')+string(h.subarray(0,100))),size=octal(h.subarray(124,136)),type=h[156];if(type!==0&&type!==48)throw Error('Only regular game files are allowed');if(size>64*1024*1024||offset+512+size>data.length)throw Error('Invalid archive file size');if(seen.has(name))throw Error('Duplicate archive path');seen.add(name);total+=size;if(total>MAX||files.length>=10000)throw Error('Content pack exceeds limits');files.push({name,data:data.subarray(offset+512,offset+512+size)});offset+=512+Math.ceil(size/512)*512;
+ }
+ if(!files.some(f=>f.name==='index.html')||!files.some(f=>f.name==='game-build.json'))throw Error('Incomplete game pack');return files;
+}
+async function extractPack(buffer,directory,build){const files=readTar(buffer),meta=JSON.parse(files.find(f=>f.name==='game-build.json').data.toString());if(meta.build!==build)throw Error('Content build identity mismatch');for(const file of files){const target=path.join(directory,file.name);await fs.mkdir(path.dirname(target),{recursive:true});await fs.writeFile(target,file.data,{flag:'wx'});}return files.length;}
+module.exports={safeName,readTar,extractPack,MAX};
