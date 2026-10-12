@@ -6,4 +6,4 @@ This early release has unsigned Windows installers and ad hoc signed, non-notari
 
 Word export includes basic paragraph, font, size, bold/italic/underline and list-text formatting. DOCX import, collaboration and cloud sync are not included. System fonts must be installed locally. Manuscript files are limited to 25 MB. No manuscripts are transmitted to AETIMM or an AI service.
 
-Renamed from AETIMM Writer in 0.1.2. Existing .aetimm manuscripts, browser drafts and desktop recovery files remain compatible; the original desktop profile and app identifier are retained.
+Renamed from AETIMM Writer in 0.1.3. Existing .aetimm manuscripts, browser drafts and desktop recovery files remain compatible; the original desktop profile and app identifier are retained.
