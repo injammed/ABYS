@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "id": "38142148315-1",
-  "checkedAt": "2026-10-11T13:10:59.028Z",
-  "sourceCommit": "05122739321db57024ba30aff54e31192b16b15b",
+  "id": "38273072737-1",
+  "checkedAt": "2026-10-12T15:50:00.259Z",
+  "sourceCommit": "36bd17033e1801456dde9f400cb9bc0594db14f3",
   "state": "completed",
   "queries": [
     {
@@ -18,9 +18,19 @@
   ],
   "candidates": [
     {
-      "id": 371476326,
-      "repository": "golanlevin/DrawingWithMachines",
-      "stars": 156,
+      "id": 1168387997,
+      "repository": "okdalto/siljangnim",
+      "stars": 25,
+      "license": "GPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 778780072,
+      "repository": "tiqdev/valocards",
+      "stars": 12,
       "license": null,
       "signals": [
         "generative-art"
@@ -28,39 +38,39 @@
       "newlySeen": true
     },
     {
-      "id": 1414149806,
-      "repository": "gillverd/accelerando-8192",
-      "stars": 18,
-      "license": null,
+      "id": 1309929105,
+      "repository": "meodai/ray-color",
+      "stars": 7,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
       "newlySeen": true
     },
     {
-      "id": 525592995,
-      "repository": "invoke-ai/InvokeAI",
-      "stars": 28559,
-      "license": "Apache-2.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 584639396,
-      "repository": "ai-collection/ai-collection",
-      "stars": 9196,
+      "id": 1412450230,
+      "repository": "piggei/wled-usermod-gpt-matrix-fx",
+      "stars": 5,
       "license": "MIT",
       "signals": [
         "generative-art"
       ],
+      "newlySeen": true
+    },
+    {
+      "id": 800083050,
+      "repository": "liamdugan/raid",
+      "stars": 221,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
       "newlySeen": false
     },
     {
-      "id": 116062718,
-      "repository": "villares/sketch-a-day",
-      "stars": 259,
+      "id": 456706468,
+      "repository": "Correia-jpv/fucking-awesome-creative-coding",
+      "stars": 34,
       "license": null,
       "signals": [
         "generative-art"
@@ -68,32 +78,22 @@
       "newlySeen": false
     },
     {
-      "id": 1304174300,
-      "repository": "corosolto/client",
-      "stars": 257,
-      "license": "AGPL-3.0",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1116451552,
-      "repository": "oocx/tfplan2md",
-      "stars": 174,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1272774651,
-      "repository": "yuki4266/yuki4266",
-      "stars": 30,
+      "id": 1388367915,
+      "repository": "cloveric/claude-drawing-skill",
+      "stars": 26,
       "license": "MIT",
       "signals": [
         "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1404086905,
+      "repository": "billpwchan/sakura-fantasy",
+      "stars": 21,
+      "license": null,
+      "signals": [
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -108,9 +108,9 @@
       "newlySeen": false
     },
     {
-      "id": 313701704,
-      "repository": "andorthehood/8f4e",
-      "stars": 14,
+      "id": 1245060445,
+      "repository": "eaviles/Ollin",
+      "stars": 15,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -128,6 +128,16 @@
       "newlySeen": false
     },
     {
+      "id": 1154425084,
+      "repository": "eremef/awaria-outage-notifier",
+      "stars": 11,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1159071863,
       "repository": "Nerahikada/chromecast-sink",
       "stars": 9,
@@ -138,20 +148,20 @@
       "newlySeen": false
     },
     {
-      "id": 804579039,
-      "repository": "xispado/illumination_pipeline",
-      "stars": 6,
-      "license": "MIT",
+      "id": 1398313770,
+      "repository": "Withlian/LuboDown",
+      "stars": 7,
+      "license": "GPL-3.0",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 1398313770,
-      "repository": "Withlian/LuboDown",
-      "stars": 6,
-      "license": "GPL-3.0",
+      "id": 1109222527,
+      "repository": "filthyrake/vlog",
+      "stars": 5,
+      "license": null,
       "signals": [
         "ai-generated"
       ],
@@ -168,30 +178,10 @@
       "newlySeen": false
     },
     {
-      "id": 1314017928,
-      "repository": "provemark/content-credentials",
-      "stars": 5,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1125583044,
       "repository": "segin/substrate",
       "stars": 4,
       "license": null,
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1160781184,
-      "repository": "nexus-llm-lang/Nexus",
-      "stars": 4,
-      "license": "MIT",
       "signals": [
         "ai-generated"
       ],
@@ -204,6 +194,16 @@
       "license": null,
       "signals": [
         "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1144076205,
+      "repository": "ariaxhan/substrate",
+      "stars": 3,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
       ],
       "newlySeen": false
     },
@@ -242,6 +242,7 @@
     581913613,
     584639396,
     723372005,
+    778780072,
     800083050,
     804579039,
     822203864,
@@ -271,6 +272,7 @@
     1159071863,
     1160668557,
     1160781184,
+    1168387997,
     1177064081,
     1177292696,
     1182901152,
@@ -293,6 +295,7 @@
     1285672288,
     1295972337,
     1304174300,
+    1309929105,
     1312280882,
     1314017928,
     1314018204,
@@ -326,6 +329,7 @@
     1407583549,
     1408412506,
     1411230193,
+    1412450230,
     1414149806
   ]
 }

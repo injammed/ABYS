@@ -1,0 +1,335 @@
+{
+  "version": 1,
+  "id": "38273072737-1",
+  "checkedAt": "2026-10-12T15:50:00.259Z",
+  "sourceCommit": "36bd17033e1801456dde9f400cb9bc0594db14f3",
+  "state": "completed",
+  "queries": [
+    {
+      "query": "topic:ai-generated stars:>=3 archived:false fork:false",
+      "state": "completed",
+      "returned": 10
+    },
+    {
+      "query": "topic:generative-art stars:>=3 archived:false fork:false",
+      "state": "completed",
+      "returned": 10
+    }
+  ],
+  "candidates": [
+    {
+      "id": 1168387997,
+      "repository": "okdalto/siljangnim",
+      "stars": 25,
+      "license": "GPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 778780072,
+      "repository": "tiqdev/valocards",
+      "stars": 12,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1309929105,
+      "repository": "meodai/ray-color",
+      "stars": 7,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1412450230,
+      "repository": "piggei/wled-usermod-gpt-matrix-fx",
+      "stars": 5,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 800083050,
+      "repository": "liamdugan/raid",
+      "stars": 221,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 456706468,
+      "repository": "Correia-jpv/fucking-awesome-creative-coding",
+      "stars": 34,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1388367915,
+      "repository": "cloveric/claude-drawing-skill",
+      "stars": 26,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1404086905,
+      "repository": "billpwchan/sakura-fantasy",
+      "stars": 21,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1099222481,
+      "repository": "MarkusNeusinger/anyplot",
+      "stars": 20,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1245060445,
+      "repository": "eaviles/Ollin",
+      "stars": 15,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1276131924,
+      "repository": "lolly-tools/lolly",
+      "stars": 12,
+      "license": "MPL-2.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1154425084,
+      "repository": "eremef/awaria-outage-notifier",
+      "stars": 11,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1159071863,
+      "repository": "Nerahikada/chromecast-sink",
+      "stars": 9,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1398313770,
+      "repository": "Withlian/LuboDown",
+      "stars": 7,
+      "license": "GPL-3.0",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1109222527,
+      "repository": "filthyrake/vlog",
+      "stars": 5,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1182901152,
+      "repository": "juliosuas/ai-garden",
+      "stars": 5,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1125583044,
+      "repository": "segin/substrate",
+      "stars": 4,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1408412506,
+      "repository": "T0mCaTTT/anima-tag-reverse",
+      "stars": 4,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1144076205,
+      "repository": "ariaxhan/substrate",
+      "stars": 3,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1387038169,
+      "repository": "qwerty-ll/CustomizeYouProfile",
+      "stars": 3,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    }
+  ],
+  "seenIds": [
+    81895167,
+    84751316,
+    86075041,
+    86194218,
+    116062718,
+    151634693,
+    215842938,
+    308233855,
+    313701704,
+    355805398,
+    371476326,
+    373191504,
+    374744219,
+    451809672,
+    456706468,
+    525592995,
+    527415438,
+    527632130,
+    530687417,
+    554771302,
+    581913613,
+    584639396,
+    723372005,
+    778780072,
+    800083050,
+    804579039,
+    822203864,
+    822443433,
+    844382769,
+    848514110,
+    955785557,
+    990303192,
+    1053323829,
+    1058699349,
+    1088429461,
+    1089922256,
+    1097790631,
+    1099222481,
+    1099326996,
+    1105562494,
+    1106063925,
+    1109222527,
+    1112528364,
+    1116451552,
+    1125583044,
+    1138060581,
+    1138892030,
+    1144076205,
+    1152251368,
+    1154425084,
+    1159071863,
+    1160668557,
+    1160781184,
+    1168387997,
+    1177064081,
+    1177292696,
+    1182901152,
+    1185183114,
+    1190257819,
+    1208109413,
+    1211288343,
+    1217888271,
+    1238133915,
+    1239257448,
+    1243928948,
+    1244552481,
+    1245060445,
+    1256196157,
+    1262901708,
+    1265180649,
+    1265662023,
+    1272774651,
+    1276131924,
+    1285672288,
+    1295972337,
+    1304174300,
+    1309929105,
+    1312280882,
+    1314017928,
+    1314018204,
+    1316492358,
+    1335431007,
+    1338283854,
+    1339231040,
+    1345614074,
+    1346198317,
+    1354834738,
+    1366877560,
+    1375251966,
+    1378012244,
+    1380658970,
+    1381356320,
+    1382053746,
+    1382304020,
+    1383156569,
+    1384845766,
+    1386555049,
+    1387038169,
+    1387056608,
+    1387344556,
+    1388327805,
+    1388367915,
+    1393034919,
+    1395436657,
+    1398313770,
+    1398674085,
+    1404086905,
+    1407583549,
+    1408412506,
+    1411230193,
+    1412450230,
+    1414149806
+  ]
+}
