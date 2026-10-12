@@ -1,4 +1,5 @@
 import * as T from "three";
+import {buildApy0cBoss} from "./apy0c-boss.ts";
 import heightData from "./currency-relief-data.json" with {type:"json"};
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import {RoundedBoxGeometry} from "three/addons/geometries/RoundedBoxGeometry.js";
@@ -33,6 +34,7 @@ function reliefMesh(kind:0|1|2,high:boolean,width=1.15,height=1.15,depth=.10){
 // Reference-guided sculptural interpretations. Hidden surfaces and relief are inferred.
 // Dimensions are exhibition units, not manufacturing specifications.
 export function buildCurrencySculpture(item: Item, detail: "gallery" | "hero" = "gallery"): T.Group {
+  if(item.form==="Boss")return buildApy0cBoss();
   const high=detail==="hero";
   const index=Number(item.id.slice(-3));
   const root=new T.Group();root.name=`${item.id} ${item.name}`;
