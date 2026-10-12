@@ -1,0 +1,52 @@
+export const W=384,H=576;
+export const STAGES=[
+ {name:'01 / CAPITAL REFUGE',enemy:'infected',waves:4,brief:'The cathedral opens. Clear infected formations. Catch green rescue pods.'},
+ {name:'02 / CRASHED VISITORS',enemy:'alien',waves:4,brief:'The alien virus spreads. Reach the broken ship and protect its refugees.'},
+ {name:'03 / MACHINE CITY',enemy:'robot',waves:5,brief:'Laser patrols hold the evacuation corridor. Break the command relay.'},
+ {name:'04 / THE CRUST OPENS',enemy:'demon',waves:5,brief:'Possession rises from the breach. Banish the vanguard and seal the rift.'},
+ {name:'05 / EYE OF HORIZONS',enemy:'eye',waves:5,brief:'Warp beyond Earth. Destroy the orbital instruments around the black hole.'},
+ {name:'06 / APY0C',enemy:'boss',waves:0,brief:'Inside the Eye, face its machine mind. Three phases. Break the Eye. Bring everyone home.'}
+];
+export const CLASSES=[{name:'Witch',color:'#d89aff',speed:210,fire:.17,special:16},{name:'Knight',color:'#e9c77b',speed:185,fire:.12,special:20},{name:'Cyborg',color:'#69e9e9',speed:220,fire:.10,special:24},{name:'Alien',color:'#a0e286',speed:230,fire:.15,special:14}];
+export function rng(seed=1){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+export function newCampaign(classId=0,seed=Date.now()){return {mode:'brief',stage:0,classId:Math.max(0,Math.min(3,classId)),score:0,saved:0,lost:0,lives:3,elapsed:0,stageTime:0,wave:0,nextWave:0,invulnerable:2,fireDelay:0,special:0,ship:{x:W/2,y:H-70},enemies:[],shots:[],bolts:[],pods:[],sparks:[],boss:null,random:rng(seed)};}
+export function beginStage(s){if(s.mode!=='brief')return;s.mode='play';s.stageTime=0;s.wave=0;s.nextWave=.5;s.enemies=[];s.shots=[];s.bolts=[];s.pods=[];s.ship={x:W/2,y:H-70};s.invulnerable=2;if(s.stage===5)s.boss={x:W/2,y:100,hp:240,max:240,clock:0,nextShot:1,phase:0};}
+function spark(s,x,y,color){for(let i=0;i<9;i++){const a=s.random()*Math.PI*2,v=25+s.random()*75;s.sparks.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:.5,color});}}
+function hurt(s){if(s.invulnerable>0||s.mode!=='play')return;s.lives--;s.invulnerable=2.4;s.bolts=[];spark(s,s.ship.x,s.ship.y,'#fba875');if(s.lives<=0)s.mode='lost';}
+export function defeatEnemy(s,e){if(e.dead)return;e.dead=true;s.score+=100+50*s.stage;spark(s,e.x,e.y,CLASSES[s.classId].color);if(s.random()<.24)s.pods.push({x:e.x,y:e.y,vy:65,kind:'rescue'});}
+export function damageBoss(s,amount){if(!s.boss||s.mode!=='play')return;s.boss.hp=Math.max(0,s.boss.hp-amount);s.boss.phase=Math.min(2,Math.floor((1-s.boss.hp/s.boss.max)*3));if(!s.boss.hp){s.score+=15000+s.saved*500;s.mode='won';s.bolts=[];spark(s,s.boss.x,s.boss.y,'#ffdf87');}}
+export function campaignStep(s,input,dt){dt=Math.max(0,Math.min(dt,1/30));if(s.mode!=='play')return;s.elapsed+=dt;s.stageTime+=dt;s.invulnerable=Math.max(0,s.invulnerable-dt);s.fireDelay=Math.max(0,s.fireDelay-dt);s.special=Math.max(0,s.special-dt);
+ const c=CLASSES[s.classId],dx=(input.right?1:0)-(input.left?1:0),dy=(input.down?1:0)-(input.up?1:0),mag=Math.max(1,Math.hypot(dx,dy));s.ship.x=Math.max(14,Math.min(W-14,s.ship.x+dx/mag*c.speed*dt));s.ship.y=Math.max(290,Math.min(H-24,s.ship.y+dy/mag*c.speed*dt));
+ if(input.fire&&s.fireDelay===0){s.fireDelay=c.fire;s.shots.push({x:s.ship.x,y:s.ship.y-17,vy:-400});if(s.classId===3)s.shots.push({x:s.ship.x+9,y:s.ship.y-8,vy:-350});}
+ if(input.special&&s.special===0){s.special=c.special;for(const e of s.enemies){e.hp-=3;if(e.hp<=0)defeatEnemy(s,e);}s.bolts=[];damageBoss(s,15);spark(s,s.ship.x,s.ship.y,'#fff6bf');}
+ const stage=STAGES[s.stage];if(s.stage<5&&s.wave<stage.waves&&s.stageTime>=s.nextWave){const row=s.wave++;s.nextWave=s.stageTime+4;for(let i=0;i<7;i++)s.enemies.push({x:45+i*49,y:-30-row*4,home:45+i*49,age:0,phase:i*.8+row,kind:stage.enemy,hp:1+(s.stage>=2?1:0),shot:1.6+s.random()*3,dead:false});s.pods.push({x:45+s.random()*(W-90),y:-40,vy:63,kind:'rescue'});}
+ for(const e of s.enemies){if(e.dead)continue;e.age+=dt;e.x=e.home+Math.sin(e.age*1.3+e.phase)*24;e.y+=dt*(31+s.stage*7);e.shot-=dt;if(e.shot<=0&&e.y>15&&e.y<360){e.shot=3.2-s.stage*.25+s.random();const a=Math.atan2(s.ship.y-e.y,s.ship.x-e.x);s.bolts.push({x:e.x,y:e.y,vx:Math.cos(a)*(95+s.stage*16),vy:Math.sin(a)*(95+s.stage*16),r:e.kind==='robot'?3:4});}if(e.y>H+25){e.dead=true;s.lost++;}if(Math.hypot(e.x-s.ship.x,e.y-s.ship.y)<20){hurt(s);e.dead=true;}}
+ if(s.boss){const b=s.boss;b.clock+=dt;b.x=W/2+Math.sin(b.clock*.7)*112;b.y=90+Math.sin(b.clock*.9)*22;b.nextShot-=dt;if(b.nextShot<=0){b.nextShot=[1.1,.8,.56][b.phase];const a=Math.atan2(s.ship.y-b.y,s.ship.x-b.x);for(let i=-2-b.phase;i<=2+b.phase;i++)s.bolts.push({x:b.x,y:b.y+24,vx:Math.cos(a+i*.15)*(125+b.phase*24),vy:Math.sin(a+i*.15)*(125+b.phase*24),r:4});if(b.phase===2)for(let i=0;i<10;i++){const a=i*Math.PI/5+b.clock;s.bolts.push({x:b.x,y:b.y,vx:Math.cos(a)*100,vy:Math.sin(a)*100,r:3});}}}
+ for(const shot of s.shots){shot.y+=shot.vy*dt;for(const e of s.enemies){if(!e.dead&&Math.abs(e.x-shot.x)<15&&Math.abs(e.y-shot.y)<15){e.hp--;shot.y=-100;if(e.hp<=0)defeatEnemy(s,e);break;}}if(s.boss&&Math.abs(shot.x-s.boss.x)<39&&Math.abs(shot.y-s.boss.y)<46){damageBoss(s,1);shot.y=-100;}}
+ for(const b of s.bolts){b.x+=b.vx*dt;b.y+=b.vy*dt;if(Math.hypot(b.x-s.ship.x,b.y-s.ship.y)<10+b.r){hurt(s);b.y=H+100;}}
+ for(const p of s.pods){p.y+=p.vy*dt;if(Math.hypot(p.x-s.ship.x,p.y-s.ship.y)<22){s.saved++;s.score+=500;p.y=H+100;spark(s,s.ship.x,s.ship.y,'#a2ffc3');}else if(p.y>H&&p.y<H+50){s.lost++;p.y=H+100;}}
+ for(const p of s.sparks){p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;}
+ s.enemies=s.enemies.filter(e=>!e.dead);s.shots=s.shots.filter(b=>b.y>-10);s.bolts=s.bolts.filter(b=>b.y<H+20&&b.y>-50&&b.x>-20&&b.x<W+20);s.pods=s.pods.filter(p=>p.y<H+20);s.sparks=s.sparks.filter(p=>p.life>0);
+ if(s.mode==='play'&&s.stage<5&&s.wave>=stage.waves&&s.enemies.length===0){s.score+=1000;s.stage++;s.mode='brief';s.bolts=[];s.pods=[];s.special=0;}
+}
+export const PW=480,PH=720;
+export const BUMPERS=[{x:175,y:210,r:26},{x:305,y:210,r:26},{x:240,y:300,r:32}];
+export const TARGETS=[{x:70,y:300,r:15},{x:410,y:300,r:15},{x:100,y:415,r:16},{x:380,y:415,r:16}];
+export const WALLS=[[22,565,22,110],[22,110,80,30],[80,30,400,30],[400,30,462,110],[462,110,462,700],[434,180,434,720],[22,565,130,640],[434,565,350,640],[90,475,152,545],[390,475,328,545]];
+export function newPinball(){return {mode:'serve',ball:{x:450,y:675,vx:0,vy:0},balls:3,score:0,multiplier:1,mission:0,lit:[false,false,false,false],cooldowns:new Array(7).fill(0),left:.38,right:Math.PI-.38,leftOmega:0,rightOmega:0,plunger:0,elapsed:0,save:0,nudges:0,lastNudge:-100,serveSaved:false,tilt:0,flash:0,message:'Hold SPACE / LAUNCH, then release. Three balls. Light four rescue targets, then hit the Eye.'};}
+export function launch(s,power=.7){if(s.mode!=='serve')return;s.mode='play';s.ball={x:450,y:675,vx:-100,vy:-780-Math.max(0,Math.min(1,power))*350};s.plunger=0;s.save=s.serveSaved?0:8;s.serveSaved=false;s.message='Rescue targets → Eye bumper. Z / left and X / right flip. N nudges.';}
+export function pinHit(s,index){if(s.cooldowns[index]>0)return;s.cooldowns[index]=.14;s.flash=.14;if(index<3){s.score+=100*s.multiplier;if(index===2&&s.lit.every(Boolean)){s.mission++;s.score+=5000*s.multiplier;s.multiplier=Math.min(5,s.multiplier+1);s.lit.fill(false);s.message=s.mission===3?'APY0C broken. Victory lap! Keep playing for a high score.':`Rescue ${s.mission}/3 complete. Light all four again.`;}}else{s.lit[index-3]=true;s.score+=250*s.multiplier;}}
+export function drain(s){if(s.save>0){s.mode='serve';s.ball={x:450,y:675,vx:0,vy:0};s.save=0;s.serveSaved=true;s.message='BALL SAVED · launch again';return;}s.serveSaved=false;s.balls--;if(s.balls<=0){s.mode='over';s.message=s.mission>=3?'THE EYE IS BROKEN · final score':'GAME OVER · three rescue missions break the Eye';}else{s.mode='serve';s.ball={x:450,y:675,vx:0,vy:0};s.message=`${s.balls} balls remain. Launch when ready.`;}}
+export function flipper(s,left){const x=left?135:345,y=615,a=left?s.left:s.right;return {ax:x,ay:y,bx:x+Math.cos(a)*90,by:y+Math.sin(a)*90,omega:left?s.leftOmega:s.rightOmega};}
+// Circle vs capsule with relative velocity against a rotating flipper's contact point.
+export function capsule(ball,ax,ay,bx,by,radius=8,omega=0,restitution=.82){const dx=bx-ax,dy=by-ay,len=dx*dx+dy*dy,t=len?Math.max(0,Math.min(1,((ball.x-ax)*dx+(ball.y-ay)*dy)/len)):0,cx=ax+t*dx,cy=ay+t*dy;let nx=ball.x-cx,ny=ball.y-cy;const d=Math.hypot(nx,ny),r=8+radius;if(d>=r)return false;if(d<.00001){nx=-dy/Math.sqrt(len||1);ny=dx/Math.sqrt(len||1);}else{nx/=d;ny/=d;}ball.x=cx+nx*(r+.01);ball.y=cy+ny*(r+.01);const sx=-omega*(cy-ay),sy=omega*(cx-ax),v=(ball.vx-sx)*nx+(ball.vy-sy)*ny;if(v<0){ball.vx-=(1+restitution)*v*nx;ball.vy-=(1+restitution)*v*ny;}return true;}
+export function pinballStep(s,input,dt){dt=Math.max(0,Math.min(dt,1/240));if(s.mode==='over')return;s.elapsed+=dt;s.flash=Math.max(0,s.flash-dt);s.tilt=Math.max(0,s.tilt-dt);s.cooldowns=s.cooldowns.map(c=>Math.max(0,c-dt));const oldLeft=s.left,oldRight=s.right;const aimLeft=input.left&&s.tilt===0?-.45:.38,aimRight=input.right&&s.tilt===0?Math.PI+.45:Math.PI-.38;const approach=(a,b)=>a+Math.sign(b-a)*Math.min(Math.abs(b-a),18*dt);s.left=approach(s.left,aimLeft);s.right=approach(s.right,aimRight);s.leftOmega=(s.left-oldLeft)/dt||0;s.rightOmega=(s.right-oldRight)/dt||0;
+ if(s.mode==='serve'){if(input.launch)s.plunger=Math.min(1,s.plunger+dt*.8);return;}
+ s.save=Math.max(0,s.save-dt);const b=s.ball;b.vy+=550*dt;b.vx*=Math.exp(-.05*dt);b.x+=b.vx*dt;b.y+=b.vy*dt;
+ for(const w of WALLS)capsule(b,...w,3);
+ for(const [i,p]of [...BUMPERS,...TARGETS].entries()){const dx=b.x-p.x,dy=b.y-p.y,d=Math.hypot(dx,dy),r=p.r+8;if(d<r){const nx=d?dx/d:0,ny=d?dy/d:-1;b.x=p.x+nx*(r+.1);b.y=p.y+ny*(r+.1);const v=b.vx*nx+b.vy*ny;if(v<0){b.vx-=2*v*nx;b.vy-=2*v*ny;}b.vx+=nx*(i<3?145:65);b.vy+=ny*(i<3?145:65);pinHit(s,i);}}
+ for(const left of [true,false]){const f=flipper(s,left);capsule(b,f.ax,f.ay,f.bx,f.by,7,f.omega,.86);}
+ if(b.y<150&&b.x>425)b.vx=Math.min(b.vx,-120);const speed=Math.hypot(b.vx,b.vy);if(speed>1400){b.vx*=1400/speed;b.vy*=1400/speed;}if(b.y>PH+20)drain(s);
+ if(![b.x,b.y,b.vx,b.vy].every(Number.isFinite)){s.ball={x:450,y:675,vx:0,vy:0};s.mode='serve';}
+}
+export function nudge(s){if(s.mode!=='play'||s.tilt>0)return;if(s.elapsed-s.lastNudge>3)s.nudges=0;s.lastNudge=s.elapsed;if(s.nudges>=3){s.tilt=3;s.nudges=0;s.message='TILT · flippers disabled for 3 seconds';return;}s.nudges++;s.ball.vy-=190;s.ball.vx+=s.ball.x<240?60:-60;}

@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import * as T from 'three';
+import {GLTFExporter} from 'three/addons/exporters/GLTFExporter.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {newCampaign,beginStage,campaignStep,STAGES,newPinball,launch,pinballStep,pinHit,drain,nudge,capsule} from '../public/arcade/arcade-core.mjs';
+import {newConsoleRun,startConsoleStage,consoleStep,consoleHit,CONSOLE_STAGES} from '../lib/console-campaign.ts';
+import {buildApy0cBoss} from '../lib/apy0c-boss.ts';
+import {disposeCurrencySculpture} from '../lib/currency-sculpture.ts';
+import {ARCADE_CABINETS,arcadeWalkable} from '../lib/cathedral-arcade.ts';
+import {cathedralWalkable} from '../lib/cathedral-plan.ts';
+const a=newCampaign(0,42),b=newCampaign(0,42);beginStage(a);beginStage(b);for(let i=0;i<120;i++){campaignStep(a,{right:true,fire:true},1/120);campaignStep(b,{right:true,fire:true},1/120);}assert.deepEqual(a.ship,b.ship);assert.deepEqual(a.enemies,b.enemies);assert.ok(a.ship.x<=370);
+// Drive all six live transitions through real projectile collisions; no forced mode changes.
+for(let classId=0;classId<4;classId++){const s=newCampaign(classId,7);let guard=0;while(s.mode!=='won'&&guard++<20000){if(s.mode==='brief')beginStage(s);s.shots.push(...s.enemies.filter(e=>!e.dead).map(e=>({x:e.x,y:e.y+3,vy:0})));if(s.boss)s.shots.push({x:s.boss.x,y:s.boss.y,vy:0});campaignStep(s,{fire:true},1/120);}assert.equal(s.mode,'won');assert.equal(s.stage,STAGES.length-1);assert.equal(s.boss.hp,0);assert.ok(s.score>=15000);}
+const lost=newCampaign();beginStage(lost);for(let i=0;i<3;i++){lost.invulnerable=0;lost.bolts.push({x:lost.ship.x,y:lost.ship.y,vx:0,vy:0,r:5});campaignStep(lost,{},1/120);}assert.equal(lost.mode,'lost');
+const pin=newPinball();pinballStep(pin,{launch:true},1/240);assert.ok(pin.plunger>0);launch(pin,.8);let visited=0;for(let i=0;i<240*90;i++){if(pin.mode==='serve')launch(pin,.8);pinballStep(pin,{left:Math.sin(i*.011)>0,right:Math.cos(i*.009)>0},1/240);visited=Math.max(visited,pin.ball.y<550?1:0);assert.ok(Object.values(pin.ball).every(Number.isFinite));}assert.equal(visited,1);
+const missions=newPinball();for(let i=0;i<3;i++){missions.cooldowns.fill(0);for(let j=3;j<7;j++)pinHit(missions,j);pinHit(missions,2);}assert.equal(missions.mission,3);assert.equal(missions.multiplier,4);assert.ok(missions.score>15000);
+const balls=newPinball();launch(balls);drain(balls);assert.equal(balls.balls,3);launch(balls);assert.equal(balls.save,0,'No infinite fresh ball saves');for(let i=0;i<3;i++){balls.save=0;drain(balls);}assert.equal(balls.mode,'over');assert.equal(balls.balls,0);
+const tilt=newPinball();launch(tilt);for(let i=0;i<4;i++)nudge(tilt);assert.equal(tilt.tilt,3);
+const testBall={x:220,y:635,vx:0,vy:100};assert.ok(capsule(testBall,135,615,230,650,7,-10));assert.ok(testBall.vy<0,'Flipper applies upward contact velocity');
+const c=newConsoleRun();for(let chapter=0;chapter<CONSOLE_STAGES.length;chapter++){startConsoleStage(c);assert.equal(c.mode,'play');for(const e of c.enemies)while(!e.dead){c.cooldown=0;assert.ok(consoleHit(c,e.id));}consoleStep(c,{x:0,z:0},1/60);}assert.equal(c.mode,'won');assert.equal(c.stage,5);assert.ok(c.score>20000);
+const dead=newConsoleRun();startConsoleStage(dead);for(let i=0;i<18;i++){dead.invulnerable=0;dead.enemies[0].x=dead.player.x;dead.enemies[0].z=dead.player.z;consoleStep(dead,{x:0,z:0},.05);}assert.equal(dead.mode,'lost');
+for(const cabinet of ARCADE_CABINETS){assert.ok(!arcadeWalkable(cabinet.x,cabinet.z));assert.ok(cathedralWalkable(cabinet.x,cabinet.z+1.6));assert.ok(arcadeWalkable(cabinet.x,cabinet.z+1.6));}assert.equal(ARCADE_CABINETS.length,3);
+globalThis.FileReader=class{readAsArrayBuffer(blob){blob.arrayBuffer().then(x=>{this.result=x;this.onloadend?.();});}readAsDataURL(blob){blob.arrayBuffer().then(x=>{this.result='data:application/octet-stream;base64,'+Buffer.from(x).toString('base64');this.onloadend?.();});}};
+const model=buildApy0cBoss(),size=new T.Box3().setFromObject(model).getSize(new T.Vector3());assert.ok(size.x>1&&size.y>1.9&&size.z>.3);assert.ok(size.x<2.2&&size.y<2.2);assert.equal(model.children.length,4);let tris=0;model.traverse(n=>{if(n.isMesh){assert.ok(n.geometry.index);for(const a of Object.values(n.geometry.attributes))for(const v of a.array)assert.ok(Number.isFinite(v));tris+=n.geometry.index.count/3;}});assert.ok(tris<35000);const glb=await new GLTFExporter().parseAsync(model,{binary:true});const reload=await new GLTFLoader().parseAsync(glb,'');assert.ok(new T.Box3().setFromObject(reload.scene).getSize(new T.Vector3()).distanceTo(size)<.001);disposeCurrencySculpture(model);disposeCurrencySculpture(reload.scene);
+const source=await readFile('lib/survival-engine.ts','utf8');assert.ok(source.includes('i===0?APY0C_EXHIBIT:item'));assert.ok(source.includes('arcade.dispose()'));const html=await readFile('public/arcade/index.html','utf8');assert.ok(html.includes('No desktop game installer is available yet'));console.log(`Arcade PASS: all four classes reach victory; loss/determinism, pinball physics/save/tilt/missions, six console chapters, three reachable cabinets, boss GLB ${Math.round(glb.byteLength/1024)} KiB / ${tris} triangles.`);

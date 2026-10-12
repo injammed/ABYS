@@ -19,6 +19,7 @@ export function CurrencyObjectViewer({item}:{item:Item}) {
       const scene=new T.Scene();const camera=new T.PerspectiveCamera(40,1,.05,30);camera.position.set(2.8,1.8,3.4);
       const controls=new OrbitControls(camera,canvas);controls.enablePan=false;controls.enableDamping=false;controls.minDistance=1.4;controls.maxDistance=7;
       const model=buildCurrencySculpture(item,"hero");scene.add(model);
+      if(item.form==="Boss"){controls.target.copy(new T.Box3().setFromObject(model).getCenter(new T.Vector3()));camera.position.set(2.8,2.4,3.4);}
       const bottom=new T.Box3().setFromObject(model).min.y;
       const stageGeometry=new T.CylinderGeometry(1.03,1.09,.10,80);const stageMaterial=new T.MeshStandardMaterial({color:0x171c26,metalness:.65,roughness:.27});const stage=new T.Mesh(stageGeometry,stageMaterial);stage.position.y=bottom-.055;stage.receiveShadow=true;scene.add(stage);
       const pmrem=new T.PMREMGenerator(renderer);const room=new RoomEnvironment();const env=pmrem.fromScene(room,.04);scene.environment=env.texture;room.dispose();pmrem.dispose();

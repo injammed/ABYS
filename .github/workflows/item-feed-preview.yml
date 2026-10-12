@@ -109,6 +109,10 @@ jobs:
           node scripts/verify-survival.mjs
           node scripts/verify-capital.mjs
 
+      - name: Verify cathedral arcade and final boss
+        working-directory: apps/item-web
+        run: node --experimental-strip-types scripts/verify-arcade.mjs
+
       - name: Verify writing app
         working-directory: apps/item-web
         run: |

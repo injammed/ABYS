@@ -1,0 +1,4 @@
+import {CurrencyObjectViewer} from '@/components/CurrencyObjectViewer';
+import {APY0C_EXHIBIT} from '@/lib/apy0c-boss';
+export const metadata={title:'APY0C · final boss | AETIMM'};
+export default function BossPage(){return <main style={{maxWidth:1100,margin:'0 auto',padding:'2rem'}}><p>AETIMM / CATHEDRAL EXHIBIT 01</p><h1>APY0C · the black-hole deity</h1><p>A singularity eye. Orbital halo. Obsidian armor. A crescent dueling scythe. The final enemy of <strong>Break the Eye</strong>.</p><CurrencyObjectViewer item={APY0C_EXHIBIT}/><p>Original reference-guided volumetric model. Hidden surfaces are inferred; this is a game sculpture, not an exact reconstruction of the image.</p><a href={(process.env.NEXT_PUBLIC_BASE_PATH??'')+'/arcade/?game=campaign'}>Play the complete arcade campaign →</a></main>;}
