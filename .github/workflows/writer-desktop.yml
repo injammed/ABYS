@@ -1,4 +1,4 @@
-name: Build AETIMM Writer desktop installers
+name: Build vnnova desktop installers
 on:
   push:
     branches: [main]
@@ -71,12 +71,12 @@ jobs:
         run: |
           VERSION="$(node -p "require('./apps/aetimm-writer/package.json').version")"
           for FILE in "Windows-x64.exe" "macOS-arm64.dmg" "macOS-x64.dmg" "Linux-x86_64.AppImage"; do
-            test -s "installers/AETIMM-Writer-$VERSION-$FILE"
+            test -s "installers/vnnova-$VERSION-$FILE"
           done
           TAG="writer-v$(node -p "require('./apps/aetimm-writer/package.json').version")"
-          (cd installers && sha256sum AETIMM-Writer-*) > installers/SHA256SUMS.txt
+          (cd installers && sha256sum vnnova-*) > installers/SHA256SUMS.txt
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "This version already exists. Increment the app version before publishing." >&2
             exit 1
           fi
-          gh release create "$TAG" installers/* --target "$GITHUB_SHA" --title "AETIMM Writer $(node -p "require('./apps/aetimm-writer/package.json').version")" --notes-file apps/aetimm-writer/RELEASE.md --latest=false
+          gh release create "$TAG" installers/* --target "$GITHUB_SHA" --title "vnnova $(node -p "require('./apps/aetimm-writer/package.json').version")" --notes-file apps/aetimm-writer/RELEASE.md --latest=false
