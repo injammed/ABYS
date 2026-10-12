@@ -1,6 +1,6 @@
 const {app,BrowserWindow,Menu,ipcMain,dialog,clipboard,ClipboardItem}=require('electron');const fs=require('node:fs/promises');const path=require('node:path');const {randomUUID}=require('node:crypto');const {pathToFileURL}=require('node:url');
 // Keep the original profile across the product rename, before taking the single-instance lock.
-const {profilePath}=require('./profile-path.cjs');app.setPath('userData',profilePath(app.getPath('appData'),app.getPath('userData')));app.setName('vnnova');
+const {profilePath}=require('./profile-path.cjs');const profile=profilePath(app.getPath('appData'),app.getPath('userData'));require('node:fs').mkdirSync(profile,{recursive:true});app.setPath('userData',profile);app.setName('vnnova');
 if(!app.requestSingleInstanceLock())app.quit();app.on('second-instance',()=>{if(win){if(win.isMinimized())win.restore();win.focus();}});
 let win,documentPath=null,pendingPath=null,closeAllowed=false,quitting=false,draftWrites=Promise.resolve();const MAX=25e6;
 const editorPath=path.join(__dirname,'editor','index.html'),trusted=pathToFileURL(editorPath).href;
