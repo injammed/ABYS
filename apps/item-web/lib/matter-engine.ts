@@ -5,10 +5,12 @@ export class MatterEngine {
  readonly position=new Float32Array(this.capacity*3);
  readonly previous=new Float32Array(this.capacity*3);
  readonly pinned=new Uint8Array(this.capacity);
- readonly bonds:{a:number;b:number;active:boolean}[]=[];
+ readonly bonds:{a:number;b:number;active:boolean;rest?:number;limit?:number;stiffness?:number}[]=[];
  count=0;collisions=0;broken=0;blockTarget=1.7;block={x:1.7,y:1.1,z:0,half:.65};
- constructor(count=5000){this.reset(count);}
+ readonly mode:'water'|'range';
+ constructor(count=5000,mode: 'water'|'range'='water'){this.mode=mode;this.reset(count);}
  reset(count=this.count){
+  if(this.mode==='range'){this.count=0;this.bonds.length=0;this.broken=0;this.pinned.fill(0);this.block.x=this.blockTarget=100;return;}
   this.count=Math.max(this.floorCount,Math.min(this.capacity,Math.floor(count)));this.bonds.length=0;this.broken=0;this.pinned.fill(0);this.blockTarget=1.7;this.block={x:1.7,y:1.1,z:0,half:.65};
   for(let i=0;i<this.count;i++){
    if(i<this.floorCount){const x=i%32,z=Math.floor(i/32);this.position.set([(x-15.5)*DIAMETER,0,(z-11.5)*DIAMETER],i*3);this.pinned[i]=1;
@@ -23,7 +25,7 @@ export class MatterEngine {
   for(let i=0;i<this.count;i++)if(!this.pinned[i])for(let a=0;a<3;a++){const k=i*3+a,v=(p[k]-o[k])*.99;o[k]=p[k];p[k]+=v+(a===1?-9.81*STEP*STEP:0);}
   for(let it=0;it<3;it++){
    for(const b of this.bonds)if(b.active){const a=b.a*3,c=b.b*3,delta=[p[c]-p[a],p[c+1]-p[a+1],p[c+2]-p[a+2]],d=Math.hypot(...delta),wa=1-this.pinned[b.a],wb=1-this.pinned[b.b],w=wa+wb;
-    if(d>DIAMETER*1.8){b.active=false;this.broken++;continue;}if(!w||!d)continue;const s=(d-DIAMETER)/d/w;for(let j=0;j<3;j++){p[a+j]+=delta[j]*s*wa;p[c+j]-=delta[j]*s*wb;}
+    const rest=b.rest??DIAMETER;if(d>rest*(b.limit??1.8)){b.active=false;this.broken++;continue;}if(!w||!d)continue;const s=(d-rest)/d/w*(b.stiffness??1);for(let j=0;j<3;j++){p[a+j]+=delta[j]*s*wa;p[c+j]-=delta[j]*s*wb;}
    }
    const cell=.3,grid=new Map<string,number[]>();
    for(let i=0;i<this.count;i++){const k=i*3,key=`${Math.floor(p[k]/cell)},${Math.floor(p[k+1]/cell)},${Math.floor(p[k+2]/cell)}`;const bucket=grid.get(key);if(bucket)bucket.push(i);else grid.set(key,[i]);}
@@ -34,7 +36,8 @@ export class MatterEngine {
      const d=Math.sqrt(d2),wa=1-this.pinned[i],wb=1-this.pinned[j],w=wa+wb;if(!w)continue;if(!d)delta[0]=.00001;const s=(DIAMETER-d)/Math.max(d,.00001)/w;
      for(let a=0;a<3;a++){p[k+a]-=delta[a]*s*wa;p[l+a]+=delta[a]*s*wb;}this.collisions++;
     }
-    if(this.pinned[i])continue;p[k]=Math.max(-4.1,Math.min(4.1,p[k]));p[k+2]=Math.max(-3.1,Math.min(3.1,p[k+2]));p[k+1]=Math.max(-2,Math.min(10,p[k+1]));
+    if(this.pinned[i])continue;p[k]=Math.max(this.mode==='range'?-8:-4.1,Math.min(this.mode==='range'?8:4.1,p[k]));p[k+2]=Math.max(this.mode==='range'?-12:-3.1,Math.min(this.mode==='range'?12:3.1,p[k+2]));p[k+1]=Math.max(this.mode==='range'?.125:-2,Math.min(10,p[k+1]));
+    if(this.mode==='range'&&p[k+1]<=.126){o[k]+=(p[k]-o[k])*.2;o[k+2]+=(p[k+2]-o[k+2])*.2;}
     const b=this.block,delta=[p[k]-b.x,p[k+1]-b.y,p[k+2]-b.z],limit=b.half+DIAMETER/2;
     if(delta.every(v=>Math.abs(v)<limit)){let axis=0;for(let a=1;a<3;a++)if(Math.abs(delta[a])>Math.abs(delta[axis]))axis=a;p[k+axis]=[b.x,b.y,b.z][axis]+(delta[axis]<0?-limit:limit);}
    }

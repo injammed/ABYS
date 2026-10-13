@@ -51,6 +51,10 @@ export function buildDistrict(skins:Skins){
   const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;
   const sprite=new T.Sprite(new T.SpriteMaterial({map:texture,depthTest:true}));sprite.position.set(x,y,z);sprite.scale.set(1.65,.4125,1);root.add(sprite);return sprite;
  };
+ const matterTerminal=new T.Group();matterTerminal.position.set(4.8,0,3);
+ const matterBase=new T.Mesh(new T.BoxGeometry(.9,1,.7),mat(0x24242a));matterBase.position.y=.5;matterTerminal.add(matterBase);
+ const matterScreen=new T.Mesh(new T.BoxGeometry(1.1,.75,.12),new T.MeshStandardMaterial({color:0x654522,emissive:0xffb64a,emissiveIntensity:.8}));matterScreen.position.set(0,1.4,0);matterScreen.rotation.x=-.15;matterTerminal.add(matterScreen);root.add(matterTerminal);
+ label('MATTER ENGINE',4.8,2.35,3);label('CHINA SHOP / USE',4.8,2,3);
  label('LIBRARY TERMINAL',2.6,2.35,6);label('MARA / KEEPER',-2.5,2.6,6);label('IRI / SURVIVOR',-8,2.6,57);
  label('CAPITAL REFUGE',0,4.2,12);label('CATHEDRAL / SAFE',0,5.7,9.9);
  const keeper=person(0x998b6e,'mara');keeper.position.set(-2.5,0,6);root.add(keeper);
