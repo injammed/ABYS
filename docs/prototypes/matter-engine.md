@@ -1,6 +1,8 @@
 # AETIMM Matter Engine — Browser Prototype
 
-Classification: **REFINE — prototype branch only; no production merge.**
+Classification: **AETIMM — bounded experimental range release, explicitly authorized by the owner on 2026-10-13.**
+
+Release decision: the owner requested “Make bull in china shop playable on site”. This supersedes the earlier prototype-only hold for the isolated terminal/range. CI, static export and simulation regressions pass. Browser visual and physical-device performance remain unverified; this release does not authorize replacing the production world with matter physics. Historical REFINE notes below describe the earlier decision. Rollback: revert the range release commit and redeploy the previous Pages version.
 
 ## Change-gate record
 - Problem: the proposed continuous matter world has no bounded implementation or performance evidence.
