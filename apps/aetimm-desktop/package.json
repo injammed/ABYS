@@ -1,0 +1,6 @@
+{
+ "name":"aetimm-desktop","version":"0.1.0","productName":"AETIMM Game","description":"AETIMM desktop playtest launcher with verified game-content updates","author":"AETIMM","license":"MIT","main":"main.cjs",
+ "scripts":{"check":"node --check main.cjs && node --check preload.cjs && node --check updater.cjs && node --check pack.cjs && node --check launcher/launcher.js","test":"node verify.cjs","prepare-game":"node prepare.cjs","start":"electron .","smoke":"electron smoke.cjs","dist":"electron-builder --publish never"},
+ "devDependencies":{"electron":"44.7.0","electron-builder":"26.15.3"},
+ "build":{"appId":"com.aetimm.game.desktop","productName":"AETIMM Game","asar":true,"files":["main.cjs","preload.cjs","updater.cjs","pack.cjs","routes.cjs","launcher/**/*","bundle/**/*","resources/icon.png"],"directories":{"output":"dist","buildResources":"resources"},"mac":{"target":"dmg","category":"public.app-category.games","icon":"resources/icon.icns","identity":"-","artifactName":"AETIMM-Game-${version}-macOS-${arch}.${ext}"}}
+}
