@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import {MatterRange} from '../lib/matter-range.ts';
 const s=new MatterRange();
-assert.equal(s.targets.length,15);assert.ok(s.physics.count>500&&s.physics.count<=5000);
-assert.deepEqual(new Set(s.targets.map(t=>t.kind)),new Set(['pottery','plate','gel']));
+assert.equal(s.targets.length,8);assert.ok(s.physics.count>500&&s.physics.count<=5000);
+assert.deepEqual(new Set(s.targets.map(t=>t.kind)),new Set(['pottery','plate','gel','concrete','brick','glass','composite','alloy']));
 const snapshot=Array.from(s.physics.position.slice(0,s.physics.count*3));s.step();assert.deepEqual(Array.from(s.physics.position.slice(0,s.physics.count*3)),snapshot);
 const t=s.targets[0],index=t.start+2,point={x:s.physics.position[index*3],y:s.physics.position[index*3+1],z:s.physics.position[index*3+2]};
 const origin={x:point.x,y:point.y,z:point.z+3},dir={x:0,y:0,z:-1};
