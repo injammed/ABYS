@@ -1,3 +1,4 @@
+import {MatterRefinement} from './matter-refinement.ts';
 import {MATERIALS,ATTUM_LEVELS,type MaterialId,type AttumSize} from './matter-materials.ts';
 import {MatterEngine,STEP} from './matter-engine.ts';
 export type Vec = {x:number;y:number;z:number};
@@ -5,6 +6,7 @@ export type Target = {kind:'pottery'|'plate'|'gel'|'concrete'|'brick'|'glass'|'c
 /** Stylised game impulses, not calibrated firearm or tissue ballistics. */
 export class MatterRange {
  readonly physics=new MatterEngine(0,'range');
+ readonly detail=new MatterRefinement();
  readonly targets:Target[]=[];
  readonly owner=new Int16Array(5000);
  readonly rest=new Float32Array(15000);
@@ -16,7 +18,7 @@ export class MatterRange {
   if(!ATTUM_LEVELS.includes(size))throw new Error('Unsupported attum size');this.requestedSize=size;
   const kinds:Target['kind'][]=['pottery','plate','gel','concrete','brick','glass','composite','alloy'];
   this.actualSize=([...ATTUM_LEVELS].reverse().find(d=>d>=size&&kinds.reduce((n,k)=>n+this.cells(k,d).length,0)<=this.physics.capacity)??.25);this.physics.diameter=this.actualSize;
-  const s=this.physics;s.reset(0);this.targets.length=0;this.ammo=[7,7];this.cooldown=[0,0];this.reloadTime=0;this.shots=this.hits=0;
+  const s=this.physics;s.reset(0);this.detail.reset();this.targets.length=0;this.ammo=[7,7];this.cooldown=[0,0];this.reloadTime=0;this.shots=this.hits=0;
   kinds.forEach((kind,i)=>this.addTarget(kind,(i%4-1.5)*3,this.actualSize/2,-2-Math.floor(i/4)*4));
   this.rest.set(s.position);
  }
@@ -44,18 +46,23 @@ export class MatterRange {
   }}this.targets.push({kind,start,end:s.count,hit:false,x,y,z});
  }
  reload(){if(!this.reloadTime&&(this.ammo[0]<7||this.ammo[1]<7))this.reloadTime=1.2;}
- step(){for(let i=0;i<2;i++)this.cooldown[i]=Math.max(0,this.cooldown[i]-STEP);if(this.reloadTime){this.reloadTime=Math.max(0,this.reloadTime-STEP);if(!this.reloadTime)this.ammo=[7,7];}this.physics.step();}
+ step(){for(let i=0;i<2;i++)this.cooldown[i]=Math.max(0,this.cooldown[i]-STEP);if(this.reloadTime){this.reloadTime=Math.max(0,this.reloadTime-STEP);if(!this.reloadTime)this.ammo=[7,7];}if(this.targets.some(t=>t.hit))this.physics.step();this.detail.step(this.physics);}
  impact(index:number,direction:Vec,power=1){
   const s=this.physics,t=this.targets[this.owner[index]],p=s.position,hit={x:p[index*3],y:p[index*3+1],z:p[index*3+2]};t.hit=true;
-  for(let i=t.start;i<t.end;i++){s.pinned[i]=0;const k=i*3,d=Math.hypot(p[k]-hit.x,p[k+1]-hit.y,p[k+2]-hit.z),force=power*.16/(1+d*3)*s.inverseMass[i];s.previous[k]-=direction.x*force;s.previous[k+1]-=direction.y*force+.025/(1+d);s.previous[k+2]-=direction.z*force;}
+  for(let i=t.start;i<t.end;i++){if(!s.enabled[i])continue;const k=i*3,d=Math.hypot(p[k]-hit.x,p[k+1]-hit.y,p[k+2]-hit.z),force=power*.16/(1+d*3)*s.inverseMass[i];if(d>.45)continue;s.pinned[i]=0;s.previous[k]-=direction.x*force;s.previous[k+1]-=direction.y*force+.025/(1+d);s.previous[k+2]-=direction.z*force;}
   for(const b of s.bonds)if(b.active&&this.owner[b.a]===this.owner[index]){const d=Math.hypot(p[b.a*3]-hit.x,p[b.a*3+1]-hit.y,p[b.a*3+2]-hit.z);if(d<.7){b.damage=(b.damage??0)+power*(1-d/.7);if(b.damage>=(b.toughness??1)){b.active=false;s.broken++;}}}
+  // Refine a struck coarse cell only after its material's local bonds have failed.
+  const attached=s.bonds.some(b=>b.active&&(b.a===index||b.b===index));
+  if(!attached&&s.enabled[index]&&power>=1&&this.detail.fracture(hit,this.actualSize,hit,this.particleMaterial[index],direction,{x:(p[index*3]-s.previous[index*3])/STEP,y:(p[index*3+1]-s.previous[index*3+1])/STEP,z:(p[index*3+2]-s.previous[index*3+2])/STEP})){s.enabled[index]=0;s.pinned[index]=1;}
  }
  fire(hand:number,origin:Vec,direction:Vec):{fired:boolean;point:Vec|null}{
   if(this.reloadTime||this.cooldown[hand]>0||this.ammo[hand]<=0)return {fired:false,point:null};
   this.ammo[hand]--;this.cooldown[hand]=.22;this.shots++;
   const s=this.physics;let nearest=35,index=-1;
-  for(let i=0;i<s.count;i++){const k=i*3,dx=s.position[k]-origin.x,dy=s.position[k+1]-origin.y,dz=s.position[k+2]-origin.z,t=dx*direction.x+dy*direction.y+dz*direction.z;if(t<0||t>nearest)continue;if((dx-t*direction.x)**2+(dy-t*direction.y)**2+(dz-t*direction.z)**2<(this.actualSize*.8)**2){nearest=t;index=i;}}
+  for(let i=0;i<s.count;i++){if(!s.enabled[i])continue;const k=i*3,dx=s.position[k]-origin.x,dy=s.position[k+1]-origin.y,dz=s.position[k+2]-origin.z,t=dx*direction.x+dy*direction.y+dz*direction.z;if(t<0||t>nearest)continue;if((dx-t*direction.x)**2+(dy-t*direction.y)**2+(dz-t*direction.z)**2<(this.actualSize*.8)**2){nearest=t;index=i;}}
+  let fragment=-1;for(let i=0;i<this.detail.fragments.length;i++){const f=this.detail.fragments[i],dx=f.x-origin.x,dy=f.y-origin.y,dz=f.z-origin.z,t=dx*direction.x+dy*direction.y+dz*direction.z;if(t<0||t>nearest)continue;if((dx-t*direction.x)**2+(dy-t*direction.y)**2+(dz-t*direction.z)**2<(f.size*.8)**2){nearest=t;fragment=i;}}
+  if(fragment>=0){this.hits++;this.detail.strike(fragment,direction);return {fired:true,point:{x:origin.x+direction.x*nearest,y:origin.y+direction.y*nearest,z:origin.z+direction.z*nearest}};}
   if(index<0)return {fired:true,point:null};this.hits++;this.impact(index,direction);return {fired:true,point:{x:origin.x+direction.x*nearest,y:origin.y+direction.y*nearest,z:origin.z+direction.z*nearest}};
  }
- shove(position:Vec,direction:Vec){for(const t of this.targets){for(let i=t.start;i<t.end;i++){const p=this.physics.position,k=i*3;if(Math.hypot(p[k]-position.x,p[k+2]-position.z)<1.1){this.impact(i,direction,.35);break;}}}}
+ shove(position:Vec,direction:Vec){for(const t of this.targets){for(let i=t.start;i<t.end;i++){if(!this.physics.enabled[i])continue;const p=this.physics.position,k=i*3;if(Math.hypot(p[k]-position.x,p[k+2]-position.z)<1.1){this.impact(i,direction,.35);break;}}}}
 }
