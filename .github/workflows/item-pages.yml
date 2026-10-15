@@ -158,6 +158,14 @@ jobs:
           npm run check --prefix ../aetimm-writer
           node ../aetimm-writer/verify.cjs
 
+      - name: Verify Matter Engine and local refinement
+        working-directory: apps/item-web
+        run: |
+          node --experimental-strip-types scripts/verify-matter.mjs
+          node --experimental-strip-types scripts/verify-matter-range.mjs
+          node --experimental-strip-types scripts/verify-matter-materials.mjs
+          node --experimental-strip-types scripts/verify-matter-refinement.mjs
+
       - name: Typecheck
         working-directory: apps/item-web
         run: npm run typecheck
