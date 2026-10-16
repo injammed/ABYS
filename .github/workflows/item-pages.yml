@@ -166,6 +166,12 @@ jobs:
           node --experimental-strip-types scripts/verify-matter-materials.mjs
           node --experimental-strip-types scripts/verify-matter-refinement.mjs
 
+      - name: Verify throne duel and starting loadouts
+        working-directory: apps/item-web
+        run: |
+          node scripts/verify-throne.mjs
+          node --experimental-strip-types scripts/verify-loadouts.mjs
+
       - name: Typecheck
         working-directory: apps/item-web
         run: npm run typecheck
