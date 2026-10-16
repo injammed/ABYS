@@ -1,5 +1,5 @@
 import type {CharacterProfile} from './character-profile';
-export type StartingLoadout={id:string;name:string;image:string;source:string;equipment:readonly string[];status:'reference-approved';};
+export type StartingLoadout={id:string;name:string;image:string;source:string;equipment:readonly string[];status:'reference-approved';provisionalNames?:boolean;};
 /** User-provided starting arsenals. IDs bind to existing save-safe roster variants.
  * Equipment descriptions are canon, not a claim that every weapon mechanic is implemented. */
 export const STARTING_LOADOUTS:Record<string,StartingLoadout>={
@@ -9,5 +9,11 @@ export const STARTING_LOADOUTS:Record<string,StartingLoadout>={
  'knight-aldric':{id:'knight-1',name:'AK / katana',image:'knight-1.webp',source:'0FE6D164-3A28-4DF9-BBF0-90B44742FB2A(1).jpeg',status:'reference-approved',equipment:['AK-47','Glock 18','SPAS-12','Masamune replica katana']},
  'knight-cassian':{id:'knight-2',name:'SBR / Excalibur',image:'knight-2.webp',source:'18A13DE7-BB39-4526-9018-BD589E0D0606(1).jpeg',status:'reference-approved',equipment:['Suppressed SBR','Akimbo Colt King Cobra','McMillan TAC-50','Excalibur replica']},
  'knight-rook':{id:'knight-3',name:'MP5 / gladius',image:'knight-3.webp',source:'177EC8A8-422B-4CDE-9A46-95E673E70DB3(1).jpeg',status:'reference-approved',equipment:['MP5','Desert Eagle','MG3','Mainz gladius replica']},
+ "alien-saela":{"id": "alien-1", "name": "Astral arsenal", "image": "alien-1.webp", "source": "8691E3C5-6A5F-4E8B-AFA4-3B1BCDE8BE76(1).jpeg", "status": "reference-approved", "equipment": ["Magneto-fusion pulse heavy beam", "Predator-skull scissor gauntlet", "The Star Summoner", "The Negation Ray"]},
+ "alien-nyrra":{"id": "alien-2", "name": "Reactor / shrieker", "image": "alien-2.webp", "source": "IMG_6029(1).jpeg", "status": "reference-approved", "equipment": ["Reactor laser rifle", "Invertocavitation sidearm", "Alien shrieker", "Twin-blade glaive"]},
+ "alien-ithara":{"id": "alien-3", "name": "Lightning / singularity", "image": "alien-3.webp", "source": "7DE92A7B-F259-40A1-84DA-D1BB48619760.jpeg", "status": "reference-approved", "equipment": ["Micro-reactor lightning rifle", "Molten dragon-breath shotgun pistol", "Ancient ritual twinblades", "Miniaturized singularity device"]},
+ "cyborg-parallax":{"id": "cyborg-1", "name": "Axe / drone forge", "image": "cyborg-1.webp", "source": "9CB83F57-195D-44C2-AA95-6A2F47A476B0.jpeg", "status": "reference-approved", "equipment": ["White-hot double axe / warhammer", "Shoulder-mounted twin machine guns", "Miniature drone dispenser", "High-temperature wrist laser"]},
+ "cyborg-nacre":{"id": "cyborg-2", "name": "Minigun / forearm lance", "image": "cyborg-2.webp", "source": "IMG_6030.jpeg", "status": "reference-approved", "equipment": ["Exo-arm minigun", "Dual-barrel magazine pump", "Vector-derived handgun", "Forearm lance"]},
+ "cyborg-axiom":{"id": "cyborg-3", "name": "Barrage / optic beam", "image": "cyborg-3.webp", "source": "7294DE17-16BF-4122-9833-C30BAFBFFC20.jpeg", "status": "reference-approved", "equipment": ["Folding arm rocket pod", "Rocket-assisted slab-and-claw fist", "Shoulder-fired automatic grenade launcher", "Golden laser eyes"]},
 };
 export const loadoutFor=(profile:CharacterProfile)=>STARTING_LOADOUTS[profile.id]??null;
