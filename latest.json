@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "id": "38730131770-1",
-  "checkedAt": "2026-10-15T11:50:02.382Z",
-  "sourceCommit": "57678374a53f174524db7e0fd07408e00151fb09",
+  "id": "38895523678-1",
+  "checkedAt": "2026-10-16T11:42:20.488Z",
+  "sourceCommit": "773d9fd46ee5d8f8518baf49fd9c007e464b5357",
   "state": "completed",
   "queries": [
     {
@@ -18,39 +18,9 @@
   ],
   "candidates": [
     {
-      "id": 528152092,
-      "repository": "easydiffusion/easydiffusion",
-      "stars": 10474,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 125893,
-      "repository": "nodebox/nodebox",
-      "stars": 791,
-      "license": "GPL-2.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1288837099,
-      "repository": "zjoooooo/galaxy-explorer",
-      "stars": 97,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1420424889,
-      "repository": "Leonxlnx/golden-temple",
-      "stars": 5,
+      "id": 382908938,
+      "repository": "Lunatic-Works/neural-tools",
+      "stars": 16,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -58,30 +28,20 @@
       "newlySeen": true
     },
     {
-      "id": 1127801500,
-      "repository": "akaihola/skills-akaihola",
-      "stars": 3,
-      "license": null,
+      "id": 1338088761,
+      "repository": "trefeon/zero-slop",
+      "stars": 4,
+      "license": "MIT",
       "signals": [
         "ai-generated"
       ],
       "newlySeen": true
     },
     {
-      "id": 581913613,
-      "repository": "vladmandic/sdnext",
-      "stars": 7354,
+      "id": 1381356320,
+      "repository": "alexgreensh/anidoodle",
+      "stars": 957,
       "license": "Apache-2.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 81895167,
-      "repository": "css-doodle/css-doodle",
-      "stars": 6060,
-      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -90,7 +50,7 @@
     {
       "id": 1304174300,
       "repository": "corosolto/client",
-      "stars": 260,
+      "stars": 259,
       "license": "AGPL-3.0",
       "signals": [
         "ai-generated"
@@ -98,9 +58,9 @@
       "newlySeen": false
     },
     {
-      "id": 800083050,
-      "repository": "liamdugan/raid",
-      "stars": 221,
+      "id": 1116451552,
+      "repository": "oocx/tfplan2md",
+      "stars": 174,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -108,10 +68,30 @@
       "newlySeen": false
     },
     {
-      "id": 151634693,
-      "repository": "openrndr/orx",
-      "stars": 139,
-      "license": "BSD-2-Clause",
+      "id": 374744219,
+      "repository": "repath-studio/repath-studio",
+      "stars": 172,
+      "license": "AGPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1105562494,
+      "repository": "levz0r/awesome-vibecoded-apps",
+      "stars": 45,
+      "license": "CC0-1.0",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1272774651,
+      "repository": "yuki4266/yuki4266",
+      "stars": 31,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -128,9 +108,9 @@
       "newlySeen": false
     },
     {
-      "id": 1345614074,
-      "repository": "frank890417/open-audiovisual",
-      "stars": 13,
+      "id": 313701704,
+      "repository": "andorthehood/8f4e",
+      "stars": 14,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -148,32 +128,32 @@
       "newlySeen": false
     },
     {
-      "id": 1159071863,
-      "repository": "Nerahikada/chromecast-sink",
-      "stars": 9,
-      "license": "MIT",
+      "id": 1398313770,
+      "repository": "Withlian/LuboDown",
+      "stars": 7,
+      "license": "GPL-3.0",
       "signals": [
         "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 1366877560,
-      "repository": "statico/ttmux",
-      "stars": 9,
+      "id": 215842938,
+      "repository": "nclslbrn/forsaken-ideas",
+      "stars": 6,
       "license": "MIT",
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 1417647255,
-      "repository": "traushb/actuali-android",
-      "stars": 8,
-      "license": null,
+      "id": 1346198317,
+      "repository": "TLausZ/plotter-links",
+      "stars": 6,
+      "license": "CC0-1.0",
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": false
     },
@@ -208,6 +188,26 @@
       "newlySeen": false
     },
     {
+      "id": 1217888271,
+      "repository": "sorny/erzberg",
+      "stars": 4,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1127801500,
+      "repository": "akaihola/skills-akaihola",
+      "stars": 3,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1387038169,
       "repository": "qwerty-ll/CustomizeYouProfile",
       "stars": 3,
@@ -234,6 +234,7 @@
     371476326,
     373191504,
     374744219,
+    382908938,
     451809672,
     456706468,
     525592995,
@@ -309,6 +310,7 @@
     1314018204,
     1316492358,
     1335431007,
+    1338088761,
     1338283854,
     1339231040,
     1341904886,
