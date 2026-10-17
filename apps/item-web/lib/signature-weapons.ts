@@ -10,7 +10,7 @@ const definitions:Signature[]=[
  {name:'Excalibur',kind:'sword',damage:4,range:3.3,delay:.8},
  {name:'Mainz gladius',kind:'sword',damage:2,range:2.7,delay:.3},
  {name:'White-hot war axe',kind:'axe',damage:5,range:3,delay:1},
- {name:'Forearm lance',kind:'sword',damage:3,range:4.5,delay:.65},
+ {name:'White-hot forearm spear',kind:'sword',damage:3,range:4.5,delay:.65},
  {name:'Golden optic beam',kind:'ak',damage:1.5,range:90,delay:.4},
  {name:'Magneto-fusion beam',kind:'ak',damage:4,range:100,delay:1.2},
  {name:'Reactor laser rifle',kind:'ak',damage:2,range:90,delay:.65},

@@ -36,6 +36,25 @@ export function characterModel(color:number,role:CharacterRole='refugee',profile
   if(profile.classId==='cyborg'){const glow=new T.MeshBasicMaterial({color:0x75e7df});for(let i=0;i<3+v;i++)mesh(new T.BoxGeometry(.025,.12,.03),glow,(i-1-v/2)*.06,1.28,-.255);for(const side of [-1,1])mesh(new T.BoxGeometry(.07,.34,.09),detail,side*.22,1.86,.05);}
   if(profile.classId==='alien'){for(let i=0;i<3+v;i++)mesh(new T.ConeGeometry(.055,.22+i*.025,6),skin,(i-1-v/2)*.07,1.97,.055);root.scale.set(.9,1.08+v*.03,.9);}
  }
+ // Nacre: body-local right is negative X because the character faces -Z.
+ if(profile?.id==='cyborg-nacre'){
+  const shell=new T.MeshStandardMaterial({color:0x32343a,metalness:.8,roughness:.32}),edge=new T.MeshStandardMaterial({color:0x9a8260,metalness:.8,roughness:.35});
+  const green=new T.MeshBasicMaterial({color:0x72ff30}),hot=new T.MeshBasicMaterial({color:0xffe9ab}),blue=new T.MeshBasicMaterial({color:0x738fff});
+  ell(0,1.7,0,.205,.245,.18,shell);mesh(new T.BoxGeometry(.3,.045,.04),blue,0,1.73,-.177);
+  mesh(new T.BoxGeometry(.49,.48,.15),shell,0,1.2,-.25);for(const side of [-1,1]){ell(side*.35,1.4,0,.2,.15,.2,shell);mesh(new T.BoxGeometry(.19,.31,.18),shell,side*.38,.95,-.03);}
+  // Compact six-barrel shoulder minigun, parallel with the forward axis.
+  const gun=new T.Group();gun.position.set(-.38,1.63,-.12);root.add(gun);
+  mesh(new T.BoxGeometry(.24,.23,.29),shell,0,0,.03,gun);
+  for(let n=0;n<6;n++){const angle=n*Math.PI/3;const barrel=mesh(new T.CylinderGeometry(.026,.026,.4,8),edge,Math.cos(angle)*.075,Math.sin(angle)*.075,-.27,gun);barrel.rotation.x=Math.PI/2;}
+  mesh(new T.TorusGeometry(.1,.022,6,16),shell,0,0,-.41,gun);
+  mesh(new T.BoxGeometry(.31,.32,.26),shell,.38,1.63,-.1);
+  for(let row=0;row<3;row++)for(let col=0;col<3;col++){const tube=mesh(new T.CylinderGeometry(.033,.033,.08,8),edge,.29+col*.09,1.54+row*.09,-.26);tube.rotation.x=Math.PI/2;ell(.29+col*.09,1.54+row*.09,-.305,.017,.017,.008,hot);}
+  // Integrated arm weapons follow the forearm axis rather than being hand-held.
+  mesh(new T.BoxGeometry(.15,.38,.15),shell,-.38,.79,-.045);mesh(new T.BoxGeometry(.05,.31,.165),green,-.38,.79,-.05);
+  const spear=new T.Mesh(new T.OctahedronGeometry(1,0),hot.clone());spear.scale.set(.065,.48,.028);spear.position.set(.38,.45,-.045);root.add(spear);
+  mesh(new T.BoxGeometry(.12,.22,.12),edge,.38,.77,-.045);
+  root.userData.loadout='nacre-v2';root.userData.mounts={rightShoulder:'minigun',leftShoulder:'swarm',leftForearm:'spear',rightForearm:'green-laser'};
+ }
  const possession=new T.Group();possession.visible=false;root.add(possession);
  if(role==='infected'){const flame=new T.MeshBasicMaterial({color:0xff6e18});for(let i=0;i<6;i++){const o=mesh(new T.ConeGeometry(.07,.25,5),flame,(i%2?1:-1)*.16,.9+i*.14,-.2,possession);o.rotation.z=(i%2?1:-1)*.4;}ell(0,1.75,-.16,.15,.045,.03,new T.MeshBasicMaterial({color:0xffe174}),possession);for(let i=0;i<5;i++)ell((i%2?1:-1)*.19,1+i*.13,-.18,.045,.08,.02,leather);root.rotation.z=.04;}
  root.userData.legs=legs;root.userData.possession=possession;batchModel(root);root.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;}});return root;
