@@ -1,0 +1,14 @@
+# Character-bound signatures and recoverable world gear
+
+Supersedes destructive swapping in three-life-squad.md and PR #210.
+
+Problem observed: weapon replacement deleted the old item; staffs had no class gate; characters lacked an enduring upgradable ability.
+User impact: weapons and replaced armor fall back to the world with their actual remaining ammunition/durability/protection. They can be recovered after saving/reloading. No weapon backpack. Non-witches cannot equip or cast staffs, including migrated saved gear.
+Smallest viable fix: extend saved scavenging state with ground objects and per-character signature levels. Bind one permanent ability to each existing roster ID. One optional scavenged weapon stays separate. Signature abilities recover through cooldown, never break or run out, cannot be dropped or replaced. Upgrade from level 1 to 10 at the cathedral, costing 250 times current level in in-game USD; each level improves damage, range and attack recovery. Scavenged gear has no upgrade tree. Levels persist for the run, including succession and reload; a new run resets them.
+Evidence: direct user correction and request. Twelve signature choices use existing character loadout references: cursed bow, wrist crossbow, throwing stars, katana, Excalibur, gladius, war axe, forearm lance, golden optic beam, magneto-fusion beam, reactor rifle, lightning rifle.
+Controls: 1 signature, 2 scavenged, 3 quest skull, E pickup/swap, X drop scavenged, U upgrade signature at cathedral. Equivalent HUD buttons; roster displays the bound signature before selection. Companions use their bound ability and its upgraded range/damage/cooldown.
+Files changed: scavenge, scavenge-world, signature-weapons, survival-engine, SurvivalGame, CharacterRoster, verify-scavenge, this record.
+Risk: simplified ray-based ability mechanics and procedural silhouettes, not final animations/particles or complete reference arsenal. Existing follower pathing limitations remain. Drop animation is a short fall, not rigid-body physics. Legacy gear deleted before this release cannot be recovered. Browser testing unavailable in managed environment under Sites guidance; no manual-playtest claim.
+Verification: gear regression covers class restrictions without mutation, swap/drop/recovery and exact resource preservation, duplicate recovery prevention, exhausted items, armor replacement, serialization, twelve unique signatures, ten-level upgrades, individual progress and insufficient funds. Squad regression, TypeScript and static build pass. Existing survival regression also run before publishing.
+Rollback: revert this commit; prior release ignores extra save fields (ground drops/signature levels unavailable on that version). No auth, backend, dependency or route changes.
+Classification: AETIMM — explicitly requested bounded feature and correction; publish after CI. Autonomous-maintenance size limit is not the scope of this user-directed request.
