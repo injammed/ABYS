@@ -1,0 +1,12 @@
+# Three-life squad and disposable world gear
+
+Problem observed: character selection allowed one preset and death reset the player; permanent weapon selection and unlimited Starfall casts conflicted with the requested scavenging loop.
+User impact: choose exactly three of twelve presets, first gold and controlled, other two blue NPC companions. Dead controlled characters yield control to the next surviving selection. Three deaths end the run, including after reload.
+Smallest viable fix: pure squad and gear state, existing engine integration, simple world pickups, selection/HUD controls. One held weapon per member, armor worn directly. Replacement or X permanently destroys previous weapon. E equips nearby loot. Ammo and melee durability are finite; no reload stock. Quest skull remains a utility, not a loot inventory. New runs reset pickups.
+Evidence: explicit user requests for squad lives and disposable weapons/armor. Reference image establishes ornate knight equipment direction; procedural pickup meshes are simplified placeholders, not recreations of all illustrated gear.
+Placement: 202 deterministic candidate items, two rare Starfall staffs; blocked candidates relocate within a bounded search or remain hidden. Only nearby pickups render. Starter street has common gear. Four casts per staff. NPCs begin with 60 shots each; no automatic replenishment.
+Files changed: squad/scavenge state modules, scavenge-world geometry, survival-engine, SurvivalGame, CharacterRoster/CSS, state tests, Pages verification workflow, this record.
+Risks: simple follower collision steering can stall; distant companions regroup. Aircraft travel stows companions. Shotgun uses a short-range high-damage ray rather than pellet simulation. Armor is a numeric worn protection layer, not full modular reference armor art. NPCs do not autonomously scavenge yet. No manual browser playtest in the managed container. No new dependencies or routes, backend/auth untouched.
+Rollback: revert the feature commit; older code ignores added save fields. Clearing local saves starts over, so do not clear storage casually.
+Verification: squad and gear state regression scripts pass; TypeScript and static build pass. Existing survival regression remains required in CI. Browser/mobile feel and placement require live playtesting; no performance measurements claimed.
+Classification: AETIMM, bounded explicitly requested gameplay capability; autonomous maintenance size limit does not apply to this user-directed feature. Publish only after required CI passes.
