@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "id": "38895523678-1",
-  "checkedAt": "2026-10-16T11:42:20.488Z",
-  "sourceCommit": "773d9fd46ee5d8f8518baf49fd9c007e464b5357",
+  "id": "39027103268-1",
+  "checkedAt": "2026-10-17T11:01:27.104Z",
+  "sourceCommit": "e86000d1c20d0b44add8bfd95f30999dcda1bfb8",
   "state": "completed",
   "queries": [
     {
@@ -18,9 +18,9 @@
   ],
   "candidates": [
     {
-      "id": 382908938,
-      "repository": "Lunatic-Works/neural-tools",
-      "stars": 16,
+      "id": 1358316829,
+      "repository": "wanshuiyin/ALIGN-Agentic-Loop-Image-GeneratioN",
+      "stars": 45,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -28,20 +28,50 @@
       "newlySeen": true
     },
     {
-      "id": 1338088761,
-      "repository": "trefeon/zero-slop",
-      "stars": 4,
-      "license": "MIT",
+      "id": 1406759710,
+      "repository": "devfbe/oxidenix",
+      "stars": 3,
+      "license": "GPL-3.0",
       "signals": [
         "ai-generated"
       ],
       "newlySeen": true
     },
     {
-      "id": 1381356320,
-      "repository": "alexgreensh/anidoodle",
-      "stars": 957,
+      "id": 525592995,
+      "repository": "invoke-ai/InvokeAI",
+      "stars": 28700,
       "license": "Apache-2.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 584639396,
+      "repository": "ai-collection/ai-collection",
+      "stars": 9211,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 81895167,
+      "repository": "css-doodle/css-doodle",
+      "stars": 6063,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 116062718,
+      "repository": "villares/sketch-a-day",
+      "stars": 259,
+      "license": null,
       "signals": [
         "generative-art"
       ],
@@ -58,32 +88,12 @@
       "newlySeen": false
     },
     {
-      "id": 1116451552,
-      "repository": "oocx/tfplan2md",
-      "stars": 174,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 374744219,
-      "repository": "repath-studio/repath-studio",
-      "stars": 172,
-      "license": "AGPL-3.0",
+      "id": 355805398,
+      "repository": "koenderks/aRtsy",
+      "stars": 196,
+      "license": "GPL-3.0",
       "signals": [
         "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1105562494,
-      "repository": "levz0r/awesome-vibecoded-apps",
-      "stars": 45,
-      "license": "CC0-1.0",
-      "signals": [
-        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -108,22 +118,22 @@
       "newlySeen": false
     },
     {
-      "id": 313701704,
-      "repository": "andorthehood/8f4e",
-      "stars": 14,
+      "id": 1412848801,
+      "repository": "Blank2007/DroidExtend",
+      "stars": 12,
       "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 1276131924,
-      "repository": "lolly-tools/lolly",
-      "stars": 12,
-      "license": "MPL-2.0",
+      "id": 1154425084,
+      "repository": "eremef/awaria-outage-notifier",
+      "stars": 11,
+      "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -134,26 +144,6 @@
       "license": "GPL-3.0",
       "signals": [
         "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 215842938,
-      "repository": "nclslbrn/forsaken-ideas",
-      "stars": 6,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1346198317,
-      "repository": "TLausZ/plotter-links",
-      "stars": 6,
-      "license": "CC0-1.0",
-      "signals": [
-        "generative-art"
       ],
       "newlySeen": false
     },
@@ -178,8 +168,18 @@
       "newlySeen": false
     },
     {
-      "id": 1160781184,
-      "repository": "nexus-llm-lang/Nexus",
+      "id": 1152251368,
+      "repository": "TrebuchetDynamics/flutter-fractal-forge",
+      "stars": 4,
+      "license": "Apache-2.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1338088761,
+      "repository": "trefeon/zero-slop",
       "stars": 4,
       "license": "MIT",
       "signals": [
@@ -188,19 +188,9 @@
       "newlySeen": false
     },
     {
-      "id": 1217888271,
-      "repository": "sorny/erzberg",
+      "id": 1408412506,
+      "repository": "T0mCaTTT/anima-tag-reverse",
       "stars": 4,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1127801500,
-      "repository": "akaihola/skills-akaihola",
-      "stars": 3,
       "license": null,
       "signals": [
         "ai-generated"
@@ -214,6 +204,16 @@
       "license": "MIT",
       "signals": [
         "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1415752723,
+      "repository": "shaderera/shaderera",
+      "stars": 3,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
       ],
       "newlySeen": false
     }
@@ -318,6 +318,7 @@
     1346198317,
     1354834738,
     1356357822,
+    1358316829,
     1366877560,
     1375251966,
     1378012244,
@@ -338,6 +339,7 @@
     1398313770,
     1398674085,
     1404086905,
+    1406759710,
     1407583549,
     1408412506,
     1411230193,
