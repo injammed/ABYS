@@ -169,6 +169,8 @@ jobs:
       - name: Verify throne duel and starting loadouts
         working-directory: apps/item-web
         run: |
+          node --experimental-strip-types scripts/verify-squad.mjs
+          node --experimental-strip-types scripts/verify-scavenge.mjs
           node --experimental-strip-types scripts/verify-pearl.mjs
           node scripts/verify-throne.mjs
           node --experimental-strip-types scripts/verify-loadouts.mjs

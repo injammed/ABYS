@@ -1,0 +1,9 @@
+import {CHARACTERS,restoreProfile,type CharacterProfile} from './character-profile.ts';
+export type SquadMember={id:string;health:number};
+export type Squad={members:SquadMember[];active:number;over:boolean};
+export function newSquad(profiles:readonly CharacterProfile[]):Squad{const ids=[...new Set(profiles.map(p=>p.id))];if(profiles.length!==3||ids.length!==3||ids.some(id=>!CHARACTERS.some(c=>c.id===id)))throw new Error('Choose three different characters');return {members:ids.map(id=>({id,health:100})),active:0,over:false};}
+export function legacySquad(profile:CharacterProfile){return newSquad([profile,...CHARACTERS.filter(c=>c.id!==profile.id).slice(0,2)]);}
+export function restoreSquad(raw:unknown,profile:CharacterProfile):Squad{if(!raw)return legacySquad(profile);const s=raw as Squad;if(!Array.isArray(s.members)||s.members.length!==3||new Set(s.members.map(m=>m.id)).size!==3||s.members.some(m=>!CHARACTERS.some(c=>c.id===m.id)||!Number.isFinite(m.health)||m.health<0||m.health>100))return legacySquad(profile);const members=s.members.map(m=>({id:m.id,health:m.health}));let active=Number.isInteger(s.active)&&s.active>=0&&s.active<3?s.active:0;if(members[active].health===0)active=members.findIndex(m=>m.health>0);return {members,active:Math.max(0,active),over:members.every(m=>m.health===0)};}
+export function damageSquad(s:Squad,index:number,damage:number){const m=s.members[index];if(!m||s.over||!Number.isFinite(damage))return;m.health=Math.max(0,m.health-Math.max(0,damage));s.over=s.members.every(m=>m.health===0);}
+export function succeedSquad(s:Squad){if(s.over)return false;if(s.members[s.active].health>0)return true;const next=s.members.findIndex(m=>m.health>0);if(next<0){s.over=true;return false;}s.active=next;return true;}
+export const squadProfile=(s:Squad)=>restoreProfile(s.members[s.active].id);
