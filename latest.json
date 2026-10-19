@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "39123396222-1",
-  "checkedAt": "2026-10-18T11:28:56.067Z",
+  "id": "39262775428-1",
+  "checkedAt": "2026-10-19T13:44:58.620Z",
   "sourceCommit": "027bcce40e2ab32ec90edf391e96b044a531e7a3",
   "state": "completed",
   "queries": [
@@ -18,8 +18,18 @@
   ],
   "candidates": [
     {
-      "id": 428847843,
-      "repository": "CostardRouge/generative-art-p5js",
+      "id": 1416636661,
+      "repository": "Kirito14IT/prompt-spider-ui",
+      "stars": 47,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 411390376,
+      "repository": "Divetoxx/Mandelbrot-2",
       "stars": 16,
       "license": null,
       "signals": [
@@ -28,32 +38,11 @@
       "newlySeen": true
     },
     {
-      "id": 1243255285,
-      "repository": "shumatsumonobu/one-prompt-games",
-      "stars": 3,
-      "license": null,
+      "id": 525592995,
+      "repository": "invoke-ai/InvokeAI",
+      "stars": 28756,
+      "license": "Apache-2.0",
       "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1418864320,
-      "repository": "R-Hatim/rule-safari",
-      "stars": 3,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1407583549,
-      "repository": "Nyankomintsu/world-execute-me-lyric-mv",
-      "stars": 279,
-      "license": "MIT",
-      "signals": [
-        "ai-generated",
         "generative-art"
       ],
       "newlySeen": false
@@ -69,12 +58,32 @@
       "newlySeen": false
     },
     {
-      "id": 456706468,
-      "repository": "Correia-jpv/fucking-awesome-creative-coding",
-      "stars": 34,
-      "license": null,
+      "id": 1116451552,
+      "repository": "oocx/tfplan2md",
+      "stars": 174,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 151634693,
+      "repository": "openrndr/orx",
+      "stars": 139,
+      "license": "BSD-2-Clause",
       "signals": [
         "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1404086905,
+      "repository": "billpwchan/sakura-fantasy",
+      "stars": 94,
+      "license": null,
+      "signals": [
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -83,6 +92,16 @@
       "repository": "andorthehood/8f4e",
       "stars": 14,
       "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1244552481,
+      "repository": "reearth/ezu",
+      "stars": 14,
+      "license": "Apache-2.0",
       "signals": [
         "generative-art"
       ],
@@ -119,9 +138,9 @@
       "newlySeen": false
     },
     {
-      "id": 1208109413,
-      "repository": "jorgeadev/the-architects-blueprint",
-      "stars": 8,
+      "id": 990303192,
+      "repository": "rrainey/obliq-2",
+      "stars": 9,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -139,22 +158,32 @@
       "newlySeen": false
     },
     {
-      "id": 215842938,
-      "repository": "nclslbrn/forsaken-ideas",
-      "stars": 6,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1182901152,
       "repository": "juliosuas/ai-garden",
       "stars": 5,
       "license": null,
       "signals": [
         "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1058699349,
+      "repository": "benckx/european-city-simulation",
+      "stars": 4,
+      "license": "LGPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1109222527,
+      "repository": "filthyrake/vlog",
+      "stars": 4,
+      "license": null,
+      "signals": [
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -187,26 +216,6 @@
         "ai-generated"
       ],
       "newlySeen": false
-    },
-    {
-      "id": 1395436657,
-      "repository": "slara/terminal-markdown-renderer",
-      "stars": 3,
-      "license": "Apache-2.0",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1415752723,
-      "repository": "shaderera/shaderera",
-      "stars": 3,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
     }
   ],
   "seenIds": [
@@ -226,6 +235,7 @@
     373191504,
     374744219,
     382908938,
+    411390376,
     428847843,
     451809672,
     456706468,
@@ -340,6 +350,7 @@
     1412848801,
     1414149806,
     1415752723,
+    1416636661,
     1417647255,
     1418864320,
     1420424889
