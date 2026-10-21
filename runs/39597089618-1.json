@@ -1,0 +1,367 @@
+{
+  "version": 1,
+  "id": "39597089618-1",
+  "checkedAt": "2026-10-21T12:07:26.011Z",
+  "sourceCommit": "027bcce40e2ab32ec90edf391e96b044a531e7a3",
+  "state": "completed",
+  "queries": [
+    {
+      "query": "topic:ai-generated stars:>=3 archived:false fork:false",
+      "state": "completed",
+      "returned": 10
+    },
+    {
+      "query": "topic:generative-art stars:>=3 archived:false fork:false",
+      "state": "completed",
+      "returned": 10
+    }
+  ],
+  "candidates": [
+    {
+      "id": 342456712,
+      "repository": "jdxyw/generativeart",
+      "stars": 934,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 598672846,
+      "repository": "q5js/q5.js",
+      "stars": 421,
+      "license": "LGPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1253379199,
+      "repository": "shasha1108/healing-visual-lab",
+      "stars": 3,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1419557893,
+      "repository": "sandbase-lab/awesome-gemini4-argon",
+      "stars": 3,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 525592995,
+      "repository": "invoke-ai/InvokeAI",
+      "stars": 28802,
+      "license": "Apache-2.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1304174300,
+      "repository": "corosolto/client",
+      "stars": 259,
+      "license": "AGPL-3.0",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 800083050,
+      "repository": "liamdugan/raid",
+      "stars": 223,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 374744219,
+      "repository": "repath-studio/repath-studio",
+      "stars": 173,
+      "license": "AGPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1404086905,
+      "repository": "billpwchan/sakura-fantasy",
+      "stars": 106,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1099222481,
+      "repository": "MarkusNeusinger/anyplot",
+      "stars": 29,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 723372005,
+      "repository": "insomnimus/seo-garbage",
+      "stars": 19,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 313701704,
+      "repository": "8f4e/8f4e",
+      "stars": 17,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1244552481,
+      "repository": "reearth/ezu",
+      "stars": 14,
+      "license": "Apache-2.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1154425084,
+      "repository": "eremef/awaria-outage-notifier",
+      "stars": 11,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1366877560,
+      "repository": "statico/ttmux",
+      "stars": 9,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 527632130,
+      "repository": "artemshar/awesome-ai",
+      "stars": 8,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1182901152,
+      "repository": "juliosuas/ai-garden",
+      "stars": 5,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1109222527,
+      "repository": "filthyrake/vlog",
+      "stars": 4,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1125583044,
+      "repository": "segin/substrate",
+      "stars": 4,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1387038169,
+      "repository": "qwerty-ll/CustomizeYouProfile",
+      "stars": 3,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    }
+  ],
+  "seenIds": [
+    125893,
+    44663250,
+    81895167,
+    84751316,
+    86075041,
+    86194218,
+    116062718,
+    151634693,
+    215842938,
+    308233855,
+    313701704,
+    342456712,
+    355805398,
+    371476326,
+    373191504,
+    374744219,
+    382908938,
+    411390376,
+    428847843,
+    451809672,
+    456706468,
+    525592995,
+    527415438,
+    527632130,
+    528152092,
+    530687417,
+    554771302,
+    581913613,
+    584639396,
+    598672846,
+    723372005,
+    778780072,
+    800083050,
+    804579039,
+    822203864,
+    822443433,
+    844382769,
+    848514110,
+    907428019,
+    955785557,
+    990303192,
+    1053323829,
+    1058699349,
+    1088429461,
+    1089922256,
+    1097790631,
+    1099222481,
+    1099326996,
+    1105562494,
+    1106063925,
+    1109222527,
+    1112528364,
+    1112657609,
+    1116451552,
+    1125583044,
+    1127801500,
+    1138060581,
+    1138892030,
+    1144076205,
+    1152251368,
+    1154425084,
+    1159071863,
+    1160668557,
+    1160781184,
+    1168387997,
+    1173458372,
+    1177064081,
+    1177292696,
+    1182901152,
+    1185183114,
+    1190257819,
+    1208109413,
+    1211288343,
+    1217888271,
+    1238133915,
+    1239257448,
+    1243255285,
+    1243928948,
+    1244552481,
+    1245060445,
+    1253379199,
+    1256196157,
+    1262901708,
+    1265180649,
+    1265662023,
+    1272774651,
+    1276131924,
+    1285672288,
+    1288837099,
+    1295972337,
+    1304174300,
+    1309929105,
+    1312280882,
+    1314017928,
+    1314018204,
+    1316492358,
+    1319678904,
+    1335431007,
+    1338088761,
+    1338283854,
+    1339231040,
+    1341904886,
+    1345614074,
+    1346198317,
+    1354834738,
+    1356357822,
+    1358316829,
+    1366877560,
+    1375251966,
+    1378012244,
+    1380658970,
+    1381356320,
+    1382053746,
+    1382304020,
+    1383156569,
+    1384845766,
+    1386555049,
+    1387038169,
+    1387056608,
+    1387344556,
+    1388327805,
+    1388367915,
+    1393034919,
+    1395436657,
+    1398313770,
+    1398674085,
+    1404086905,
+    1406759710,
+    1407583549,
+    1408412506,
+    1411230193,
+    1412450230,
+    1412848801,
+    1413183323,
+    1414149806,
+    1415752723,
+    1415970408,
+    1416636661,
+    1417647255,
+    1418864320,
+    1419557893,
+    1420424889,
+    1421025526,
+    1426571704
+  ]
+}
