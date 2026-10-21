@@ -30,6 +30,7 @@ def instructions(agent):
     identity(agent)
     directory = ROOT / 'agents/game'
     return ((directory / 'WORLD_DOCTRINE.md').read_text()
+            + '\n\nEndgame implementation contract:\n' + (directory / 'ENDGAME.json').read_text()
             + '\n\n' + (directory / f'{agent}.md').read_text())
 
 
