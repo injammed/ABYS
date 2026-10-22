@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "39597089618-1",
-  "checkedAt": "2026-10-21T12:07:26.011Z",
+  "id": "39776282502-1",
+  "checkedAt": "2026-10-22T12:11:15.436Z",
   "sourceCommit": "027bcce40e2ab32ec90edf391e96b044a531e7a3",
   "state": "completed",
   "queries": [
@@ -25,46 +25,6 @@
       "signals": [
         "generative-art"
       ],
-      "newlySeen": true
-    },
-    {
-      "id": 598672846,
-      "repository": "q5js/q5.js",
-      "stars": 421,
-      "license": "LGPL-3.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1253379199,
-      "repository": "shasha1108/healing-visual-lab",
-      "stars": 3,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1419557893,
-      "repository": "sandbase-lab/awesome-gemini4-argon",
-      "stars": 3,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 525592995,
-      "repository": "invoke-ai/InvokeAI",
-      "stars": 28802,
-      "license": "Apache-2.0",
-      "signals": [
-        "generative-art"
-      ],
       "newlySeen": false
     },
     {
@@ -78,29 +38,19 @@
       "newlySeen": false
     },
     {
-      "id": 800083050,
-      "repository": "liamdugan/raid",
-      "stars": 223,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 374744219,
-      "repository": "repath-studio/repath-studio",
-      "stars": 173,
-      "license": "AGPL-3.0",
+      "id": 1138060581,
+      "repository": "eljojo/estrella",
+      "stars": 107,
+      "license": null,
       "signals": [
         "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 1404086905,
-      "repository": "billpwchan/sakura-fantasy",
-      "stars": 106,
+      "id": 1388327805,
+      "repository": "jbang2004/long-wind",
+      "stars": 100,
       "license": null,
       "signals": [
         "ai-generated"
@@ -110,18 +60,8 @@
     {
       "id": 1099222481,
       "repository": "MarkusNeusinger/anyplot",
-      "stars": 29,
+      "stars": 31,
       "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 723372005,
-      "repository": "insomnimus/seo-garbage",
-      "stars": 19,
-      "license": null,
       "signals": [
         "ai-generated"
       ],
@@ -138,12 +78,42 @@
       "newlySeen": false
     },
     {
+      "id": 411390376,
+      "repository": "Divetoxx/Mandelbrot-2",
+      "stars": 16,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 527415438,
+      "repository": "golanlevin/60-212",
+      "stars": 15,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1244552481,
       "repository": "reearth/ezu",
-      "stars": 14,
+      "stars": 15,
       "license": "Apache-2.0",
       "signals": [
         "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1412848801,
+      "repository": "Blank2007/DroidExtend",
+      "stars": 13,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -158,8 +128,8 @@
       "newlySeen": false
     },
     {
-      "id": 1366877560,
-      "repository": "statico/ttmux",
+      "id": 990303192,
+      "repository": "rrainey/obliq-2",
       "stars": 9,
       "license": "MIT",
       "signals": [
@@ -168,9 +138,29 @@
       "newlySeen": false
     },
     {
-      "id": 527632130,
-      "repository": "artemshar/awesome-ai",
-      "stars": 8,
+      "id": 1398313770,
+      "repository": "Withlian/LuboDown",
+      "stars": 9,
+      "license": "GPL-3.0",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1160781184,
+      "repository": "nexus-llm-lang/Nexus",
+      "stars": 7,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1413183323,
+      "repository": "AndreXes03/motion-lab",
+      "stars": 7,
       "license": null,
       "signals": [
         "generative-art"
@@ -188,16 +178,6 @@
       "newlySeen": false
     },
     {
-      "id": 1109222527,
-      "repository": "filthyrake/vlog",
-      "stars": 4,
-      "license": null,
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1125583044,
       "repository": "segin/substrate",
       "stars": 4,
@@ -208,12 +188,32 @@
       "newlySeen": false
     },
     {
+      "id": 1256196157,
+      "repository": "sunkek/noir-code",
+      "stars": 4,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1387038169,
       "repository": "qwerty-ll/CustomizeYouProfile",
       "stars": 3,
       "license": "MIT",
       "signals": [
         "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1415752723,
+      "repository": "shaderera/shaderera",
+      "stars": 3,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
       ],
       "newlySeen": false
     }
