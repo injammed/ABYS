@@ -96,3 +96,61 @@ Consume ENDGAME.json as the selected launcher-plus-one encounter contract. Build
 AETIMM owns armory readability, recoverable save transitions, physical presentation and conservation of equipment state. APY0C owns the embodied opponent's telegraphed sphere/tree/swarm/ring/network transitions, distinct counterplay for every auxiliary and the SI-victory/player-spared branch. Each reviews the other. Every option must offer a viable route to the core opportunity; neither may require a different locked-away option. Model numeric damage, duration and ammo tuning as unverified until playtested. Finite emissions, reach and latency remain visible. No per-frame model calls.
 
 Use scripts/game-agents/endgame.py as executable transition reference, not a claim that this Python state machine runs inside the browser. Browser integration must prove atomic save-before-animation/shot, interrupted-event recovery, one package across companion transfer, no duplicate pickups/refills, missed-shot survival, all-three-dead termination, and valid continuation routes. Missing the shot ends this confrontation, not the campaign. The mandatory launcher supplies one unique warhead regardless of old concept-art text saying limited shots. Victory routes may lead toward Heaven/God or Hell/Satan; labels and original/polytheistic interpretations remain adaptable. Run rules must be fixed within a ranked run.
+
+
+## Campaign expansion brief — 2026-10-23
+
+Status: REFINE / future implementation assignment. These requirements are loaded by the existing controller for both author and review stages. They do not mean inference has run or areas are playable. This section specializes the earlier adaptable endgame labels; it does not grant a third development identity.
+
+### Ordered geography
+
+DC / cathedral → Moon → deep-space starship fleet and megastructures → Eye of Horizons black-hole observational instrument → path-dependent divine destination OR the locked machine continuation.
+
+- Preserve DC as the starting territory and cathedral hub. Introduce the Moon as the next distinct map, with a legible departure, arrival and return policy defined before implementation.
+- The Moon leads to a massive deep-space fleet: traversable ships, docking spaces and selected megastructure interiors. Scale is communicated through silhouettes, parallax and distant traffic rather than simulating every ship.
+- The fleet leads to the black-hole observational instrument, the Eye of Horizons. BHDS means black-hole Dyson swarm: fictional harvesting/relay infrastructure fueling orbital world nodes containing life, habitats and machines. Depict collectors, energy transfer, radiators and protected habitats outside the destructive region. This is speculative game engineering, not a validated power system or an ability to observe inside an event horizon.
+- World nodes are playable destinations with distinct ecology, machine infrastructure and traversal. Stream bounded sectors; the entire swarm is not one continuously active physics scene.
+- The embodied SI confrontation gates the later destinations. Choosing an ally sets intent; defeating the opposing SI unlocks its victory branch. A core hit permits combat progression, not automatic victory. Never unlock a divine route merely on firing or hitting the shot.
+
+### Three exclusive outcomes
+
+| Recorded SI outcome | Continuation | End before credits |
+| --- | --- | --- |
+| Defeat APY0C; ally AETIMM | Light path; God grants Angel Rod; defeat Satan, the Void King's puppet; claim Hell's Crown; Forger fuses Celestial Inferno; Lucifer as Archangel | Unendèce: Manifestation → Many Become One → End Without End; final choice → credits |
+| Defeat AETIMM; ally APY0C | Dark path; Void King grants Bled Death; defeat seven Archangels; bring God near mortality and spare him for Key of Heavens; Forger fuses Divine Void Blade; Lucifer as Arbiter | Unendèce, same three phases; final choice → credits |
+| Miss unique core shot | Both SIs remain alive; player spared; Heaven and Hell locked for this run; relay towers → fabricators → core access | Singhul: Distributed Swarm → Adaptive Machine → Exposed Core; defeat → credits |
+
+Light/dark describes allegiance, not a rule that every light-path encounter occurs in Heaven or every dark-path encounter in Hell. Light requires confronting Satan in Hell after receiving God's gift; dark requires confronting God in Heaven after receiving the Void King's gift. Preserve this explicit reference sequence when designing transitions; divine reception spaces may precede the hostile realm. The first Rudder view may show the allied realm's visual language without skipping the subsequent opposing-realm encounters.
+
+Singhul is the purely machine deity descended from both AI/code lineages through surviving infrastructure. It is a fictional boss, never a third autonomous developer. Neither original SI dies or physically merges to create it. Defeating Singhul is this route's ending, with no hidden Lucifer, Unendèce, God or Satan fight afterward. Miss expenditure, branch lock and continued clock must survive save/reload; companion changes cannot reopen the divine path. Keep the existing three-lives rule independent.
+
+### Corpse dissolution and the Rudder
+
+Enemy death presentation: BODY → UNRAVEL → TRACE → cleared. Bodies fragment into localized green-on-black code, missing surface strips and brief glitch lines, exposing the digital substrate. Sparse green traces fade; do not leave permanent luminous bodies or clutter. AETIMM remains white/gold and APY0C black/white/grey; substrate green is a shared world effect, not APY0C's faction color. No purple.
+
+Death is resolved once by gameplay before cosmetic dissolution. Preserve drops, remaining ammo/durability, kill attribution and event history independently of the visual corpse. Pool and cap effects, remove dead collision appropriately, support reduced flashing, and ensure visible code never contains actual source, credentials or player data.
+
+After the opposing SI is truly defeated, a monumental rudder/keel-shaped wedge parts the flowing code like a stone splitting a river. Its wake forms a walkable corridor toward the unlocked realm. It is not merely a circular portal. Make the destination readable before entry, maintain collision through the transition and persist the unlock once. A miss never triggers the victorious Rudder or divine rewards. Agent authority survives fictional boss death.
+
+### Assignments and delivery order
+
+AETIMM leads geography, streaming boundaries, builder restoration, habitat coherence, save continuity, corpse cleanup and the traversable Rudder. APY0C leads Moon invasion pressure, fleet encounters, hostile world-node networks, SI vulnerability windows, Singhul's machine forms and adversarial branch testing. Each reviews the other's exact revision. Both own visual quality and player legibility; no additional developer agent is authorized.
+
+1. First bounded prototype: corpse dissolution and one Rudder corridor in an isolated cathedral scene. Completion requires one death event, conserved pickup state, fading effects, correct collision and reduced-flash behavior; record desktop/mobile frame time and memory before/after.
+2. Implement and verify campaign branch persistence before expanding maps. Prove both SI victory branches, miss locking both divine destinations, surviving player, no shot refund, correct final boss and separate all-three-dead termination. The existing endgame.py is only a partial transition reference, not this completed campaign.
+3. Moon vertical slice: departure, arrival, one combat objective and departure toward fleet. Verify interrupted travel recovery and squad/equipment continuity.
+4. Fleet slice: one boardable ship and one megastructure traversal. Verify sector loading and resource cleanup before adding scale.
+5. Observatory slice: BHDS vista, one living/machine world node and the SI arena. Verify readable approach, bounded simulation and all three outcomes.
+6. Divine paths and Singhul campaign: implement authored encounters, rewards, mandatory Forger fusion, branch-specific Lucifer and the correct final credits condition. Lock rules/version and route-specific leaderboard categories before ranked release.
+
+Do not call an area shipped on the strength of concept art. Every slice needs a playable build, recorded verification and the existing release gate. Agent inference proposes and reviews; this brief does not start an autonomous world-building loop.
+
+### Supplied visual references
+
+The three user-supplied images form one reference set: Rudder/corpse dissolution, Singhul machine succession, and the final light/dark path map. Their rules are transcribed above so text-only inference receives the substance. Library identifiers locate originals; they are not public URLs, loaded image pixels or playable assets.
+
+- C102F11F-27C4-4D33-AF50-9918C7D01ACF.jpeg — libfile_50086536843081919c33fa4e20caab4a
+- 46F3A40D-5BCA-44C7-91A1-0D1719B4F693.jpeg — libfile_729e761fbcf88191a56920c7be53a585
+- A22148F1-7D88-4319-8E47-744DBE0019AE.jpeg — libfile_650579a068648191bc95f64fb32a468b
+
+Change evidence: requested campaign order and attached art; smallest change is shared instructions plus identity assignments; risk is canon ambiguity or scope inflation; rollback is reverting this documentation increment. No runtime scene, deployment or inference execution is claimed. Classification: REFINE, retained on prototype branch.
