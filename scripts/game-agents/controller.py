@@ -31,17 +31,22 @@ SPEEDRUN_INVARIANTS = frozenset({
 })
 
 
+DIFFICULTIES = {"theatrical":{"scoreboard":False,"enemy_health":"reduced","enemy_damage":"reduced","behavior":"fallible_chaotic","randomness":"expanded_seeded_variation"},"hardcore":{"scoreboard":True,"enemy_health":"challenge_tuned","enemy_damage":"challenge_tuned","behavior":"purposeful_aggression","randomness":"ranked_seed_policy"}}
+
+
 def speedrun_contract(directory):
     """Fail closed on malformed/disabled laws; not proof of runtime compliance."""
     data = json.loads((directory / 'SPEEDRUN_LAWS.json').read_text())
     fields = {'schema_version', 'status', 'agents', 'invariants', 'laws',
-              'assignments', 'acceptance', 'release_notes'}
+              'assignments', 'acceptance', 'release_notes', 'difficulties'}
     if not isinstance(data, dict) or set(data) != fields:
         raise ValueError('Invalid speedrun contract fields')
-    if type(data['schema_version']) is not int or data['schema_version'] != 1:
+    if type(data['schema_version']) is not int or data['schema_version'] != 2:
         raise ValueError('Unsupported speedrun law version')
     if data['status'] != 'prototype' or data['agents'] != list(AGENTS):
         raise ValueError('Invalid speedrun status or developer identities')
+    if json.dumps(data['difficulties'], sort_keys=True) != json.dumps(DIFFICULTIES, sort_keys=True):
+        raise ValueError('Exactly Theatrical/unranked and Hardcore/scoreboard are required')
     inv = data['invariants']
     if not isinstance(inv, dict) or set(inv) != SPEEDRUN_INVARIANTS:
         raise ValueError('Missing or unknown speedrun invariants')
