@@ -189,3 +189,48 @@ Both are reversibly configurable machine embodiments using the same sphere/tree/
 Within the already assigned cathedral prototype, AETIMM should propose one reusable dissolution/trace generator and one parameterized Rudder field. APY0C should review its performance/legibility and propose opposing inward/outward configurations from the same primitives. Preserve death/pickup bookkeeping outside cosmetic effects. Acceptance requires a playable isolated comparison, bounded effect counts, conserved equipment state, correct transition collision and recorded desktop/mobile budgets. Do not expand this into a new engine or pursue theoretical optimality before that comparison works.
 
 Status: shared author/review instructions, REFINE. No optimized runtime, physical-substrate computation or live inference is claimed by this addition. Risk: mistaken compression claims or illegible over-abstraction; rollback: revert this instruction increment. Exactly two developer identities remain authorized.
+
+
+## Roaming progression and cosmetic inheritance — 2026-10-24
+
+Status: REFINE / implementation assignment, not shipped runtime. Owner explicitly requests these systems. Exactly two developer identities remain; the opportunity director below is ordinary deterministic game logic, not another agent.
+
+### Campaign facts with flexible entrances
+
+Across Earth/DC, Moon, deep-space fleet, and BHDS cluster, encode progression as facts and explicit commitment thresholds rather than a mandatory NPC at a mandatory coordinate. Author several causally different routes to each required milestone. Exploration, conversation, salvage, aid, combat and investigation can expose those routes. Opportunities do not grant progress automatically; validated encounter outcomes grant facts.
+
+Separate campaign graph, world/NPC simulation, opportunity selection and encounter execution. Each NPC has persistent identity, location, availability, knowledge, goals and relationships. Match a currently unmet campaign fact to a plausible local carrier and the player's observable actions. Do not teleport quest givers, resurrect unavailable NPCs, rewrite witnessed events or grant everyone identical knowledge. Existing events continue along their own schedules.
+
+Select on meaningful events, not every render frame: sector entry, conversation, combat resolution, discovery or a bounded pacing tick. Filter by region, prerequisites, NPC availability, branch locks, decline cooldowns and active encounter. Rank by local plausibility, relevance, novelty and interruption cost, using stable tie breaks and pinned run seed/rules. If nothing fits, wait. Persist offers and consequences; cap concurrent hooks and avoid repeated nagging.
+
+Ignore/decline must remain real options. Maintain discoverable alternatives after supported NPC deaths or route destruction, without guaranteeing progression against continued refusal. Do not punish peaceful exploration merely for refusing a hook. Let broadcasts, convoys, wreckage and other non-dialogue clues support players who talk to nobody. NPC stories remain distinctive even when they satisfy the same campaign fact.
+
+Use roam -> opportunity -> investigation -> explicit commitment -> locked labyrinth/boss -> resolved outcome. Signal irreversible boarding, sealing or assault entry before commitment. Suspend unrelated roaming hooks during locked encounters; authored victory or defeat-with-continuation resolves the lock. A core-shot miss remains a persistent branch consequence, never an automatic refund or softlock.
+
+For ranked runs pin rules, seed category, timing policy and opportunity data. Record decisions and authoritative outcomes for replay/verification. No hidden catch-up assistance based on slow elapsed time, cosmetics or account kill totals. Separate leaderboard paths and ruleset versions. Do not claim cross-device deterministic replay without verifying it.
+
+First slice: one Earth district, six NPCs, three causal routes to one departure milestone, one locked encounter. Verify conversation-free exploration, assistance, scavenging, hostility, repeated refusal, unavailable NPCs, destroyed routes, interrupted saves and stable replay. Refusal may leave the player roaming; supported disruptions must not eliminate every discoverable route.
+
+### Cosmetic-only between-run inheritance
+
+Hard rule: persistent rewards are 100% aesthetic. Carry unlocked clothes, armor appearances, weapon skins/camos, compatible equipment selections, achievement records and verified personal bests. Reset run health, ammo, durability, upgrades, money, equipment ownership, campaign facts, world destruction and branch choice according to the new run's fixed starting rules. Within-run upgrades remain meaningful but never become account power.
+
+An armor appearance is not armor protection. A weapon skin does not grant its underlying weapon. Apply a selected skin only when that compatible base item is legitimately acquired; preserve dropped-item ammo/durability. Class and witch-only staff restrictions remain. Use the same gameplay stats, hitboxes, collision, reach, movement, aim behavior, NPC detection, attack timing and resources for all appearances. No paid or earned XP boosts, better loot odds, additional lives or starting advantages.
+
+Maintain separate RunState, verified RunReceipt, AccountRecord and CosmeticLoadout data. The gameplay simulation must not read cosmetic ownership to calculate outcomes. A cosmetic definition contains ID, slot, compatible base/class IDs, render assets and an unlock predicate, never gameplay modifiers. Profile selection changes presentation only. Preserve class/team recognition, weapon readability and first-person visibility; cosmetics cannot hide telegraphs, add gameplay-useful illumination, obscure targets or impose unbounded effects. Offer a standardized ranked presentation.
+
+Award from authoritative validated events with stable run/event/entity-life IDs. Enemy death resolves once before corpse dissolution. Never count hits, visual fragments, despawns, scenery or repeated delivery of the same death. Explicitly define player/companion attribution; proposed default is player and selected companions, excluding unrelated NPC kills. Reanimated entities need a new validated life ID; scripted cosmetic resurrection earns nothing.
+
+Use composable enemy tags, e.g. alien + undead + possessed. One kill increments total kills once and each matching named mastery track once; it can legitimately progress Alien, Undead and Possessed Alien Undead challenges simultaneously. Display this rule. Initial tracks: zombies/undead, demons, robots, aliens and possessed alien zombies. Separate generic robot kills from named bosses where required by challenge rules.
+
+Persist validated kill progress from failed runs as well as successful ones; do not require a campaign clear for lifetime mastery. Speed challenges require a verified finish in an eligible route/ruleset/seed category. Record raw elapsed and adjusted time separately; unlock predicates explicitly choose one and never mix them. Invalid/debug/modded/practice runs cannot grant ranked speed rewards; keep practice records separate.
+
+Finalize rewards idempotently: verify receipt -> transactionally record unique receipt/event -> update eligible counters and PBs -> evaluate versioned unlock rules -> grant unique cosmetic IDs -> commit -> display rewards. Duplicate submission, crash/retry or save reload must not multiply counts. On failed verification, preserve pending evidence for retry without provisional ranked grants. Never trust client-submitted totals as authoritative.
+
+Proposed mastery tiers for playtesting: 100 / 1,000 / 10,000 / 100,000 eligible kills per track. Rewards progress from fabric/emblem to weapon camo to coordinated armor appearance to mastery finish; avoid required flashing or silhouette changes. Numeric tiers are provisional, not a proven retention target. Speed tiers must come from route playtests, not the aspirational 25-minute/2-hour targets. No daily streak loss, loot-box randomness or expiry of earned cosmetics.
+
+AETIMM leads causal NPC continuity, recoverable progression, profile/run separation, cosmetic compatibility and wardrobe presentation. APY0C leads pressure without coercion, blocked-route tests, enemy taxonomy, kill attribution, receipt abuse tests and cosmetic readability adversarial review. Both review the other's exact revision; these responsibilities do not restrict equal whole-game scope.
+
+Delivery: first the roaming slice; independently prototype cosmetic profile/receipt reducer and a pre-run wardrobe with representative appearances. Verify duplicate receipts/events, failed-run kill retention, composite-tag counting, interrupted writes, incompatible skins, speed category isolation and identical gameplay outcomes with cosmetics on/off before browser integration and ranked publication.
+
+Change evidence: owner request for natural progression and aesthetic-only replay rewards. Smallest change: shared injected contract plus two identity assignments. Risk: forced progression, reward exploits or accidental persistent power. Rollback: revert this instruction increment. Existing release gate applies; no runtime implementation, live inference, migration, build, merge or deployment claimed.
