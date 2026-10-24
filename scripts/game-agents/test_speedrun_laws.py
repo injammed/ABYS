@@ -40,7 +40,7 @@ class SpeedrunLawsTests(unittest.TestCase):
 
     def test_identity_schema_and_empty_laws(self):
         mutations = [('agents', ['AETIMM', 'APY0C', 'third']),
-                     ('schema_version', True), ('schema_version', 2),
+                     ('schema_version', True), ('schema_version', 3),
                      ('laws', []), ('acceptance', ['']),
                      ('assignments', {'AETIMM': ['alone']}),
                      ('release_notes', ''), ('status', 'live')]
@@ -52,6 +52,25 @@ class SpeedrunLawsTests(unittest.TestCase):
                     self.validate(data)
         data = copy.deepcopy(self.base)
         data['hidden_override'] = True
+        with self.assertRaises(ValueError):
+            self.validate(data)
+
+    def test_only_two_difficulty_profiles(self):
+        self.assertEqual(set(self.base['difficulties']), {'theatrical', 'hardcore'})
+        self.assertIs(self.base['difficulties']['theatrical']['scoreboard'], False)
+        self.assertIs(self.base['difficulties']['hardcore']['scoreboard'], True)
+        for mode, replacement in [('theatrical', True), ('hardcore', False),
+                                  ('hardcore', 1)]:
+            data = copy.deepcopy(self.base)
+            data['difficulties'][mode]['scoreboard'] = replacement
+            with self.assertRaises(ValueError):
+                self.validate(data)
+        data = copy.deepcopy(self.base)
+        data['difficulties']['normal'] = data['difficulties']['theatrical']
+        with self.assertRaises(ValueError):
+            self.validate(data)
+        data = copy.deepcopy(self.base)
+        del data['difficulties']['theatrical']
         with self.assertRaises(ValueError):
             self.validate(data)
 
