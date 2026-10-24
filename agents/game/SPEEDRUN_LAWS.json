@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "prototype",
   "agents": [
     "AETIMM",
@@ -34,7 +34,12 @@
     "Only appearance and records persist between runs. Whole-model skins retain identical simulation properties and readable reach/telegraphs; appearance is never a source of gameplay stats, starting equipment, better RNG or extra lives.",
     "Locked labyrinths resolve through their authored outcomes. Declared defeat-with-continuation preserves the player and changes the route; it does not become a reset. Exactly-once irreversible events and branch locks survive interruption.",
     "Replay logs and receipts need trusted validation, deduplicated outcomes and integrity checks; client-supplied totals and model assertions are not proof. Prototype checks are not an anti-cheat system.",
-    "Both agents can propose across the whole game. One authors, the other reviews the pinned diff; independent tests and the existing change gate decide release. No third development identity, no self-approval, no direct publishing. Deadlocks go to the owner."
+    "Both agents can propose across the whole game. One authors, the other reviews the pinned diff; independent tests and the existing change gate decide release. No third development identity, no self-approval, no direct publishing. Deadlocks go to the owner.",
+    "Exactly two difficulty choices: Theatrical and Hardcore, presented as one pre-run toggle. Lock difficulty at run creation and persist it through saves. Changing the toggle affects a new run only; never convert or promote an existing Theatrical run into Hardcore.",
+    "Theatrical is relaxed spectacle and experimentation: lower mob AND boss health and damage than Hardcore, deliberately fallible decisions, blunders, messy encounters and wider bounded randomized variations. No scoreboard, score HUD, adjusted-time ranking, ranked personal best or speed trophy. Internal events may still support saves and cosmetic achievements; randomness never erases consequences or required progression.",
+    "Hardcore is the only scoreboard mode. Every hostile mob and boss purposefully tries to hurt the player with challenge-tuned health and damage, competent decisions and readable counterplay. Preserve useful aggression, not indiscriminate attacks by friendly NPCs; no omniscience, unavoidable hits or mere health inflation. No deliberate Theatrical blunder system. Ranked randomness follows the frozen seed/category policy.",
+    "Both modes retain the campaign, exploration, branch consequences, squad rules and cosmetic-only inheritance. Validated kill-based cosmetic mastery may accrue in either mode; only verified Hardcore finishes qualify for competitive timing trophies. Ranked eligibility additionally requires receipt validation and rules compliance: selecting Hardcore alone is not proof. Accessibility options remain available, not extra difficulty settings; gameplay-changing assists cannot silently enter ranked results.",
+    "Health/damage values, blunder frequencies and variation budgets are pending playtests, not invented measured balance. AETIMM owns the two-choice menu, save identity and score-UI separation; APY0C owns the two enemy behavior profiles and fair tuning."
   ],
   "assignments": {
     "AETIMM": [
@@ -54,7 +59,24 @@
     "Duplicate events, reloads and retries cannot refund unique resources, multiply score or change branches.",
     "Menu, pause, loading, dialogue, disconnect/resume and terminal-event boundaries follow the pinned clock policy.",
     "Credit cap, integer rounding, zero floor and end-action duration are tested; invalid/unverified scores never enter ranked boards.",
-    "Evidence compares novice and expert routes, route diversity, unavoidable waiting and device frame times; estimates are labeled, not reported as measurements."
+    "Evidence compares novice and expert routes, route diversity, unavoidable waiting and device frame times; estimates are labeled, not reported as measurements.",
+    "Reject any third difficulty, mode mutation during a run, Theatrical score submission or Theatrical speed trophy; test both mobs and bosses for reduced Theatrical health/damage and authored blunders. Verify Hardcore aggression remains telegraphed and escapable."
   ],
-  "release_notes": "Instruction contract and reference arithmetic only. No browser timer, director, replay verifier or leaderboard is implemented by this file. Constants require measured playtests. Does not publish undisclosed ending lore."
+  "release_notes": "Instruction contract and reference arithmetic only. No browser timer, director, replay verifier or leaderboard is implemented by this file. Constants require measured playtests. Does not publish undisclosed ending lore.",
+  "difficulties": {
+    "theatrical": {
+      "scoreboard": false,
+      "enemy_health": "reduced",
+      "enemy_damage": "reduced",
+      "behavior": "fallible_chaotic",
+      "randomness": "expanded_seeded_variation"
+    },
+    "hardcore": {
+      "scoreboard": true,
+      "enemy_health": "challenge_tuned",
+      "enemy_damage": "challenge_tuned",
+      "behavior": "purposeful_aggression",
+      "randomness": "ranked_seed_policy"
+    }
+  }
 }
