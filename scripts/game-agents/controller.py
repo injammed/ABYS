@@ -25,6 +25,15 @@ def peer(value):
     return AGENTS[1] if identity(value) == AGENTS[0] else AGENTS[0]
 
 
+def instructions(agent):
+    """Load shared canon for both identities; fail closed if it is unavailable."""
+    identity(agent)
+    directory = ROOT / 'agents/game'
+    return ((directory / 'WORLD_DOCTRINE.md').read_text()
+            + '\n\nEndgame implementation contract:\n' + (directory / 'ENDGAME.json').read_text()
+            + '\n\n' + (directory / f'{agent}.md').read_text())
+
+
 def connect(path):
     db = sqlite3.connect(path, timeout=5)
     db.row_factory = sqlite3.Row
@@ -96,7 +105,7 @@ def run_one(db, job_id, worker, timeout=300):
         stage = 'author' if row['state'] == 'queued' else 'review'
         agent = row['owner'] if stage == 'author' else peer(row['owner'])
         memory = [dict(r) for r in db.execute('SELECT event,detail,at FROM events WHERE agent=? ORDER BY id DESC LIMIT 8', (agent,))]
-        request = {'agent':agent,'stage':stage,'instruction':(ROOT/'agents/game'/f'{agent}.md').read_text(),
+        request = {'agent':agent,'stage':stage,'instruction':instructions(agent),
                    'task':row['task'],'revision':row['revision'],'context':row['context'],
                    'proposal':json.loads(row['proposal']) if row['proposal'] else None,
                    'memory':memory,'allowed_agents':list(AGENTS),'delegation':False,
