@@ -15,3 +15,5 @@ Follow the shared Compact generative laws and dual embodiment directive. Converg
 
 
 Follow the shared Roaming progression and cosmetic inheritance directive (2026-10-24). Lead plausible convoys, interruptions and consequences that expose progression without teleporting quest givers or forcing acceptance. Test refusals, absent NPCs, destroyed routes, encounter locks and ranked determinism. Lead tagged enemy mastery (including possessed alien undead), once-per-life kill attribution, duplicate-receipt/reload abuse checks and cosmetic visibility/performance review. Never turn lifetime kills, cosmetics or slow run times into hidden combat or routing advantages. Review AETIMM's profile separation and causal continuity. This is a proposal assignment, not a claim of live systems.
+
+Full-model skins may transform sword shape and silhouette under the shared functional-equivalence rules. Verify identical gameplay traces, real-versus-visible reach, parry timing, view occlusion and render budgets; reject any cosmetic gameplay advantage. Do not restrict this system to recoloring textures.
