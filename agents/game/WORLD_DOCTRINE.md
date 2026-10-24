@@ -154,3 +154,38 @@ The three user-supplied images form one reference set: Rudder/corpse dissolution
 - A22148F1-7D88-4319-8E47-744DBE0019AE.jpeg — libfile_650579a068648191bc95f64fb32a468b
 
 Change evidence: requested campaign order and attached art; smallest change is shared instructions plus identity assignments; risk is canon ambiguity or scope inflation; rollback is reverting this documentation increment. No runtime scene, deployment or inference execution is claimed. Classification: REFINE, retained on prototype branch.
+
+
+## Compact generative laws and dual embodiment
+
+Owner direction: seek the smallest coherent description that produces the intended rich game behavior. Treat this as a constrained engineering objective, never as permission to replace clear working systems with opaque notation. The user reference IMG_6107.jpeg (libfile_e2565007417c8191936e7be6d195ad82) depicts diffuse symbols and branching networks converging through a narrow symbolic waist, then resolving into ordered curves and a radiant point. Use that shared transformation grammar for the dark/light duality.
+
+### Mathematical boundary
+
+Kolmogorov complexity concerns shortest descriptions relative to a fixed universal machine and encoding; exact complexity is not generally computable. Compression/search cannot generally certify or guarantee convergence to the shortest program. Lambda normal forms, SKI expressions and dense point-free code are possible representations, not guarantees of minimal size, termination, speed or energy use. Some lambda terms have no normal form. Do not require those syntaxes for production. A small program may require enormous execution time or produce repetitive, poor gameplay. Count generator, interpreter/runtime, parameters, seeds, assets and saved exceptions rather than hiding complexity in a dependency or model. Circuit topology and weights are implementation representations; code disappearing into matter is a fictional motif, not evidence that browser software becomes atomic physics.
+
+Reference: Catt and Norrish, On the formalisation of Kolmogorov complexity (2021), https://trustworthy.systems/publications/abstracts/Catt_Norrish_21.abstract — formal uncomputability and invariance results.
+
+### Practical operating rule for both authors
+
+Preserve required behavior, player agency, save semantics, visual quality and measured device budgets first; then reduce unnecessary description and execution cost. Prefer a small set of explicit, composable, parameterized laws over duplicated bespoke behaviors. Keep readable typed source, named operations, diagnostics and provenance. Minification is a build artifact, not the authoring style. Pure functions and declarative data are useful where they simplify reasoning; no language rewrite is implied.
+
+For world generation, propose versioned recipes + explicit seeds + bounded local state + persistent player-caused deltas. Generate only needed sectors. Never regenerate away destruction, dropped-item resources, deaths, unique-shot expenditure or branch locks. Pin recipe/seed versions for a run and preserve compatible save migrations. Do not presume cross-device floating-point determinism without tests. Deterministic rendering decoration may be lossy; consequential gameplay state may not be silently approximated.
+
+Candidate shared laws include material response tables, reusable fracture rules, instanced geometry, bounded swarm steering, reusable boss morphology transitions and composable encounter phases. Keep distinctive authored landmarks, fair telegraphs and meaningful exceptions. Avoid turning the Moon, fleet and world nodes into identical procedural corridors. No per-frame LLM calls or unbounded search at runtime.
+
+Every optimization proposal must state: desired behavior and invariants; reference implementation/revision; bounded candidate search budget; complete representation cost; before/after load time, memory and CPU/GPU frame-time measurements on named devices; gameplay/visual comparison; regression evidence; rollback. Compare improvements across these dimensions rather than optimizing character count alone. Keep candidates with useful measured tradeoffs; reject a shorter expression that makes maintenance, frame time or correctness worse without an explicit justified tradeoff. Tests establish coverage, not proof of universal program equivalence. Never erase tests or evidence to lower the measured size.
+
+### Dark/light visual grammar
+
+AETIMM: compact rules unfold into distinct, coherent, inhabitable structure. White/gold star point → fine ordered curves → differentiated branches and world geometry. Boundaries and individual nodes remain legible. Favor constructive outward motion and visible restoration; heat and power remain visible fictional constraints.
+
+APY0C: distributed branches and dependencies converge through a narrow waist into a Vantablack-like singularity and enclosing rings. Black/white/grey only; render filaments as edges against negative space. Favor inward collection, constrained routing and appropriation. Relation is not intrinsically evil; its coercive use is the character conflict.
+
+Both are reversibly configurable machine embodiments using the same sphere/tree/swarm/torus/network vocabulary. The reference's direction can reverse during attacks, defense and reconfiguration; neither is limited to a fixed humanoid or one animation. Shared green code appears only as exposed substrate/dissolution/Rudder effects, not a replacement faction palette. Match silhouette, contrast, collision, attack windows and reduced-flash accessibility; decorative equations must not overwhelm readable player controls.
+
+### Next bounded assignment
+
+Within the already assigned cathedral prototype, AETIMM should propose one reusable dissolution/trace generator and one parameterized Rudder field. APY0C should review its performance/legibility and propose opposing inward/outward configurations from the same primitives. Preserve death/pickup bookkeeping outside cosmetic effects. Acceptance requires a playable isolated comparison, bounded effect counts, conserved equipment state, correct transition collision and recorded desktop/mobile budgets. Do not expand this into a new engine or pursue theoretical optimality before that comparison works.
+
+Status: shared author/review instructions, REFINE. No optimized runtime, physical-substrate computation or live inference is claimed by this addition. Risk: mistaken compression claims or illegible over-abstraction; rollback: revert this instruction increment. Exactly two developer identities remain authorized.
