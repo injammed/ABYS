@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "status": "prototype",
+  "agents": [
+    "AETIMM",
+    "APY0C"
+  ],
+  "invariants": {
+    "freeze_ranked_rules_at_start": true,
+    "cosmetic_only_carryover": true,
+    "no_hidden_rubber_banding": true,
+    "event_driven_causal_opportunities": true,
+    "explicit_irreversible_commitments": true,
+    "persistent_consequences": true,
+    "fixed_step_gameplay": true,
+    "seeded_gameplay_randomness": true,
+    "separate_raw_and_adjusted_time": true,
+    "bounded_score_credit": true,
+    "versioned_leaderboard_categories": true,
+    "independent_verification_before_release": true
+  },
+  "laws": [
+    "Build a world worth exploring and a system worth mastering. Optimize mastery opportunities, not minimum campaign length or compulsory rushing. Two hours and 25 minutes are unmeasured aspirations.",
+    "Progress is a graph of facts with multiple causal entrances, not a mandatory itinerary. Exploration, aid, salvage and combat can satisfy facts through distinct authored encounters. Preserve refusal and previously observed reality.",
+    "Allow creative freedom in topology, NPC stories, material aesthetics, encounters and bounded procedural recipes. Keep recognizable authored landmarks. Generate candidates between releases; never rewrite a ranked run's pinned rules or layout in response to performance.",
+    "Every major traversal or combat obstacle should expose a learnable, telegraphed way to save time through execution, knowledge, resource use or risk. Avoid arbitrary waiting, compulsory repeated exposition and unskippable repeat cinematics.",
+    "APY0C may adapt enemies to visible player actions under published bounded rules shared by every runner. No input reading, hidden PB-based difficulty, account-based routing, unavoidable counterpicks or secret catch-up rewards.",
+    "Preserve emergent shortcuts that respect declared category rules and meaningful tradeoffs. Do not erase discoveries merely because they beat the intended route. Classify bugs and skips explicitly; security/data loss are fixed promptly, and changed gameplay creates a new category/version without rewriting historical records.",
+    "Freeze build/content hashes, physics version, tick rate, seed policy, difficulty, squad/loadout category, timing policy, scoring policy and terminal event definitions at run start. Category identity is derived from these fields. Any mismatch invalidates ranked comparison, not historical records.",
+    "Use fixed simulation steps independent of render FPS, stable event ordering and seeded gameplay RNG. Pin physics behavior and verify on target devices. If replay diverges, mark the run unverified; never claim a seed alone proves deterministic physics.",
+    "Timing must explicitly define start, finish, dialogue, menus, pauses, loading, slow motion, disconnects and resume. Retain raw elapsed separately from scored time. Pausing cannot permit unrecorded simulation or free planning in a category that forbids it.",
+    "For score-adjusted categories use nonnegative integer accounting: credit = min(cap, floor(validated_points * numerator / denominator)); adjusted = max(0, eligible_elapsed - credit). All units, caps and score sources are pinned. Tune caps against real route minima so zero-time ties and endless farming do not dominate.",
+    "A deliberate in-game terminal action may be optimal only where the category explicitly permits it. Count the time required to reach the terminal event. Once credit caps, additional score grants no more time. Compare raw-time, score-adjusted and survival categories separately. Do not award on hits, despawns or duplicate events without explicit score rules.",
+    "Only appearance and records persist between runs. Whole-model skins retain identical simulation properties and readable reach/telegraphs; appearance is never a source of gameplay stats, starting equipment, better RNG or extra lives.",
+    "Locked labyrinths resolve through their authored outcomes. Declared defeat-with-continuation preserves the player and changes the route; it does not become a reset. Exactly-once irreversible events and branch locks survive interruption.",
+    "Replay logs and receipts need trusted validation, deduplicated outcomes and integrity checks; client-supplied totals and model assertions are not proof. Prototype checks are not an anti-cheat system.",
+    "Both agents can propose across the whole game. One authors, the other reviews the pinned diff; independent tests and the existing change gate decide release. No third development identity, no self-approval, no direct publishing. Deadlocks go to the owner."
+  ],
+  "assignments": {
+    "AETIMM": [
+      "Lead causal route graphs, readable traversal, simulation/time separation, recoverable state and cosmetic equivalence.",
+      "Create meaningful optional exploration and teachable shortcuts; test continuity and multiple entrances without forced progression."
+    ],
+    "APY0C": [
+      "Lead learnable enemy pressure, telegraphed openings, alternative combat routes and risk/reward.",
+      "Test softlocks, forced waits, hidden adaptation, score farming, cosmetic advantages and replay/category exploits without sabotaging code."
+    ]
+  },
+  "acceptance": [
+    "Replaying identical validated inputs under the same manifest preserves gameplay outcomes on supported devices or explicitly fails verification.",
+    "Different render frame rates preserve simulation movement, attacks and clock policy; stalls and dropped steps are handled by an explicit tested rule.",
+    "Every cosmetic for a base weapon produces identical contact/timing/damage traces; view occlusion and render budget are inspected independently.",
+    "Ignoring hooks remains possible; supported NPC loss and route destruction leave a discoverable alternative; locked encounters suppress unrelated hooks.",
+    "Duplicate events, reloads and retries cannot refund unique resources, multiply score or change branches.",
+    "Menu, pause, loading, dialogue, disconnect/resume and terminal-event boundaries follow the pinned clock policy.",
+    "Credit cap, integer rounding, zero floor and end-action duration are tested; invalid/unverified scores never enter ranked boards.",
+    "Evidence compares novice and expert routes, route diversity, unavoidable waiting and device frame times; estimates are labeled, not reported as measurements."
+  ],
+  "release_notes": "Instruction contract and reference arithmetic only. No browser timer, director, replay verifier or leaderboard is implemented by this file. Constants require measured playtests. Does not publish undisclosed ending lore."
+}
