@@ -1,14 +1,14 @@
 {
   "version": 1,
-  "id": "40504278449-1",
-  "checkedAt": "2026-10-27T12:30:30.447Z",
+  "id": "40695153069-1",
+  "checkedAt": "2026-10-28T13:18:08.069Z",
   "sourceCommit": "027bcce40e2ab32ec90edf391e96b044a531e7a3",
-  "state": "partial",
+  "state": "completed",
   "queries": [
     {
       "query": "topic:ai-generated stars:>=3 archived:false fork:false",
-      "state": "failed",
-      "returned": 0
+      "state": "completed",
+      "returned": 10
     },
     {
       "query": "topic:generative-art stars:>=3 archived:false fork:false",
@@ -18,19 +18,19 @@
   ],
   "candidates": [
     {
-      "id": 443502100,
-      "repository": "Roebou1989/create-and-mint-nft-collection",
-      "stars": 112,
-      "license": null,
+      "id": 381990120,
+      "repository": "supermosh/supermosh.github.io",
+      "stars": 380,
+      "license": "GPL-3.0",
       "signals": [
         "generative-art"
       ],
       "newlySeen": true
     },
     {
-      "id": 1034339488,
-      "repository": "tre-systems/geno-1",
-      "stars": 4,
+      "id": 1407569742,
+      "repository": "xianshi3/sigilgen",
+      "stars": 3,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -38,22 +38,32 @@
       "newlySeen": true
     },
     {
-      "id": 116062718,
-      "repository": "villares/sketch-a-day",
-      "stars": 260,
-      "license": null,
+      "id": 1265180649,
+      "repository": "pulkitxm/claude-directory",
+      "stars": 603,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1382304020,
+      "repository": "sevenevesai/riso-windowseat",
+      "stars": 304,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 451809672,
-      "repository": "igr/gart",
-      "stars": 202,
-      "license": "BSD-2-Clause",
+      "id": 1304174300,
+      "repository": "corosolto/client",
+      "stars": 260,
+      "license": "AGPL-3.0",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -68,9 +78,19 @@
       "newlySeen": false
     },
     {
-      "id": 313701704,
-      "repository": "8f4e/8f4e",
-      "stars": 17,
+      "id": 1105562494,
+      "repository": "levz0r/awesome-vibecoded-apps",
+      "stars": 49,
+      "license": "CC0-1.0",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1272774651,
+      "repository": "yuki4266/yuki4266",
+      "stars": 34,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -78,20 +98,70 @@
       "newlySeen": false
     },
     {
-      "id": 1393034919,
-      "repository": "howardc38/motion-fx-lab",
-      "stars": 13,
-      "license": "0BSD",
+      "id": 1099222481,
+      "repository": "MarkusNeusinger/anyplot",
+      "stars": 31,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 313701704,
+      "repository": "8f4e/8f4e",
+      "stars": 19,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 1276131924,
-      "repository": "lolly-tools/lolly",
-      "stars": 12,
-      "license": "MPL-2.0",
+      "id": 723372005,
+      "repository": "insomnimus/seo-garbage",
+      "stars": 19,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 527415438,
+      "repository": "golanlevin/60-212",
+      "stars": 15,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1154425084,
+      "repository": "eremef/awaria-outage-notifier",
+      "stars": 11,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1159071863,
+      "repository": "Nerahikada/chromecast-sink",
+      "stars": 10,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1106063925,
+      "repository": "Het161/Het161",
+      "stars": 6,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -108,12 +178,42 @@
       "newlySeen": false
     },
     {
-      "id": 1415752723,
-      "repository": "shaderera/shaderera",
+      "id": 1314017928,
+      "repository": "provemark/content-credentials",
+      "stars": 5,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1125583044,
+      "repository": "segin/substrate",
+      "stars": 4,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1202177971,
+      "repository": "jstevoh/chromaglass",
+      "stars": 4,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1387038169,
+      "repository": "qwerty-ll/CustomizeYouProfile",
       "stars": 3,
       "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     }
@@ -136,6 +236,7 @@
     371476326,
     373191504,
     374744219,
+    381990120,
     382908938,
     411390376,
     428847843,
@@ -261,6 +362,7 @@
     1398674085,
     1404086905,
     1406759710,
+    1407569742,
     1407583549,
     1408412506,
     1411230193,
