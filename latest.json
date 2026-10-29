@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "40695153069-1",
-  "checkedAt": "2026-10-28T13:18:08.069Z",
+  "id": "40881945691-1",
+  "checkedAt": "2026-10-29T13:26:37.599Z",
   "sourceCommit": "027bcce40e2ab32ec90edf391e96b044a531e7a3",
   "state": "completed",
   "queries": [
@@ -18,40 +18,30 @@
   ],
   "candidates": [
     {
-      "id": 381990120,
-      "repository": "supermosh/supermosh.github.io",
-      "stars": 380,
-      "license": "GPL-3.0",
+      "id": 1209521327,
+      "repository": "masa-san-jp/Audio-visual-analyzer",
+      "stars": 4,
+      "license": null,
       "signals": [
         "generative-art"
       ],
       "newlySeen": true
     },
     {
-      "id": 1407569742,
-      "repository": "xianshi3/sigilgen",
-      "stars": 3,
+      "id": 584639396,
+      "repository": "ai-collection/ai-collection",
+      "stars": 9257,
       "license": "MIT",
       "signals": [
         "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1265180649,
-      "repository": "pulkitxm/claude-directory",
-      "stars": 603,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 1382304020,
-      "repository": "sevenevesai/riso-windowseat",
-      "stars": 304,
-      "license": "MIT",
+      "id": 1338283854,
+      "repository": "chengmarc/minecraft-citygen",
+      "stars": 476,
+      "license": "Apache-2.0",
       "signals": [
         "generative-art"
       ],
@@ -78,19 +68,39 @@
       "newlySeen": false
     },
     {
-      "id": 1105562494,
-      "repository": "levz0r/awesome-vibecoded-apps",
-      "stars": 49,
-      "license": "CC0-1.0",
+      "id": 1138060581,
+      "repository": "eljojo/estrella",
+      "stars": 107,
+      "license": null,
       "signals": [
-        "ai-generated"
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1335742225,
+      "repository": "MiguelCarino/CyberCity",
+      "stars": 61,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 313701704,
+      "repository": "8f4e/8f4e",
+      "stars": 40,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
       ],
       "newlySeen": false
     },
     {
       "id": 1272774651,
       "repository": "yuki4266/yuki4266",
-      "stars": 34,
+      "stars": 36,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -108,32 +118,12 @@
       "newlySeen": false
     },
     {
-      "id": 313701704,
-      "repository": "8f4e/8f4e",
-      "stars": 19,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 723372005,
       "repository": "insomnimus/seo-garbage",
       "stars": 19,
       "license": null,
       "signals": [
         "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 527415438,
-      "repository": "golanlevin/60-212",
-      "stars": 15,
-      "license": null,
-      "signals": [
-        "generative-art"
       ],
       "newlySeen": false
     },
@@ -158,10 +148,20 @@
       "newlySeen": false
     },
     {
-      "id": 1106063925,
-      "repository": "Het161/Het161",
-      "stars": 6,
+      "id": 990303192,
+      "repository": "rrainey/obliq-2",
+      "stars": 9,
       "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1368981509,
+      "repository": "peterwalker78/slipstream-desktop",
+      "stars": 7,
+      "license": "GPL-3.0",
       "signals": [
         "generative-art"
       ],
@@ -188,9 +188,9 @@
       "newlySeen": false
     },
     {
-      "id": 1125583044,
-      "repository": "segin/substrate",
-      "stars": 4,
+      "id": 1355375900,
+      "repository": "rianfalltwilight-lab/scex-sanae-ops-bot",
+      "stars": 5,
       "license": null,
       "signals": [
         "ai-generated"
@@ -198,12 +198,12 @@
       "newlySeen": false
     },
     {
-      "id": 1202177971,
-      "repository": "jstevoh/chromaglass",
+      "id": 1125583044,
+      "repository": "segin/substrate",
       "stars": 4,
       "license": null,
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -299,6 +299,7 @@
     1190257819,
     1202177971,
     1208109413,
+    1209521327,
     1211288343,
     1217888271,
     1238133915,
