@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "40881945691-1",
-  "checkedAt": "2026-10-29T13:26:37.599Z",
+  "id": "41061755779-1",
+  "checkedAt": "2026-10-30T13:15:48.966Z",
   "sourceCommit": "027bcce40e2ab32ec90edf391e96b044a531e7a3",
   "state": "completed",
   "queries": [
@@ -18,30 +18,50 @@
   ],
   "candidates": [
     {
-      "id": 1209521327,
-      "repository": "masa-san-jp/Audio-visual-analyzer",
-      "stars": 4,
-      "license": null,
+      "id": 1194821384,
+      "repository": "meodai/heerich",
+      "stars": 629,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
       "newlySeen": true
     },
     {
-      "id": 584639396,
-      "repository": "ai-collection/ai-collection",
-      "stars": 9257,
+      "id": 1276049976,
+      "repository": "enonforetsam/fluid",
+      "stars": 93,
       "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 887750740,
+      "repository": "sandner-art/ArtAgents",
+      "stars": 17,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 525592995,
+      "repository": "invoke-ai/InvokeAI",
+      "stars": 28922,
+      "license": "Apache-2.0",
       "signals": [
         "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 1338283854,
-      "repository": "chengmarc/minecraft-citygen",
-      "stars": 476,
-      "license": "Apache-2.0",
+      "id": 554771302,
+      "repository": "steven2358/awesome-generative-ai",
+      "stars": 12789,
+      "license": "CC0-1.0",
       "signals": [
         "generative-art"
       ],
@@ -58,30 +78,10 @@
       "newlySeen": false
     },
     {
-      "id": 374744219,
-      "repository": "repath-studio/repath-studio",
-      "stars": 173,
-      "license": "AGPL-3.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1138060581,
-      "repository": "eljojo/estrella",
-      "stars": 107,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1335742225,
-      "repository": "MiguelCarino/CyberCity",
-      "stars": 61,
-      "license": null,
+      "id": 1388367915,
+      "repository": "cloveric/claude-drawing-skill",
+      "stars": 78,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -91,16 +91,6 @@
       "id": 313701704,
       "repository": "8f4e/8f4e",
       "stars": 40,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1272774651,
-      "repository": "yuki4266/yuki4266",
-      "stars": 36,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -118,10 +108,20 @@
       "newlySeen": false
     },
     {
-      "id": 723372005,
-      "repository": "insomnimus/seo-garbage",
-      "stars": 19,
-      "license": null,
+      "id": 1412848801,
+      "repository": "Blank2007/DroidExtend",
+      "stars": 15,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1378012244,
+      "repository": "Vatsal057/safari-magic-extensions",
+      "stars": 13,
+      "license": "MIT",
       "signals": [
         "ai-generated"
       ],
@@ -131,16 +131,6 @@
       "id": 1154425084,
       "repository": "eremef/awaria-outage-notifier",
       "stars": 11,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1159071863,
-      "repository": "Nerahikada/chromecast-sink",
-      "stars": 10,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -158,12 +148,12 @@
       "newlySeen": false
     },
     {
-      "id": 1368981509,
-      "repository": "peterwalker78/slipstream-desktop",
-      "stars": 7,
-      "license": "GPL-3.0",
+      "id": 1366877560,
+      "repository": "statico/ttmux",
+      "stars": 9,
+      "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -188,9 +178,9 @@
       "newlySeen": false
     },
     {
-      "id": 1355375900,
-      "repository": "rianfalltwilight-lab/scex-sanae-ops-bot",
-      "stars": 5,
+      "id": 1125583044,
+      "repository": "segin/substrate",
+      "stars": 4,
       "license": null,
       "signals": [
         "ai-generated"
@@ -198,12 +188,22 @@
       "newlySeen": false
     },
     {
-      "id": 1125583044,
-      "repository": "segin/substrate",
+      "id": 1202177971,
+      "repository": "jstevoh/chromaglass",
       "stars": 4,
       "license": null,
       "signals": [
-        "ai-generated"
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1316492358,
+      "repository": "gfargo/pixelkiln",
+      "stars": 4,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
       ],
       "newlySeen": false
     },
@@ -260,6 +260,7 @@
     822443433,
     844382769,
     848514110,
+    887750740,
     890657727,
     907428019,
     955785557,
@@ -297,6 +298,7 @@
     1182901152,
     1185183114,
     1190257819,
+    1194821384,
     1202177971,
     1208109413,
     1209521327,
@@ -315,6 +317,7 @@
     1265662023,
     1272774651,
     1275327182,
+    1276049976,
     1276131924,
     1285672288,
     1288837099,
