@@ -63,3 +63,5 @@ const outsideDoor=new T.Raycaster(new T.Vector3(0,1.8,12),new T.Vector3(0,0,-1),
 const roseRay=new T.Raycaster(new T.Vector3(0,11.1,8),new T.Vector3(0,0,1),0,3);const roseHit=roseRay.intersectObjects(hybrid.root.children)[0];assert.equal(roseHit.object.material.color.getHex(),0x88bbcc,'Spawn-facing rose window sits in a real facade opening');
 let hybridDisposed=0;hybridResources.forEach(r=>r.addEventListener('dispose',()=>hybridDisposed++));hybrid.dispose();assert.equal(hybridDisposed,hybridResources.size);
 console.log(`Hybrid cathedral PASS: ${hybridTriangles} triangles, ${hybrid.root.children.length} batches, five retained paintings, five walkable aisles, doors, court, safety, flight and disposal.`);
+
+await import("./verify-cathedral-banquet.mjs");
