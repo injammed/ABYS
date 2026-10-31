@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "id": "41061755779-1",
-  "checkedAt": "2026-10-30T13:15:48.966Z",
-  "sourceCommit": "027bcce40e2ab32ec90edf391e96b044a531e7a3",
+  "id": "41203068237-1",
+  "checkedAt": "2026-10-31T12:53:14.343Z",
+  "sourceCommit": "786f3bde290d8eba40c3126df4109f4721331fac",
   "state": "completed",
   "queries": [
     {
@@ -18,9 +18,19 @@
   ],
   "candidates": [
     {
-      "id": 1194821384,
-      "repository": "meodai/heerich",
-      "stars": 629,
+      "id": 1439308037,
+      "repository": "alchaincyf/huashu-bird-sticker",
+      "stars": 332,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1439317522,
+      "repository": "kubai087/pro-threads",
+      "stars": 27,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -28,9 +38,9 @@
       "newlySeen": true
     },
     {
-      "id": 1276049976,
-      "repository": "enonforetsam/fluid",
-      "stars": 93,
+      "id": 352382800,
+      "repository": "sumy7/an-arts",
+      "stars": 7,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -38,19 +48,9 @@
       "newlySeen": true
     },
     {
-      "id": 887750740,
-      "repository": "sandner-art/ArtAgents",
-      "stars": 17,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 525592995,
-      "repository": "invoke-ai/InvokeAI",
-      "stars": 28922,
+      "id": 1381356320,
+      "repository": "alexgreensh/anidoodle",
+      "stars": 1196,
       "license": "Apache-2.0",
       "signals": [
         "generative-art"
@@ -58,19 +58,19 @@
       "newlySeen": false
     },
     {
-      "id": 554771302,
-      "repository": "steven2358/awesome-generative-ai",
-      "stars": 12789,
-      "license": "CC0-1.0",
+      "id": 1265180649,
+      "repository": "pulkitxm/claude-directory",
+      "stars": 613,
+      "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
     {
       "id": 1304174300,
       "repository": "corosolto/client",
-      "stars": 260,
+      "stars": 261,
       "license": "AGPL-3.0",
       "signals": [
         "ai-generated"
@@ -78,9 +78,19 @@
       "newlySeen": false
     },
     {
-      "id": 1388367915,
-      "repository": "cloveric/claude-drawing-skill",
-      "stars": 78,
+      "id": 371476326,
+      "repository": "golanlevin/DrawingWithMachines",
+      "stars": 159,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 86194218,
+      "repository": "noisefactorllc/noisemaker",
+      "stars": 124,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -98,29 +108,19 @@
       "newlySeen": false
     },
     {
+      "id": 1272774651,
+      "repository": "yuki4266/yuki4266",
+      "stars": 36,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1099222481,
       "repository": "MarkusNeusinger/anyplot",
       "stars": 31,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1412848801,
-      "repository": "Blank2007/DroidExtend",
-      "stars": 15,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1378012244,
-      "repository": "Vatsal057/safari-magic-extensions",
-      "stars": 13,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -198,10 +198,10 @@
       "newlySeen": false
     },
     {
-      "id": 1316492358,
-      "repository": "gfargo/pixelkiln",
+      "id": 1209521327,
+      "repository": "masa-san-jp/Audio-visual-analyzer",
       "stars": 4,
-      "license": "MIT",
+      "license": null,
       "signals": [
         "generative-art"
       ],
@@ -232,6 +232,7 @@
     308233855,
     313701704,
     342456712,
+    352382800,
     355805398,
     371476326,
     373191504,
@@ -383,6 +384,8 @@
     1420424889,
     1420437496,
     1421025526,
-    1426571704
+    1426571704,
+    1439308037,
+    1439317522
   ]
 }
