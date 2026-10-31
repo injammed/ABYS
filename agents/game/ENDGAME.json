@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "status": "reference prototype; browser integration pending",
+  "acquisition": "preview_then_select_one_vault_then_scripted_breach",
+  "scope": "one selection for entire run, not per companion",
+  "launcher": {
+    "id": "severer",
+    "name": "The Severer",
+    "mandatory": true,
+    "warheads": 1,
+    "reference": {
+      "upload_name": "9EF6A17A-CD2F-4555-8568-F3114EDB8B12.jpeg",
+      "library_file_id": "libfile_b02e51c9e0c081918c630c50a723cce4",
+      "sha256": "bfcd7ca4292330317a664b4d237b8589af1ae56cd3c5ebb8c27390c413723a36"
+    }
+  },
+  "weapons": {
+    "interrupter": {
+      "name": "The Interrupter",
+      "role": "Precision sensor denial",
+      "reference": {
+        "upload_name": "68DEE941-9D1E-421D-A560-3C7EE2DC263B(1).jpeg",
+        "library_file_id": "libfile_4c02af5663648191b9870ef7dd58a3cf",
+        "sha256": "42879dd7c7f01342aba74945eeb16b80a660b928483f0d08043662bda4d9310d"
+      }
+    },
+    "disruptor": {
+      "name": "The Disruptor",
+      "role": "Backpack-fed green arc projector",
+      "reference": {
+        "upload_name": "D235A3D4-3BDD-4B28-9CCB-BBC3DEE76D93.jpeg",
+        "library_file_id": "libfile_490b722c1b6881918e4e22ff529925ff",
+        "sha256": "56408ed72766bb316a251851adb2f1f04a9c470c8a52284fa4c82469f67c6a69"
+      }
+    },
+    "null_twins": {
+      "name": "The Null Twins",
+      "role": "Akimbo black bolts; pair counts as ONE package; 1000 bolts and 5000 RPM per gun are fictional game targets",
+      "reference": {
+        "upload_name": "FB348B12-4BE0-4693-8D66-F4F3D6DB8BFE.jpeg",
+        "library_file_id": "libfile_30547b3a551081919d9ff3ba4638c4c5",
+        "sha256": "2916e4c175a3194def4dca7fbd65898cd552a2083db1ffb7a6b178e65cc73891"
+      }
+    },
+    "white_hole": {
+      "name": "The White Hole",
+      "role": "Rectangular executioner sword; four-way guard; melee pressure",
+      "reference": {
+        "upload_name": "863BFB02-792C-4657-85E2-D0FAAC133337.jpeg",
+        "library_file_id": "libfile_68401641a2f8819184f8054a7e1f4231",
+        "sha256": "4fa793c4d9d4f557d68687d4ca7370f67217f822053fa1590292a24376997edf"
+      }
+    },
+    "stillpoint": {
+      "name": "The Stillpoint",
+      "role": "20mm single shot; fictional 20-foot-diameter localized disruption field",
+      "reference": {
+        "upload_name": "B3442BF5-5780-442F-92B1-28ED208C76EA.jpeg",
+        "library_file_id": "libfile_027f190678288191bb8eb957d19d9e2a",
+        "sha256": "90158362b11904edf7c82fb4f12dddb45a3b96a0e8c2b6b5524182fce3617a34"
+      }
+    },
+    "dissonance": {
+      "name": "The Dissonance",
+      "role": ".50 belt-fed; small local desynchronization pockets",
+      "reference": {
+        "upload_name": "1FDEE306-2E22-4BBF-8E01-6D41793FC259.jpeg",
+        "library_file_id": "libfile_52ae7cf8c1f081918dc942aea5b37149",
+        "sha256": "ba97ba26d7f50e5c04cb20c201b0e7e9b36004120e83a2fc052943d1ddf7e93f"
+      }
+    },
+    "discord": {
+      "name": "The Discord",
+      "role": "Double separate flared barrels; close-range resonance and knockback; ivory/gold original aesthetic",
+      "reference": {
+        "upload_name": "DB26A683-FC6B-4390-AB96-CC0260239D29.jpeg",
+        "library_file_id": "libfile_0ef253075a1081918a1361f5d635f066",
+        "sha256": "14cb09c93f6f6a168d1244b109d1583608ec6cbfd6fac18b37c2025533704480"
+      }
+    }
+  },
+  "rules": [
+    "Every vault choice also opens the launcher compartment atomically.",
+    "Preview freely; commit explicitly. Exactly one scripted breach interaction, no free-position explosive simulation.",
+    "No currency requirement or mandatory purchase; no real-world explosive placement instructions.",
+    "Optional weapons create readable approach/control openings; no option replaces the unique core shot.",
+    "AETIMM and APY0C are the only agent identities. NPC armorer is deterministic game logic.",
+    "Host must save selected package and consumed charge BEFORE animation; interrupted breach restores same result.",
+    "Host must save warhead spent BEFORE projectile launch; interrupted shot never refunds ammo.",
+    "Miss or failed core opportunity: SI wins, player spared, squad health unchanged, clock continues.",
+    "Core hit records a hit; subsequent victory and Heaven/Hell routing require campaign logic, not automatic assumptions.",
+    "Theological endpoint names are provisional; original/polytheistic interpretation is permitted.",
+    "Existing signature weapons remain character-bound; endgame auxiliaries replace scavenged slot. Only selected anti-NSIE package can be active in encounter. No second package via sidekicks, loot, merchant or reload.",
+    "Resource depletion never grants another package; retain existing drop/pickup rules for the SAME physical item without refill.",
+    "No implicit leaderboard verification: trusted persistence, run IDs, event ordering and replay protection still need host implementation."
+  ]
+}
