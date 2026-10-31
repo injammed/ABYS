@@ -3,14 +3,33 @@ on:
   push:
     branches: [main]
     paths: ['apps/aetimm-writer/**', 'apps/item-web/public/writer/**', '.github/workflows/writer-desktop.yml']
+  pull_request:
+    paths: ['apps/aetimm-writer/**', 'apps/item-web/public/writer/**', '.github/workflows/writer-desktop.yml']
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: writer-desktop
+  group: writer-desktop-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  editor-smoke:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/aetimm-writer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run check && npm test && npm run prepare-editor
+      - run: xvfb-run -a npm run smoke -- --no-sandbox
+      - name: Verify Word symbols and XML
+        run: python -c "import zipfile,xml.etree.ElementTree as E; z=zipfile.ZipFile('smoke-output.docx'); assert z.testzip() is None; [E.fromstring(z.read(n)) for n in z.namelist() if n.endswith(('.xml', '.rels'))]; assert len([n for n in z.namelist() if n.endswith('.png')]) == 2; print('Word images / XML / CRC PASS')"
   package:
+    if: github.event_name != 'pull_request'
+    needs: editor-smoke
     strategy:
       fail-fast: false
       matrix:
@@ -35,12 +54,6 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run check && npm test && npm run prepare-editor
-      - name: Real Chromium writing smoke test
-        if: runner.os == 'Linux'
-        run: xvfb-run -a npm run smoke -- --no-sandbox
-      - name: Verify generated Word document
-        if: runner.os == 'Linux'
-        run: python -c "import zipfile,xml.etree.ElementTree as E; z=zipfile.ZipFile('smoke-output.docx'); assert z.testzip() is None; [E.fromstring(z.read(n)) for n in z.namelist()]; print('Word XML / CRC validation PASS')"
       - name: Build installable desktop app
         run: npm run dist -- ${{ matrix.target }}
         env:
