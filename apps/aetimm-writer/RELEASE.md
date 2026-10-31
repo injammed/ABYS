@@ -7,3 +7,5 @@ This early release has unsigned Windows installers and ad hoc signed, non-notari
 Word export includes basic paragraph, font, size, bold/italic/underline and list-text formatting. DOCX import, collaboration and cloud sync are not included. System fonts must be installed locally. Manuscript files are limited to 25 MB. No manuscripts are transmitted to AETIMM or an AI service.
 
 Renamed from AETIMM Writer in 0.1.3. Existing .aetimm manuscripts, browser drafts and desktop recovery files remain compatible; the original desktop profile and app identifier are retained.
+
+New in 0.1.4: ten original ornate punctuation marks. Use Ornate marks to insert a raised single mark or a pair around selected words. Manuscripts, formatted HTML, printing/PDF and Word exports preserve the symbols; plain text substitutes curly quotation marks. Reinstall the new desktop version to receive this feature.
