@@ -3,7 +3,7 @@
  const active=()=>book.chapters.find(c=>c.id===book.active)||book.chapters[0];
  const message=s=>{$('save-state').textContent=s;};
  function snapshot(){active().html=C.sanitize(editor.innerHTML,document);book.title=$('project-title').value.trim()||'Untitled novel';active().title=$('chapter-title').value.trim()||'Untitled chapter';book.updated=new Date().toISOString();return JSON.stringify(book);}
- function counts(){snapshot();const total=book.chapters.reduce((n,c)=>n+C.words(C.text(c.html,document)),0);$('count').textContent=C.words(editor.innerText)+' chapter words · '+total.toLocaleString()+' manuscript words';$('selection-count').textContent=window.getSelection()?.toString()?C.words(window.getSelection().toString())+' selected':'';}
+ function counts(){snapshot();const total=book.chapters.reduce((n,c)=>n+C.words(C.text(c.html,document,false)),0);$('count').textContent=C.words(editor.innerText)+' chapter words · '+total.toLocaleString()+' manuscript words';$('selection-count').textContent=window.getSelection()?.toString()?C.words(window.getSelection().toString())+' selected':'';}
  function normalizeSize(){for(const f of editor.querySelectorAll('font[size="7"]')){f.removeAttribute('size');f.style.fontSize=$('size').value+'pt';}}
  async function persist(){clearTimeout(timer);const raw=snapshot(),seq=++saveSequence;try{if(native)await native.saveDraft(raw);else localStorage.setItem(KEY,raw);if(seq===saveSequence){dirty=false;message('Recovery saved · '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));}return true;}catch{message('Recovery save failed — use File → Save manuscript.');return false;}}
  function changed(){normalizeSize();dirty=true;counts();message('Saving recovery…');clearTimeout(timer);timer=setTimeout(persist,400);}
@@ -11,7 +11,7 @@
  function focusRange(){editor.focus();const s=window.getSelection();if(range&&editor.contains(range.startContainer)){s.removeAllRanges();s.addRange(range);}}
  function command(name,value=null){focusRange();let ok=false;try{ok=document.execCommand(name,false,value);}catch{}if(!ok)message('This command is unavailable here. Try its keyboard shortcut.');else {remember();changed();}return ok;}
  function render(){range=null;editor.innerHTML=active().html;$('project-title').value=book.title;$('chapter-title').value=active().title;renderChapters();counts();}
- function renderChapters(){const list=$('chapters');list.replaceChildren();for(const c of book.chapters){const li=document.createElement('li'),b=document.createElement('button'),label=document.createElement('span'),count=document.createElement('small');label.textContent=c.title;count.textContent=C.words(C.text(c.html,document)).toLocaleString()+' words';b.append(label,count);b.setAttribute('aria-current',String(c.id===book.active));b.onclick=()=>{snapshot();book.active=c.id;render();changed();editor.focus();};li.appendChild(b);list.appendChild(li);}$('delete-chapter').disabled=book.chapters.length===1;const index=book.chapters.findIndex(c=>c.id===book.active);$('chapter-up').disabled=index===0;$('chapter-down').disabled=index===book.chapters.length-1;}
+ function renderChapters(){const list=$('chapters');list.replaceChildren();for(const c of book.chapters){const li=document.createElement('li'),b=document.createElement('button'),label=document.createElement('span'),count=document.createElement('small');label.textContent=c.title;count.textContent=C.words(C.text(c.html,document,false)).toLocaleString()+' words';b.append(label,count);b.setAttribute('aria-current',String(c.id===book.active));b.onclick=()=>{snapshot();book.active=c.id;render();changed();editor.focus();};li.appendChild(b);list.appendChild(li);}$('delete-chapter').disabled=book.chapters.length===1;const index=book.chapters.findIndex(c=>c.id===book.active);$('chapter-up').disabled=index===0;$('chapter-down').disabled=index===book.chapters.length-1;}
  async function backup(){const raw=snapshot();try{if(native)await native.backup(raw);else localStorage.setItem(PREVIOUS,raw);}catch{throw Error('Could not preserve the previous manuscript. Save it to a file first.');}}
  async function loadProject(content,name){let next;if(/\.txt$/i.test(name))next={...C.fresh(),title:name.replace(/\.txt$/i,''),chapters:[{id:'chapter-1',title:'Chapter 1',html:content.split(/\r?\n/).map(line=>'<p>'+C.escape(line||'')+'</p>').join('')}]};else if(/\.html?$/i.test(name)){next=C.fresh();next.title=name.replace(/\.html?$/i,'');next.chapters[0].html=C.sanitize(content,document);}else next=C.restore(content,document);if(!confirm('Open this manuscript? The current one will be kept as the previous recovery copy.'))return;await backup();if(native)await native.acceptOpen();book=next;render();changed();}
  async function saveFile(kind,saveAs=false){snapshot();const base=C.filename(book.title),format=kind==='save'?'aetimm':kind;let content;if(format==='aetimm')content=JSON.stringify(book,null,2);else if(format==='text')content=book.title+'\n\n'+book.chapters.map(c=>c.title+'\n\n'+C.text(c.html,document)).join('\n\n');else if(format==='html')content=C.bookHTML(book,document);else content=Array.from(C.docx(book,document));const extension=format==='text'?'txt':format,name=base+'.'+extension;
@@ -33,6 +33,22 @@
   if(action==='print'){snapshot();const temp=document.createElement('html');temp.innerHTML=C.bookHTML(book,document);$('print-book').innerHTML=temp.querySelector('body')?.innerHTML||'';if(native)await native.print();else window.print();}
   if(action==='close'){const saved=await persist();if(saved||confirm('Recovery could not be saved. Close anyway?'))await native.finishClose();}
  }catch(error){message(error.message||'This operation could not complete.');}}
+ $('open-glyphs').onmousedown=remember;
+ $('open-glyphs').onclick=()=>{remember();$('glyph-dialog').showModal();};
+ function setSpeaker(id){
+  $('glyph-dialog').close();focusRange();let node=window.getSelection()?.anchorNode;
+  const paragraphOf=n=>(n?.nodeType===3?n.parentElement:n)?.closest('p');let paragraph=paragraphOf(node);
+  if(!paragraph||!editor.contains(paragraph)){if(!id){message('No dialogue speaker here.');return;}command('formatBlock','p');paragraph=paragraphOf(window.getSelection()?.anchorNode);}
+  if(!paragraph||!editor.contains(paragraph)){message('Place the cursor inside a dialogue paragraph first.');return;}
+  const copy=paragraph.cloneNode(true);for(const icon of copy.querySelectorAll('[data-speaker-icon]'))icon.remove();
+  if(id)copy.dataset.vnnovaSpeaker=id;else {delete copy.dataset.vnnovaSpeaker;copy.style.removeProperty('padding-left');copy.style.removeProperty('text-indent');}
+  range=document.createRange();range.selectNode(paragraph);command('insertHTML',C.sanitize(copy.outerHTML,document));
+ }
+ for(const glyph of window.WriterGlyphs.glyphs){
+  const b=document.createElement('button'),img=document.createElement('img'),label=document.createElement('span');b.type='button';img.src='data:image/png;base64,'+glyph.png;img.alt='';label.textContent=glyph.name;b.append(img,label);b.title=glyph.description;b.setAttribute('aria-label','Insert '+glyph.name+' character');
+  b.onclick=()=>{if($('glyph-mode').value==='dialogue')setSpeaker(glyph.id);else {$('glyph-dialog').close();command('insertHTML',window.WriterGlyphs.html(glyph.id));}};$('glyph-grid').appendChild(b);
+ }
+ $('remove-speaker').onclick=()=>setSpeaker(null);
  $('open-symbols').onmousedown=remember;
  $('open-symbols').onclick=()=>{remember();$('symbol-dialog').showModal();};
  for(const mark of window.WriterSymbols.marks){
