@@ -19,7 +19,7 @@
    for(const prop of ['color','backgroundColor'])if(/^(#[a-f\d]{3,8}|rgba?\([\d.,%\s]+\)|[a-z]+)$/i.test(st[prop]))e.style[prop]=st[prop];
    if(['1','1.2','1.5','1.7','2'].includes(st.lineHeight))e.style.lineHeight=st.lineHeight;
    for(const child of node.childNodes)visit(child,e);
-   const speaker=node.tagName==='P'?Glyphs.get(node.getAttribute('data-vnnova-speaker')):null;
+   const speaker=node.tagName==='P'&&Array.from(node.children).some(c=>c.tagName==='IMG'&&c.hasAttribute('data-speaker-icon')&&c.dataset.vnnovaGlyph===node.dataset.vnnovaSpeaker)?Glyphs.get(node.getAttribute('data-vnnova-speaker')):null;
    if(speaker){e.dataset.vnnovaSpeaker=speaker.id;e.style.paddingLeft='1.6em';e.style.textIndent='-1.6em';e.insertAdjacentHTML('afterbegin',Glyphs.html(speaker.id));const icon=e.firstChild;icon.dataset.speakerIcon='true';icon.style.marginRight='.6em';}
    parent.appendChild(e);
   }for(const child of source.content.childNodes)visit(child,out);return out.innerHTML||'<p><br></p>';

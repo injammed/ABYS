@@ -11,3 +11,5 @@ Renamed from AETIMM Writer in 0.1.3. Existing .aetimm manuscripts, browser draft
 New in 0.1.4: ten original ornate punctuation marks. Use Ornate marks to insert a raised single mark or a pair around selected words. Manuscripts, formatted HTML, printing/PDF and Word exports preserve the symbols; plain text substitutes curly quotation marks. Reinstall the new desktop version to receive this feature.
 
 New in 0.1.5: Character glyphs adds Topknot and Eyestalk from the reference plus eight invented speaker marks. Insert a one-em inline glyph or attach a speaker to a dialogue paragraph with hanging alignment. Glyphs persist through manuscript save/recovery, HTML, print/PDF and DOCX; plain text uses descriptive names.
+
+The main toolbar now has visible Undo and Redo. Quick Delete chapter, Remove speaker and Clear format controls are absent; ordinary text editing, the Edit menu and keyboard shortcuts remain available.
