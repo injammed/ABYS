@@ -26,7 +26,7 @@ jobs:
       - run: npm run check && npm test && npm run prepare-editor
       - run: xvfb-run -a npm run smoke -- --no-sandbox
       - name: Verify Word symbols and XML
-        run: python -c "import zipfile,xml.etree.ElementTree as E; z=zipfile.ZipFile('smoke-output.docx'); assert z.testzip() is None; [E.fromstring(z.read(n)) for n in z.namelist() if n.endswith(('.xml', '.rels'))]; assert len([n for n in z.namelist() if n.endswith('.png')]) == 2; print('Word images / XML / CRC PASS')"
+        run: python -c "import zipfile,xml.etree.ElementTree as E; z=zipfile.ZipFile('smoke-output.docx'); assert z.testzip() is None; [E.fromstring(z.read(n)) for n in z.namelist() if n.endswith(('.xml', '.rels'))]; assert len([n for n in z.namelist() if n.endswith('.png')]) == 3; print('Word images / XML / CRC PASS')"
   package:
     if: github.event_name != 'pull_request'
     needs: editor-smoke

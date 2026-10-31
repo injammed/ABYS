@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 const directory = resolve('out/writer');
 const index = resolve(directory, 'index.html');
 let html = readFileSync(index, 'utf8');
-for (const name of ['writer.css', 'symbols.js', 'core.js', 'writer.js']) {
+for (const name of ['writer.css', 'symbols.js', 'glyphs.js', 'core.js', 'writer.js']) {
   const source = resolve(directory, name);
   const digest = createHash('sha256').update(readFileSync(source)).digest('hex').slice(0, 16);
   const dot = name.lastIndexOf('.');
