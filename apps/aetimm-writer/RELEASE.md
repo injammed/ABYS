@@ -1,3 +1,7 @@
+## 0.1.6 — Summers handwriting font
+
+Adds the original Summers typeface, based on the supplied handwriting sample, to the font menu. Bundled offline in desktop and web, embedded in HTML and Word exports. Includes uppercase, lowercase, digits, punctuation and Latin accents.
+
 vnnova — a writing studio by AETIMM — is an offline desktop novel-writing app: File/Edit menus, fonts and sizes, rich text, named chapters, word counts, find/replace, recovery autosaves, native open/save dialogs, Word (.docx), plain-text and HTML exports, and printing/PDF.
 
 Download the file for your laptop. Windows: run the .exe installer. Mac: open the matching .dmg and drag vnnova to Applications. Linux: make the AppImage executable and open it.
