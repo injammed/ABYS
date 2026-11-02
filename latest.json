@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "41312326466-1",
-  "checkedAt": "2026-11-01T13:39:46.040Z",
+  "id": "41480914767-1",
+  "checkedAt": "2026-11-02T16:23:13.450Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,69 +18,29 @@
   ],
   "candidates": [
     {
-      "id": 1428345942,
-      "repository": "Ryder191/haloflux",
-      "stars": 345,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1371857104,
-      "repository": "shadowofze/OfflineDAoC",
-      "stars": 50,
-      "license": "GPL-3.0",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 412465570,
-      "repository": "Eugene-Y/bit_murals",
+      "id": 1186987372,
+      "repository": "kekel87/pokemon-tactics",
       "stars": 4,
       "license": null,
       "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1069848521,
-      "repository": "ToledoEM/stlshaper",
-      "stars": 3,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 44663250,
-      "repository": "generative-design/Code-Package-p5.js",
-      "stars": 1020,
-      "license": "Apache-2.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1265180649,
-      "repository": "pulkitxm/claude-directory",
-      "stars": 615,
-      "license": "MIT",
-      "signals": [
         "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 81895167,
+      "repository": "css-doodle/css-doodle",
+      "stars": 6076,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
       ],
       "newlySeen": false
     },
     {
       "id": 1439308037,
       "repository": "alchaincyf/huashu-bird-sticker",
-      "stars": 460,
+      "stars": 563,
       "license": null,
       "signals": [
         "ai-generated"
@@ -88,20 +48,10 @@
       "newlySeen": false
     },
     {
-      "id": 1304174300,
-      "repository": "corosolto/client",
-      "stars": 262,
-      "license": "AGPL-3.0",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 374744219,
-      "repository": "repath-studio/repath-studio",
-      "stars": 173,
-      "license": "AGPL-3.0",
+      "id": 151634693,
+      "repository": "openrndr/orx",
+      "stars": 140,
+      "license": "BSD-2-Clause",
       "signals": [
         "generative-art"
       ],
@@ -118,19 +68,49 @@
       "newlySeen": false
     },
     {
-      "id": 313701704,
-      "repository": "8f4e/8f4e",
-      "stars": 40,
-      "license": "MIT",
+      "id": 1388327805,
+      "repository": "jbang2004/long-wind",
+      "stars": 112,
+      "license": null,
       "signals": [
-        "generative-art"
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1105562494,
+      "repository": "levz0r/awesome-vibecoded-apps",
+      "stars": 50,
+      "license": "CC0-1.0",
+      "signals": [
+        "ai-generated"
       ],
       "newlySeen": false
     },
     {
       "id": 1099222481,
       "repository": "MarkusNeusinger/anyplot",
-      "stars": 31,
+      "stars": 32,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 411390376,
+      "repository": "Divetoxx/Mandelbrot-2",
+      "stars": 17,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1412848801,
+      "repository": "Blank2007/DroidExtend",
+      "stars": 16,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -148,22 +128,12 @@
       "newlySeen": false
     },
     {
-      "id": 1366877560,
-      "repository": "statico/ttmux",
-      "stars": 9,
+      "id": 1018706685,
+      "repository": "Eoic/ASCIIGround",
+      "stars": 11,
       "license": "MIT",
       "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1319678904,
-      "repository": "statico/nethack-tiles-client",
-      "stars": 8,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": false
     },
@@ -188,6 +158,16 @@
       "newlySeen": false
     },
     {
+      "id": 412465570,
+      "repository": "Eugene-Y/bit_murals",
+      "stars": 4,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1125583044,
       "repository": "segin/substrate",
       "stars": 4,
@@ -198,10 +178,30 @@
       "newlySeen": false
     },
     {
-      "id": 1202177971,
-      "repository": "jstevoh/chromaglass",
+      "id": 1152251368,
+      "repository": "TrebuchetDynamics/flutter-fractal-forge",
       "stars": 4,
+      "license": "Apache-2.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1127801500,
+      "repository": "akaihola/skills-akaihola",
+      "stars": 3,
       "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1144076205,
+      "repository": "ariaxhan/substrate",
+      "stars": 3,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -300,6 +300,7 @@
     1177292696,
     1182901152,
     1185183114,
+    1186987372,
     1190257819,
     1194821384,
     1202177971,
