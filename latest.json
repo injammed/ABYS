@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "41480914767-1",
-  "checkedAt": "2026-11-02T16:23:13.450Z",
+  "id": "41654265594-1",
+  "checkedAt": "2026-11-03T14:30:06.759Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,62 +18,52 @@
   ],
   "candidates": [
     {
-      "id": 1186987372,
-      "repository": "kekel87/pokemon-tactics",
-      "stars": 4,
-      "license": null,
+      "id": 1403870583,
+      "repository": "AR13X3/halation",
+      "stars": 7,
+      "license": "AGPL-3.0",
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": true
     },
     {
-      "id": 81895167,
-      "repository": "css-doodle/css-doodle",
-      "stars": 6076,
-      "license": "MIT",
+      "id": 1438497396,
+      "repository": "g1lg1l/velo",
+      "stars": 4,
+      "license": "Apache-2.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 525592995,
+      "repository": "invoke-ai/InvokeAI",
+      "stars": 28971,
+      "license": "Apache-2.0",
       "signals": [
         "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 1439308037,
-      "repository": "alchaincyf/huashu-bird-sticker",
-      "stars": 563,
-      "license": null,
+      "id": 1304174300,
+      "repository": "corosolto/client",
+      "stars": 263,
+      "license": "AGPL-3.0",
       "signals": [
         "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 151634693,
-      "repository": "openrndr/orx",
-      "stars": 140,
-      "license": "BSD-2-Clause",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 86194218,
-      "repository": "noisefactorllc/noisemaker",
-      "stars": 124,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1388327805,
-      "repository": "jbang2004/long-wind",
-      "stars": 112,
+      "id": 116062718,
+      "repository": "villares/sketch-a-day",
+      "stars": 260,
       "license": null,
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": false
     },
@@ -88,6 +78,16 @@
       "newlySeen": false
     },
     {
+      "id": 313701704,
+      "repository": "8f4e/8f4e",
+      "stars": 40,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1099222481,
       "repository": "MarkusNeusinger/anyplot",
       "stars": 32,
@@ -98,19 +98,9 @@
       "newlySeen": false
     },
     {
-      "id": 411390376,
-      "repository": "Divetoxx/Mandelbrot-2",
-      "stars": 17,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1412848801,
       "repository": "Blank2007/DroidExtend",
-      "stars": 16,
+      "stars": 18,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -128,9 +118,39 @@
       "newlySeen": false
     },
     {
-      "id": 1018706685,
-      "repository": "Eoic/ASCIIGround",
+      "id": 1341904886,
+      "repository": "kiaquila/ember",
       "stars": 11,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1356357822,
+      "repository": "kiaquila/fathom",
+      "stars": 11,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 990303192,
+      "repository": "rrainey/obliq-2",
+      "stars": 9,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1053323829,
+      "repository": "Rikiya89/glsl_daily_practice",
+      "stars": 7,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -158,16 +178,6 @@
       "newlySeen": false
     },
     {
-      "id": 412465570,
-      "repository": "Eugene-Y/bit_murals",
-      "stars": 4,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1125583044,
       "repository": "segin/substrate",
       "stars": 4,
@@ -178,12 +188,12 @@
       "newlySeen": false
     },
     {
-      "id": 1152251368,
-      "repository": "TrebuchetDynamics/flutter-fractal-forge",
+      "id": 1186987372,
+      "repository": "kekel87/pokemon-tactics",
       "stars": 4,
-      "license": "Apache-2.0",
+      "license": null,
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -194,16 +204,6 @@
       "license": null,
       "signals": [
         "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1144076205,
-      "repository": "ariaxhan/substrate",
-      "stars": 3,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
       ],
       "newlySeen": false
     },
@@ -369,6 +369,7 @@
     1395436657,
     1398313770,
     1398674085,
+    1403870583,
     1404086905,
     1406759710,
     1407569742,
@@ -390,6 +391,7 @@
     1421025526,
     1426571704,
     1428345942,
+    1438497396,
     1439308037,
     1439317522
   ]
