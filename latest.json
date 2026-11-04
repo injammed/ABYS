@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "41654265594-1",
-  "checkedAt": "2026-11-03T14:30:06.759Z",
+  "id": "41850633959-1",
+  "checkedAt": "2026-11-04T14:44:55.327Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,32 +18,62 @@
   ],
   "candidates": [
     {
-      "id": 1403870583,
-      "repository": "AR13X3/halation",
-      "stars": 7,
+      "id": 1439430391,
+      "repository": "kevinraymond/florilegium",
+      "stars": 1422,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 253780109,
+      "repository": "baku89/glisp",
+      "stars": 1186,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1429189599,
+      "repository": "weswalz/ULTIMATEVJ-releases",
+      "stars": 25,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1431285431,
+      "repository": "Mcp20091/kindle-koreader-apps",
+      "stars": 4,
       "license": "AGPL-3.0",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": true
     },
     {
-      "id": 1438497396,
-      "repository": "g1lg1l/velo",
-      "stars": 4,
-      "license": "Apache-2.0",
+      "id": 125893,
+      "repository": "nodebox/nodebox",
+      "stars": 792,
+      "license": "GPL-2.0",
       "signals": [
         "generative-art"
       ],
-      "newlySeen": true
+      "newlySeen": false
     },
     {
-      "id": 525592995,
-      "repository": "invoke-ai/InvokeAI",
-      "stars": 28971,
-      "license": "Apache-2.0",
+      "id": 1439308037,
+      "repository": "alchaincyf/huashu-bird-sticker",
+      "stars": 646,
+      "license": null,
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -58,22 +88,12 @@
       "newlySeen": false
     },
     {
-      "id": 116062718,
-      "repository": "villares/sketch-a-day",
-      "stars": 260,
-      "license": null,
+      "id": 374744219,
+      "repository": "repath-studio/repath-studio",
+      "stars": 173,
+      "license": "AGPL-3.0",
       "signals": [
         "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1105562494,
-      "repository": "levz0r/awesome-vibecoded-apps",
-      "stars": 50,
-      "license": "CC0-1.0",
-      "signals": [
-        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -90,17 +110,7 @@
     {
       "id": 1099222481,
       "repository": "MarkusNeusinger/anyplot",
-      "stars": 32,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1412848801,
-      "repository": "Blank2007/DroidExtend",
-      "stars": 18,
+      "stars": 31,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -118,22 +128,22 @@
       "newlySeen": false
     },
     {
-      "id": 1341904886,
-      "repository": "kiaquila/ember",
-      "stars": 11,
+      "id": 1378012244,
+      "repository": "Vatsal057/safari-magic-extensions",
+      "stars": 13,
       "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 1356357822,
-      "repository": "kiaquila/fathom",
+      "id": 1154425084,
+      "repository": "eremef/awaria-outage-notifier",
       "stars": 11,
       "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -148,8 +158,8 @@
       "newlySeen": false
     },
     {
-      "id": 1053323829,
-      "repository": "Rikiya89/glsl_daily_practice",
+      "id": 1415752723,
+      "repository": "shaderera/shaderera",
       "stars": 7,
       "license": "MIT",
       "signals": [
@@ -164,16 +174,6 @@
       "license": null,
       "signals": [
         "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1314017928,
-      "repository": "provemark/content-credentials",
-      "stars": 5,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -198,12 +198,12 @@
       "newlySeen": false
     },
     {
-      "id": 1127801500,
-      "repository": "akaihola/skills-akaihola",
-      "stars": 3,
-      "license": null,
+      "id": 1217888271,
+      "repository": "sorny/erzberg",
+      "stars": 4,
+      "license": "MIT",
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": false
     },
@@ -229,6 +229,7 @@
     151634693,
     215842938,
     238487904,
+    253780109,
     308233855,
     313701704,
     342456712,
@@ -391,8 +392,11 @@
     1421025526,
     1426571704,
     1428345942,
+    1429189599,
+    1431285431,
     1438497396,
     1439308037,
-    1439317522
+    1439317522,
+    1439430391
   ]
 }
