@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "41850633959-1",
-  "checkedAt": "2026-11-04T14:44:55.327Z",
+  "id": "42048842987-1",
+  "checkedAt": "2026-11-05T14:50:15.339Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,9 +18,9 @@
   ],
   "candidates": [
     {
-      "id": 1439430391,
-      "repository": "kevinraymond/florilegium",
-      "stars": 1422,
+      "id": 1249530755,
+      "repository": "Pantani/tdmcp",
+      "stars": 58,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -28,9 +28,9 @@
       "newlySeen": true
     },
     {
-      "id": 253780109,
-      "repository": "baku89/glisp",
-      "stars": 1186,
+      "id": 1446745577,
+      "repository": "kaan0d/glyphworks",
+      "stars": 3,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -38,30 +38,10 @@
       "newlySeen": true
     },
     {
-      "id": 1429189599,
-      "repository": "weswalz/ULTIMATEVJ-releases",
-      "stars": 25,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1431285431,
-      "repository": "Mcp20091/kindle-koreader-apps",
-      "stars": 4,
-      "license": "AGPL-3.0",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 125893,
-      "repository": "nodebox/nodebox",
-      "stars": 792,
-      "license": "GPL-2.0",
+      "id": 525592995,
+      "repository": "invoke-ai/InvokeAI",
+      "stars": 28993,
+      "license": "Apache-2.0",
       "signals": [
         "generative-art"
       ],
@@ -70,7 +50,7 @@
     {
       "id": 1439308037,
       "repository": "alchaincyf/huashu-bird-sticker",
-      "stars": 646,
+      "stars": 668,
       "license": null,
       "signals": [
         "ai-generated"
@@ -88,10 +68,20 @@
       "newlySeen": false
     },
     {
-      "id": 374744219,
-      "repository": "repath-studio/repath-studio",
-      "stars": 173,
-      "license": "AGPL-3.0",
+      "id": 800083050,
+      "repository": "liamdugan/raid",
+      "stars": 224,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1138060581,
+      "repository": "eljojo/estrella",
+      "stars": 107,
+      "license": null,
       "signals": [
         "generative-art"
       ],
@@ -128,16 +118,6 @@
       "newlySeen": false
     },
     {
-      "id": 1378012244,
-      "repository": "Vatsal057/safari-magic-extensions",
-      "stars": 13,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1154425084,
       "repository": "eremef/awaria-outage-notifier",
       "stars": 11,
@@ -150,7 +130,7 @@
     {
       "id": 990303192,
       "repository": "rrainey/obliq-2",
-      "stars": 9,
+      "stars": 10,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -178,6 +158,16 @@
       "newlySeen": false
     },
     {
+      "id": 1058699349,
+      "repository": "benckx/european-city-simulation",
+      "stars": 4,
+      "license": "LGPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1125583044,
       "repository": "segin/substrate",
       "stars": 4,
@@ -198,12 +188,22 @@
       "newlySeen": false
     },
     {
-      "id": 1217888271,
-      "repository": "sorny/erzberg",
+      "id": 1438497396,
+      "repository": "g1lg1l/velo",
       "stars": 4,
-      "license": "MIT",
+      "license": "Apache-2.0",
       "signals": [
         "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1332856174,
+      "repository": "BobClawblaw/bitcoinmachinecode",
+      "stars": 3,
+      "license": "Apache-2.0",
+      "signals": [
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -315,6 +315,7 @@
     1243928948,
     1244552481,
     1245060445,
+    1249530755,
     1253379199,
     1256196157,
     1262901708,
@@ -397,6 +398,7 @@
     1438497396,
     1439308037,
     1439317522,
-    1439430391
+    1439430391,
+    1446745577
   ]
 }
