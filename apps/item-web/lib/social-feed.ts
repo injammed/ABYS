@@ -213,9 +213,13 @@ export async function loadPublicFeedPage(options: {
     ids.length > 0 ? client.rpc("get_artifact_slop_ranks", { p_artifact_ids: ids }) : Promise.resolve({ data: [], error: null }),
   ]);
 
-  if (judgmentResult.error) throw judgmentResult.error;
-  for (const judgment of (judgmentResult.data ?? []) as BinaryJudgmentRow[]) {
-    judgmentsByArtifact.set(judgment.artifact_id, judgment);
+  // Judgment metadata is additive. A transient aggregate outage must not erase
+  // otherwise healthy public Artifact rows and runtimes from the Trough. Exact
+  // totals converge later through the visible-card aggregate refresh.
+  if (!judgmentResult.error) {
+    for (const judgment of (judgmentResult.data ?? []) as BinaryJudgmentRow[]) {
+      judgmentsByArtifact.set(judgment.artifact_id, judgment);
+    }
   }
 
   // Rank is additive display metadata. If ranking temporarily fails, the
@@ -256,8 +260,8 @@ export async function loadPublicFeedPage(options: {
       gradient: laneGradients[row.lane],
       mediaUrl: mediaByArtifact.get(row.id),
       parts: partsByArtifact.get(row.id) ?? [],
-      museumVotes: judgments ? Number(judgments.museum_count) : 0,
-      slopVotes: judgments ? Number(judgments.slop_count) : 0,
+      museumVotes: judgments ? Number(judgments.museum_count) : undefined,
+      slopVotes: judgments ? Number(judgments.slop_count) : undefined,
       slopRank: slopRank ? Number(slopRank.slop_rank) : undefined,
       publishedAt: row.published_at,
       visibility: "public",
