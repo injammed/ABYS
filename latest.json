@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "42048842987-1",
-  "checkedAt": "2026-11-05T14:50:15.339Z",
+  "id": "42234175614-1",
+  "checkedAt": "2026-11-06T14:28:17.205Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,30 +18,40 @@
   ],
   "candidates": [
     {
-      "id": 1249530755,
-      "repository": "Pantani/tdmcp",
-      "stars": 58,
+      "id": 1383631049,
+      "repository": "IGUNUBLUE/lerdr-rust-kotlin",
+      "stars": 4,
       "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": true
     },
     {
-      "id": 1446745577,
-      "repository": "kaan0d/glyphworks",
+      "id": 1440649053,
+      "repository": "shadowofze/OfflineDAoC-True165",
+      "stars": 4,
+      "license": "GPL-3.0",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1391100311,
+      "repository": "VincentBounce/Tessera",
       "stars": 3,
-      "license": "MIT",
+      "license": null,
       "signals": [
         "generative-art"
       ],
       "newlySeen": true
     },
     {
-      "id": 525592995,
-      "repository": "invoke-ai/InvokeAI",
-      "stars": 28993,
-      "license": "Apache-2.0",
+      "id": 1439430391,
+      "repository": "kevinraymond/florilegium",
+      "stars": 1534,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -50,7 +60,7 @@
     {
       "id": 1439308037,
       "repository": "alchaincyf/huashu-bird-sticker",
-      "stars": 668,
+      "stars": 694,
       "license": null,
       "signals": [
         "ai-generated"
@@ -78,10 +88,20 @@
       "newlySeen": false
     },
     {
-      "id": 1138060581,
-      "repository": "eljojo/estrella",
-      "stars": 107,
-      "license": null,
+      "id": 374744219,
+      "repository": "repath-studio/repath-studio",
+      "stars": 173,
+      "license": "AGPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 530687417,
+      "repository": "trebeljahr/fractal-garden",
+      "stars": 163,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -118,6 +138,16 @@
       "newlySeen": false
     },
     {
+      "id": 1185183114,
+      "repository": "imweb-project/ImWeb",
+      "stars": 12,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1154425084,
       "repository": "eremef/awaria-outage-notifier",
       "stars": 11,
@@ -128,40 +158,10 @@
       "newlySeen": false
     },
     {
-      "id": 990303192,
-      "repository": "rrainey/obliq-2",
-      "stars": 10,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1415752723,
-      "repository": "shaderera/shaderera",
-      "stars": 7,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1182901152,
       "repository": "juliosuas/ai-garden",
       "stars": 5,
       "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1058699349,
-      "repository": "benckx/european-city-simulation",
-      "stars": 4,
-      "license": "LGPL-3.0",
       "signals": [
         "generative-art"
       ],
@@ -178,20 +178,20 @@
       "newlySeen": false
     },
     {
-      "id": 1186987372,
-      "repository": "kekel87/pokemon-tactics",
+      "id": 1217888271,
+      "repository": "sorny/erzberg",
       "stars": 4,
-      "license": null,
+      "license": "MIT",
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 1438497396,
-      "repository": "g1lg1l/velo",
-      "stars": 4,
-      "license": "Apache-2.0",
+      "id": 1173458372,
+      "repository": "aljazfrancic/generative-art-gallery",
+      "stars": 3,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -359,6 +359,7 @@
     1382053746,
     1382304020,
     1383156569,
+    1383631049,
     1384845766,
     1386555049,
     1387038169,
@@ -366,6 +367,7 @@
     1387344556,
     1388327805,
     1388367915,
+    1391100311,
     1393034919,
     1394103683,
     1395436657,
@@ -399,6 +401,7 @@
     1439308037,
     1439317522,
     1439430391,
+    1440649053,
     1446745577
   ]
 }
