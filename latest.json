@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "42234175614-1",
-  "checkedAt": "2026-11-06T14:28:17.205Z",
+  "id": "42376646787-1",
+  "checkedAt": "2026-11-07T13:22:19.601Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,9 +18,9 @@
   ],
   "candidates": [
     {
-      "id": 1383631049,
-      "repository": "IGUNUBLUE/lerdr-rust-kotlin",
-      "stars": 4,
+      "id": 1255294416,
+      "repository": "Kon-on/rimworld-modding-skill",
+      "stars": 23,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -28,9 +28,19 @@
       "newlySeen": true
     },
     {
-      "id": 1440649053,
-      "repository": "shadowofze/OfflineDAoC-True165",
-      "stars": 4,
+      "id": 1444928772,
+      "repository": "gasparegas/describble",
+      "stars": 5,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1448039352,
+      "repository": "TanCan1998/uxian",
+      "stars": 5,
       "license": "GPL-3.0",
       "signals": [
         "ai-generated"
@@ -38,8 +48,8 @@
       "newlySeen": true
     },
     {
-      "id": 1391100311,
-      "repository": "VincentBounce/Tessera",
+      "id": 1444485589,
+      "repository": "yapitw/nodevember",
       "stars": 3,
       "license": null,
       "signals": [
@@ -48,9 +58,19 @@
       "newlySeen": true
     },
     {
-      "id": 1439430391,
-      "repository": "kevinraymond/florilegium",
-      "stars": 1534,
+      "id": 525592995,
+      "repository": "invoke-ai/InvokeAI",
+      "stars": 29012,
+      "license": "Apache-2.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 253780109,
+      "repository": "baku89/glisp",
+      "stars": 1196,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -60,7 +80,7 @@
     {
       "id": 1439308037,
       "repository": "alchaincyf/huashu-bird-sticker",
-      "stars": 694,
+      "stars": 704,
       "license": null,
       "signals": [
         "ai-generated"
@@ -68,49 +88,19 @@
       "newlySeen": false
     },
     {
-      "id": 1304174300,
-      "repository": "corosolto/client",
-      "stars": 263,
-      "license": "AGPL-3.0",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 800083050,
-      "repository": "liamdugan/raid",
-      "stars": 224,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 374744219,
-      "repository": "repath-studio/repath-studio",
-      "stars": 173,
-      "license": "AGPL-3.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 530687417,
-      "repository": "trebeljahr/fractal-garden",
-      "stars": 163,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 313701704,
       "repository": "8f4e/8f4e",
       "stars": 40,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1272774651,
+      "repository": "yuki4266/yuki4266",
+      "stars": 37,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -128,32 +118,22 @@
       "newlySeen": false
     },
     {
-      "id": 1276131924,
-      "repository": "lolly-tools/lolly",
-      "stars": 13,
-      "license": "MPL-2.0",
+      "id": 1415752723,
+      "repository": "shaderera/shaderera",
+      "stars": 7,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 1185183114,
-      "repository": "imweb-project/ImWeb",
-      "stars": 12,
+      "id": 1419557893,
+      "repository": "sandbase-lab/awesome-gemini4-argon",
+      "stars": 7,
       "license": null,
       "signals": [
         "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1154425084,
-      "repository": "eremef/awaria-outage-notifier",
-      "stars": 11,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -178,22 +158,32 @@
       "newlySeen": false
     },
     {
-      "id": 1217888271,
-      "repository": "sorny/erzberg",
+      "id": 1186987372,
+      "repository": "kekel87/pokemon-tactics",
       "stars": 4,
-      "license": "MIT",
+      "license": null,
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 1173458372,
-      "repository": "aljazfrancic/generative-art-gallery",
-      "stars": 3,
+      "id": 1383631049,
+      "repository": "IGUNUBLUE/lerdr-rust-kotlin",
+      "stars": 4,
       "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1440649053,
+      "repository": "shadowofze/OfflineDAoC-True165",
+      "stars": 4,
+      "license": "GPL-3.0",
+      "signals": [
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -214,6 +204,16 @@
       "license": "MIT",
       "signals": [
         "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1391100311,
+      "repository": "VincentBounce/Tessera",
+      "stars": 3,
+      "license": null,
+      "signals": [
+        "generative-art"
       ],
       "newlySeen": false
     }
@@ -317,6 +317,7 @@
     1245060445,
     1249530755,
     1253379199,
+    1255294416,
     1256196157,
     1262901708,
     1265180649,
@@ -402,6 +403,9 @@
     1439317522,
     1439430391,
     1440649053,
-    1446745577
+    1444485589,
+    1444928772,
+    1446745577,
+    1448039352
   ]
 }
