@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "42657390767-1",
-  "checkedAt": "2026-11-09T16:42:04.570Z",
+  "id": "42840743552-1",
+  "checkedAt": "2026-11-10T15:05:36.191Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,19 +18,29 @@
   ],
   "candidates": [
     {
-      "id": 1403371776,
-      "repository": "billpwchan/neon-zenith",
-      "stars": 67,
+      "id": 1327302854,
+      "repository": "reneweller-coding/KaleidoscopeEnhanced",
+      "stars": 8,
       "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1433438555,
+      "repository": "4786925/OldBiliRetro",
+      "stars": 3,
+      "license": "GPL-3.0",
       "signals": [
         "ai-generated"
       ],
       "newlySeen": true
     },
     {
-      "id": 892697715,
-      "repository": "pearmini/mountains-trees-names-inf",
-      "stars": 8,
+      "id": 1440856488,
+      "repository": "DingTom23/terra-ficta",
+      "stars": 3,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -38,9 +48,9 @@
       "newlySeen": true
     },
     {
-      "id": 1403864656,
-      "repository": "billpwchan/halcyon",
-      "stars": 4,
+      "id": 1451758319,
+      "repository": "Prokopiy8247/Opus5-5-Atomic-Bombs",
+      "stars": 3,
       "license": null,
       "signals": [
         "ai-generated"
@@ -48,24 +58,14 @@
       "newlySeen": true
     },
     {
-      "id": 1403887038,
-      "repository": "billpwchan/utsuroi",
-      "stars": 4,
-      "license": null,
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1449942746,
-      "repository": "Dicklesworthstone/frankenlife",
-      "stars": 4,
-      "license": null,
+      "id": 581913613,
+      "repository": "vladmandic/sdnext",
+      "stars": 7375,
+      "license": "Apache-2.0",
       "signals": [
         "generative-art"
       ],
-      "newlySeen": true
+      "newlySeen": false
     },
     {
       "id": 1304174300,
@@ -78,32 +78,22 @@
       "newlySeen": false
     },
     {
-      "id": 374744219,
-      "repository": "repath-studio/repath-studio",
-      "stars": 173,
-      "license": "AGPL-3.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1404086905,
-      "repository": "billpwchan/sakura-fantasy",
-      "stars": 147,
+      "id": 116062718,
+      "repository": "villares/sketch-a-day",
+      "stars": 261,
       "license": null,
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 86194218,
-      "repository": "noisefactorllc/noisemaker",
-      "stars": 124,
-      "license": "MIT",
+      "id": 1371857104,
+      "repository": "shadowofze/OfflineDAoC",
+      "stars": 50,
+      "license": "GPL-3.0",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -128,22 +118,22 @@
       "newlySeen": false
     },
     {
-      "id": 1412848801,
-      "repository": "Blank2007/DroidExtend",
+      "id": 1245060445,
+      "repository": "eaviles/Ollin",
       "stars": 20,
       "license": "MIT",
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 1034339488,
-      "repository": "tre-systems/geno-1",
-      "stars": 5,
+      "id": 1154425084,
+      "repository": "eremef/awaria-outage-notifier",
+      "stars": 11,
       "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -158,19 +148,19 @@
       "newlySeen": false
     },
     {
-      "id": 1314017928,
-      "repository": "provemark/content-credentials",
-      "stars": 5,
-      "license": "MIT",
+      "id": 1125583044,
+      "repository": "segin/substrate",
+      "stars": 4,
+      "license": null,
       "signals": [
         "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 1438497396,
-      "repository": "g1lg1l/velo",
-      "stars": 5,
+      "id": 1152251368,
+      "repository": "TrebuchetDynamics/flutter-fractal-forge",
+      "stars": 4,
       "license": "Apache-2.0",
       "signals": [
         "generative-art"
@@ -188,16 +178,6 @@
       "newlySeen": false
     },
     {
-      "id": 1202177971,
-      "repository": "jstevoh/chromaglass",
-      "stars": 4,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1440649053,
       "repository": "shadowofze/OfflineDAoC-True165",
       "stars": 4,
@@ -208,8 +188,28 @@
       "newlySeen": false
     },
     {
+      "id": 1387038169,
+      "repository": "qwerty-ll/CustomizeYouProfile",
+      "stars": 3,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1391100311,
       "repository": "VincentBounce/Tessera",
+      "stars": 3,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1444485589,
+      "repository": "yapitw/nodevember",
       "stars": 3,
       "license": null,
       "signals": [
@@ -339,6 +339,7 @@
     1314018204,
     1316492358,
     1319678904,
+    1327302854,
     1332856174,
     1333698951,
     1335431007,
@@ -405,15 +406,18 @@
     1428345942,
     1429189599,
     1431285431,
+    1433438555,
     1438497396,
     1439308037,
     1439317522,
     1439430391,
     1440649053,
+    1440856488,
     1444485589,
     1444928772,
     1446745577,
     1448039352,
-    1449942746
+    1449942746,
+    1451758319
   ]
 }
