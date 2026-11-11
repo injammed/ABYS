@@ -12,6 +12,9 @@ class ControllerTests(unittest.TestCase):
         self.db.close()
     def worker(self, argv, **kwargs):
         req = json.loads(kwargs['input'])
+        self.assertIn('The two world authors', req['instruction'])
+        self.assertIn('A miss loses the confrontation', req['instruction'])
+        self.assertIn(req['agent'] + ' —', req['instruction'])
         self.assertFalse(req['delegation'])
         self.assertEqual(req['tools'], [])
         self.assertEqual(req['allowed_agents'], ['AETIMM', 'APY0C'])
@@ -26,6 +29,21 @@ class ControllerTests(unittest.TestCase):
         with self.assertRaises(ValueError): c.run_one(self.db,self.job,['trusted-adapter'])
         self.assertEqual(run.call_count, 2)
         self.assertEqual(self.db.execute('SELECT count(*) FROM worker_lock').fetchone()[0],0)
+    @patch('controller.subprocess.run')
+    def test_reverse_author_review_uses_shared_doctrine(self, run):
+        run.side_effect = self.worker
+        job = c.enqueue(self.db, 'APY0C', 'World pressure', 'rev', '')
+        self.assertEqual(c.run_one(self.db,job,['adapter']), 'review_pending')
+        self.assertEqual(c.run_one(self.db,job,['adapter']), 'ready_for_verification')
+
+    @patch('controller.subprocess.run')
+    def test_missing_doctrine_prevents_inference_and_releases_lock(self, run):
+        with patch('controller.Path.read_text', side_effect=FileNotFoundError):
+            with self.assertRaises(FileNotFoundError):
+                c.run_one(self.db,self.job,['adapter'])
+        run.assert_not_called()
+        self.assertEqual(self.db.execute('SELECT count(*) FROM worker_lock').fetchone()[0],0)
+
     def test_third_identity_rejected(self):
         with self.assertRaises(ValueError): c.enqueue(self.db,'planner','task','rev','')
     def test_spoof_and_extra_fields_rejected(self):

@@ -15,6 +15,68 @@ AGENTS = ('AETIMM', 'APY0C')
 ROOT = Path(__file__).resolve().parents[2]
 
 
+SPEEDRUN_INVARIANTS = frozenset({
+    'freeze_ranked_rules_at_start',
+    'cosmetic_only_carryover',
+    'no_hidden_rubber_banding',
+    'event_driven_causal_opportunities',
+    'explicit_irreversible_commitments',
+    'persistent_consequences',
+    'fixed_step_gameplay',
+    'seeded_gameplay_randomness',
+    'separate_raw_and_adjusted_time',
+    'bounded_score_credit',
+    'versioned_leaderboard_categories',
+    'independent_verification_before_release',
+})
+
+
+DIFFICULTIES = {"theatrical":{"scoreboard":False,"enemy_health":"reduced","enemy_damage":"reduced","behavior":"fallible_chaotic","randomness":"expanded_seeded_variation"},"hardcore":{"scoreboard":True,"enemy_health":"challenge_tuned","enemy_damage":"challenge_tuned","behavior":"purposeful_aggression","randomness":"ranked_seed_policy"}}
+
+
+def speedrun_contract(directory):
+    """Fail closed on malformed/disabled laws; not proof of runtime compliance."""
+    data = json.loads((directory / 'SPEEDRUN_LAWS.json').read_text())
+    fields = {'schema_version', 'status', 'agents', 'invariants', 'laws',
+              'assignments', 'acceptance', 'release_notes', 'difficulties'}
+    if not isinstance(data, dict) or set(data) != fields:
+        raise ValueError('Invalid speedrun contract fields')
+    if type(data['schema_version']) is not int or data['schema_version'] != 2:
+        raise ValueError('Unsupported speedrun law version')
+    if data['status'] != 'prototype' or data['agents'] != list(AGENTS):
+        raise ValueError('Invalid speedrun status or developer identities')
+    if json.dumps(data['difficulties'], sort_keys=True) != json.dumps(DIFFICULTIES, sort_keys=True):
+        raise ValueError('Exactly Theatrical/unranked and Hardcore/scoreboard are required')
+    inv = data['invariants']
+    if not isinstance(inv, dict) or set(inv) != SPEEDRUN_INVARIANTS:
+        raise ValueError('Missing or unknown speedrun invariants')
+    if any(value is not True for value in inv.values()):
+        raise ValueError('Speedrun invariants cannot be disabled')
+    def text_list(value):
+        return (isinstance(value, list) and bool(value)
+                and all(isinstance(s, str) and s.strip() for s in value))
+    if not text_list(data['laws']) or not text_list(data['acceptance']):
+        raise ValueError('Laws and acceptance evidence requirements are mandatory')
+    roles = data['assignments']
+    if (not isinstance(roles, dict) or set(roles) != set(AGENTS)
+            or not all(text_list(v) for v in roles.values())):
+        raise ValueError('Both agents need assignments')
+    if not isinstance(data['release_notes'], str) or not data['release_notes'].strip():
+        raise ValueError('Implementation limits must be stated')
+    return json.dumps(data, sort_keys=True, ensure_ascii=False)
+
+
+def adjusted_time_ms(elapsed_ms, points, numerator_ms, denominator_points, cap_ms):
+    """Reference arithmetic only; caller must independently validate score/events."""
+    values = (elapsed_ms, points, numerator_ms, denominator_points, cap_ms)
+    if any(type(value) is not int or value < 0 for value in values):
+        raise ValueError('Timing and scoring inputs must be nonnegative integers')
+    if denominator_points == 0:
+        raise ValueError('Score denominator must be positive')
+    credit = min(cap_ms, points * numerator_ms // denominator_points)
+    return max(0, elapsed_ms - credit)
+
+
 def identity(value):
     if value not in AGENTS:
         raise ValueError('Exactly AETIMM and APY0C are authorized; no third identity')
@@ -23,6 +85,17 @@ def identity(value):
 
 def peer(value):
     return AGENTS[1] if identity(value) == AGENTS[0] else AGENTS[0]
+
+
+def instructions(agent):
+    """Load shared canon for both identities; fail closed if it is unavailable."""
+    identity(agent)
+    directory = ROOT / 'agents/game'
+    return ('Speedrun laws (mandatory for author and review):\n'
+            + speedrun_contract(directory)
+            + '\n\n' + (directory / 'WORLD_DOCTRINE.md').read_text()
+            + '\n\nEndgame implementation contract:\n' + (directory / 'ENDGAME.json').read_text()
+            + '\n\n' + (directory / f'{agent}.md').read_text())
 
 
 def connect(path):
@@ -96,7 +169,7 @@ def run_one(db, job_id, worker, timeout=300):
         stage = 'author' if row['state'] == 'queued' else 'review'
         agent = row['owner'] if stage == 'author' else peer(row['owner'])
         memory = [dict(r) for r in db.execute('SELECT event,detail,at FROM events WHERE agent=? ORDER BY id DESC LIMIT 8', (agent,))]
-        request = {'agent':agent,'stage':stage,'instruction':(ROOT/'agents/game'/f'{agent}.md').read_text(),
+        request = {'agent':agent,'stage':stage,'instruction':instructions(agent),
                    'task':row['task'],'revision':row['revision'],'context':row['context'],
                    'proposal':json.loads(row['proposal']) if row['proposal'] else None,
                    'memory':memory,'allowed_agents':list(AGENTS),'delegation':False,
