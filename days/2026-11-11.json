@@ -1,0 +1,32 @@
+[
+  {
+    "sequence": 949,
+    "time": "2026-11-11T05:51:07.035Z",
+    "source": "aetimm-probe",
+    "kind": "infrastructure",
+    "target": "home",
+    "outcome": "reachable",
+    "status": 200,
+    "latencyMs": 384
+  },
+  {
+    "sequence": 950,
+    "time": "2026-11-11T05:51:07.035Z",
+    "source": "aetimm-probe",
+    "kind": "infrastructure",
+    "target": "eye",
+    "outcome": "reachable",
+    "status": 200,
+    "latencyMs": 193
+  },
+  {
+    "sequence": 951,
+    "time": "2026-11-11T05:51:07.035Z",
+    "source": "aetimm-probe",
+    "kind": "infrastructure",
+    "target": "shop",
+    "outcome": "reachable",
+    "status": 200,
+    "latencyMs": 322
+  }
+]
