@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "42840743552-1",
-  "checkedAt": "2026-11-10T15:05:36.191Z",
+  "id": "43040153494-1",
+  "checkedAt": "2026-11-11T14:36:57.317Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,28 +18,28 @@
   ],
   "candidates": [
     {
-      "id": 1327302854,
-      "repository": "reneweller-coding/KaleidoscopeEnhanced",
-      "stars": 8,
+      "id": 1402096598,
+      "repository": "AATINF/deepseek-whale-girl-assets",
+      "stars": 44,
       "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1433438555,
-      "repository": "4786925/OldBiliRetro",
-      "stars": 3,
-      "license": "GPL-3.0",
       "signals": [
         "ai-generated"
       ],
       "newlySeen": true
     },
     {
-      "id": 1440856488,
-      "repository": "DingTom23/terra-ficta",
+      "id": 1411275921,
+      "repository": "CptPakundo/MPCvibedRPC",
+      "stars": 4,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 1453821919,
+      "repository": "ChetasLua/mona-lisa-js",
       "stars": 3,
       "license": "MIT",
       "signals": [
@@ -48,50 +48,40 @@
       "newlySeen": true
     },
     {
-      "id": 1451758319,
-      "repository": "Prokopiy8247/Opus5-5-Atomic-Bombs",
-      "stars": 3,
-      "license": null,
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 581913613,
-      "repository": "vladmandic/sdnext",
-      "stars": 7375,
-      "license": "Apache-2.0",
+      "id": 1439430391,
+      "repository": "kevinraymond/florilegium",
+      "stars": 1631,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 1304174300,
-      "repository": "corosolto/client",
-      "stars": 262,
-      "license": "AGPL-3.0",
+      "id": 1439308037,
+      "repository": "alchaincyf/huashu-bird-sticker",
+      "stars": 723,
+      "license": null,
       "signals": [
         "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 116062718,
-      "repository": "villares/sketch-a-day",
-      "stars": 261,
+      "id": 1404086905,
+      "repository": "billpwchan/sakura-fantasy",
+      "stars": 151,
       "license": null,
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 1371857104,
-      "repository": "shadowofze/OfflineDAoC",
-      "stars": 50,
-      "license": "GPL-3.0",
+      "id": 1403371776,
+      "repository": "billpwchan/neon-zenith",
+      "stars": 70,
+      "license": null,
       "signals": [
         "ai-generated"
       ],
@@ -118,22 +108,12 @@
       "newlySeen": false
     },
     {
-      "id": 1245060445,
-      "repository": "eaviles/Ollin",
-      "stars": 20,
-      "license": "MIT",
+      "id": 1185183114,
+      "repository": "imweb-project/ImWeb",
+      "stars": 12,
+      "license": "AGPL-3.0",
       "signals": [
         "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1154425084,
-      "repository": "eremef/awaria-outage-notifier",
-      "stars": 11,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -148,12 +128,22 @@
       "newlySeen": false
     },
     {
-      "id": 1125583044,
-      "repository": "segin/substrate",
-      "stars": 4,
-      "license": null,
+      "id": 1314017928,
+      "repository": "provemark/content-credentials",
+      "stars": 5,
+      "license": "MIT",
       "signals": [
         "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1438497396,
+      "repository": "g1lg1l/velo",
+      "stars": 5,
+      "license": "Apache-2.0",
+      "signals": [
+        "generative-art"
       ],
       "newlySeen": false
     },
@@ -168,8 +158,18 @@
       "newlySeen": false
     },
     {
-      "id": 1186987372,
-      "repository": "kekel87/pokemon-tactics",
+      "id": 1202177971,
+      "repository": "jstevoh/chromaglass",
+      "stars": 4,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1403864656,
+      "repository": "billpwchan/halcyon",
       "stars": 4,
       "license": null,
       "signals": [
@@ -178,12 +178,22 @@
       "newlySeen": false
     },
     {
-      "id": 1440649053,
-      "repository": "shadowofze/OfflineDAoC-True165",
+      "id": 1403887038,
+      "repository": "billpwchan/utsuroi",
       "stars": 4,
-      "license": "GPL-3.0",
+      "license": null,
       "signals": [
         "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1449942746,
+      "repository": "Dicklesworthstone/frankenlife",
+      "stars": 4,
+      "license": null,
+      "signals": [
+        "generative-art"
       ],
       "newlySeen": false
     },
@@ -198,20 +208,10 @@
       "newlySeen": false
     },
     {
-      "id": 1391100311,
-      "repository": "VincentBounce/Tessera",
+      "id": 1440856488,
+      "repository": "DingTom23/terra-ficta",
       "stars": 3,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1444485589,
-      "repository": "yapitw/nodevember",
-      "stars": 3,
-      "license": null,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -378,6 +378,7 @@
     1395436657,
     1398313770,
     1398674085,
+    1402096598,
     1403371776,
     1403864656,
     1403870583,
@@ -388,6 +389,7 @@
     1407583549,
     1408412506,
     1411230193,
+    1411275921,
     1412450230,
     1412848801,
     1413183323,
@@ -418,6 +420,7 @@
     1446745577,
     1448039352,
     1449942746,
-    1451758319
+    1451758319,
+    1453821919
   ]
 }
