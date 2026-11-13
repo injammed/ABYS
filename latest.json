@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "43248193865-1",
-  "checkedAt": "2026-11-12T15:28:47.169Z",
+  "id": "43445834640-1",
+  "checkedAt": "2026-11-13T14:45:58.090Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,54 +18,14 @@
   ],
   "candidates": [
     {
-      "id": 1452733335,
-      "repository": "fengyiqicoder/awesome-fable-5.2",
-      "stars": 134,
-      "license": "CC0-1.0",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1166081641,
-      "repository": "dreamrec/TDPilot",
-      "stars": 16,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1452415213,
-      "repository": "VibeClip/awesome-fable-5-2-videos",
-      "stars": 3,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1439430391,
-      "repository": "kevinraymond/florilegium",
-      "stars": 1641,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1439308037,
-      "repository": "alchaincyf/huashu-bird-sticker",
-      "stars": 734,
+      "id": 297687306,
+      "repository": "summasmiff/processing_experiments",
+      "stars": 11,
       "license": null,
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
-      "newlySeen": false
+      "newlySeen": true
     },
     {
       "id": 1304174300,
@@ -78,9 +38,59 @@
       "newlySeen": false
     },
     {
+      "id": 1452733335,
+      "repository": "fengyiqicoder/awesome-fable-5.2",
+      "stars": 221,
+      "license": "CC0-1.0",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 86194218,
+      "repository": "noisefactorllc/noisemaker",
+      "stars": 124,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1388327805,
+      "repository": "jbang2004/long-wind",
+      "stars": 120,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 313701704,
+      "repository": "8f4e/8f4e",
+      "stars": 42,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1099222481,
       "repository": "MarkusNeusinger/anyplot",
       "stars": 31,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1412848801,
+      "repository": "Blank2007/DroidExtend",
+      "stars": 20,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -98,9 +108,9 @@
       "newlySeen": false
     },
     {
-      "id": 1154425084,
-      "repository": "eremef/awaria-outage-notifier",
-      "stars": 11,
+      "id": 990303192,
+      "repository": "rrainey/obliq-2",
+      "stars": 10,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -108,22 +118,12 @@
       "newlySeen": false
     },
     {
-      "id": 1366877560,
-      "repository": "statico/ttmux",
-      "stars": 9,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1368981509,
-      "repository": "peterwalker78/slipstream-desktop",
+      "id": 1440649053,
+      "repository": "shadowofze/OfflineDAoC-True165",
       "stars": 7,
       "license": "GPL-3.0",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -138,19 +138,19 @@
       "newlySeen": false
     },
     {
-      "id": 1440649053,
-      "repository": "shadowofze/OfflineDAoC-True165",
+      "id": 1314017928,
+      "repository": "provemark/content-credentials",
       "stars": 5,
-      "license": "GPL-3.0",
+      "license": "MIT",
       "signals": [
         "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 1152251368,
-      "repository": "TrebuchetDynamics/flutter-fractal-forge",
-      "stars": 4,
+      "id": 1438497396,
+      "repository": "g1lg1l/velo",
+      "stars": 5,
       "license": "Apache-2.0",
       "signals": [
         "generative-art"
@@ -158,8 +158,8 @@
       "newlySeen": false
     },
     {
-      "id": 1186987372,
-      "repository": "kekel87/pokemon-tactics",
+      "id": 1125583044,
+      "repository": "segin/substrate",
       "stars": 4,
       "license": null,
       "signals": [
@@ -178,20 +178,20 @@
       "newlySeen": false
     },
     {
-      "id": 1411275921,
-      "repository": "CptPakundo/MPCvibedRPC",
+      "id": 1256196157,
+      "repository": "sunkek/noir-code",
       "stars": 4,
       "license": "MIT",
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 1449942746,
-      "repository": "Dicklesworthstone/frankenlife",
+      "id": 1452415213,
+      "repository": "VibeClip/awesome-fable-5-2-videos",
       "stars": 4,
-      "license": null,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -230,6 +230,7 @@
     215842938,
     238487904,
     253780109,
+    297687306,
     308233855,
     313701704,
     342456712,
