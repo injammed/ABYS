@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "43445834640-1",
-  "checkedAt": "2026-11-13T14:45:58.090Z",
+  "id": "43601065912-1",
+  "checkedAt": "2026-11-14T13:42:09.389Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,14 +18,54 @@
   ],
   "candidates": [
     {
-      "id": 297687306,
-      "repository": "summasmiff/processing_experiments",
-      "stars": 11,
-      "license": null,
+      "id": 1401555710,
+      "repository": "ShazMoghaddam/orbs",
+      "stars": 3,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
       "newlySeen": true
+    },
+    {
+      "id": 1422287425,
+      "repository": "gke0op/argus",
+      "stars": 3,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 525592995,
+      "repository": "invoke-ai/InvokeAI",
+      "stars": 29090,
+      "license": "Apache-2.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 598672846,
+      "repository": "q5js/q5.js",
+      "stars": 425,
+      "license": "LGPL-3.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1452733335,
+      "repository": "fengyiqicoder/awesome-fable-5.2",
+      "stars": 266,
+      "license": "CC0-1.0",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
     },
     {
       "id": 1304174300,
@@ -38,19 +78,9 @@
       "newlySeen": false
     },
     {
-      "id": 1452733335,
-      "repository": "fengyiqicoder/awesome-fable-5.2",
-      "stars": 221,
-      "license": "CC0-1.0",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 86194218,
-      "repository": "noisefactorllc/noisemaker",
-      "stars": 124,
+      "id": 1272774651,
+      "repository": "yuki4266/yuki4266",
+      "stars": 42,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -58,20 +88,10 @@
       "newlySeen": false
     },
     {
-      "id": 1388327805,
-      "repository": "jbang2004/long-wind",
-      "stars": 120,
+      "id": 456706468,
+      "repository": "Correia-jpv/fucking-awesome-creative-coding",
+      "stars": 34,
       "license": null,
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 313701704,
-      "repository": "8f4e/8f4e",
-      "stars": 42,
-      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -88,9 +108,19 @@
       "newlySeen": false
     },
     {
-      "id": 1412848801,
-      "repository": "Blank2007/DroidExtend",
-      "stars": 20,
+      "id": 1421483960,
+      "repository": "Sousastep/sousa_fx_generator",
+      "stars": 13,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1366877560,
+      "repository": "statico/ttmux",
+      "stars": 9,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -98,19 +128,9 @@
       "newlySeen": false
     },
     {
-      "id": 1276131924,
-      "repository": "lolly-tools/lolly",
-      "stars": 14,
-      "license": "MPL-2.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 990303192,
-      "repository": "rrainey/obliq-2",
-      "stars": 10,
+      "id": 1319678904,
+      "repository": "statico/nethack-tiles-client",
+      "stars": 8,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -118,10 +138,10 @@
       "newlySeen": false
     },
     {
-      "id": 1440649053,
-      "repository": "shadowofze/OfflineDAoC-True165",
+      "id": 1431285431,
+      "repository": "Mcp20091/kindle-koreader-apps",
       "stars": 7,
-      "license": "GPL-3.0",
+      "license": "AGPL-3.0",
       "signals": [
         "ai-generated"
       ],
@@ -148,16 +168,6 @@
       "newlySeen": false
     },
     {
-      "id": 1438497396,
-      "repository": "g1lg1l/velo",
-      "stars": 5,
-      "license": "Apache-2.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1125583044,
       "repository": "segin/substrate",
       "stars": 4,
@@ -172,16 +182,6 @@
       "repository": "jstevoh/chromaglass",
       "stars": 4,
       "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1256196157,
-      "repository": "sunkek/noir-code",
-      "stars": 4,
-      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -380,6 +380,7 @@
     1395436657,
     1398313770,
     1398674085,
+    1401555710,
     1402096598,
     1403371776,
     1403864656,
@@ -406,6 +407,7 @@
     1420437496,
     1421025526,
     1421483960,
+    1422287425,
     1426571704,
     1428345942,
     1429189599,
