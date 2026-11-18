@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "44124346705-1",
-  "checkedAt": "2026-11-17T16:19:11.990Z",
+  "id": "44340510200-1",
+  "checkedAt": "2026-11-18T15:51:57.447Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,18 +18,18 @@
   ],
   "candidates": [
     {
-      "id": 1418763959,
-      "repository": "LN334/aurora",
-      "stars": 3,
-      "license": "MIT",
+      "id": 1325479147,
+      "repository": "n1m21n/Infinite",
+      "stars": 336,
+      "license": null,
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": true
     },
     {
-      "id": 1459387044,
-      "repository": "abundantbeing/aether",
+      "id": 1415644832,
+      "repository": "Sur1ive/contribution-fx",
       "stars": 3,
       "license": "MIT",
       "signals": [
@@ -38,10 +38,20 @@
       "newlySeen": true
     },
     {
-      "id": 554771302,
-      "repository": "steven2358/awesome-generative-ai",
-      "stars": 12835,
-      "license": "CC0-1.0",
+      "id": 1458229715,
+      "repository": "GuoCoder/awesome-html-games",
+      "stars": 3,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 581913613,
+      "repository": "vladmandic/sdnext",
+      "stars": 7381,
+      "license": "Apache-2.0",
       "signals": [
         "generative-art"
       ],
@@ -50,7 +60,7 @@
     {
       "id": 1452733335,
       "repository": "fengyiqicoder/awesome-fable-5.2",
-      "stars": 382,
+      "stars": 414,
       "license": "CC0-1.0",
       "signals": [
         "ai-generated"
@@ -68,19 +78,39 @@
       "newlySeen": false
     },
     {
-      "id": 1099222481,
-      "repository": "MarkusNeusinger/anyplot",
-      "stars": 31,
-      "license": "MIT",
+      "id": 151634693,
+      "repository": "openrndr/orx",
+      "stars": 141,
+      "license": "BSD-2-Clause",
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": false
     },
     {
-      "id": 1412848801,
-      "repository": "Blank2007/DroidExtend",
-      "stars": 21,
+      "id": 1358316829,
+      "repository": "wanshuiyin/ALIGN-Agentic-Loop-Image-GeneratioN",
+      "stars": 51,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 313701704,
+      "repository": "8f4e/8f4e",
+      "stars": 44,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1099222481,
+      "repository": "MarkusNeusinger/anyplot",
+      "stars": 31,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -98,8 +128,18 @@
       "newlySeen": false
     },
     {
-      "id": 1154425084,
-      "repository": "eremef/awaria-outage-notifier",
+      "id": 1455489419,
+      "repository": "ygx2378/awesome-fable-5-2-games",
+      "stars": 12,
+      "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1366877560,
+      "repository": "statico/ttmux",
       "stars": 11,
       "license": "MIT",
       "signals": [
@@ -108,21 +148,12 @@
       "newlySeen": false
     },
     {
-      "id": 1341904886,
-      "repository": "kiaquila/ember",
+      "id": 1457695086,
+      "repository": "AI-Terrarium/terrarium",
       "stars": 11,
-      "license": "MIT",
+      "license": "CC0-1.0",
       "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1356357822,
-      "repository": "kiaquila/fathom",
-      "stars": 11,
-      "license": "MIT",
-      "signals": [
+        "ai-generated",
         "generative-art"
       ],
       "newlySeen": false
@@ -138,41 +169,10 @@
       "newlySeen": false
     },
     {
-      "id": 1455489419,
-      "repository": "ygx2378/awesome-fable-5-2-games",
-      "stars": 8,
-      "license": null,
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1457695086,
-      "repository": "AI-Terrarium/terrarium",
-      "stars": 8,
-      "license": "CC0-1.0",
-      "signals": [
-        "ai-generated",
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1182901152,
       "repository": "juliosuas/ai-garden",
       "stars": 5,
       "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1144076205,
-      "repository": "ariaxhan/substrate",
-      "stars": 4,
-      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -189,18 +189,18 @@
       "newlySeen": false
     },
     {
-      "id": 1391100311,
-      "repository": "VincentBounce/Tessera",
+      "id": 1418763959,
+      "repository": "LN334/aurora",
       "stars": 3,
-      "license": null,
+      "license": "MIT",
       "signals": [
-        "generative-art"
+        "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 1440856488,
-      "repository": "DingTom23/terra-ficta",
+      "id": 1459387044,
+      "repository": "abundantbeing/aether",
       "stars": 3,
       "license": "MIT",
       "signals": [
@@ -334,6 +334,7 @@
     1314018204,
     1316492358,
     1319678904,
+    1325479147,
     1327302854,
     1332856174,
     1333698951,
@@ -390,6 +391,7 @@
     1412848801,
     1413183323,
     1414149806,
+    1415644832,
     1415752723,
     1415970408,
     1416636661,
@@ -424,6 +426,7 @@
     1453821919,
     1455489419,
     1457695086,
+    1458229715,
     1459387044
   ]
 }
