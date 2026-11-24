@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "45239586156-1",
-  "checkedAt": "2026-11-23T18:33:21.235Z",
+  "id": "45454909967-1",
+  "checkedAt": "2026-11-24T18:01:22.386Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,9 +18,9 @@
   ],
   "candidates": [
     {
-      "id": 763195774,
-      "repository": "litecanvas/game-engine",
-      "stars": 80,
+      "id": 1422602820,
+      "repository": "StopBanning/toaster",
+      "stars": 165,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -28,19 +28,19 @@
       "newlySeen": true
     },
     {
-      "id": 1210277886,
-      "repository": "0xsyr0/AI-Exploit-Forge-Collection",
-      "stars": 3,
-      "license": null,
+      "id": 1406867986,
+      "repository": "VisualxIntelligence/motion-tools-and-skills",
+      "stars": 19,
+      "license": "MIT",
       "signals": [
-        "ai-generated"
+        "generative-art"
       ],
       "newlySeen": true
     },
     {
       "id": 1452733335,
       "repository": "fengyiqicoder/awesome-fable-5.2",
-      "stars": 535,
+      "stars": 545,
       "license": "CC0-1.0",
       "signals": [
         "ai-generated"
@@ -48,10 +48,10 @@
       "newlySeen": false
     },
     {
-      "id": 313701704,
-      "repository": "8f4e/8f4e",
-      "stars": 44,
-      "license": "MIT",
+      "id": 1325479147,
+      "repository": "n1m21n/Infinite",
+      "stars": 342,
+      "license": null,
       "signals": [
         "generative-art"
       ],
@@ -60,7 +60,7 @@
     {
       "id": 1099222481,
       "repository": "MarkusNeusinger/anyplot",
-      "stars": 31,
+      "stars": 30,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -68,19 +68,9 @@
       "newlySeen": false
     },
     {
-      "id": 1245060445,
-      "repository": "eaviles/Ollin",
-      "stars": 22,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1345614074,
-      "repository": "frank890417/open-audiovisual",
-      "stars": 19,
+      "id": 887750740,
+      "repository": "sandner-art/ArtAgents",
+      "stars": 18,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -98,16 +88,6 @@
       "newlySeen": false
     },
     {
-      "id": 1276131924,
-      "repository": "lolly-tools/lolly",
-      "stars": 14,
-      "license": "MPL-2.0",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1457695086,
       "repository": "AI-Terrarium/terrarium",
       "stars": 12,
@@ -115,6 +95,26 @@
       "signals": [
         "ai-generated",
         "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1449942746,
+      "repository": "Dicklesworthstone/frankenlife",
+      "stars": 9,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1462294529,
+      "repository": "Blank2007/cuktech-ultra-tray",
+      "stars": 9,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -129,28 +129,18 @@
       "newlySeen": false
     },
     {
-      "id": 1202177971,
-      "repository": "jstevoh/chromaglass",
-      "stars": 5,
+      "id": 1458229715,
+      "repository": "GuoCoder/awesome-html-games",
+      "stars": 6,
       "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1462294529,
-      "repository": "Blank2007/cuktech-ultra-tray",
-      "stars": 5,
-      "license": "MIT",
       "signals": [
         "ai-generated"
       ],
       "newlySeen": false
     },
     {
-      "id": 1144076205,
-      "repository": "ariaxhan/substrate",
+      "id": 1316492358,
+      "repository": "gfargo/pixelkiln",
       "stars": 4,
       "license": "MIT",
       "signals": [
@@ -199,10 +189,20 @@
       "newlySeen": false
     },
     {
-      "id": 1429590425,
-      "repository": "chengyuuci/Course-OCR-manage-tools",
+      "id": 1446726756,
+      "repository": "Ablation-Tool/zoe",
       "stars": 3,
-      "license": "GPL-3.0",
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1450005474,
+      "repository": "KylinZhangQAQ/SaltPlayer-Mod-Updater",
+      "stars": 3,
+      "license": "MIT",
       "signals": [
         "ai-generated"
       ],
@@ -389,6 +389,7 @@
     1403887038,
     1404086905,
     1406759710,
+    1406867986,
     1407569742,
     1407583549,
     1408412506,
@@ -412,6 +413,7 @@
     1421025526,
     1421483960,
     1422287425,
+    1422602820,
     1426571704,
     1428345942,
     1429189599,
