@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "45454909967-1",
-  "checkedAt": "2026-11-24T18:01:22.386Z",
+  "id": "45665076526-1",
+  "checkedAt": "2026-11-25T17:28:19.088Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,9 +18,9 @@
   ],
   "candidates": [
     {
-      "id": 1422602820,
-      "repository": "StopBanning/toaster",
-      "stars": 165,
+      "id": 1419952918,
+      "repository": "appautomaton/delineate",
+      "stars": 15,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -28,19 +28,39 @@
       "newlySeen": true
     },
     {
-      "id": 1406867986,
-      "repository": "VisualxIntelligence/motion-tools-and-skills",
-      "stars": 19,
-      "license": "MIT",
+      "id": 1461934447,
+      "repository": "tarpetos/fractique",
+      "stars": 7,
+      "license": null,
       "signals": [
         "generative-art"
       ],
       "newlySeen": true
+    },
+    {
+      "id": 1470579877,
+      "repository": "TheoBIET/OpenVI",
+      "stars": 4,
+      "license": "GPL-3.0",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": true
+    },
+    {
+      "id": 525592995,
+      "repository": "invoke-ai/InvokeAI",
+      "stars": 29158,
+      "license": "Apache-2.0",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
     },
     {
       "id": 1452733335,
       "repository": "fengyiqicoder/awesome-fable-5.2",
-      "stars": 545,
+      "stars": 563,
       "license": "CC0-1.0",
       "signals": [
         "ai-generated"
@@ -48,10 +68,10 @@
       "newlySeen": false
     },
     {
-      "id": 1325479147,
-      "repository": "n1m21n/Infinite",
-      "stars": 342,
-      "license": null,
+      "id": 374744219,
+      "repository": "repath-studio/repath-studio",
+      "stars": 175,
+      "license": "AGPL-3.0",
       "signals": [
         "generative-art"
       ],
@@ -68,9 +88,9 @@
       "newlySeen": false
     },
     {
-      "id": 887750740,
-      "repository": "sandner-art/ArtAgents",
-      "stars": 18,
+      "id": 1245060445,
+      "repository": "eaviles/Ollin",
+      "stars": 22,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -78,10 +98,10 @@
       "newlySeen": false
     },
     {
-      "id": 1455489419,
-      "repository": "ygx2378/awesome-fable-5-2-games",
-      "stars": 18,
-      "license": null,
+      "id": 1412848801,
+      "repository": "Blank2007/DroidExtend",
+      "stars": 22,
+      "license": "MIT",
       "signals": [
         "ai-generated"
       ],
@@ -99,22 +119,22 @@
       "newlySeen": false
     },
     {
+      "id": 1462294529,
+      "repository": "Blank2007/cuktech-ultra-tray",
+      "stars": 12,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
       "id": 1449942746,
       "repository": "Dicklesworthstone/frankenlife",
       "stars": 9,
       "license": null,
       "signals": [
         "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1462294529,
-      "repository": "Blank2007/cuktech-ultra-tray",
-      "stars": 9,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
       ],
       "newlySeen": false
     },
@@ -129,10 +149,30 @@
       "newlySeen": false
     },
     {
-      "id": 1458229715,
-      "repository": "GuoCoder/awesome-html-games",
-      "stars": 6,
+      "id": 1144076205,
+      "repository": "ariaxhan/substrate",
+      "stars": 4,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1186987372,
+      "repository": "kekel87/pokemon-tactics",
+      "stars": 4,
       "license": null,
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1230303781,
+      "repository": "holoduke/vibe",
+      "stars": 4,
+      "license": "MIT",
       "signals": [
         "ai-generated"
       ],
@@ -149,19 +189,9 @@
       "newlySeen": false
     },
     {
-      "id": 1418763959,
-      "repository": "LN334/aurora",
+      "id": 1411275921,
+      "repository": "CptPakundo/MPCvibedRPC",
       "stars": 4,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1230303781,
-      "repository": "holoduke/vibe",
-      "stars": 3,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -171,36 +201,6 @@
     {
       "id": 1387038169,
       "repository": "qwerty-ll/CustomizeYouProfile",
-      "stars": 3,
-      "license": "MIT",
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1391100311,
-      "repository": "VincentBounce/Tessera",
-      "stars": 3,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1446726756,
-      "repository": "Ablation-Tool/zoe",
-      "stars": 3,
-      "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1450005474,
-      "repository": "KylinZhangQAQ/SaltPlayer-Mod-Updater",
       "stars": 3,
       "license": "MIT",
       "signals": [
@@ -408,6 +408,7 @@
     1418763959,
     1418864320,
     1419557893,
+    1419952918,
     1420424889,
     1420437496,
     1421025526,
@@ -443,6 +444,8 @@
     1458229715,
     1459387044,
     1459785741,
-    1462294529
+    1461934447,
+    1462294529,
+    1470579877
   ]
 }
