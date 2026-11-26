@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "id": "45665076526-1",
-  "checkedAt": "2026-11-25T17:28:19.088Z",
+  "id": "45865296764-1",
+  "checkedAt": "2026-11-26T17:09:44.295Z",
   "sourceCommit": "a47d054ebb091d169a144b508dd4abe93cb48c7e",
   "state": "completed",
   "queries": [
@@ -18,9 +18,9 @@
   ],
   "candidates": [
     {
-      "id": 1419952918,
-      "repository": "appautomaton/delineate",
-      "stars": 15,
+      "id": 903645640,
+      "repository": "DevxD98/Blobtracking",
+      "stars": 33,
       "license": "MIT",
       "signals": [
         "generative-art"
@@ -28,20 +28,10 @@
       "newlySeen": true
     },
     {
-      "id": 1461934447,
-      "repository": "tarpetos/fractique",
-      "stars": 7,
+      "id": 1473117634,
+      "repository": "huangserva/manhattan-free-roam",
+      "stars": 26,
       "license": null,
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": true
-    },
-    {
-      "id": 1470579877,
-      "repository": "TheoBIET/OpenVI",
-      "stars": 4,
-      "license": "GPL-3.0",
       "signals": [
         "ai-generated"
       ],
@@ -50,7 +40,7 @@
     {
       "id": 525592995,
       "repository": "invoke-ai/InvokeAI",
-      "stars": 29158,
+      "stars": 29164,
       "license": "Apache-2.0",
       "signals": [
         "generative-art"
@@ -60,7 +50,7 @@
     {
       "id": 1452733335,
       "repository": "fengyiqicoder/awesome-fable-5.2",
-      "stars": 563,
+      "stars": 582,
       "license": "CC0-1.0",
       "signals": [
         "ai-generated"
@@ -68,10 +58,30 @@
       "newlySeen": false
     },
     {
-      "id": 374744219,
-      "repository": "repath-studio/repath-studio",
-      "stars": 175,
-      "license": "AGPL-3.0",
+      "id": 1325479147,
+      "repository": "n1m21n/Infinite",
+      "stars": 343,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 86194218,
+      "repository": "noisefactorllc/noisemaker",
+      "stars": 124,
+      "license": "MIT",
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 313701704,
+      "repository": "8f4e/8f4e",
+      "stars": 45,
+      "license": "MIT",
       "signals": [
         "generative-art"
       ],
@@ -81,6 +91,16 @@
       "id": 1099222481,
       "repository": "MarkusNeusinger/anyplot",
       "stars": 30,
+      "license": "MIT",
+      "signals": [
+        "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1412848801,
+      "repository": "Blank2007/DroidExtend",
+      "stars": 24,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -98,9 +118,9 @@
       "newlySeen": false
     },
     {
-      "id": 1412848801,
-      "repository": "Blank2007/DroidExtend",
-      "stars": 22,
+      "id": 1462294529,
+      "repository": "Blank2007/cuktech-ultra-tray",
+      "stars": 17,
       "license": "MIT",
       "signals": [
         "ai-generated"
@@ -110,7 +130,7 @@
     {
       "id": 1457695086,
       "repository": "AI-Terrarium/terrarium",
-      "stars": 12,
+      "stars": 13,
       "license": "CC0-1.0",
       "signals": [
         "ai-generated",
@@ -119,10 +139,20 @@
       "newlySeen": false
     },
     {
-      "id": 1462294529,
-      "repository": "Blank2007/cuktech-ultra-tray",
+      "id": 1461934447,
+      "repository": "tarpetos/fractique",
+      "stars": 13,
+      "license": null,
+      "signals": [
+        "generative-art"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1458229715,
+      "repository": "GuoCoder/awesome-html-games",
       "stars": 12,
-      "license": "MIT",
+      "license": null,
       "signals": [
         "ai-generated"
       ],
@@ -139,42 +169,22 @@
       "newlySeen": false
     },
     {
-      "id": 1452415213,
-      "repository": "VibeClip/awesome-fable-5-2-videos",
-      "stars": 8,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1144076205,
-      "repository": "ariaxhan/substrate",
-      "stars": 4,
-      "license": "MIT",
-      "signals": [
-        "generative-art"
-      ],
-      "newlySeen": false
-    },
-    {
-      "id": 1186987372,
-      "repository": "kekel87/pokemon-tactics",
-      "stars": 4,
-      "license": null,
-      "signals": [
-        "ai-generated"
-      ],
-      "newlySeen": false
-    },
-    {
       "id": 1230303781,
       "repository": "holoduke/vibe",
-      "stars": 4,
+      "stars": 5,
       "license": "MIT",
       "signals": [
         "ai-generated"
+      ],
+      "newlySeen": false
+    },
+    {
+      "id": 1152251368,
+      "repository": "TrebuchetDynamics/flutter-fractal-forge",
+      "stars": 4,
+      "license": "Apache-2.0",
+      "signals": [
+        "generative-art"
       ],
       "newlySeen": false
     },
@@ -189,8 +199,8 @@
       "newlySeen": false
     },
     {
-      "id": 1411275921,
-      "repository": "CptPakundo/MPCvibedRPC",
+      "id": 1418763959,
+      "repository": "LN334/aurora",
       "stars": 4,
       "license": "MIT",
       "signals": [
@@ -260,6 +270,7 @@
     887750740,
     890657727,
     892697715,
+    903645640,
     907428019,
     941609210,
     955785557,
@@ -446,6 +457,7 @@
     1459785741,
     1461934447,
     1462294529,
-    1470579877
+    1470579877,
+    1473117634
   ]
 }
